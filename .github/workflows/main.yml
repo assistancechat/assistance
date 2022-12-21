@@ -1,0 +1,53 @@
+name: Main
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  repository_dispatch:
+    types:
+      - webhook
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  web:
+    name: Landing page
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: src/javascript
+
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 19
+          cache: "npm"
+          cache-dependency-path: package-lock.json
+
+      - name: Clean install dependencies
+        run: npm ci
+
+      - name: Build app
+        run: |
+          npm run build
+          npm run build  # Seems to remember old builder.io content, building twice appears to fix it.
+
+      - name: Add GitHub Pages config files
+        if: github.ref == 'refs/heads/main'
+        run: |
+          echo chat.internationalstudentassistance.com > dist/CNAME
+          touch dist/.nojekyll
+          cp dist/index.html dist/404.html
+
+      - name: Deploy to gh-pages branch
+        if: github.ref == 'refs/heads/main'
+        uses: JamesIves/github-pages-deploy-action@v4.4.1
+        with:
+          branch: gh-pages
+          folder: dist
