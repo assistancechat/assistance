@@ -6,7 +6,12 @@ export default component$(() => {
     <>
       <main>
           <Slot />
-          <Chat />
+          <Chat conversation={
+            [
+              "Hi there! Can you tell me a little about yourself and what your skills and interests are?",
+              "Lorem ipsum dolor, sit amet consectetur adipisicing elit. Magnam, repudiandae."
+            ]
+          } />
       </main>
     </>
   );
