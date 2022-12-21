@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from .main import main
+from assistance.api.main import main
 
 if __name__ == "__main__":
     main()
