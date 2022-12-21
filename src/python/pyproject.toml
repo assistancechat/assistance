@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "isacareers"
+name = "assistancechat"
 version = "0.1.0"
 description = ""
 authors = ["Simon Biggs <simon.biggs@radiotherapy.ai>"]
