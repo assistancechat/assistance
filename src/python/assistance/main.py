@@ -51,7 +51,7 @@ def chat(uuid: str, student_text: str):
 
 
 def main():
-    uvicorn.run("assistancechat.main:app", port=8080, log_level="info", reload=True)
+    uvicorn.run("assistance.main:app", port=8080, log_level="info", reload=True)
 
 
 if __name__ == "__main__":
