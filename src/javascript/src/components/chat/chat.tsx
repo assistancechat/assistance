@@ -1,189 +1,208 @@
-import { useRef } from '@builder.io/qwik';
-interface ICBFunction {
-  (event: any): void
-}
+import { component$ } from "@builder.io/qwik";
 
-interface Props {
-  style: object,
-  isTyping: boolean,
-  show: boolean,
-  user: {
-    id: string,
-    online: boolean,
-    name: string,
-    profile: string,
-    connected: boolean
-  },
-  recepient: {
-    id: string,
-    profile: string
-  },
-  messages: {
-    displayName: string,
-    message: string,
-    id: string,
-    profile: string,
-    timestamp: string
-  }[],
-  options?: {
-    isAudioRecord?: boolean,
-    isCamera?: boolean,
-    isAttachment?: boolean,
-    isSmiley?: boolean,
-    inputDisabled?: boolean
-  },
-  onSend: ICBFunction,
-  onHide: ICBFunction,
-  onShow: ICBFunction
-}
-
-export const ChatX = ({
-  isTyping = false,
-  show = false,
-  onHide,
-  onShow,
-  recepient,
-  user,
-  messages = [],
-  options = {},
-  onSend,
-  style = {
-    zIndex: '111',
-    bottom: '0',
-    fontSize: '12px',
-    right: '24px',
-    position: 'fixed',
-    width: '360px',
-    height: '500px',
-    background: '#ffffff'
-  }
-}: Props) => {
-  const { isAudioRecord, isCamera, isAttachment, isSmiley, inputDisabled } = options;
-  const messagesEndRef = useRef<null | HTMLDivElement>(null);
-
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
-  }
-
-  const [message, setMessage] = useState("");
-
-  useEffect(() => {
-    scrollToBottom()
-  }, [messages]);
-
-  const handleSend = () => {
-    onSend(message)
-    setMessage("")
-  }
-
-  const handleChange = (value: string) => setMessage(value);
-
+export default component$(() => {
   return (
-    <div className="chat-component">
-      <div id="chat-window" style={style} className={`flex-1 justify-between flex flex-col h-screen shadow pb-3 mb-3 transition duration-500 transform ${show ? '' : 'translate-x-60 translate-y-96 scale-0'}`}>
-        <div className="flex sm:items-center justify-between p-3 border-b-2 border-gray-200 bg-blue-500">
-          {user.connected && <div className="flex items-center space-x-4">
-            <img src={user.profile} alt="" className="w-5 sm:w-10 h-10 sm:h-10 rounded-full" />
-            <div className="flex flex-col leading-tight">
-              <div className="text-xl mt-1 flex items-center">
-                <span className="text-white mr-3">{user.name}</span>
-                <span className={`${user.online ? 'text-green-500' : 'text-grey-50'}`}>
-                  <svg width="10" height="10">
-                    <circle cx="5" cy="5" r="5" fill="currentColor"></circle>
-                  </svg>
-                </span>
-              </div>
-            </div>
-          </div>}
-          <div className="flex items-center space-x-2 float-right">
-            <button onClick={() => { }} type="button" className="inline-flex items-center justify-center rounded-full h-6 w-6 transition duration-500 ease-in-out text-white hover:bg-gray-300 focus:outline-none">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v3.586L7.707 9.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 10.586V7z" clipRule="evenodd" />
-              </svg>
-            </button>
-            <button onClick={(e) => onHide(e)} type="button" className="inline-flex items-center justify-center rounded-full h-6 w-6 transition duration-500 ease-in-out text-white hover:bg-gray-300 focus:outline-none">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-              </svg>
-            </button>
-          </div>
+    <div class="sticky bottom-0 z-40 flex-none mx-auto w-full transition-all container mx-auto shadow-lg rounded-lg">
+        <div class="px-5 py-5 flex justify-between items-center bg-white border-b-2">
+        <div class="font-semibold text-2xl">GoingChat</div>
+        <div class="w-1/2">
+            <input
+            type="text"
+            name=""
+            id=""
+            placeholder="search IRL"
+            class="rounded-2xl bg-gray-100 py-3 px-5 w-full"
+            />
         </div>
-        <div id="messages" className="flex flex-col space-y-4 p-3 overflow-y-auto scrollbar-thumb-blue scrollbar-thumb-rounded scrollbar-track-blue-lighter scrollbar-w-2 scrolling-touch">
-          {
-            messages.map((data: any) => {
-              let recepientUser = recepient.id !== data.from
-              return (
-                <div className="chat-message" key={data.id}>
-                  <div className={`flex items-end ${recepientUser && 'justify-end'}`}>
-                    <div className={`flex flex-col space-y-2 text-xs max-w-xs mx-2 ${recepientUser ? 'order-1 items-end' : 'order-2 items-start'}`}>
-                      <div>
-                        <span className={`px-4 py-2 rounded-lg inline-block ${recepientUser ? "rounded-br-none bg-blue-600 text-white" : "rounded-bl-none bg-gray-300 text-gray-600"}`}>
-                          {data.message}
-                        </span>
-                      </div>
-                    </div>
-                    <img src={data.profile} alt="My profile" className={`w-6 h-6 rounded-full ${recepientUser ? "order-2" : "order-1"}`} />
-                  </div>
+        <div
+            class="h-12 w-12 p-2 bg-yellow-500 rounded-full text-white font-semibold flex items-center justify-center"
+        >
+            RA
+        </div>
+        </div>
+        <div class="flex flex-row justify-between bg-white">
+        <div class="flex flex-col w-2/5 border-r-2 overflow-y-auto">
+
+            <div class="border-b-2 py-4 px-2">
+            <input
+                type="text"
+                placeholder="search chatting"
+                class="py-2 px-2 border-2 border-gray-200 rounded-2xl w-full"
+            />
+            </div>
+
+            <div
+            class="flex flex-row py-4 px-2 justify-center items-center border-b-2"
+            >
+            <div class="w-1/4">
+                <img
+                src="https://source.unsplash.com/_7LbC5J-jw4/600x600"
+                class="object-cover h-12 w-12 rounded-full"
+                alt=""
+                />
+            </div>
+            <div class="w-full">
+                <div class="text-lg font-semibold">Luis1994</div>
+                <span class="text-gray-500">Pick me at 9:00 Am</span>
+            </div>
+            </div>
+            <div class="flex flex-row py-4 px-2 items-center border-b-2">
+            <div class="w-1/4">
+                <img
+                src="https://source.unsplash.com/otT2199XwI8/600x600"
+                class="object-cover h-12 w-12 rounded-full"
+                alt=""
+                />
+            </div>
+            <div class="w-full">
+                <div class="text-lg font-semibold">Everest Trip 2021</div>
+                <span class="text-gray-500">Hi Sam, Welcome</span>
+            </div>
+            </div>
+            <div
+            class="flex flex-row py-4 px-2 items-center border-b-2 border-l-4 border-blue-400"
+            >
+            <div class="w-1/4">
+                <img
+                src="https://source.unsplash.com/L2cxSuKWbpo/600x600"
+                class="object-cover h-12 w-12 rounded-full"
+                alt=""
+                />
+            </div>
+            <div class="w-full">
+                <div class="text-lg font-semibold">MERN Stack</div>
+                <span class="text-gray-500">Lusi : Thanks Everyone</span>
+            </div>
+            </div>
+            <div class="flex flex-row py-4 px-2 items-center border-b-2">
+            <div class="w-1/4">
+                <img
+                src="https://source.unsplash.com/vpOeXr5wmR4/600x600"
+                class="object-cover h-12 w-12 rounded-full"
+                alt=""
+                />
+            </div>
+            <div class="w-full">
+                <div class="text-lg font-semibold">Javascript Indonesia</div>
+                <span class="text-gray-500">Evan : some one can fix this</span>
+            </div>
+            </div>
+            <div class="flex flex-row py-4 px-2 items-center border-b-2">
+            <div class="w-1/4">
+                <img
+                src="https://source.unsplash.com/vpOeXr5wmR4/600x600"
+                class="object-cover h-12 w-12 rounded-full"
+                alt=""
+                />
+            </div>
+            <div class="w-full">
+                <div class="text-lg font-semibold">Javascript Indonesia</div>
+                <span class="text-gray-500">Evan : some one can fix this</span>
+            </div>
+            </div>
+
+            <div class="flex flex-row py-4 px-2 items-center border-b-2">
+            <div class="w-1/4">
+                <img
+                src="https://source.unsplash.com/vpOeXr5wmR4/600x600"
+                class="object-cover h-12 w-12 rounded-full"
+                alt=""
+                />
+            </div>
+            <div class="w-full">
+                <div class="text-lg font-semibold">Javascript Indonesia</div>
+                <span class="text-gray-500">Evan : some one can fix this</span>
+            </div>
+            </div>
+        </div>
+        <div class="w-full px-5 flex flex-col justify-between">
+            <div class="flex flex-col mt-5">
+            <div class="flex justify-end mb-4">
+                <div
+                class="mr-2 py-3 px-4 bg-blue-400 rounded-bl-3xl rounded-tl-3xl rounded-tr-xl text-white"
+                >
+                Welcome to group everyone !
                 </div>
-              )
-            })
-          }
-          <div ref={messagesEndRef} />
-        </div>
-        <div className="border-t-2 border-gray-200 px-4 pt-4 mb-2 sm:mb-0">
-          {
-            isTyping && <svg className="-mt-10 absolute animate-bounce w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z" />
-            </svg>
-          }
-          <div className="relative flex">
-            {
-              isAudioRecord && (<span className="absolute inset-y-0 flex items-center">
-                <button type="button" className="inline-flex items-center justify-center rounded-full h-12 w-12 transition duration-500 ease-in-out text-gray-500 hover:bg-gray-300 focus:outline-none">
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="h-6 w-6 text-gray-600">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path>
-                  </svg>
-                </button>
-              </span>)
-            }
-            <input disabled={inputDisabled} value={message} onKeyDown={(e: any) => { if (e.key === 'Enter') handleSend() }} onChange={(e) => handleChange(e.target.value)} type="text" placeholder="Write Something" className="w-full focus:outline-none focus:placeholder-gray-400 text-gray-600 placeholder-gray-600 pl-12 bg-gray-200 rounded-full py-3" />
-            <div className="absolute right-0 items-center inset-y-0 hidden sm:flex">
-              {isAttachment && (<button type="button" className="inline-flex items-center justify-center rounded-full h-10 w-10 transition duration-500 ease-in-out text-gray-500 hover:bg-gray-300 focus:outline-none">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="h-6 w-6 text-gray-600">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path>
-                </svg>
-              </button>)
-              }
-              {
-                isCamera && (<button type="button" className="inline-flex items-center justify-center rounded-full h-10 w-10 transition duration-500 ease-in-out text-gray-500 hover:bg-gray-300 focus:outline-none">
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="h-6 w-6 text-gray-600">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path>
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                  </svg>
-                </button>)
-              }
-              {
-                isSmiley && (<button type="button" className="inline-flex items-center justify-center rounded-full h-10 w-10 transition duration-500 ease-in-out text-gray-500 hover:bg-gray-300 focus:outline-none">
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="h-6 w-6 text-gray-600">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                  </svg>
-                </button>)
-              }
-              <button disabled={!user.connected} onClick={handleSend} type="button" className="inline-flex items-center justify-center rounded-full h-12 w-12 transition duration-500 ease-in-out text-white bg-blue-500 hover:bg-blue-400 focus:outline-none">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="h-6 w-6 transform rotate-90">
-                  <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z"></path>
-                </svg>
-              </button>
+                <img
+                src="https://source.unsplash.com/vpOeXr5wmR4/600x600"
+                class="object-cover h-8 w-8 rounded-full"
+                alt=""
+                />
             </div>
-          </div>
+            <div class="flex justify-start mb-4">
+                <img
+                src="https://source.unsplash.com/vpOeXr5wmR4/600x600"
+                class="object-cover h-8 w-8 rounded-full"
+                alt=""
+                />
+                <div
+                class="ml-2 py-3 px-4 bg-gray-400 rounded-br-3xl rounded-tr-3xl rounded-tl-xl text-white"
+                >
+                Lorem ipsum dolor sit amet consectetur adipisicing elit. Quaerat
+                at praesentium, aut ullam delectus odio error sit rem. Architecto
+                nulla doloribus laborum illo rem enim dolor odio saepe,
+                consequatur quas?
+                </div>
+            </div>
+            <div class="flex justify-end mb-4">
+                <div>
+                <div
+                    class="mr-2 py-3 px-4 bg-blue-400 rounded-bl-3xl rounded-tl-3xl rounded-tr-xl text-white"
+                >
+                    Lorem ipsum dolor, sit amet consectetur adipisicing elit.
+                    Magnam, repudiandae.
+                </div>
+
+                <div
+                    class="mt-4 mr-2 py-3 px-4 bg-blue-400 rounded-bl-3xl rounded-tl-3xl rounded-tr-xl text-white"
+                >
+                    Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                    Debitis, reiciendis!
+                </div>
+                </div>
+                <img
+                src="https://source.unsplash.com/vpOeXr5wmR4/600x600"
+                class="object-cover h-8 w-8 rounded-full"
+                alt=""
+                />
+            </div>
+            <div class="flex justify-start mb-4">
+                <img
+                src="https://source.unsplash.com/vpOeXr5wmR4/600x600"
+                class="object-cover h-8 w-8 rounded-full"
+                alt=""
+                />
+                <div
+                class="ml-2 py-3 px-4 bg-gray-400 rounded-br-3xl rounded-tr-3xl rounded-tl-xl text-white"
+                >
+                happy holiday guys!
+                </div>
+            </div>
+            </div>
+            <div class="py-5">
+            <input
+                class="w-full bg-gray-300 py-5 px-3 rounded-xl"
+                type="text"
+                placeholder="type your message here..."
+            />
+            </div>
         </div>
-      </div>
-      <button onClick={(e) => onShow(e)} type="button" className={`z-10 chat-btn right-3 p-3 bottom-3 fixed inline-flex items-center justify-center rounded-full h-16 w-16 transition duration-500 ease-in-out text-white bg-blue-500 hover:bg-blue-400 focus:outline-none transform ${show ? 'scale-0' : ''}`}>
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-          <path d="M2 5a2 2 0 012-2h7a2 2 0 012 2v4a2 2 0 01-2 2H9l-3 3v-3H4a2 2 0 01-2-2V5z" />
-          <path d="M15 7v2a4 4 0 01-4 4H9.828l-1.766 1.767c.28.149.599.233.938.233h2l3 3v-3h2a2 2 0 002-2V9a2 2 0 00-2-2h-1z" />
-        </svg>
-      </button>
+        <div class="w-2/5 border-l-2 px-5">
+            <div class="flex flex-col">
+            <div class="font-semibold text-xl py-4">Mern Stack Group</div>
+            <img
+                src="https://source.unsplash.com/L2cxSuKWbpo/600x600"
+                class="object-cover rounded-xl h-64"
+                alt=""
+            />
+            <div class="font-semibold py-4">Created 22 Sep 2021</div>
+            <div class="font-light">
+                Lorem ipsum dolor sit amet consectetur adipisicing elit. Deserunt,
+                perspiciatis!
+            </div>
+            </div>
+            </div>
+        </div>
     </div>
-  )
-}
+  );
+});
