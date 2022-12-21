@@ -5,6 +5,7 @@
     }
   ],
   "settings": {
+    "css.lint.unknownAtRules": "ignore",
     "editor.detectIndentation": true,
     "editor.formatOnSave": true,
     "editor.formatOnPaste": false,
@@ -161,10 +162,12 @@
       "pyplot",
       "pyright",
       "pytest",
+      "Qwik",
       "radiotherapyai",
       "raicontours",
       "RANZCR",
       "Retrophars",
+      "Rsrc",
       "RTSTRUCT",
       "ruamel",
       "savefig",
