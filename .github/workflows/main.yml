@@ -41,6 +41,7 @@ jobs:
         run: |
           echo chat.internationalstudentassistance.com > dist/CNAME
           touch dist/.nojekyll
+          touch dist/boo
           cp dist/index.html dist/404.html
         working-directory: src/javascript
 
