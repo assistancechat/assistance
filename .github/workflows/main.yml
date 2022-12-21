@@ -39,9 +39,8 @@ jobs:
       - name: Add GitHub Pages config files
         if: github.ref == 'refs/heads/main'
         run: |
-          echo chat.internationalstudentassistance.com > dist/CNAME
+          echo career.assistance.chat > dist/CNAME
           touch dist/.nojekyll
-          touch dist/boo
           cp dist/index.html dist/404.html
         working-directory: src/javascript
 
