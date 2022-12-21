@@ -12,10 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import getpass
+import pathlib
 from functools import lru_cache
 
-import keyring
 import openai
 import uvicorn
 from fastapi import FastAPI
@@ -23,23 +22,13 @@ from fastapi import FastAPI
 from .config import Settings
 from .conversations import chat_response
 
-KEYRING_SERVICE_NAME = "OpenAI API Key"
-KEYRING_APPLICATION_NAME = "isacareers"
-
 
 @lru_cache()
 def get_settings():
-    openai_api_key = keyring.get_password(
-        KEYRING_SERVICE_NAME, KEYRING_APPLICATION_NAME
-    )
+    api_key_path = pathlib.Path.home() / ".openai"
 
-    if not openai_api_key:
-        openai_api_key = getpass.getpass(
-            f"{KEYRING_APPLICATION_NAME}@{KEYRING_SERVICE_NAME}: "
-        )
-        keyring.set_password(
-            KEYRING_SERVICE_NAME, KEYRING_APPLICATION_NAME, openai_api_key
-        )
+    with open(api_key_path, encoding="utf8") as f:
+        openai_api_key = f.read().strip()
 
     return Settings(openai_api_key=openai_api_key)
 
@@ -62,7 +51,7 @@ def chat(uuid: str, student_text: str):
 
 
 def main():
-    uvicorn.run("isacareers.main:app", port=8080, log_level="info", reload=True)
+    uvicorn.run("assistancechat.main:app", port=8080, log_level="info", reload=True)
 
 
 if __name__ == "__main__":
