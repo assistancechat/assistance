@@ -12,6 +12,7 @@ fastapi = "^0.88.0"
 uvicorn = {extras = ["standard"], version = "^0.20.0"}
 openai = "^0.25.0"
 keyring = "^23.13.1"
+python-multipart = "^0.0.5"
 
 
 [tool.poetry.group.dev.dependencies]
