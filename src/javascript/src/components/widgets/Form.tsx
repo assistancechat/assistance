@@ -58,7 +58,6 @@ const Form = component$((props: {hasButton: boolean, buttonText: string, fieldsT
                   value={formState[recordId]}
                   onChange$={(event) => {
                     const value = event.target.value
-                    console.log(value)
                     formState[recordId] = value
                     promptState.formContents[promptId] = value
                   }}
