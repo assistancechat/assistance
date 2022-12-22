@@ -12,8 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import pathlib
 
-CONFIG = pathlib.Path.home() / ".assistance.chat"
-SECRETS = CONFIG / "secrets"
-USERS = CONFIG / "users"
+from .keys import get_mailgun_api_key
+
+EMAIL_TEMPLATE = (
+    "Your personal access link, which is tied to your email is {access_link}"
+)

@@ -39,3 +39,7 @@ def get_jwt_key():
 
 def get_mailgun_api_key():
     return _load_secret("mailgun_api_key")
+
+
+def get_notion_api_key():
+    return _load_secret("notion_api_key")
