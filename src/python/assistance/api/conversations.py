@@ -50,12 +50,12 @@ what your skills and interests are?"""
 ctx = collections.defaultdict(lambda: PROMPT)
 
 
-def chat_response(uuid: str, student_text: str):
-    ctx[uuid] += f"\n\n{STUDENT_NAME}: {student_text}\n\n{ASSISTANT_NAME}:"
+def chat_response(username: str, student_text: str):
+    ctx[username] += f"\n\n{STUDENT_NAME}: {student_text}\n\n{ASSISTANT_NAME}:"
 
     completions = openai.Completion.create(
         engine="text-davinci-003",
-        prompt=ctx[uuid],
+        prompt=ctx[username],
         max_tokens=256,
         best_of=2,
         stop=f"{STUDENT_NAME}: ",
@@ -67,9 +67,9 @@ def chat_response(uuid: str, student_text: str):
 
     message: str = completions.choices[0].text.strip()
 
-    ctx[uuid] += f" {message}"
+    ctx[username] += f" {message}"
 
     print("Current Prompt\n==============\n")
-    print(ctx[uuid])
+    print(ctx[username])
 
     return message

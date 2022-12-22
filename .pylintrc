@@ -7,10 +7,11 @@ disable =
     fixme,  ; Makes TODO lines not flag the CI
     line-too-long,  ; Line length is being entirely managed by black
     missing-function-docstring,
-
-[FORMAT]
-good-names =
-    i,j,k,x,y,z,a,b,dx,dy,x0,y0,p,t,ax,c,f,ds,vr,xx,yy,zz
+    no-name-in-module,
+    missing-class-docstring,
+    too-few-public-methods,
+    invalid-name,
+    missing-module-docstring,
 
 [DESIGN]
 max-locals = 25

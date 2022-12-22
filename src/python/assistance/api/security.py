@@ -12,15 +12,26 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import pathlib
 
 import openai
 
+from .paths import SECRETS
+
+
+def _load_secret(name):
+    secret_path = SECRETS / name
+
+    with open(secret_path, encoding="utf8") as f:
+        secret = f.read().strip()
+
+    return secret
+
 
 def set_openai_api_key():
-    api_key_path = pathlib.Path.home() / ".openai"
-
-    with open(api_key_path, encoding="utf8") as f:
-        openai_api_key = f.read().strip()
+    openai_api_key = _load_secret("openai_api_key")
 
     openai.api_key = openai_api_key
+
+
+def get_jwt_key():
+    return _load_secret("jwt_key")
