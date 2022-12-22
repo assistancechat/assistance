@@ -9,7 +9,7 @@ type Item = {
 
 
 
-const Form = component$((props: {buttonText: string, items: Item[]}) => {
+const Form = component$((props: {hasButton: boolean, buttonText: string, items: Item[]}) => {
   const formState = useContext(FormContext);
 
   if (props.items === undefined || props.items.length === 0) {
@@ -35,13 +35,9 @@ const Form = component$((props: {buttonText: string, items: Item[]}) => {
               </div>
             </div>
           ))}
-          <div class="md:flex md:items-center">
-            <div>
-              <button class="btn btn-primary sm:mb-0 w-full" type="button">
-                {props.buttonText}
-              </button>
-            </div>
-          </div>
+          <button style={{display: `${props.hasButton ? "block" : "none"}`}} class="btn btn-primary sm:mb-0" type="button">
+            {props.buttonText}
+          </button>
         </form>
       </div>
     </div>
@@ -54,6 +50,10 @@ export const FormItem: RegisteredComponent = {
   name: 'Form',
   builtIn: true,
   inputs: [
+    {
+      name: 'hasButton',
+      type: "boolean"
+    },
     {
       name: 'buttonText',
       type: "text"
