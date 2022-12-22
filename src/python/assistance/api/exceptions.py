@@ -13,25 +13,10 @@
 # limitations under the License.
 
 
-import openai
+from fastapi import HTTPException, status
 
-from .paths import SECRETS
-
-
-def _load_secret(name):
-    secret_path = SECRETS / name
-
-    with open(secret_path, encoding="utf8") as f:
-        secret = f.read().strip()
-
-    return secret
-
-
-def set_openai_api_key():
-    openai_api_key = _load_secret("openai_api_key")
-
-    openai.api_key = openai_api_key
-
-
-def get_jwt_key():
-    return _load_secret("jwt_key")
+CredentialsException = HTTPException(
+    status_code=status.HTTP_401_UNAUTHORIZED,
+    detail="Incorrect username or password",
+    headers={"WWW-Authenticate": "Bearer"},
+)

@@ -15,106 +15,22 @@
 import uvicorn
 from fastapi import Depends, FastAPI, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-from jose import JWTError, jwt
-from passlib.context import CryptContext
 from pydantic import BaseModel
 
 from .conversations import chat_response
-from .security import set_openai_api_key
+from .keys import set_openai_api_key
+from .login import Token, User, get_access_token, get_current_active_user
 
 app = FastAPI()
 
 set_openai_api_key()
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
+@app.post("/login", response_model=Token)
+async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends()):
+    access_token = get_access_token(form_data.username, form_data.password)
 
-class User(BaseModel):
-    username: str
-    email: str | None = None
-    preferred_name: str | None = None
-    full_name: str | None = None
-    disabled: bool | None = None
-
-
-class UserInDB(User):
-    hashed_password: str
-
-
-fake_users_db: dict[str, UserInDB] = {
-    "johndoe": {
-        "username": "johndoe",
-        "full_name": "John Doe",
-        "email": "johndoe@example.com",
-        "hashed_password": "fakehashedsecret",
-        "disabled": False,
-    },
-    "alice": {
-        "username": "alice",
-        "full_name": "Alice Wonderson",
-        "email": "alice@example.com",
-        "hashed_password": "fakehashedsecret2",
-        "disabled": True,
-    },
-}
-
-
-def get_user(db, username: str):
-    if username not in db:
-        return None
-
-    user_dict = db[username]
-
-    return UserInDB(**user_dict)
-
-
-def fake_decode_token(token):
-    # This doesn't provide any security at all
-    # Check the next version
-    user = get_user(fake_users_db, token)
-    return user
-
-
-async def get_current_user(token: str = Depends(oauth2_scheme)):
-    user = fake_decode_token(token)
-
-    if not user:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid authentication credentials",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-
-    return user
-
-
-async def get_current_active_user(current_user: User = Depends(get_current_user)):
-
-    if current_user.disabled:
-        raise HTTPException(status_code=400, detail="Inactive user")
-
-    return current_user
-
-
-def fake_hash_password(password: str):
-    return "fakehashed" + password
-
-
-@app.post("/token")
-async def login(form_data: OAuth2PasswordRequestForm = Depends()):
-
-    user_dict = fake_users_db.get(form_data.username)
-
-    if not user_dict:
-        raise HTTPException(status_code=400, detail="Incorrect username or password")
-
-    user = UserInDB(**user_dict)
-    hashed_password = fake_hash_password(form_data.password)
-
-    if not hashed_password == user.hashed_password:
-        raise HTTPException(status_code=400, detail="Incorrect username or password")
-
-    return {"access_token": user.username, "token_type": "bearer"}
+    return {"access_token": access_token, "token_type": "bearer"}
 
 
 @app.get("/users/me")
@@ -123,7 +39,7 @@ async def read_users_me(current_user: User = Depends(get_current_active_user)):
 
 
 @app.post("/chat")
-def chat(student_text: str, current_user: User = Depends(get_current_user)):
+def chat(student_text: str, current_user: User = Depends(get_current_active_user)):
     response = chat_response(username=current_user.username, student_text=student_text)
 
     return {"response": response}
