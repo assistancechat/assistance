@@ -56,7 +56,12 @@ const Form = component$((props: {hasButton: boolean, buttonText: string, fieldsT
               </div>
             </div>
           ))}
-          <button style={{display: `${props.hasButton ? "block" : "none"}`}} class="btn btn-primary sm:mb-0" type="button">
+          <button
+            style={{display: `${props.hasButton ? "block" : "none"}`}}
+            class="btn btn-primary sm:mb-0"
+            type="button"
+            onClick$={() => {console.log("Boo")}}
+          >
             {props.buttonText}
           </button>
         </form>
