@@ -4,7 +4,7 @@ import { FormContext } from "~/providers/form";
 
 
 
-export const Chat = component$((props: {conversation: string[]}) => {
+export const Chat = component$((props: {disabled: boolean, conversation: string[]}) => {
   return (
     <div class="container mx-auto items-center">
       <div class="px-5 py-5 flex justify-between bg-white border-b-2 shadow-lg rounded-lg">
@@ -27,7 +27,8 @@ export const Chat = component$((props: {conversation: string[]}) => {
             <input
               class="w-full bg-gray-300 py-5 px-5 rounded-xl"
               type="text"
-              placeholder="Type your message here..."
+              disabled={props.disabled}
+              placeholder={props.disabled ? "Use the link within your email before you can type a message." : "Type your message here..."}
             />
           </div>
         </div>
@@ -47,7 +48,7 @@ const GPTChat = component$((props: {agentName: string, placeholderText: string, 
   }
 
   return (
-    <Chat conversation={[`${greeting} My name is ${props.agentName}. ${props.placeholderText}`]}></Chat>
+    <Chat disabled={true} conversation={[`${greeting} My name is ${props.agentName}. ${props.placeholderText}`]}></Chat>
   );
 })
 
