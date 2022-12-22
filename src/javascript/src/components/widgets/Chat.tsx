@@ -23,7 +23,7 @@ export const Chat = component$((props: {disabled: boolean, conversation: string[
               )
             })}
           </div>
-          <div class="py-5">
+          <div class="py-5" style={{display: `${props.disabled ? "none" : "block"}`}}>
             <input
               class="w-full bg-gray-300 py-5 px-5 rounded-xl"
               type="text"
