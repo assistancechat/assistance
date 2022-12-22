@@ -1,4 +1,4 @@
-import { component$, useContext, useTask$, useStore } from '@builder.io/qwik';
+import { component$, useContext, useTask$ } from '@builder.io/qwik';
 import { RegisteredComponent } from "@builder.io/sdk-qwik";
 import { FormContext, PromptContext } from "~/providers/form";
 
@@ -14,15 +14,10 @@ type FieldToWaitFor = {
   recordId: string
 }
 
-type PromptString = {
-  prompt: string
-}
-
 
 const Form = component$((props: {hasButton: boolean, buttonText: string, fieldsToWaitFor: FieldToWaitFor[], items: Item[]}) => {
   const formState = useContext(FormContext);
   const promptState = useContext(PromptContext);
-  const rawPromptState = useStore<PromptString>({prompt: ""})
 
   useTask$(() => {
     for (let i = 0; i < props.items.length; i++) {
@@ -33,17 +28,6 @@ const Form = component$((props: {hasButton: boolean, buttonText: string, fieldsT
       formState[item.recordId] = startingContent
       promptState.formContents[item.promptId] = startingContent
     }
-  })
-
-  useTask$(({ track }) => {
-    track(() => formState['preferredName']);
-    track(() => promptState);
-    track(() => promptState.formContents);
-
-    rawPromptState.prompt = promptState.template
-      .replaceAll("{clientName}", formState['preferredName'])
-      .replaceAll("{agentName}", promptState.agentName)
-      .replaceAll("{formContents}", JSON.stringify(promptState.formContents, null, 2))
   })
 
   if (props.items === undefined || props.items.length === 0) {
@@ -89,7 +73,12 @@ const Form = component$((props: {hasButton: boolean, buttonText: string, fieldsT
             class="btn btn-primary sm:mb-0"
             type="button"
             onClick$={() => {
-              console.log(rawPromptState.prompt)
+              const prompt = promptState.template
+                .replaceAll("{clientName}", formState['preferredName'])
+                .replaceAll("{agentName}", promptState.agentName)
+                .replaceAll("{formContents}", JSON.stringify(promptState.formContents, null, 2))
+
+              console.log(prompt)
             }}
           >
             {props.buttonText}
