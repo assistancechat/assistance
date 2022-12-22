@@ -9,7 +9,7 @@ type Item = {
 
 
 
-const Form = component$((props: {items: Item[]}) => {
+const Form = component$((props: {buttonText: string, items: Item[]}) => {
   const formState = useContext(FormContext);
 
   if (props.items === undefined || props.items.length === 0) {
@@ -38,7 +38,7 @@ const Form = component$((props: {items: Item[]}) => {
           <div class="md:flex md:items-center">
             <div>
               <button class="btn btn-primary sm:mb-0 w-full" type="button">
-                Send chat URL to your email inbox
+                {props.buttonText}
               </button>
             </div>
           </div>
@@ -54,6 +54,10 @@ export const FormItem: RegisteredComponent = {
   name: 'Form',
   builtIn: true,
   inputs: [
+    {
+      name: 'buttonText',
+      type: "text"
+    },
     {
       name: 'items',
       type: 'list',
