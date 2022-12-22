@@ -12,7 +12,7 @@ export default extendConfig(baseConfig, () => {
     },
     plugins: [
       staticAdaptor({
-        origin: 'https://internationalstudentassistance.com/',
+        origin: 'https://opensamd.com',
       }),
     ],
   };

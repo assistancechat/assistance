@@ -1,18 +1,28 @@
-import { component$, Slot } from '@builder.io/qwik';
-import Chat from "../components/chat/chat";
+import { component$, Slot } from "@builder.io/qwik";
+
+import Footer from "~/components/widgets/Footer";
+import Header from "~/components/widgets/Header";
 
 export default component$(() => {
+  // useClientEffect$(() => {
+  //   if (
+  //     localStorage.theme === "dark" ||
+  //     (!("theme" in localStorage) &&
+  //       window.matchMedia("(prefers-color-scheme: dark)").matches)
+  //   ) {
+  //     document.documentElement.classList.add("dark");
+  //   } else {
+  //     document.documentElement.classList.remove("dark");
+  //   }
+  // });
+
   return (
     <>
+      <Header />
       <main>
-          <Slot />
-          <Chat conversation={
-            [
-              "Hi there! Can you tell me a little about yourself and what your skills and interests are?",
-              "Lorem ipsum dolor, sit amet consectetur adipisicing elit. Magnam, repudiandae."
-            ]
-          } />
+        <Slot />
       </main>
+      <Footer />
     </>
   );
 });

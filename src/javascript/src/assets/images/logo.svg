@@ -2,14 +2,14 @@
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
 
 <svg
-   width="500"
-   height="500"
-   viewBox="0 0 132.29166 132.29167"
+   width="144.01231mm"
+   height="77.710442mm"
+   viewBox="0 0 144.01231 77.710442"
    version="1.1"
-   id="svg44944"
+   id="svg45333"
    inkscape:version="1.1.2 (0a00cf5339, 2022-02-04)"
-   sodipodi:docname="favicon.svg"
-   inkscape:export-filename="../40814fe1/logo-only.png"
+   sodipodi:docname="logo.svg"
+   inkscape:export-filename="/home/simon/Documents/full-logo.png"
    inkscape:export-xdpi="96"
    inkscape:export-ydpi="96"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
@@ -17,30 +17,32 @@
    xmlns="http://www.w3.org/2000/svg"
    xmlns:svg="http://www.w3.org/2000/svg">
   <sodipodi:namedview
-     id="namedview44946"
+     id="namedview45335"
      pagecolor="#ffffff"
      bordercolor="#000000"
      borderopacity="0.25"
      inkscape:showpageshadow="2"
      inkscape:pageopacity="0.0"
-     inkscape:pagecheckerboard="true"
+     inkscape:pagecheckerboard="0"
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="mm"
      showgrid="false"
      inkscape:zoom="1.1023743"
-     inkscape:cx="209.5477"
-     inkscape:cy="217.25833"
+     inkscape:cx="154.21259"
+     inkscape:cy="236.76169"
      inkscape:window-width="1846"
-     inkscape:window-height="1016"
-     inkscape:window-x="1994"
-     inkscape:window-y="27"
+     inkscape:window-height="1043"
+     inkscape:window-x="74"
+     inkscape:window-y="0"
      inkscape:window-maximized="1"
      inkscape:current-layer="layer1"
      inkscape:pageshadow="2"
-     units="px"
-     width="500px" />
+     fit-margin-top="0"
+     fit-margin-left="0"
+     fit-margin-right="0"
+     fit-margin-bottom="0" />
   <defs
-     id="defs44941">
+     id="defs45330">
     <clipPath
        id="pf8ec8cbf24">
       <rect
@@ -180,22 +182,37 @@
        id="m63b86c8195"
        d="M 0,10 C 2.652031,10 5.195799,8.946337 7.071068,7.071068 8.946337,5.195799 10,2.652031 10,0 10,-2.652031 8.946337,-5.195799 7.071068,-7.071068 5.195799,-8.946337 2.652031,-10 0,-10 -2.652031,-10 -5.195799,-8.946337 -7.071068,-7.071068 -8.946337,-5.195799 -10,-2.652031 -10,0 -10,2.652031 -8.946337,5.195799 -7.071068,7.071068 -5.195799,8.946337 -2.652031,10 0,10 Z"
        style="stroke:#1f77b4" />
+    <path
+       id="path45131"
+       d="M 0,10 C 2.652031,10 5.195799,8.946337 7.071068,7.071068 8.946337,5.195799 10,2.652031 10,0 10,-2.652031 8.946337,-5.195799 7.071068,-7.071068 5.195799,-8.946337 2.652031,-10 0,-10 -2.652031,-10 -5.195799,-8.946337 -7.071068,-7.071068 -8.946337,-5.195799 -10,-2.652031 -10,0 -10,2.652031 -8.946337,5.195799 -7.071068,7.071068 -5.195799,8.946337 -2.652031,10 0,10 Z"
+       style="stroke:#1f77b4" />
   </defs>
   <g
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
      id="layer1"
-     transform="translate(-79.608307,-74.78228)">
+     transform="translate(25.888173,-29.230044)">
+    <path
+       d="M 67.32329,87.623799 56.198091,76.397 c 4.7752,-1.8288 7.619999,-6.1468 7.619999,-12.2428 0,-8.2296 -4.978399,-13.462 -13.411199,-13.462 h -26.5176 v 36.931599 h 6.4008 V 57.1438 h 20.1168 c 4.4196,0 7.0612,2.3368 7.0612,7.112 0,4.7752 -2.4384,7.4168 -7.0612,7.4168 h -15.3924 v 5.6896 h 13.8176 l 9.3472,10.261599 z"
+       style="font-size:144px;font-family:'Good Times';-inkscape-font-specification:'Good Times';fill:#1e77b4;stroke:#000000;stroke-width:0.264583;stroke-linecap:butt;stroke-linejoin:round;stroke-opacity:0"
+       id="path6668" />
+    <path
+       d="M 112.19237,87.623799 90.907169,52.267 c -0.762,-1.27 -1.6764,-2.0828 -3.0988,-2.0828 -1.4224,0 -2.3876,0.8128 -3.1496,2.0828 l -21.2344,35.356799 h 7.366 l 16.764,-28.346399 8.2296,13.8176 h -11.3284 l -3.048,5.2324 h 17.4752 l 5.537201,9.296399 z"
+       style="font-size:144px;font-family:'Good Times';-inkscape-font-specification:'Good Times';fill:#1e77b4;stroke:#000000;stroke-width:0.264583;stroke-linecap:butt;stroke-linejoin:round;stroke-opacity:0"
+       id="path6670" />
+    <path
+       d="M 117.37061,87.650145 V 64.154972 h -6.50429 v 23.495173 z"
+       style="font-size:144px;font-family:'Good Times';-inkscape-font-specification:'Good Times';fill:#1e77b4;stroke:#000000;stroke-width:0.211894;stroke-linecap:butt;stroke-linejoin:round;stroke-opacity:0"
+       id="path6672" />
     <circle
-       cx="145.75414"
-       cy="140.92812"
-       r="66.145836"
-       fill="#ffffff"
-       id="circle2"
-       style="stroke-width:0.264583" />
+       style="fill:#ff7f0e;fill-opacity:1;stroke:#000000;stroke-width:0.292551;stroke-linecap:butt;stroke-linejoin:round;stroke-opacity:0"
+       id="path6730"
+       cx="114.094"
+       cy="54.141605"
+       r="3.8838646" />
     <g
        id="axes_1"
-       transform="matrix(0.4782835,0,0,0.4782835,76.881316,72.055292)"
+       transform="matrix(0.29248073,0,0,0.29248073,-48.754978,25.968042)"
        style="stroke-linecap:butt;stroke-linejoin:round">
       <g
          id="PathCollection_1"
@@ -203,7 +220,7 @@
         <defs
            id="defs28">
           <path
-             id="path45131"
+             id="path732"
              d="M 0,10 C 2.652031,10 5.195799,8.946337 7.071068,7.071068 8.946337,5.195799 10,2.652031 10,0 10,-2.652031 8.946337,-5.195799 7.071068,-7.071068 5.195799,-8.946337 2.652031,-10 0,-10 -2.652031,-10 -5.195799,-8.946337 -7.071068,-7.071068 -8.946337,-5.195799 -10,-2.652031 -10,0 -10,2.652031 -8.946337,5.195799 -7.071068,7.071068 -5.195799,8.946337 -2.652031,10 0,10 Z"
              style="stroke:#1f77b4" />
         </defs>
