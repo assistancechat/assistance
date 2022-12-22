@@ -13,9 +13,8 @@
 # limitations under the License.
 
 import uvicorn
-from fastapi import Depends, FastAPI, HTTPException, status
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-from pydantic import BaseModel
+from fastapi import Depends, FastAPI
+from fastapi.security import OAuth2PasswordRequestForm
 
 from .conversations import chat_response
 from .keys import set_openai_api_key
