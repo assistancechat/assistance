@@ -29,7 +29,7 @@ ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
@@ -83,10 +83,9 @@ class TokenData(BaseModel):
 
 
 class User(BaseModel):
+    # username is the user's email
     username: str
-    email: str | None = None
-    preferred_name: str | None = None
-    full_name: str | None = None
+    preferred_name: str | None
     disabled: bool | None = None
 
 
