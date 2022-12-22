@@ -1,14 +1,19 @@
-import { component$ } from "@builder.io/qwik";
+import { component$, useContext } from '@builder.io/qwik';
 import { RegisteredComponent } from "@builder.io/sdk-qwik";
+import { FormContext } from "~/providers/form";
 
 
-const Chat = component$((props: {conversation: string[]}) => {
+
+export const Chat = component$((props: {conversation: string[]}) => {
+  const formState = useContext(FormContext);
+
   return (
     <div class="container mx-auto items-center">
+      {formState['preferredName']}
       <div class="px-5 py-5 flex justify-between bg-white border-b-2 shadow-lg rounded-lg">
         <div class="w-full px-5 flex flex-col justify-between">
           <div class="mt-5">
-            {props.conversation.map(({message}, index) => {
+            {props.conversation.map((message, index) => {
               return (
                 <div class={`flex ${index % 2 == 0 ? "justify-start" : "justify-end"} mb-4`}>
                   <div
@@ -34,23 +39,22 @@ const Chat = component$((props: {conversation: string[]}) => {
   );
 });
 
+const GPTChat = component$((props: {prompt: string}) => {
+  return (
+    <Chat conversation={["Hello!", "Boo!"]}></Chat>
+  );
+})
 
 
 
-export const ChatItem: RegisteredComponent = {
-  component: Chat,
-  name: 'Chat',
+export const GPTChatItem: RegisteredComponent = {
+  component: GPTChat,
+  name: 'GPTChat',
   builtIn: true,
   inputs: [
     {
-      name: 'conversation',
-      type: 'list',
-      subFields: [
-        {
-          name: "message",
-          type: 'string',
-        },
-      ]
+      name: 'prompt',
+      type: 'longText'
     }
   ],
 }

@@ -1,4 +1,10 @@
-import { component$, Resource, useResource$ } from "@builder.io/qwik";
+import {
+  component$,
+  useStore,
+  useContextProvider,
+  Resource,
+  useResource$
+} from "@builder.io/qwik";
 import { useLocation, DocumentHead } from "@builder.io/qwik-city";
 import { getContent, RegisteredComponent, RenderContent, getBuilderSearchParams } from "@builder.io/sdk-qwik";
 
@@ -7,7 +13,9 @@ import { FeaturesItem } from "~/components/widgets/Features";
 import { FaqsItem } from "~/components/widgets/Faqs";
 import { CallToActionItem } from "~/components/widgets/CallToAction";
 import { FormItem } from "~/components/widgets/Form";
-import { ChatItem } from "~/components/widgets/Chat";
+import { GPTChatItem } from "~/components/widgets/Chat";
+
+import { FormContext } from "~/providers/form";
 
 export const BUILDER_PUBLIC_API_KEY = '57b43c3a14484f6ebb27d8b26e9db047';
 export const BUILDER_MODEL = "page";
@@ -20,10 +28,14 @@ export const CUSTOM_COMPONENTS: RegisteredComponent[] = [
   FaqsItem,
   CallToActionItem,
   FormItem,
-  ChatItem,
+  GPTChatItem,
 ];
 
 export default component$(() => {
+  const formState = useStore<Record<string, string>>({});
+  useContextProvider(FormContext, formState);
+
+
   const location = useLocation();
   const builderContentRsrc = useResource$<any>(() => {
     return getContent({
