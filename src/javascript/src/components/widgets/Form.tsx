@@ -15,7 +15,7 @@ const Form = component$((props: {items: Item[]}) => {
     <div class="container mx-auto items-center">
       <div class="px-5 py-5 flex justify-between bg-white border-b-2 shadow-lg rounded-lg ">
         <form class="w-full">
-          {props.items.map(({recordId, promptText, interfaceText}) => (
+          {props.items.map(({interfaceText}) => (
             <div class="flex flex-wrap -mx-3 mb-6">
               <div class="w-full px-3">
                 <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="grid-password">
