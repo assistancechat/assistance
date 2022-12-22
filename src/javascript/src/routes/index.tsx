@@ -34,10 +34,12 @@ export const CUSTOM_COMPONENTS: RegisteredComponent[] = [
 export default component$(() => {
   const formState = useStore<Record<string, string>>({});
   const promptState = useStore<PromptState>({
-    agentName: "",
-    template: "",
-    formContents: {}
-  });
+      agentName: "",
+      template: "",
+      formContents: {}
+    },
+    { recursive: true }
+  );
 
   useContextProvider(FormContext, formState);
   useContextProvider(PromptContext, promptState);

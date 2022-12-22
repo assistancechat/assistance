@@ -1,6 +1,7 @@
-import { component$, useContext } from '@builder.io/qwik';
+import { component$, useContext, useTask$, useStore, useServerMount$ } from '@builder.io/qwik';
 import { RegisteredComponent } from "@builder.io/sdk-qwik";
 import { FormContext, PromptContext } from "~/providers/form";
+
 
 type Item = {
   recordId: string
@@ -13,9 +14,37 @@ type FieldToWaitFor = {
   recordId: string
 }
 
+type PromptString = {
+  prompt: string
+}
+
+
 const Form = component$((props: {hasButton: boolean, buttonText: string, fieldsToWaitFor: FieldToWaitFor[], items: Item[]}) => {
   const formState = useContext(FormContext);
   const promptState = useContext(PromptContext);
+  const rawPromptState = useStore<PromptString>({prompt: ""})
+
+  useTask$(() => {
+    for (let i = 0; i < props.items.length; i++) {
+      const item = props.items[i]
+
+      const startingContent = item.startingContent ? item.startingContent : ""
+
+      formState[item.recordId] = startingContent
+      promptState.formContents[item.promptId] = startingContent
+    }
+  })
+
+  useTask$(({ track }) => {
+    track(() => formState['preferredName']);
+    track(() => promptState);
+    track(() => promptState.formContents);
+
+    rawPromptState.prompt = promptState.template
+      .replaceAll("{clientName}", formState['preferredName'])
+      .replaceAll("{agentName}", promptState.agentName)
+      .replaceAll("{formContents}", JSON.stringify(promptState.formContents, null, 2))
+  })
 
   if (props.items === undefined || props.items.length === 0) {
     return <></>
@@ -28,12 +57,6 @@ const Form = component$((props: {hasButton: boolean, buttonText: string, fieldsT
         return <></>
       }
     }
-  }
-
-  for (let i = 0; i < props.items.length; i++) {
-    const item = props.items[i]
-    formState[item.recordId] = item.startingContent
-    promptState.formContents[item.promptId] = item.startingContent
   }
 
   return (
@@ -50,8 +73,10 @@ const Form = component$((props: {hasButton: boolean, buttonText: string, fieldsT
                   id={recordId}
                   value={formState[recordId]}
                   onChange$={(event) => {
-                    formState[recordId] = event.target.value
-                    promptState.formContents[promptId] = event.target.value
+                    const value = event.target.value
+                    console.log(value)
+                    formState[recordId] = value
+                    promptState.formContents[promptId] = value
                   }}
                   type="text"
                   class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
@@ -64,12 +89,8 @@ const Form = component$((props: {hasButton: boolean, buttonText: string, fieldsT
             class="btn btn-primary sm:mb-0"
             type="button"
             onClick$={() => {
-              const prompt = promptState.template
-                .replaceAll("{clientName}", formState['preferredName'])
-                .replaceAll("{agentName}", promptState.agentName)
-                .replaceAll("{formContents}", JSON.stringify(promptState.formContents))
-              console.log(prompt)
-              }}
+              console.log(rawPromptState.prompt)
+            }}
           >
             {props.buttonText}
           </button>

@@ -21,8 +21,8 @@
     "qwik": "qwik"
   },
   "devDependencies": {
-    "@builder.io/qwik": "0.15.0",
-    "@builder.io/qwik-city": "0.0.128",
+    "@builder.io/qwik": "^0.16.1",
+    "@builder.io/qwik-city": "^0.0.128",
     "@fontsource/inter": "^4.5.14",
     "@iconify-json/tabler": "^1.1.49",
     "@types/eslint": "8.4.10",
