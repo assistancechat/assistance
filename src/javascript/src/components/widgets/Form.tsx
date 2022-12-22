@@ -22,7 +22,8 @@ const Form = component$((props: {hasButton: boolean, buttonText: string, fieldsT
 
   if (props.fieldsToWaitFor != null) {
     for (let i = 0; i < props.fieldsToWaitFor.length; i++) {
-      if (formState[props.fieldsToWaitFor[i].recordId] == null) {
+      const item = formState[props.fieldsToWaitFor[i].recordId]
+      if (item == null || item == "") {
         return <></>
       }
     }

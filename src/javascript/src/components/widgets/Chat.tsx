@@ -40,7 +40,7 @@ export const Chat = component$((props: {disabled: boolean, conversation: string[
 const GPTChat = component$((props: {agentName: string, placeholderText: string, prompt: string}) => {
   const formState = useContext(FormContext);
 
-  if (formState['preferredName'] == null || formState['email'] == null) {
+  if (formState['preferredName'] == null || formState['preferredName'] == "" || formState['email'] == null || formState['email'] == "") {
     return <></>
   }
 
