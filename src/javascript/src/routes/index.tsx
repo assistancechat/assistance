@@ -6,6 +6,7 @@ import { HeroItem } from "~/components/widgets/Hero";
 import { FeaturesItem } from "~/components/widgets/Features";
 import { FaqsItem } from "~/components/widgets/Faqs";
 import { CallToActionItem } from "~/components/widgets/CallToAction";
+import { FormItem } from "~/components/widgets/Form";
 
 export const BUILDER_PUBLIC_API_KEY = '57b43c3a14484f6ebb27d8b26e9db047';
 export const BUILDER_MODEL = "page";
@@ -17,6 +18,7 @@ export const CUSTOM_COMPONENTS: RegisteredComponent[] = [
   FeaturesItem,
   FaqsItem,
   CallToActionItem,
+  FormItem,
 ];
 
 export default component$(() => {
