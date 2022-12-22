@@ -5,11 +5,8 @@ import { FormContext } from "~/providers/form";
 
 
 export const Chat = component$((props: {conversation: string[]}) => {
-  const formState = useContext(FormContext);
-
   return (
     <div class="container mx-auto items-center">
-      {formState['preferredName']}
       <div class="px-5 py-5 flex justify-between bg-white border-b-2 shadow-lg rounded-lg">
         <div class="w-full px-5 flex flex-col justify-between">
           <div class="mt-5">
@@ -39,9 +36,18 @@ export const Chat = component$((props: {conversation: string[]}) => {
   );
 });
 
-const GPTChat = component$((props: {prompt: string}) => {
+const GPTChat = component$((props: {agentName: string, placeholderText: string, prompt: string}) => {
+  const formState = useContext(FormContext);
+
+  let greeting: string
+  if (formState['preferredName'] != null) {
+    greeting = `Hello ${formState['preferredName']}!`
+  } else {
+    greeting = "Hello!"
+  }
+
   return (
-    <Chat conversation={["Hello!", "Boo!"]}></Chat>
+    <Chat conversation={[`${greeting} My name is ${props.agentName}. ${props.placeholderText}`]}></Chat>
   );
 })
 
@@ -52,6 +58,14 @@ export const GPTChatItem: RegisteredComponent = {
   name: 'GPTChat',
   builtIn: true,
   inputs: [
+    {
+      name: "agentName",
+      type: "text"
+    },
+    {
+      name: "placeholderText",
+      type: "longText"
+    },
     {
       name: 'prompt',
       type: 'longText'
