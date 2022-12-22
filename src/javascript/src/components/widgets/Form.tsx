@@ -108,7 +108,7 @@ export const FormItem: RegisteredComponent = {
       subFields: [
         {
           name: "recordId",
-          type: 'string',
+          type: 'text',
         }
       ]
     },
@@ -118,19 +118,19 @@ export const FormItem: RegisteredComponent = {
       subFields: [
         {
           name: "recordId",
-          type: 'string',
+          type: 'text',
         },
         {
           name: "formText",
-          type: 'string'
+          type: 'text'
         },
         {
           name: "promptId",
-          type: "string"
+          type: "text"
         },
         {
           name: "startingContent",
-          type: "string",
+          type: "text",
         }
       ]
     }

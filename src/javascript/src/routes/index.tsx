@@ -13,7 +13,7 @@ import { FeaturesItem } from "~/components/widgets/Features";
 import { FaqsItem } from "~/components/widgets/Faqs";
 import { CallToActionItem } from "~/components/widgets/CallToAction";
 import { FormItem } from "~/components/widgets/Form";
-import { GPTChatItem } from "~/components/widgets/Chat";
+import { GPTChatItem, ChatItem } from "~/components/widgets/Chat";
 
 import { FormContext, PromptContext, PromptState } from "~/providers/form";
 
@@ -29,6 +29,7 @@ export const CUSTOM_COMPONENTS: RegisteredComponent[] = [
   CallToActionItem,
   FormItem,
   GPTChatItem,
+  ChatItem,
 ];
 
 export default component$(() => {

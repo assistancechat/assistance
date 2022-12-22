@@ -2,13 +2,18 @@ import { component$, useContext, useTask$ } from '@builder.io/qwik';
 import { RegisteredComponent } from "@builder.io/sdk-qwik";
 import { FormContext, PromptContext } from "~/providers/form";
 
-export const Chat = component$((props: {disabled: boolean, conversation: string[]}) => {
+
+type Message = {
+  message: string
+}
+
+export const Chat = component$((props: {disabled: boolean, conversation: Message[]}) => {
   return (
     <div class="container mx-auto items-center">
       <div class="px-5 py-5 flex justify-between bg-white border-b-2 shadow-lg rounded-lg">
         <div class="w-full px-5 flex flex-col justify-between">
           <div class="mt-5">
-            {props.conversation.map((message, index) => {
+            {props.conversation.map(({message}, index) => {
               return (
                 <div class={`flex ${index % 2 == 0 ? "justify-start" : "justify-end"} mb-4`}>
                   <div
@@ -51,14 +56,36 @@ const GPTChat = component$((props: {agentName: string, placeholderText: string, 
     return <></>
   }
 
-  const greeting = props.placeholderText
+  const message = props.placeholderText
     .replaceAll("{clientName}", preferredName)
     .replaceAll("{agentName}", props.agentName)
 
   return (
-    <Chat disabled={true} conversation={[greeting]}></Chat>
+    <Chat disabled={true} conversation={[{message}]}></Chat>
   );
 })
+
+export const ChatItem: RegisteredComponent = {
+  component: Chat,
+  name: 'Chat',
+  builtIn: true,
+  inputs: [
+    {
+      name: 'disabled',
+      type: "boolean",
+    },
+    {
+      name: 'conversation',
+      type: "list",
+      subFields: [
+        {
+          name: "message",
+          type: 'longText',
+        }
+      ]
+    },
+  ],
+}
 
 export const GPTChatItem: RegisteredComponent = {
   component: GPTChat,
