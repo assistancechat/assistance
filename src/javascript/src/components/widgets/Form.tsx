@@ -5,6 +5,8 @@ import { FormContext } from "~/providers/form";
 type Item = {
   recordId: string
   formText: string
+  promptId: string
+  startingContent: string
 }
 
 type FieldToWaitFor = {
@@ -27,6 +29,11 @@ const Form = component$((props: {hasButton: boolean, buttonText: string, fieldsT
         return <></>
       }
     }
+  }
+
+  for (let i = 0; i < props.items.length; i++) {
+    const item = props.items[i]
+    formState[item.recordId] = item.startingContent
   }
 
   return (
@@ -93,6 +100,14 @@ export const FormItem: RegisteredComponent = {
         {
           name: "formText",
           type: 'string'
+        },
+        {
+          name: "promptId",
+          type: "string"
+        },
+        {
+          name: "startingContent",
+          type: "string",
         }
       ]
     }
