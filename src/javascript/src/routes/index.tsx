@@ -2,7 +2,7 @@ import { component$, Resource, useResource$ } from "@builder.io/qwik";
 import { useLocation, DocumentHead } from "@builder.io/qwik-city";
 import { getContent, RenderContent, getBuilderSearchParams } from "@builder.io/sdk-qwik";
 
-export const BUILDER_PUBLIC_API_KEY = '2d86af9fbb854700ab69c5d05e1bf5b9';
+export const BUILDER_PUBLIC_API_KEY = '57b43c3a14484f6ebb27d8b26e9db047';
 export const BUILDER_MODEL = "page";
 
 export default component$(() => {
