@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import logging
+
 import aiohttp
 import uvicorn
 from fastapi import Depends, FastAPI
@@ -20,8 +22,15 @@ from fastapi.security import OAuth2PasswordRequestForm
 from . import ctx
 from .conversations import chat_response
 from .keys import set_openai_api_key
-from .login import Token, User, get_access_token, get_current_active_user
+from .login import Token, User, get_access_token, get_current_user
 from .mailgun import send_access_link
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s.%(msecs)d %(levelname)s: %(message)s",
+    datefmt="%Y-%m-%d %H:%M:%S",
+)
+
 
 app = FastAPI()
 
@@ -45,14 +54,12 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
 
 
 @app.get("/users/me")
-async def read_users_me(current_user: User = Depends(get_current_active_user)):
+async def read_users_me(current_user: User = Depends(get_current_user)):
     return current_user
 
 
 @app.post("/chat")
-async def chat(
-    student_text: str, current_user: User = Depends(get_current_active_user)
-):
+async def chat(student_text: str, current_user: User = Depends(get_current_user)):
     response = chat_response(username=current_user.username, student_text=student_text)
 
     return {"response": response}

@@ -12,10 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
+import logging
 from datetime import datetime, timedelta
 
-from fastapi import Depends, HTTPException
+from fastapi import Depends
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
 from pydantic import BaseModel
@@ -35,11 +35,17 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 async def get_current_user(token: str = Depends(oauth2_scheme)):
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        username: str = payload.get("sub")
-        if username is None:
+        sub: str = payload.get("sub")
+
+        logging.info(f"sub: {sub}")
+        if sub is None:
             raise CredentialsException
 
+        username = sub.removeprefix("username:")
+
         token_data = TokenData(username=username)
+
+        logging.info(f"token_data: {token_data}")
 
     except JWTError as e:
         raise CredentialsException from e
@@ -47,13 +53,6 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
     user = _get_user(username=token_data.username)
 
     return user
-
-
-async def get_current_active_user(current_user: "User" = Depends(get_current_user)):
-    if current_user.disabled:
-        raise HTTPException(status_code=400, detail="Inactive user")
-
-    return current_user
 
 
 def get_access_token(username, password):
