@@ -22,9 +22,7 @@ from pydantic import BaseModel
 
 from .exceptions import CredentialsException
 from .keys import get_jwt_key
-
-# from passlib.context import CryptContext
-
+from .paths import USERS
 
 SECRET_KEY = get_jwt_key()
 ALGORITHM = "HS256"
@@ -32,12 +30,6 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
-
-# We are generating random cryptographic tokens and assigning them as
-# passwords for the user. User's aren't making their own passwords. We
-# are sending them a signin link.
-
-# pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
 async def get_current_user(token: str = Depends(oauth2_scheme)):
@@ -48,13 +40,11 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
             raise CredentialsException
 
         token_data = TokenData(username=username)
+
     except JWTError as e:
         raise CredentialsException from e
 
-    user = _get_user(_fake_users_db, username=token_data.username)
-
-    if user is None:
-        raise CredentialsException
+    user = _get_user(username=token_data.username)
 
     return user
 
@@ -67,10 +57,7 @@ async def get_current_active_user(current_user: "User" = Depends(get_current_use
 
 
 def get_access_token(username, password):
-    user = _authenticate_user(_fake_users_db, username, password)
-
-    if not user:
-        raise CredentialsException
+    user = _authenticate_user(username, password)
 
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = _create_access_token(
@@ -92,49 +79,33 @@ class TokenData(BaseModel):
 class User(BaseModel):
     # username is the user's email
     username: str
-    preferred_name: str | None
-    disabled: bool | None = None
 
 
 class UserInDB(User):
-    hashed_password: str
+    generated_password: str
 
 
-_fake_users_db: dict[str, UserInDB] = {
-    "johndoe": {
-        "username": "johndoe",
-        "email": "johndoe@example.com",
-        "preferred_name": "John",
-        "full_name": "John Doe",
-        "hashed_password": "fakehashedsecret",
-        "disabled": False,
-    },
-}
+def _get_user(username: str):
+    path = USERS / username
+
+    try:
+        with open(path, encoding="utf8") as f:
+            stored_password = f.read().strip()
+    except FileNotFoundError as e:
+        raise CredentialsException from e
+
+    return UserInDB(username=username, generated_password=stored_password)
 
 
-def _verify_password(plain_password, hashed_password):
-    return pwd_context.verify(plain_password, hashed_password)
+# We are generating random cryptographic tokens and assigning them as
+# passwords for the user. User's aren't making their own passwords. We
+# are sending them a signin link.
+def _authenticate_user(username: str, password: str):
+    user = _get_user(username)
 
+    if not user or password != user.generated_password:
+        raise CredentialsException
 
-def _get_password_hash(password):
-    return pwd_context.hash(password)
-
-
-def _get_user(db, username: str):
-    if username not in db:
-        return None
-
-    user_dict = db[username]
-
-    return UserInDB(**user_dict)
-
-
-def _authenticate_user(fake_db, username: str, password: str):
-    user = _get_user(fake_db, username)
-    if not user:
-        return False
-    if not _verify_password(password, user.hashed_password):
-        return False
     return user
 
 

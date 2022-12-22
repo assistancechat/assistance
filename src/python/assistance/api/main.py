@@ -21,6 +21,7 @@ from . import ctx
 from .conversations import chat_response
 from .keys import set_openai_api_key
 from .login import Token, User, get_access_token, get_current_active_user
+from .mailgun import send_access_link
 
 app = FastAPI()
 
@@ -58,8 +59,8 @@ async def chat(
 
 
 @app.post("/send/signin-link")
-async def send_user_signin_link():
-    pass
+async def send_user_signin_link(email: str):
+    await send_access_link(email=email)
 
 
 def main():
