@@ -1,6 +1,6 @@
 import { component$, useContext } from '@builder.io/qwik';
 import { RegisteredComponent } from "@builder.io/sdk-qwik";
-import { FormContext } from "~/providers/form";
+import { FormContext, PromptContext } from "~/providers/form";
 
 
 
@@ -39,6 +39,10 @@ export const Chat = component$((props: {disabled: boolean, conversation: string[
 
 const GPTChat = component$((props: {agentName: string, placeholderText: string, prompt: string}) => {
   const formState = useContext(FormContext);
+  const promptState = useContext(PromptContext);
+
+  promptState.template = props.prompt
+  promptState.agentName = props.agentName
 
   const preferredName = formState['preferredName']
   const email = formState['email']
@@ -55,8 +59,6 @@ const GPTChat = component$((props: {agentName: string, placeholderText: string, 
     <Chat disabled={true} conversation={[greeting]}></Chat>
   );
 })
-
-
 
 export const GPTChatItem: RegisteredComponent = {
   component: GPTChat,

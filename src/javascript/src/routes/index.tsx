@@ -15,7 +15,7 @@ import { CallToActionItem } from "~/components/widgets/CallToAction";
 import { FormItem } from "~/components/widgets/Form";
 import { GPTChatItem } from "~/components/widgets/Chat";
 
-import { FormContext } from "~/providers/form";
+import { FormContext, PromptContext, PromptState } from "~/providers/form";
 
 export const BUILDER_PUBLIC_API_KEY = '57b43c3a14484f6ebb27d8b26e9db047';
 export const BUILDER_MODEL = "page";
@@ -33,8 +33,14 @@ export const CUSTOM_COMPONENTS: RegisteredComponent[] = [
 
 export default component$(() => {
   const formState = useStore<Record<string, string>>({});
-  useContextProvider(FormContext, formState);
+  const promptState = useStore<PromptState>({
+    agentName: "",
+    template: "",
+    formContents: {}
+  });
 
+  useContextProvider(FormContext, formState);
+  useContextProvider(PromptContext, promptState);
 
   const location = useLocation();
   const builderContentRsrc = useResource$<any>(() => {
