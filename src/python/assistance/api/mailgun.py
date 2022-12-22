@@ -12,9 +12,46 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import secrets
 
+from . import ctx
 from .keys import get_mailgun_api_key
+from .paths import USERS
 
+EMAIL_SUBJECT = "Your career.assistance.chat access link"
 EMAIL_TEMPLATE = (
     "Your personal access link, which is tied to your email is {access_link}"
 )
+LINK_TEMPLATE = "https://career.assistance.chat/?pwd={password}"
+
+API_KEY = get_mailgun_api_key()
+DOMAIN = "assistance.chat"
+
+
+def get_access_link(email: str):
+    try:
+        with open(USERS / email, encoding="utf8") as f:
+            password = f.read().strip()
+    except FileNotFoundError:
+        password = secrets.token_urlsafe()
+
+        # We are generating the user passwords. They are not user
+        # generated. Therefore we can save the tokens that we generate
+        # in plaintext on the secure server.
+        with open(USERS / email, "w", encoding="utf8") as f:
+            f.write(password)
+
+    return LINK_TEMPLATE.format(password=password)
+
+
+async def send_access_link(email: str):
+    url = f"https://api.eu.mailgun.net/v3/{DOMAIN}/messages"
+
+    data = {
+        "from": "noreply@assistance.chat",
+        "to": email,
+        "subject": EMAIL_SUBJECT,
+        "text": EMAIL_TEMPLATE,
+    }
+
+    await ctx.session.post(url=url, auth={"api": API_KEY}, data=data)

@@ -18,11 +18,13 @@ from datetime import datetime, timedelta
 from fastapi import Depends, HTTPException
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
-from passlib.context import CryptContext
 from pydantic import BaseModel
 
 from .exceptions import CredentialsException
 from .keys import get_jwt_key
+
+# from passlib.context import CryptContext
+
 
 SECRET_KEY = get_jwt_key()
 ALGORITHM = "HS256"
@@ -30,7 +32,12 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+# We are generating random cryptographic tokens and assigning them as
+# passwords for the user. User's aren't making their own passwords. We
+# are sending them a signin link.
+
+# pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
 async def get_current_user(token: str = Depends(oauth2_scheme)):
