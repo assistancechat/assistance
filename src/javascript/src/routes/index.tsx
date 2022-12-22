@@ -7,6 +7,7 @@ import { FeaturesItem } from "~/components/widgets/Features";
 import { FaqsItem } from "~/components/widgets/Faqs";
 import { CallToActionItem } from "~/components/widgets/CallToAction";
 import { FormItem } from "~/components/widgets/Form";
+import { ChatItem } from "~/components/widgets/Chat";
 
 export const BUILDER_PUBLIC_API_KEY = '57b43c3a14484f6ebb27d8b26e9db047';
 export const BUILDER_MODEL = "page";
@@ -19,6 +20,7 @@ export const CUSTOM_COMPONENTS: RegisteredComponent[] = [
   FaqsItem,
   CallToActionItem,
   FormItem,
+  ChatItem,
 ];
 
 export default component$(() => {
