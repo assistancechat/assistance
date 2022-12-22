@@ -14,6 +14,8 @@
 
 import secrets
 
+import aiohttp
+
 from . import ctx
 from .keys import get_mailgun_api_key
 from .paths import USERS
@@ -47,11 +49,15 @@ def get_access_link(email: str):
 async def send_access_link(email: str):
     url = f"https://api.eu.mailgun.net/v3/{DOMAIN}/messages"
 
+    access_link = get_access_link(email=email)
+
     data = {
         "from": "noreply@assistance.chat",
         "to": email,
         "subject": EMAIL_SUBJECT,
-        "text": EMAIL_TEMPLATE,
+        "text": EMAIL_TEMPLATE.format(access_link=access_link),
     }
 
-    await ctx.session.post(url=url, auth={"api": API_KEY}, data=data)
+    await ctx.session.post(
+        url=url, auth=aiohttp.BasicAuth(login="api", password=API_KEY), data=data
+    )

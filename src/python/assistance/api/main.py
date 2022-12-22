@@ -34,7 +34,7 @@ async def startup_event():
 
 @app.on_event("shutdown")
 async def shutdown_event():
-    ctx.session.close()
+    await ctx.session.close()
 
 
 @app.post("/token", response_model=Token)
