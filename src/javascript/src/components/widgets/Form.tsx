@@ -7,14 +7,27 @@ type Item = {
   formText: string
 }
 
+type FieldToWaitFor = {
+  recordId: string
+}
 
 
-const Form = component$((props: {hasButton: boolean, buttonText: string, items: Item[]}) => {
+
+const Form = component$((props: {hasButton: boolean, buttonText: string, fieldsToWaitFor: FieldToWaitFor[], items: Item[]}) => {
   const formState = useContext(FormContext);
 
   if (props.items === undefined || props.items.length === 0) {
     return <></>
   }
+
+  if (props.fieldsToWaitFor != null) {
+    for (let i = 0; i < props.fieldsToWaitFor.length; i++) {
+      if (formState[props.fieldsToWaitFor[i].recordId] == null) {
+        return <></>
+      }
+    }
+  }
+
   return (
     <div class="container mx-auto items-center">
       <div class="px-5 py-5 flex justify-between bg-white border-b-2 shadow-lg rounded-lg">
@@ -57,6 +70,16 @@ export const FormItem: RegisteredComponent = {
     {
       name: 'buttonText',
       type: "text"
+    },
+    {
+      name: 'fieldsToWaitFor',
+      type: "list",
+      subFields: [
+        {
+          name: "recordId",
+          type: 'string',
+        }
+      ]
     },
     {
       name: 'items',

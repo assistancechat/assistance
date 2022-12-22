@@ -40,15 +40,15 @@ export const Chat = component$((props: {disabled: boolean, conversation: string[
 const GPTChat = component$((props: {agentName: string, placeholderText: string, prompt: string}) => {
   const formState = useContext(FormContext);
 
-  let greeting: string
-  if (formState['preferredName'] != null) {
-    greeting = `Hello ${formState['preferredName']}!`
-  } else {
-    greeting = "Hello!"
+  if (formState['preferredName'] == null || formState['email'] == null) {
+    return <></>
   }
 
+  const greeting = `Hello ${formState['preferredName']}!`
+  const conversation = [`${greeting} My name is ${props.agentName}. ${props.placeholderText}`]
+
   return (
-    <Chat disabled={true} conversation={[`${greeting} My name is ${props.agentName}. ${props.placeholderText}`]}></Chat>
+    <Chat disabled={true} conversation={conversation}></Chat>
   );
 })
 
