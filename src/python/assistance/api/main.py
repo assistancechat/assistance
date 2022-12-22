@@ -60,7 +60,7 @@ async def read_users_me(current_user: User = Depends(get_current_user)):
 
 @app.post("/chat/careers")
 async def careers_chat(
-    student_text: str, current_user: User = Depends(get_current_user)
+    student_text: str | None = None, current_user: User = Depends(get_current_user)
 ):
     response = chat_response(username=current_user.username, student_text=student_text)
 
