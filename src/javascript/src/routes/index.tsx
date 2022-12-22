@@ -7,7 +7,7 @@ import { FeaturesItem } from "~/components/widgets/Features";
 import { FaqsItem } from "~/components/widgets/Faqs";
 import { CallToActionItem } from "~/components/widgets/CallToAction";
 
-export const BUILDER_PUBLIC_API_KEY = 'edda39be50be49b9ae9ea5964be965f3';
+export const BUILDER_PUBLIC_API_KEY = '57b43c3a14484f6ebb27d8b26e9db047';
 export const BUILDER_MODEL = "page";
 
 // Input types can be found at:
