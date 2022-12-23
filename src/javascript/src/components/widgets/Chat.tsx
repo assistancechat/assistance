@@ -94,7 +94,7 @@ const GPTChat = component$((props: {agentName: string, prompt: string}) => {
   }
 
   return (
-    <Chat disabled={false} conversation={[]} fieldsToWaitFor={[]}></Chat>
+    <Chat disabled={false} conversation={gptState.conversation} fieldsToWaitFor={[]}></Chat>
   );
 })
 

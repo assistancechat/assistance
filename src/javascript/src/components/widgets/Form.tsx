@@ -75,8 +75,30 @@ const Form = component$((props: {hasButton: boolean, buttonText: string, fieldsT
             style={{display: `${props.hasButton ? "block" : "none"}`}}
             class="btn btn-primary sm:mb-0"
             type="button"
-            onClick$={() => {
-              console.log(gptState.initialPrompt)
+            onClick$={async () => {
+              const body = JSON.stringify({
+                client_name: formRecordIdState["preferredName"],
+                agent_name: gptState.agentName,
+                prompt: gptState.initialPrompt,
+              })
+
+              console.log(body)
+
+              const firstMessageResponse = await fetch("https://api.assistance.chat/chat/start", {
+                method: 'POST',
+                body: body,
+                headers: {
+                  'Content-Type': 'application/json;charset=UTF-8',
+                  "Authorization": `Bearer ${gptState.accessToken}`,
+                }
+              });
+
+              const firstMessageData = await firstMessageResponse.json()
+              const message: string = firstMessageData["response"]
+
+              console.log(message)
+
+              gptState.conversation.push({message})
             }}
           >
             {props.buttonText}

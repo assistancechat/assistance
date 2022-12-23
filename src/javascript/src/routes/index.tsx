@@ -47,7 +47,7 @@ export default component$(() => {
       agentName: "",
       promptTemplate: "",
       initialPrompt: "",
-      messages: []
+      conversation: []
     },
     { recursive: true }
   );
@@ -60,7 +60,6 @@ export default component$(() => {
   useClientEffect$(async () => {
     const usernameResponse = await fetch("https://api.assistance.chat/temp-account", {
       method: 'POST',
-      body: "{}",
       headers: {'Content-Type': 'application/json;charset=UTF-8'}
     });
 
