@@ -44,7 +44,6 @@ export default component$(() => {
   });
   const gptState = useStore<GptState>({
       accessToken: "",
-      hashedAccessToken: "",
       agentName: "",
       promptTemplate: "",
       initialPrompt: "",
@@ -59,17 +58,45 @@ export default component$(() => {
   useContextProvider(GptContext, gptState);
 
   useClientEffect$(async () => {
-    const response = await fetch("https://api.assistance.chat/temp-account", {
+    const usernameResponse = await fetch("https://api.assistance.chat/temp-account", {
       method: 'POST',
       body: "{}",
       headers: {'Content-Type': 'application/json'} });
 
-    const data = await response.json()
-    const accessToken: string = data["username"]
-    const hashedAccessToken = sha224(accessToken).toString()
+    const usernameData = await usernameResponse.json()
 
-    gptState.accessToken = accessToken
-    gptState.hashedAccessToken = hashedAccessToken
+    // This corresponds to a temporary anonymous account. The username is a
+    // cryptographic token
+    const username: string = usernameData["username"]
+
+    // NOTE: This doesn't provide any extra security
+    const password = sha224(username).toString()
+
+    const details: Record<string, string> = {
+        'username': username,
+        'password': password,
+        'grant_type': 'password'
+    };
+
+    const formBodyItems = [];
+    for (const property in details) {
+      const encodedKey = encodeURIComponent(property);
+      const encodedValue = encodeURIComponent(details[property]);
+      formBodyItems.push(encodedKey + "=" + encodedValue);
+    }
+    const formBody = formBodyItems.join("&");
+
+    const tokenResponse = await fetch('https://api.assistance.chat/token', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
+      },
+      body: formBody
+    })
+
+    const accessTokenData = await tokenResponse.json()
+
+    gptState.accessToken = accessTokenData["access_token"]
     }, {
     eagerness: 'idle',
   });

@@ -4,7 +4,6 @@ import {
 
 export interface GptState {
   accessToken: string
-  hashedAccessToken: string
   agentName: string
   promptTemplate: string
   initialPrompt: string
