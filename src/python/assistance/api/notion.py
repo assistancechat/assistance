@@ -35,7 +35,7 @@ async def store_data_as_new_notion_page(user_id, content):
         payload = {
             "parent": {"page_id": PARENT_PAGE_ID},
             "properties": {
-                "Name": {"title": [{"text": {"content": user_id}}]},
+                "title": {"title": [{"text": {"content": user_id}}]},
             },
             "children": [
                 {
@@ -48,7 +48,7 @@ async def store_data_as_new_notion_page(user_id, content):
             ],
         }
 
-        async with session.patch(url, json=payload, headers=headers) as resp:
+        async with session.post(url, json=payload, headers=headers) as resp:
             print(resp.status)
             json = await resp.json()
 

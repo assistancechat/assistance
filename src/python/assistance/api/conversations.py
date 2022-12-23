@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import asyncio
 import logging
 
 import openai
@@ -23,25 +24,25 @@ from .utilities import LRUCache
 message_history = LRUCache(10000)
 
 
-def run_chat_start(username: str, client_name: str, agent_name: str, prompt: str):
+async def run_chat_start(username: str, client_name: str, agent_name: str, prompt: str):
     message_history[username] = f"{prompt}\n\n{agent_name}:"
 
-    message = _run_gpt(username=username, client_name=client_name)
+    message = await _run_gpt(username=username, client_name=client_name)
 
     return message
 
 
-def run_chat_response(
+async def run_chat_response(
     username: str, client_name: str, agent_name: str, client_text: str | None
 ):
     message_history[username] += f"\n\n{client_name}: {client_text}\n\n{agent_name}:"
 
-    message = _run_gpt(username=username, client_name=client_name)
+    message = await _run_gpt(username=username, client_name=client_name)
 
     return message
 
 
-def _run_gpt(username: str, client_name: str):
+async def _run_gpt(username: str, client_name: str):
     completions = openai.Completion.create(
         engine="text-davinci-003",
         prompt=message_history[username],
@@ -57,7 +58,9 @@ def _run_gpt(username: str, client_name: str):
     message: str = completions.choices[0].text.strip()
     message_history[username] += f" {message}"
 
-    store_data_as_new_notion_page(username, message_history[username])
+    asyncio.create_task(
+        store_data_as_new_notion_page(username, message_history[username])
+    )
 
     logging.info(message_history[username])
 

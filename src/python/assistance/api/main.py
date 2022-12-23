@@ -92,7 +92,7 @@ async def chat_start(
     data: ChatStartData,
     current_user: User = Depends(get_current_user),
 ):
-    response = run_chat_start(
+    response = await run_chat_start(
         username=current_user.username,
         client_name=data.client_name,
         agent_name=data.agent_name,
@@ -113,7 +113,7 @@ async def chat_continue(
     data: ChatContinueData,
     current_user: User = Depends(get_current_user),
 ):
-    response = run_chat_response(
+    response = await run_chat_response(
         username=current_user.username,
         client_name=data.client_name,
         agent_name=data.agent_name,
