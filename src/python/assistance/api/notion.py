@@ -18,9 +18,10 @@ import aiohttp
 from .keys import get_notion_api_key
 
 API_KEY = get_notion_api_key()
+PARENT_PAGE_ID = "ad816892782d478d9998f700a5c783be"
 
 
-async def store_data_as_new_notion_page(parent_page_id, user_id, content):
+async def store_data_as_new_notion_page(user_id, content):
     # TODO: Move the session object out
     async with aiohttp.ClientSession() as session:
         url = "https://api.notion.com/v1/pages"
@@ -32,7 +33,7 @@ async def store_data_as_new_notion_page(parent_page_id, user_id, content):
         }
 
         payload = {
-            "parent": {"page_id": parent_page_id},
+            "parent": {"page_id": PARENT_PAGE_ID},
             "properties": {
                 "Name": {"title": [{"text": {"content": user_id}}]},
             },

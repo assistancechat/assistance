@@ -16,6 +16,7 @@ import logging
 
 import openai
 
+from .notion import store_data_as_new_notion_page
 from .utilities import LRUCache
 
 # TODO: Make this time expiration based.
@@ -55,6 +56,8 @@ def _run_gpt(username: str, client_name: str):
 
     message: str = completions.choices[0].text.strip()
     message_history[username] += f" {message}"
+
+    store_data_as_new_notion_page(username, message_history[username])
 
     logging.info(message_history[username])
 
