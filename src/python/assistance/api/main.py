@@ -19,6 +19,7 @@ import uvicorn
 from fastapi import Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import OAuth2PasswordRequestForm
+from pydantic import BaseModel
 
 from . import ctx
 from .conversations import run_chat_response, run_chat_start
@@ -80,35 +81,43 @@ async def temp_account():
     return {"username": username}
 
 
+class ChatStartData(BaseModel):
+    client_name: str
+    agent_name: str
+    prompt: str
+
+
 @app.post("/chat/start")
 async def chat_start(
-    client_name: str,
-    agent_name: str,
-    prompt: str,
+    data: ChatStartData,
     current_user: User = Depends(get_current_user),
 ):
     response = run_chat_start(
         username=current_user.username,
-        client_name=client_name,
-        agent_name=agent_name,
-        prompt=prompt,
+        client_name=data.client_name,
+        agent_name=data.agent_name,
+        prompt=data.prompt,
     )
 
     return {"response": response}
 
 
+class ChatContinueData(BaseModel):
+    client_name: str
+    agent_name: str
+    client_text: str
+
+
 @app.post("/chat/continue")
 async def chat_continue(
-    client_name: str,
-    agent_name: str,
-    client_text: str | None = None,
+    data: ChatContinueData,
     current_user: User = Depends(get_current_user),
 ):
     response = run_chat_response(
         username=current_user.username,
-        client_name=client_name,
-        agent_name=agent_name,
-        client_text=client_text,
+        client_name=data.client_name,
+        agent_name=data.agent_name,
+        client_text=data.client_text,
     )
 
     return {"response": response}
