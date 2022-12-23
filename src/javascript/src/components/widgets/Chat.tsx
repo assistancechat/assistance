@@ -15,7 +15,7 @@ type FieldToWaitFor = {
 
 
 export const Chat = component$((props: {disabled: boolean, fieldsToWaitFor: FieldToWaitFor[], conversation: Message[]}) => {
-  const formState = useContext(FormRecordIdContext);
+  const formRecordIdState = useContext(FormRecordIdContext);
   const gptState = useContext(GptContext);
 
   if (props.conversation == null || props.conversation.length == 0) {
@@ -24,7 +24,7 @@ export const Chat = component$((props: {disabled: boolean, fieldsToWaitFor: Fiel
 
   if (props.fieldsToWaitFor != null) {
     for (let i = 0; i < props.fieldsToWaitFor.length; i++) {
-      const item = formState[props.fieldsToWaitFor[i].recordId]
+      const item = formRecordIdState[props.fieldsToWaitFor[i].recordId]
       if (item == null || item == "") {
         return <></>
       }
@@ -43,7 +43,7 @@ export const Chat = component$((props: {disabled: boolean, fieldsToWaitFor: Fiel
                     class={`ml-2 py-3 px-4 text-white ${index % 2 == 0 ? "bg-gray-400 ml-2 rounded-br-3xl rounded-tr-3xl rounded-tl-xl" : "bg-blue-400 mr-2 rounded-bl-3xl rounded-tl-3xl rounded-tr-xl"}`}
                     style={{order: "2"}}
                   >
-                    {message.replaceAll("{clientName}", formState['preferredName']).replaceAll("{agentName}", gptState.agentName)}
+                    {message.replaceAll("{clientName}", formRecordIdState['preferredName']).replaceAll("{agentName}", gptState.agentName)}
                   </div>
                 </div>
               )
@@ -53,8 +53,33 @@ export const Chat = component$((props: {disabled: boolean, fieldsToWaitFor: Fiel
             <input
               class="w-full bg-gray-300 py-5 px-5 rounded-xl"
               type="text"
-              disabled={props.disabled}
-              placeholder={props.disabled ? "Use the link within your email before you can type a message." : "Type your message here..."}
+              disabled={props.conversation.length % 2 == 0}
+              placeholder="Type your message here..."
+              onChange$={async (event) => {
+                let message = event.target.value
+                props.conversation.push({message})
+                event.target.value = ""
+
+                const body = JSON.stringify({
+                  client_name: formRecordIdState["preferredName"],
+                  agent_name: gptState.agentName,
+                  client_text: message,
+                })
+
+                const continuedMessageResponse = await fetch("https://api.assistance.chat/chat/continue", {
+                  method: 'POST',
+                  body: body,
+                  headers: {
+                    'Content-Type': 'application/json;charset=UTF-8',
+                    "Authorization": `Bearer ${gptState.accessToken}`,
+                  }
+                });
+
+                const continuedMessageData = await continuedMessageResponse.json()
+                message = continuedMessageData["response"]
+
+                gptState.conversation.push({message})
+              }}
             />
           </div>
         </div>
