@@ -14,7 +14,7 @@
 
 import hashlib
 import logging
-import uuid
+import secrets
 from datetime import datetime, timedelta
 
 from fastapi import Depends
@@ -67,11 +67,8 @@ def get_user_access_token(username, password):
     return access_token
 
 
-# Temp accounts should only be used in senarios where the user is unable
-# to gain access to previously submitted data. Temp accounts are able
-# to be readily spoofed by a malicious actor.
 def create_temp_account():
-    username = str(uuid.uuid4())
+    username = secrets.token_urlsafe()
     path = USERS / username
 
     with open(path, "w", encoding="utf8") as f:

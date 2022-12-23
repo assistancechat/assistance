@@ -20,7 +20,7 @@ from fastapi import Depends, FastAPI
 from fastapi.security import OAuth2PasswordRequestForm
 
 from . import ctx
-from .conversations import chat_response
+from .conversations import run_chat_response, run_chat_start
 from .keys import set_openai_api_key
 from .login import (
     Token,
@@ -66,11 +66,36 @@ async def temp_account():
     return {"username": username}
 
 
-@app.post("/chat")
-async def chat(
-    student_text: str | None = None, current_user: User = Depends(get_current_user)
+@app.post("/chat/start")
+async def chat_start(
+    client_name: str,
+    agent_name: str,
+    prompt: str,
+    current_user: User = Depends(get_current_user),
 ):
-    response = chat_response(username=current_user.username, student_text=student_text)
+    response = run_chat_start(
+        username=current_user.username,
+        client_name=client_name,
+        agent_name=agent_name,
+        prompt=prompt,
+    )
+
+    return {"response": response}
+
+
+@app.post("/chat/continue")
+async def chat_continue(
+    client_name: str,
+    agent_name: str,
+    client_text: str | None = None,
+    current_user: User = Depends(get_current_user),
+):
+    response = run_chat_response(
+        username=current_user.username,
+        client_name=client_name,
+        agent_name=agent_name,
+        client_text=client_text,
+    )
 
     return {"response": response}
 
