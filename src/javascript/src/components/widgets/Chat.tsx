@@ -7,12 +7,27 @@ type Message = {
   message: string
 }
 
-export const Chat = component$((props: {disabled: boolean, conversation: Message[]}) => {
+// TODO: Make this DRY
+type FieldToWaitFor = {
+  recordId: string
+}
+
+
+export const Chat = component$((props: {disabled: boolean, fieldsToWaitFor: FieldToWaitFor[], conversation: Message[]}) => {
   const formState = useContext(FormContext);
   const promptState = useContext(PromptContext);
 
   if (props.conversation == null || props.conversation.length == 0) {
     return <></>
+  }
+
+  if (props.fieldsToWaitFor != null) {
+    for (let i = 0; i < props.fieldsToWaitFor.length; i++) {
+      const item = formState[props.fieldsToWaitFor[i].recordId]
+      if (item == null || item == "") {
+        return <></>
+      }
+    }
   }
 
   return (
@@ -64,7 +79,7 @@ const GPTChat = component$((props: {agentName: string, prompt: string}) => {
   }
 
   return (
-    <Chat disabled={false} conversation={[]}></Chat>
+    <Chat disabled={false} conversation={[]} fieldsToWaitFor={[]}></Chat>
   );
 })
 
@@ -76,6 +91,16 @@ export const ChatItem: RegisteredComponent = {
     {
       name: 'disabled',
       type: "boolean",
+    },
+    {
+      name: 'fieldsToWaitFor',
+      type: "list",
+      subFields: [
+        {
+          name: "recordId",
+          type: 'text',
+        }
+      ]
     },
     {
       name: 'conversation',
