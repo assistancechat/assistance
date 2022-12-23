@@ -8,6 +8,9 @@ type Message = {
 }
 
 export const Chat = component$((props: {disabled: boolean, conversation: Message[]}) => {
+  const formState = useContext(FormContext);
+  const promptState = useContext(PromptContext);
+
   return (
     <div class="container mx-auto items-center">
       <div class="px-5 py-5 flex justify-between bg-white border-b-2 shadow-lg rounded-lg">
@@ -20,7 +23,7 @@ export const Chat = component$((props: {disabled: boolean, conversation: Message
                     class={`ml-2 py-3 px-4 text-white ${index % 2 == 0 ? "bg-gray-400 ml-2 rounded-br-3xl rounded-tr-3xl rounded-tl-xl" : "bg-blue-400 mr-2 rounded-bl-3xl rounded-tl-3xl rounded-tr-xl"}`}
                     style={{order: "2"}}
                   >
-                    {message}
+                    {message.replaceAll("{clientName}", formState['preferredName']).replaceAll("{agentName}", promptState.agentName)}
                   </div>
                 </div>
               )
@@ -40,7 +43,7 @@ export const Chat = component$((props: {disabled: boolean, conversation: Message
   );
 });
 
-const GPTChat = component$((props: {agentName: string, placeholderText: string, prompt: string}) => {
+const GPTChat = component$((props: {agentName: string, prompt: string}) => {
   const formState = useContext(FormContext);
   const promptState = useContext(PromptContext);
 
@@ -56,12 +59,8 @@ const GPTChat = component$((props: {agentName: string, placeholderText: string, 
     return <></>
   }
 
-  const message = props.placeholderText
-    .replaceAll("{clientName}", preferredName)
-    .replaceAll("{agentName}", props.agentName)
-
   return (
-    <Chat disabled={true} conversation={[{message}]}></Chat>
+    <Chat disabled={true} conversation={[]}></Chat>
   );
 })
 
@@ -95,10 +94,6 @@ export const GPTChatItem: RegisteredComponent = {
     {
       name: "agentName",
       type: "text"
-    },
-    {
-      name: "placeholderText",
-      type: "longText"
     },
     {
       name: 'prompt',
