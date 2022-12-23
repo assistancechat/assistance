@@ -3,7 +3,8 @@ import {
   useStore,
   useContextProvider,
   Resource,
-  useResource$
+  useResource$,
+  useClientEffect$
 } from "@builder.io/qwik";
 import { useLocation, DocumentHead } from "@builder.io/qwik-city";
 import { getContent, RegisteredComponent, RenderContent, getBuilderSearchParams } from "@builder.io/sdk-qwik";
@@ -54,6 +55,20 @@ export default component$(() => {
   useContextProvider(FormPromptIdContext, formPromptIdState);
   useContextProvider(FormUpdateCounterContext, formUpdateCounterState);
   useContextProvider(GptContext, gptState);
+
+  useClientEffect$(async () => {
+    console.log('runs in the browser')
+    const response = await fetch("https://api.assistance.chat/temp-account", {
+      method: 'POST',
+      body: "{}",
+      headers: {'Content-Type': 'application/json'} });
+
+    const data = await response.json()
+    console.log(data)
+
+    }, {
+    eagerness: 'idle',
+  });
 
   const location = useLocation();
   const builderContentRsrc = useResource$<any>(() => {
