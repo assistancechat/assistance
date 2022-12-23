@@ -12,7 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import hashlib
 import logging
+import uuid
 from datetime import datetime, timedelta
 
 from fastapi import Depends
@@ -27,7 +29,6 @@ from .paths import USERS
 SECRET_KEY = get_jwt_key()
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
-
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
@@ -55,7 +56,7 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
     return user
 
 
-def get_access_token(username, password):
+def get_user_access_token(username, password):
     user = _authenticate_user(username, password)
 
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
@@ -64,6 +65,19 @@ def get_access_token(username, password):
     )
 
     return access_token
+
+
+# Temp accounts should only be used in senarios where the user is unable
+# to gain access to previously submitted data. Temp accounts are able
+# to be readily spoofed by a malicious actor.
+def create_temp_account():
+    username = str(uuid.uuid4())
+    path = USERS / username
+
+    with open(path, "w", encoding="utf8") as f:
+        f.write(hashlib.sha224(username.encode("utf8")).hexdigest())
+
+    return username
 
 
 class Token(BaseModel):
