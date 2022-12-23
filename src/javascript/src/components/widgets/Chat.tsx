@@ -1,6 +1,6 @@
 import { component$, useContext, useTask$ } from '@builder.io/qwik';
 import { RegisteredComponent } from "@builder.io/sdk-qwik";
-import { FormRecordIdContext, FormPromptIdContext } from "~/providers/form";
+import { FormRecordIdContext, FormPromptIdContext, FormUpdateCounterContext } from "~/providers/form";
 import { GptContext } from "~/providers/gpt";
 
 
@@ -66,6 +66,7 @@ export const Chat = component$((props: {disabled: boolean, fieldsToWaitFor: Fiel
 const GPTChat = component$((props: {agentName: string, prompt: string}) => {
   const formRecordIdState = useContext(FormRecordIdContext);
   const formPromptIdState = useContext(FormPromptIdContext);
+  const formUpdateCounterState = useContext(FormUpdateCounterContext);
   const gptState = useContext(GptContext);
 
   useTask$(() => {
@@ -76,13 +77,13 @@ const GPTChat = component$((props: {agentName: string, prompt: string}) => {
   useTask$(({track}) => {
     const template = track(() => gptState.promptTemplate);
     const clientName = track(() => formRecordIdState['preferredName']);
-    const agentName = track(() => formPromptIdState.agentName);
-    const formContents = track(() => formPromptIdState);
+    const agentName = track(() => gptState.agentName);
+    track(() => formUpdateCounterState.counter);
 
     gptState.initialPrompt = template
       .replaceAll("{clientName}", clientName)
       .replaceAll("{agentName}", agentName)
-      .replaceAll("{formContents}", JSON.stringify(formContents, null, 2))
+      .replaceAll("{formContents}", JSON.stringify(formPromptIdState, null, 2))
   })
 
   const preferredName = formRecordIdState['preferredName']

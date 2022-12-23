@@ -15,7 +15,7 @@ import { CallToActionItem } from "~/components/widgets/CallToAction";
 import { FormItem } from "~/components/widgets/Form";
 import { GPTChatItem, ChatItem } from "~/components/widgets/Chat";
 
-import { FormRecordIdContext, FormPromptIdContext } from "~/providers/form";
+import { FormRecordIdContext, FormPromptIdContext, FormUpdateCounterContext, FormUpdateCounterState } from "~/providers/form";
 import { GptContext, GptState } from "~/providers/gpt";
 
 export const BUILDER_PUBLIC_API_KEY = '57b43c3a14484f6ebb27d8b26e9db047';
@@ -36,6 +36,9 @@ export const CUSTOM_COMPONENTS: RegisteredComponent[] = [
 export default component$(() => {
   const formRecordIdState = useStore<Record<string, string>>({});
   const formPromptIdState = useStore<Record<string, string>>({});
+  const formUpdateCounterState = useStore<FormUpdateCounterState>({
+    counter: 0
+  });
   const gptState = useStore<GptState>({
       accessToken: "",
       hashedAccessToken: "",
@@ -49,6 +52,7 @@ export default component$(() => {
 
   useContextProvider(FormRecordIdContext, formRecordIdState);
   useContextProvider(FormPromptIdContext, formPromptIdState);
+  useContextProvider(FormUpdateCounterContext, formUpdateCounterState);
   useContextProvider(GptContext, gptState);
 
   const location = useLocation();

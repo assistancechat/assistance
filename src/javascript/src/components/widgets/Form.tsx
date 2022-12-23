@@ -1,6 +1,6 @@
 import { component$, useContext, useTask$ } from '@builder.io/qwik';
 import { RegisteredComponent } from "@builder.io/sdk-qwik";
-import { FormRecordIdContext, FormPromptIdContext } from "~/providers/form";
+import { FormRecordIdContext, FormPromptIdContext, FormUpdateCounterContext } from "~/providers/form";
 import { GptContext } from "~/providers/gpt";
 
 
@@ -19,6 +19,7 @@ type FieldToWaitFor = {
 const Form = component$((props: {hasButton: boolean, buttonText: string, fieldsToWaitFor: FieldToWaitFor[], items: Item[]}) => {
   const formRecordIdState = useContext(FormRecordIdContext);
   const formPromptIdState = useContext(FormPromptIdContext);
+  const formUpdateCounterState = useContext(FormUpdateCounterContext);
   const gptState = useContext(GptContext);
 
   useTask$(() => {
@@ -62,6 +63,7 @@ const Form = component$((props: {hasButton: boolean, buttonText: string, fieldsT
                     const value = event.target.value
                     formRecordIdState[recordId] = value
                     formPromptIdState[promptId] = value
+                    formUpdateCounterState.counter += 1
                   }}
                   type="text"
                   class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
