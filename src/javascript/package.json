@@ -25,6 +25,7 @@
     "@builder.io/qwik-city": "^0.0.128",
     "@fontsource/inter": "^4.5.14",
     "@iconify-json/tabler": "^1.1.49",
+    "@types/crypto-js": "^4.1.1",
     "@types/eslint": "8.4.10",
     "@types/node": "latest",
     "@typescript-eslint/eslint-plugin": "5.45.0",
@@ -46,6 +47,7 @@
     "node": ">=15.0.0"
   },
   "dependencies": {
-    "@builder.io/sdk-qwik": "^0.0.37"
+    "@builder.io/sdk-qwik": "^0.0.37",
+    "crypto-js": "^4.1.1"
   }
 }

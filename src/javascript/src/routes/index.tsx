@@ -9,6 +9,8 @@ import {
 import { useLocation, DocumentHead } from "@builder.io/qwik-city";
 import { getContent, RegisteredComponent, RenderContent, getBuilderSearchParams } from "@builder.io/sdk-qwik";
 
+import sha224 from 'crypto-js/sha224';
+
 import { HeroItem } from "~/components/widgets/Hero";
 import { FeaturesItem } from "~/components/widgets/Features";
 import { FaqsItem } from "~/components/widgets/Faqs";
@@ -57,15 +59,17 @@ export default component$(() => {
   useContextProvider(GptContext, gptState);
 
   useClientEffect$(async () => {
-    console.log('runs in the browser')
     const response = await fetch("https://api.assistance.chat/temp-account", {
       method: 'POST',
       body: "{}",
       headers: {'Content-Type': 'application/json'} });
 
     const data = await response.json()
-    console.log(data)
+    const accessToken: string = data["username"]
+    const hashedAccessToken = sha224(accessToken).toString()
 
+    gptState.accessToken = accessToken
+    gptState.hashedAccessToken = hashedAccessToken
     }, {
     eagerness: 'idle',
   });
