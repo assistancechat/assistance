@@ -11,6 +11,10 @@ export const Chat = component$((props: {disabled: boolean, conversation: Message
   const formState = useContext(FormContext);
   const promptState = useContext(PromptContext);
 
+  if (props.conversation == null || props.conversation.length == 0) {
+    return <></>
+  }
+
   return (
     <div class="container mx-auto items-center">
       <div class="px-5 py-5 flex justify-between bg-white border-b-2 shadow-lg rounded-lg">
@@ -60,7 +64,7 @@ const GPTChat = component$((props: {agentName: string, prompt: string}) => {
   }
 
   return (
-    <Chat disabled={true} conversation={[]}></Chat>
+    <Chat disabled={false} conversation={[]}></Chat>
   );
 })
 
