@@ -74,12 +74,12 @@ export default component$(() => {
 });
 
 export const head: DocumentHead = {
-  title: "OpenSaMD & RAi",
+  title: "Career Assistance Chat",
   meta: [
     {
       name: "description",
       content:
-        "We help you commercialise your open source medical software.",
+        "",
     },
   ],
 };
