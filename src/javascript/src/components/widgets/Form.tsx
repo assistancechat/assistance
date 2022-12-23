@@ -1,4 +1,4 @@
-import { component$, useContext, useTask$ } from '@builder.io/qwik';
+import { component$, useContext, useTask$, useStore } from '@builder.io/qwik';
 import { RegisteredComponent } from "@builder.io/sdk-qwik";
 import { FormRecordIdContext, FormPromptIdContext, FormUpdateCounterContext } from "~/providers/form";
 import { GptContext } from "~/providers/gpt";
@@ -15,12 +15,17 @@ type FieldToWaitFor = {
   recordId: string
 }
 
+type ButtonState = {
+  disabled: boolean
+}
 
 const Form = component$((props: {hasButton: boolean, buttonText: string, fieldsToWaitFor: FieldToWaitFor[], items: Item[]}) => {
   const formRecordIdState = useContext(FormRecordIdContext);
   const formPromptIdState = useContext(FormPromptIdContext);
   const formUpdateCounterState = useContext(FormUpdateCounterContext);
   const gptState = useContext(GptContext);
+
+  const buttonState = useStore<ButtonState>({disabled: false});
 
   useTask$(() => {
     for (let i = 0; i < props.items.length; i++) {
@@ -59,8 +64,12 @@ const Form = component$((props: {hasButton: boolean, buttonText: string, fieldsT
                 <input
                   id={recordId}
                   value={formRecordIdState[recordId]}
-                  onChange$={(event) => {
-                    const value = event.target.value
+                  onInput$={(event) => {
+                    if (event.target == null) {
+                      return
+                    }
+                    const target: HTMLInputElement = event.target as HTMLInputElement
+                    const value = target.value
                     formRecordIdState[recordId] = value
                     formPromptIdState[promptId] = value
                     formUpdateCounterState.counter += 1
@@ -75,7 +84,16 @@ const Form = component$((props: {hasButton: boolean, buttonText: string, fieldsT
             style={{display: `${props.hasButton ? "block" : "none"}`}}
             class="btn btn-primary sm:mb-0"
             type="button"
+            disabled={buttonState.disabled}
             onClick$={async () => {
+              buttonState.disabled = true
+              const e = document.getElementById("gpt-assistance-chat");
+              if (e !== null) {
+                e.scrollIntoView();
+              }
+
+              console.log(gptState.initialPrompt)
+
               const body = JSON.stringify({
                 client_name: formRecordIdState["preferredName"],
                 agent_name: gptState.agentName,
