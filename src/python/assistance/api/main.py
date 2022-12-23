@@ -20,9 +20,15 @@ from fastapi import Depends, FastAPI
 from fastapi.security import OAuth2PasswordRequestForm
 
 from . import ctx
-from .conversations import chat_response
+from .conversations import run_chat_response, run_chat_start
 from .keys import set_openai_api_key
-from .login import Token, User, get_access_token, get_current_user
+from .login import (
+    Token,
+    User,
+    create_temp_account,
+    get_current_user,
+    get_user_access_token,
+)
 from .mailgun import send_access_link
 
 logging.basicConfig(
@@ -48,21 +54,48 @@ async def shutdown_event():
 
 @app.post("/token", response_model=Token)
 async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends()):
-    access_token = get_access_token(form_data.username, form_data.password)
+    access_token = get_user_access_token(form_data.username, form_data.password)
 
     return {"access_token": access_token, "token_type": "bearer"}
 
 
-@app.get("/users/me")
-async def read_users_me(current_user: User = Depends(get_current_user)):
-    return current_user
+@app.post("/temp-account")
+async def temp_account():
+    username = create_temp_account()
+
+    return {"username": username}
 
 
-@app.post("/chat/careers")
-async def careers_chat(
-    student_text: str | None = None, current_user: User = Depends(get_current_user)
+@app.post("/chat/start")
+async def chat_start(
+    client_name: str,
+    agent_name: str,
+    prompt: str,
+    current_user: User = Depends(get_current_user),
 ):
-    response = chat_response(username=current_user.username, student_text=student_text)
+    response = run_chat_start(
+        username=current_user.username,
+        client_name=client_name,
+        agent_name=agent_name,
+        prompt=prompt,
+    )
+
+    return {"response": response}
+
+
+@app.post("/chat/continue")
+async def chat_continue(
+    client_name: str,
+    agent_name: str,
+    client_text: str | None = None,
+    current_user: User = Depends(get_current_user),
+):
+    response = run_chat_response(
+        username=current_user.username,
+        client_name=client_name,
+        agent_name=agent_name,
+        client_text=client_text,
+    )
 
     return {"response": response}
 
