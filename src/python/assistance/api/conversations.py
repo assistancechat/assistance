@@ -16,7 +16,9 @@ import logging
 
 import openai
 
-message_history = {}
+from .utilities import LRUCache
+
+message_history = LRUCache(10000)
 
 
 def run_chat_start(username: str, client_name: str, agent_name: str, prompt: str):
@@ -51,7 +53,6 @@ def _run_gpt(username: str, client_name: str):
     )
 
     message: str = completions.choices[0].text.strip()
-
     message_history[username] += f" {message}"
 
     logging.info(message_history[username])
