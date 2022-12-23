@@ -61,7 +61,8 @@ export default component$(() => {
     const usernameResponse = await fetch("https://api.assistance.chat/temp-account", {
       method: 'POST',
       body: "{}",
-      headers: {'Content-Type': 'application/json'} });
+      headers: {'Content-Type': 'application/json;charset=UTF-8'}
+    });
 
     const usernameData = await usernameResponse.json()
 
