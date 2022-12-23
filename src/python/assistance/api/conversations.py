@@ -18,6 +18,7 @@ import openai
 
 from .utilities import LRUCache
 
+# TODO: Make this time expiration based.
 message_history = LRUCache(10000)
 
 
