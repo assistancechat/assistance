@@ -82,8 +82,6 @@ const Form = component$((props: {hasButton: boolean, buttonText: string, fieldsT
                 prompt: gptState.initialPrompt,
               })
 
-              console.log(body)
-
               const firstMessageResponse = await fetch("https://api.assistance.chat/chat/start", {
                 method: 'POST',
                 body: body,
@@ -95,8 +93,6 @@ const Form = component$((props: {hasButton: boolean, buttonText: string, fieldsT
 
               const firstMessageData = await firstMessageResponse.json()
               const message: string = firstMessageData["response"]
-
-              console.log(message)
 
               gptState.conversation.push({message})
             }}
