@@ -1,6 +1,7 @@
 import { component$, useContext, useTask$ } from '@builder.io/qwik';
 import { RegisteredComponent } from "@builder.io/sdk-qwik";
-import { FormContext, PromptContext } from "~/providers/form";
+import { FormRecordIdContext, FormPromptIdContext } from "~/providers/form";
+import { GptContext } from "~/providers/gpt";
 
 
 type Message = {
@@ -14,8 +15,8 @@ type FieldToWaitFor = {
 
 
 export const Chat = component$((props: {disabled: boolean, fieldsToWaitFor: FieldToWaitFor[], conversation: Message[]}) => {
-  const formState = useContext(FormContext);
-  const promptState = useContext(PromptContext);
+  const formState = useContext(FormRecordIdContext);
+  const gptState = useContext(GptContext);
 
   if (props.conversation == null || props.conversation.length == 0) {
     return <></>
@@ -42,7 +43,7 @@ export const Chat = component$((props: {disabled: boolean, fieldsToWaitFor: Fiel
                     class={`ml-2 py-3 px-4 text-white ${index % 2 == 0 ? "bg-gray-400 ml-2 rounded-br-3xl rounded-tr-3xl rounded-tl-xl" : "bg-blue-400 mr-2 rounded-bl-3xl rounded-tl-3xl rounded-tr-xl"}`}
                     style={{order: "2"}}
                   >
-                    {message.replaceAll("{clientName}", formState['preferredName']).replaceAll("{agentName}", promptState.agentName)}
+                    {message.replaceAll("{clientName}", formState['preferredName']).replaceAll("{agentName}", gptState.agentName)}
                   </div>
                 </div>
               )
@@ -63,16 +64,29 @@ export const Chat = component$((props: {disabled: boolean, fieldsToWaitFor: Fiel
 });
 
 const GPTChat = component$((props: {agentName: string, prompt: string}) => {
-  const formState = useContext(FormContext);
-  const promptState = useContext(PromptContext);
+  const formRecordIdState = useContext(FormRecordIdContext);
+  const formPromptIdState = useContext(FormPromptIdContext);
+  const gptState = useContext(GptContext);
 
   useTask$(() => {
-    promptState.template = props.prompt
-    promptState.agentName = props.agentName
+    gptState.promptTemplate = props.prompt
+    gptState.agentName = props.agentName
   })
 
-  const preferredName = formState['preferredName']
-  const email = formState['email']
+  useTask$(({track}) => {
+    const template = track(() => gptState.promptTemplate);
+    const clientName = track(() => formRecordIdState['preferredName']);
+    const agentName = track(() => formPromptIdState.agentName);
+    const formContents = track(() => formPromptIdState);
+
+    gptState.initialPrompt = template
+      .replaceAll("{clientName}", clientName)
+      .replaceAll("{agentName}", agentName)
+      .replaceAll("{formContents}", JSON.stringify(formContents, null, 2))
+  })
+
+  const preferredName = formRecordIdState['preferredName']
+  const email = formRecordIdState['email']
 
   if (preferredName == null || preferredName == "" || email == null || email == "") {
     return <></>

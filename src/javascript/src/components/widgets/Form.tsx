@@ -1,6 +1,7 @@
 import { component$, useContext, useTask$ } from '@builder.io/qwik';
 import { RegisteredComponent } from "@builder.io/sdk-qwik";
-import { FormContext, PromptContext } from "~/providers/form";
+import { FormRecordIdContext, FormPromptIdContext } from "~/providers/form";
+import { GptContext } from "~/providers/gpt";
 
 
 type Item = {
@@ -16,8 +17,9 @@ type FieldToWaitFor = {
 
 
 const Form = component$((props: {hasButton: boolean, buttonText: string, fieldsToWaitFor: FieldToWaitFor[], items: Item[]}) => {
-  const formState = useContext(FormContext);
-  const promptState = useContext(PromptContext);
+  const formRecordIdState = useContext(FormRecordIdContext);
+  const formPromptIdState = useContext(FormPromptIdContext);
+  const gptState = useContext(GptContext);
 
   useTask$(() => {
     for (let i = 0; i < props.items.length; i++) {
@@ -25,8 +27,8 @@ const Form = component$((props: {hasButton: boolean, buttonText: string, fieldsT
 
       const startingContent = item.startingContent ? item.startingContent : ""
 
-      formState[item.recordId] = startingContent
-      promptState.formContents[item.promptId] = startingContent
+      formRecordIdState[item.recordId] = startingContent
+      formPromptIdState[item.promptId] = startingContent
     }
   })
 
@@ -36,7 +38,7 @@ const Form = component$((props: {hasButton: boolean, buttonText: string, fieldsT
 
   if (props.fieldsToWaitFor != null) {
     for (let i = 0; i < props.fieldsToWaitFor.length; i++) {
-      const item = formState[props.fieldsToWaitFor[i].recordId]
+      const item = formRecordIdState[props.fieldsToWaitFor[i].recordId]
       if (item == null || item == "") {
         return <></>
       }
@@ -55,11 +57,11 @@ const Form = component$((props: {hasButton: boolean, buttonText: string, fieldsT
                 </label>
                 <input
                   id={recordId}
-                  value={formState[recordId]}
+                  value={formRecordIdState[recordId]}
                   onChange$={(event) => {
                     const value = event.target.value
-                    formState[recordId] = value
-                    promptState.formContents[promptId] = value
+                    formRecordIdState[recordId] = value
+                    formPromptIdState[promptId] = value
                   }}
                   type="text"
                   class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
@@ -72,12 +74,7 @@ const Form = component$((props: {hasButton: boolean, buttonText: string, fieldsT
             class="btn btn-primary sm:mb-0"
             type="button"
             onClick$={() => {
-              const prompt = promptState.template
-                .replaceAll("{clientName}", formState['preferredName'])
-                .replaceAll("{agentName}", promptState.agentName)
-                .replaceAll("{formContents}", JSON.stringify(promptState.formContents, null, 2))
-
-              console.log(prompt)
+              console.log(gptState.initialPrompt)
             }}
           >
             {props.buttonText}
