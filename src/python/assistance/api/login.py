@@ -87,7 +87,8 @@ class TokenData(BaseModel):
 
 
 class User(BaseModel):
-    # username is the user's email
+    # username is either the user's email or for a temporary account it
+    # is a cryptographic token
     username: str
 
 
