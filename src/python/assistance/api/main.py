@@ -129,7 +129,7 @@ class StoreData(BaseModel):
 
 
 @app.post("/save")
-async def save_coontent(
+async def save_content(
     data: StoreData,
     current_user: User = Depends(get_current_user),
 ):
