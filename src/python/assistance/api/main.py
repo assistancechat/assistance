@@ -32,6 +32,7 @@ from .login import (
     get_user_access_token,
 )
 from .mailgun import send_access_link
+from .notion import store_data_as_new_notion_page
 
 logging.basicConfig(
     level=logging.INFO,
@@ -121,6 +122,18 @@ async def chat_continue(
     )
 
     return {"response": response}
+
+
+class StoreData(BaseModel):
+    contents: str
+
+
+@app.post("/store")
+async def store_as_notion(
+    data: StoreData,
+    current_user: User = Depends(get_current_user),
+):
+    store_data_as_new_notion_page(current_user.username, data.contents)
 
 
 @app.post("/send/signin-link")
