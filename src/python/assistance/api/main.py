@@ -125,15 +125,15 @@ async def chat_continue(
 
 
 class StoreData(BaseModel):
-    contents: str
+    content: str
 
 
-@app.post("/store")
-async def store_as_notion(
+@app.post("/save")
+async def save_coontent(
     data: StoreData,
     current_user: User = Depends(get_current_user),
 ):
-    store_data_as_new_notion_page(current_user.username, data.contents)
+    store_data_as_new_notion_page(current_user.username, data.content)
 
 
 @app.post("/send/signin-link")
