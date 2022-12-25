@@ -134,7 +134,7 @@ async def save_content(
     data: StoreData,
     current_user: User = Depends(get_current_user),
 ):
-    store_data_as_new_notion_page(current_user.username, data.content)
+    await store_data_as_new_notion_page(current_user.username, data.content)
 
 
 @app.post("/send/signin-link")
