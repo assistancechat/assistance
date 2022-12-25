@@ -32,6 +32,7 @@ from .login import (
     get_user_access_token,
 )
 from .mailgun import send_access_link
+from .notion import store_data_as_new_notion_page
 
 logging.basicConfig(
     level=logging.INFO,
@@ -44,6 +45,7 @@ app = FastAPI()
 
 origins = [
     "https://career.assistance.chat",
+    "http://localhost:5173",
     "http://localhost:5174",
 ]
 
@@ -92,7 +94,7 @@ async def chat_start(
     data: ChatStartData,
     current_user: User = Depends(get_current_user),
 ):
-    response = run_chat_start(
+    response = await run_chat_start(
         username=current_user.username,
         client_name=data.client_name,
         agent_name=data.agent_name,
@@ -113,7 +115,7 @@ async def chat_continue(
     data: ChatContinueData,
     current_user: User = Depends(get_current_user),
 ):
-    response = run_chat_response(
+    response = await run_chat_response(
         username=current_user.username,
         client_name=data.client_name,
         agent_name=data.agent_name,
@@ -121,6 +123,18 @@ async def chat_continue(
     )
 
     return {"response": response}
+
+
+class StoreData(BaseModel):
+    content: str
+
+
+@app.post("/save")
+async def save_content(
+    data: StoreData,
+    current_user: User = Depends(get_current_user),
+):
+    await store_data_as_new_notion_page(current_user.username, data.content)
 
 
 @app.post("/send/signin-link")

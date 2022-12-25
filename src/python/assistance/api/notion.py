@@ -15,43 +15,45 @@
 
 import aiohttp
 
+from .keys import get_notion_api_key
 
-async def add_to_notion_page(password, page_id, content):
+API_KEY = get_notion_api_key()
+PARENT_PAGE_ID = "ad816892782d478d9998f700a5c783be"
+
+
+async def store_data_as_new_notion_page(user_id: str, content: str):
     # TODO: Move the session object out
     async with aiohttp.ClientSession() as session:
-        url = f"https://api.notion.com/v1/blocks/{page_id}/children"
+        url = "https://api.notion.com/v1/pages"
 
         headers = {
             "accept": "application/json",
             "Notion-Version": "2022-06-28",
-            "Authorization": f"Bearer {password}",
+            "Authorization": f"Bearer {API_KEY}",
         }
+
+        split_content = content.split("\n\n")
+
+        children = [
+            {
+                "object": "block",
+                "type": "paragraph",
+                "paragraph": {
+                    "rich_text": [{"type": "text", "text": {"content": item}}]
+                },
+            }
+            for item in split_content
+        ]
 
         payload = {
-            "children": [
-                {
-                    "object": "block",
-                    "parent": {"type": "page_id", "page_id": page_id},
-                    "has_children": False,
-                    "archived": False,
-                    "type": "paragraph",
-                    "paragraph": {
-                        "rich_text": [
-                            {
-                                "type": "text",
-                                "text": {
-                                    "content": content,
-                                },
-                            }
-                        ],
-                        "color": "default",
-                        "children": [],
-                    },
-                }
-            ]
+            "parent": {"page_id": PARENT_PAGE_ID},
+            "properties": {
+                "title": {"title": [{"text": {"content": user_id}}]},
+            },
+            "children": children,
         }
 
-        async with session.patch(url, json=payload, headers=headers) as resp:
+        async with session.post(url, json=payload, headers=headers) as resp:
             print(resp.status)
             json = await resp.json()
 
