@@ -50,11 +50,22 @@ export const Chat = component$((props: {disabled: boolean, fieldsToWaitFor: Fiel
             })}
           </div>
           <div class="py-5" style={{display: `${props.disabled ? "none" : "block"}`}}>
-            <input
-              class="w-full bg-gray-300 py-5 px-5 rounded-xl"
-              type="text"
+            <textarea
+              style="overflow-y: hidden"
+              class="w-full bg-gray-300 py-5 px-5 rounded-xl max-h-58 resize-none"
               disabled={props.conversation.length % 2 == 0}
               placeholder="Type your message here..."
+
+              onKeyUp$={(event) => {
+                if (event.target == null) {
+                  return
+                }
+
+                const el = event.target as HTMLTextAreaElement
+
+                el.style.height = '5px'
+                el.style.height = el.scrollHeight + 'px'
+              }}
               onChange$={async (event) => {
                 let message = event.target.value
                 props.conversation.push({message})
