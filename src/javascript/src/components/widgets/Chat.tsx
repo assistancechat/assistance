@@ -1,4 +1,4 @@
-import { component$, useContext, useTask$, QwikChangeEvent, QwikKeyboardEvent, $ } from '@builder.io/qwik';
+import { component$, useContext, useTask$, QwikChangeEvent, QwikKeyboardEvent, $, useStore } from '@builder.io/qwik';
 import { RegisteredComponent } from "@builder.io/sdk-qwik";
 import { FormRecordIdContext, FormPromptIdContext, FormUpdateCounterContext } from "~/providers/form";
 import { GptContext } from "~/providers/gpt";
@@ -13,10 +13,16 @@ type FieldToWaitFor = {
   recordId: string
 }
 
+type TextAreaState = {
+  content: string
+}
+
 
 export const Chat = component$((props: {disabled: boolean, fieldsToWaitFor: FieldToWaitFor[], conversation: Message[]}) => {
   const formRecordIdState = useContext(FormRecordIdContext);
   const gptState = useContext(GptContext);
+
+  const textAreaState = useStore<TextAreaState>({content: ""});
 
   if (props.conversation == null || props.conversation.length == 0) {
     return <></>
@@ -31,6 +37,15 @@ export const Chat = component$((props: {disabled: boolean, fieldsToWaitFor: Fiel
     }
   }
 
+  const updateTextAreaState$ = $((event: QwikChangeEvent<HTMLTextAreaElement> | QwikKeyboardEvent<HTMLTextAreaElement>) => {
+    if (event.target == null) {
+      return
+    }
+
+    const target = event.target as HTMLTextAreaElement
+    textAreaState.content = target.value
+  })
+
   const resize$ = $((event: QwikChangeEvent<HTMLTextAreaElement> | QwikKeyboardEvent<HTMLTextAreaElement>) => {
     if (event.target == null) {
       return
@@ -42,21 +57,14 @@ export const Chat = component$((props: {disabled: boolean, fieldsToWaitFor: Fiel
     el.style.height = `${(el.scrollHeight + 4)}px`
   })
 
-  const submitMessage$ = $(async (event: QwikChangeEvent<HTMLTextAreaElement> | QwikKeyboardEvent<HTMLTextAreaElement>) => {
-    if (event.target == null) {
+  const submitMessage$ = $(async () => {
+    let message = textAreaState.content.trim()
+
+    if (message == "") {
       return
     }
 
-    const target = event.target as HTMLTextAreaElement
-
-    let message = target.value
-
-    if (message.trim() == "") {
-      return
-    }
-
-    target.value = ""
-    resize$(event)
+    textAreaState.content = ""
 
     const body = JSON.stringify({
       client_name: formRecordIdState["preferredName"],
@@ -102,18 +110,32 @@ export const Chat = component$((props: {disabled: boolean, fieldsToWaitFor: Fiel
           <div class="py-5" style={{display: `${props.disabled ? "none" : "block"}`}}>
             <textarea
               style="overflow-y: hidden"
-              class="appearance-none h-16 bg-gray-200 text-gray-700 border border-gray-200  w-full py-5 px-5 rounded-xl mb-3 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+              class="block w-full h-16 bg-gray-200 text-gray-700 border border-gray-200 py-5 pl-5 pr-14 rounded-xl mb-3 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
               disabled={props.conversation.length % 2 == 0}
               placeholder="Type your message here..."
-              onKeyDown$={async (event) => {
+              value={textAreaState.content}
+              onKeyUp$={async (event) => {
                 resize$(event)
-
+                updateTextAreaState$(event)
                 if (event.key === "Enter") {
-                  await submitMessage$(event)
+                  await submitMessage$()
+                  resize$(event)
                 }
               }}
-              onChange$={submitMessage$}
+              onChange$={async (event) => {
+                resize$(event)
+                updateTextAreaState$(event)
+                await submitMessage$()
+                resize$(event)
+              }}
             />
+            <button
+              class="absolute px-4 py-4 my-12 rounded-xl text-gray-500 bottom-1.5 right-10 md:bottom-2.5 md:right-2 hover:bg-gray-100 dark:hover:text-gray-400 dark:hover:bg-gray-900 disabled:hover:bg-transparent dark:disabled:hover:bg-transparent"
+              disabled={props.conversation.length % 2 == 0}
+              onClick$={submitMessage$}
+            >
+              <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 20 20" class="h-8 w-8 rotate-90" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z"></path></svg>
+            </button>
           </div>
         </div>
       </div>
@@ -153,7 +175,12 @@ const GPTChat = component$((props: {agentName: string, prompt: string}) => {
 
   return (
     <div>
-      <Chat disabled={false} conversation={gptState.conversation} fieldsToWaitFor={[]}></Chat>
+      <Chat
+        disabled={false}
+        conversation={gptState.conversation}
+        // conversation={[{message:'Test'}, {message:'Test'}]}
+        fieldsToWaitFor={[]}>
+      </Chat>
       <div id="gpt-assistance-chat"></div>
     </div>
   );
