@@ -149,7 +149,7 @@ const GPTChat = component$((props: {agentName: string, prompt: string}) => {
   return (
     <div>
       <Chat disabled={false} conversation={gptState.conversation} fieldsToWaitFor={[]}></Chat>
-      <div class="h-6" id="gpt-assistance-chat"></div>
+      <div id="gpt-assistance-chat"></div>
     </div>
   );
 })
