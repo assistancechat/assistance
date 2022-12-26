@@ -50,9 +50,12 @@ export const Chat = component$((props: {disabled: boolean, fieldsToWaitFor: Fiel
     const target = event.target as HTMLTextAreaElement
 
     let message = target.value
-    props.conversation.push({message})
-    target.value = ""
 
+    if (message.trim() == "") {
+      return
+    }
+
+    target.value = ""
     resize$(event)
 
     const body = JSON.stringify({
@@ -60,6 +63,8 @@ export const Chat = component$((props: {disabled: boolean, fieldsToWaitFor: Fiel
       agent_name: gptState.agentName,
       client_text: message,
     })
+
+    props.conversation.push({message})
 
     const continuedMessageResponse = await fetch("https://api.assistance.chat/chat/continue", {
       method: 'POST',
@@ -73,7 +78,7 @@ export const Chat = component$((props: {disabled: boolean, fieldsToWaitFor: Fiel
     const continuedMessageData = await continuedMessageResponse.json()
     message = continuedMessageData["response"]
 
-    gptState.conversation.push({message})
+    props.conversation.push({message})
   })
 
   return (
