@@ -37,15 +37,6 @@ export const Chat = component$((props: {disabled: boolean, fieldsToWaitFor: Fiel
     }
   }
 
-  const updateTextAreaState$ = $((event: QwikChangeEvent<HTMLTextAreaElement> | QwikKeyboardEvent<HTMLTextAreaElement>) => {
-    if (event.target == null) {
-      return
-    }
-
-    const target = event.target as HTMLTextAreaElement
-    textAreaState.content = target.value
-  })
-
   const resize$ = $((event: QwikChangeEvent<HTMLTextAreaElement> | QwikKeyboardEvent<HTMLTextAreaElement>) => {
     if (event.target == null) {
       return
@@ -114,20 +105,8 @@ export const Chat = component$((props: {disabled: boolean, fieldsToWaitFor: Fiel
               disabled={props.conversation.length % 2 == 0}
               placeholder="Type your message here..."
               value={textAreaState.content}
-              onKeyUp$={async (event) => {
-                resize$(event)
-                updateTextAreaState$(event)
-                if (event.key === "Enter") {
-                  await submitMessage$()
-                  resize$(event)
-                }
-              }}
-              onChange$={async (event) => {
-                resize$(event)
-                updateTextAreaState$(event)
-                await submitMessage$()
-                resize$(event)
-              }}
+              onKeyUp$={resize$}
+              onChange$={(event) => {textAreaState.content = event.target.value}}
             />
             <button
               class="absolute px-4 py-4 my-12 rounded-xl text-gray-500 bottom-1.5 right-10 md:bottom-2.5 md:right-2 hover:bg-gray-100 dark:hover:text-gray-400 dark:hover:bg-gray-900 disabled:hover:bg-transparent dark:disabled:hover:bg-transparent"
