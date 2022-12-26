@@ -101,12 +101,6 @@ const Form = component$((props: {hasButton: boolean, buttonText: string, fieldsT
             class="btn btn-primary sm:mb-0"
             type="button"
             disabled={buttonState.disabled}
-            onMouseUp$={() => {
-              const e = document.getElementById("gpt-assistance-chat");
-              if (e !== null) {
-                e.scrollIntoView();
-              }
-            }}
             onClick$={async () => {
               buttonState.disabled = true
               console.log(gptState.initialPrompt)
@@ -130,6 +124,11 @@ const Form = component$((props: {hasButton: boolean, buttonText: string, fieldsT
               const message: string = firstMessageData["response"]
 
               gptState.conversation.push({message})
+
+              const e = document.getElementById("gpt-assistance-chat");
+              if (e !== null) {
+                e.scrollIntoView();
+              }
             }}
           >
             {props.buttonText}
