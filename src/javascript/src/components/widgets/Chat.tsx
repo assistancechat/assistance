@@ -1,4 +1,10 @@
-import { component$, useContext, useTask$, QwikChangeEvent, QwikKeyboardEvent, $, useStore } from '@builder.io/qwik';
+import {
+  component$,
+  useContext,
+  useTask$,
+  // QwikChangeEvent,
+  // QwikKeyboardEvent,
+  $, useStore } from '@builder.io/qwik';
 import { RegisteredComponent } from "@builder.io/sdk-qwik";
 import { FormRecordIdContext, FormPromptIdContext, FormUpdateCounterContext } from "~/providers/form";
 import { GptContext } from "~/providers/gpt";
@@ -37,16 +43,16 @@ export const Chat = component$((props: {disabled: boolean, fieldsToWaitFor: Fiel
     }
   }
 
-  const resize$ = $((event: QwikChangeEvent<HTMLTextAreaElement> | QwikKeyboardEvent<HTMLTextAreaElement>) => {
-    if (event.target == null) {
-      return
-    }
+  // const resize$ = $((event: QwikChangeEvent<HTMLTextAreaElement> | QwikKeyboardEvent<HTMLTextAreaElement>) => {
+  //   if (event.target == null) {
+  //     return
+  //   }
 
-    const el = event.target as HTMLTextAreaElement
+  //   const el = event.target as HTMLTextAreaElement
 
-    el.style.height = '5px'
-    el.style.height = `${(el.scrollHeight + 4)}px`
-  })
+  //   el.style.height = '5px'
+  //   el.style.height = `${(el.scrollHeight + 4)}px`
+  // })
 
   const submitMessage$ = $(async () => {
     let message = textAreaState.content.trim()
@@ -81,7 +87,7 @@ export const Chat = component$((props: {disabled: boolean, fieldsToWaitFor: Fiel
   })
 
   return (
-    <div class="container mx-auto items-center">
+    <div class="items-center">
       <div class="px-5 py-5 flex justify-between bg-white border-b-2 shadow-lg rounded-lg">
         <div class="w-full px-5 flex flex-col justify-between">
           <div class="mt-5">
@@ -100,16 +106,17 @@ export const Chat = component$((props: {disabled: boolean, fieldsToWaitFor: Fiel
           </div>
           <div class="py-5" style={{display: `${props.disabled ? "none" : "block"}`}}>
             <textarea
-              style="overflow-y: hidden"
-              class="block w-full h-16 bg-gray-200 text-gray-700 border border-gray-200 py-5 pl-5 pr-14 rounded-xl mb-3 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+              // style="overflow-y: hidden"
+              rows={2}
+              class="block w-full h-32 bg-gray-200 text-gray-700 border border-gray-200 py-5 pl-5 pr-14 rounded-xl mb-3 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
               disabled={props.conversation.length % 2 == 0}
               placeholder="Type your message here..."
               value={textAreaState.content}
-              onKeyUp$={resize$}
+              // onKeyUp$={resize$}
               onChange$={(event) => {textAreaState.content = event.target.value}}
             />
             <button
-              class="absolute px-4 py-4 my-12 rounded-xl text-gray-500 bottom-1.5 right-10 md:bottom-2.5 md:right-2 hover:bg-gray-100 dark:hover:text-gray-400 dark:hover:bg-gray-900 disabled:hover:bg-transparent dark:disabled:hover:bg-transparent"
+              class="absolute px-4 py-4 my-12 rounded-xl text-gray-500 bottom-1.5 right-10 hover:bg-gray-100 dark:hover:text-gray-400 dark:hover:bg-gray-900 disabled:hover:bg-transparent dark:disabled:hover:bg-transparent"
               disabled={props.conversation.length % 2 == 0}
               onClick$={submitMessage$}
             >
