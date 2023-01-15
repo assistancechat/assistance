@@ -27,12 +27,12 @@ const Hero = component$((props: {header: string, tagline: string, image: string,
                     </a>
                   </div>
                   <div class="flex w-full sm:w-auto">
-                    <button 
+                    <button
                       class="btn w-full bg-gray-50 dark:bg-transparent"
                       onClick$={() => {
                           const e = document.getElementById("features");
                           if (e !== null) {
-                            e.scrollIntoView(); 
+                            e.scrollIntoView();
                           }
                         }
                       }
