@@ -64,6 +64,22 @@ const Form = component$((props: {hasButton: boolean, buttonText: string, fieldsT
                 <input
                   id={recordId}
                   value={formRecordIdState[recordId]}
+                  onChange$={async (event) => {
+                    const value = event.target.value
+
+                    const body = JSON.stringify({
+                      content: `{"${recordId}": "${value}"}`,
+                    })
+
+                    await fetch("https://api.assistance.chat/save", {
+                      method: 'POST',
+                      body: body,
+                      headers: {
+                        'Content-Type': 'application/json;charset=UTF-8',
+                        "Authorization": `Bearer ${gptState.accessToken}`,
+                      }
+                    });
+                  }}
                   onInput$={(event) => {
                     if (event.target == null) {
                       return
@@ -87,11 +103,6 @@ const Form = component$((props: {hasButton: boolean, buttonText: string, fieldsT
             disabled={buttonState.disabled}
             onClick$={async () => {
               buttonState.disabled = true
-              const e = document.getElementById("gpt-assistance-chat");
-              if (e !== null) {
-                e.scrollIntoView();
-              }
-
               console.log(gptState.initialPrompt)
 
               const body = JSON.stringify({
@@ -113,6 +124,11 @@ const Form = component$((props: {hasButton: boolean, buttonText: string, fieldsT
               const message: string = firstMessageData["response"]
 
               gptState.conversation.push({message})
+
+              const e = document.getElementById("gpt-assistance-chat");
+              if (e !== null) {
+                e.scrollIntoView();
+              }
             }}
           >
             {props.buttonText}
