@@ -18,7 +18,7 @@ import openai
 from .paths import SECRETS
 
 
-def _load_secret(name):
+def load_secret(name):
     secret_path = SECRETS / name
 
     with open(secret_path, encoding="utf8") as f:
@@ -28,18 +28,18 @@ def _load_secret(name):
 
 
 def set_openai_api_key():
-    openai_api_key = _load_secret("openai_api_key")
+    openai_api_key = load_secret("openai_api_key")
 
     openai.api_key = openai_api_key
 
 
 def get_jwt_key():
-    return _load_secret("jwt_key")
+    return load_secret("jwt_key")
 
 
 def get_mailgun_api_key():
-    return _load_secret("mailgun_api_key")
+    return load_secret("mailgun_api_key")
 
 
 def get_notion_api_key():
-    return _load_secret("notion_api_key")
+    return load_secret("notion_api_key")
