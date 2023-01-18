@@ -1,0 +1,9 @@
+{
+  "$schema": "https://json.schemastore.org/web-manifest-combined.json",
+  "name": "career-assistance-chat",
+  "short_name": "Career Assistance Chat",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#fff",
+  "description": "Career Assitance Chat"
+}
