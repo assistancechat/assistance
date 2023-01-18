@@ -1,18 +1,16 @@
 import { component$ } from "@builder.io/qwik";
 import { Link } from "@builder.io/qwik-city";
 
-import { IconTwitter } from "~/components/icons/IconTwitter";
-import { IconLinkedIn } from "~/components/icons/IconLinkedIn";
+// import { IconTwitter } from "~/components/icons/IconTwitter";
+// import { IconLinkedIn } from "~/components/icons/IconLinkedIn";
 import { IconGithub } from "~/components/icons/IconGithub";
 
 export default component$(() => {
   const social = [
-    { label: "LinkedIn", icon: IconLinkedIn, href: "https://www.linkedin.com/company/OpenSaMD/" },
-    { label: "Twitter", icon: IconTwitter, href: "https://twitter.com/OpenSaMD" },
     {
       label: "Github",
       icon: IconGithub,
-      href: "https://github.com/OpenSaMD/OpenSaMD",
+      href: "https://github.com/assistancechat/assistance.chat",
     },
   ];
 
