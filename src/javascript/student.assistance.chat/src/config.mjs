@@ -1,7 +1,12 @@
 export const SITE = {
-  name: "OpenSaMD",
+  name: "student.assistance.chat",
 
-  origin: "https://opensamd.com",
+  title:
+    "student.assistance.chat",
+  description:
+    "student.assistance.chat",
+
+  origin: "https://student.assistance.chat",
   basePathname: "/",
   trailingSlash: true
 };
