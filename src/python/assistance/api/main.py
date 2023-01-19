@@ -26,7 +26,6 @@ from .conversations import (
     call_gpt_and_keep_record,
     run_career_chat_response,
     run_career_chat_start,
-    run_student_chat,
 )
 from .keys import set_openai_api_key
 from .login import (
@@ -150,23 +149,6 @@ async def career_chat_continue(
         client_name=data.client_name,
         agent_name=data.agent_name,
         client_text=data.client_text,
-    )
-
-    return {"response": response}
-
-
-class StudentChatData(BaseModel):
-    client_text: str
-
-
-@app.post("/chat/student")
-async def student_chat(
-    data: StudentChatData,
-    current_user: User = Depends(get_current_user),
-):
-    # TODO: Need to make this async, currently blocking users
-    response = await run_student_chat(
-        username=current_user.username, client_text=data.client_text
     )
 
     return {"response": response}
