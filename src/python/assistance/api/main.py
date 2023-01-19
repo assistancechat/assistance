@@ -22,7 +22,7 @@ from fastapi.security import OAuth2PasswordRequestForm
 from pydantic import BaseModel
 
 from . import ctx
-from .conversations import run_chat_response, run_chat_start
+from .conversations import call_gpt_and_keep_record, run_chat_response, run_chat_start
 from .keys import set_openai_api_key
 from .login import (
     Token,
@@ -96,10 +96,10 @@ async def run_prompt(
     data: Prompt,
     current_user: User = Depends(get_current_user),
 ):
-    response = await run_chat_start(
+    response = await call_gpt_and_keep_record(
+        record_grouping=data.record_grouping,
         username=current_user.username,
-        client_name=data.client_name,
-        agent_name=data.agent_name,
+        model_kwargs=data.model_kwargs,
         prompt=data.prompt,
     )
 
@@ -148,14 +148,14 @@ async def chat_continue(
     return {"response": response}
 
 
-class StoreData(BaseModel):
+class StoreDataRecordGroupingOptional(BaseModel):
     record_grouping: str | None = None
     content: str
 
 
 @app.post("/save")
 async def save_content(
-    data: StoreData,
+    data: StoreDataRecordGroupingOptional,
     current_user: User = Depends(get_current_user),
 ):
     record_grouping = data.record_grouping
@@ -165,6 +165,22 @@ async def save_content(
 
     dirnames = [record_grouping, current_user.username, "save-api-call"]
     filename = "contents.txt"
+
+    await store_file(dirnames=dirnames, filename=filename, contents=data.content)
+
+
+class StoreData(BaseModel):
+    record_grouping: str
+    content: str
+
+
+@app.post("/save/form")
+async def save_form(
+    data: StoreData,
+    current_user: User = Depends(get_current_user),
+):
+    dirnames = [data.record_grouping, current_user.username, "forms"]
+    filename = "form.txt"
 
     await store_file(dirnames=dirnames, filename=filename, contents=data.content)
 
