@@ -33,6 +33,10 @@ def set_openai_api_key():
     openai.api_key = openai_api_key
 
 
+def get_serp_api_key():
+    return load_secret("serp_api_key")
+
+
 def get_jwt_key():
     return load_secret("jwt_key")
 
