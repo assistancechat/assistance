@@ -32,7 +32,7 @@ from .login import (
     get_user_access_token,
 )
 from .mailgun import send_access_link
-from .notion import store_data_as_new_notion_page
+from .store import store_file
 
 logging.basicConfig(
     level=logging.INFO,
@@ -70,6 +70,7 @@ async def shutdown_event():
     await ctx.session.close()
 
 
+@app.post("/login", response_model=Token)
 @app.post("/token", response_model=Token)
 async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends()):
     access_token = get_user_access_token(form_data.username, form_data.password)
@@ -82,6 +83,27 @@ async def temp_account():
     username = create_temp_account()
 
     return {"username": username}
+
+
+class Prompt(BaseModel):
+    record_grouping: str
+    model_kwargs: dict
+    prompt: str
+
+
+@app.post("/prompt")
+async def run_prompt(
+    data: Prompt,
+    current_user: User = Depends(get_current_user),
+):
+    response = await run_chat_start(
+        username=current_user.username,
+        client_name=data.client_name,
+        agent_name=data.agent_name,
+        prompt=data.prompt,
+    )
+
+    return {"response": response}
 
 
 class ChatStartData(BaseModel):
@@ -127,6 +149,7 @@ async def chat_continue(
 
 
 class StoreData(BaseModel):
+    record_grouping: str | None = None
     content: str
 
 
@@ -135,7 +158,15 @@ async def save_content(
     data: StoreData,
     current_user: User = Depends(get_current_user),
 ):
-    await store_data_as_new_notion_page(current_user.username, data.content)
+    record_grouping = data.record_grouping
+
+    if record_grouping is None:
+        record_grouping = "career.assistance.chat"
+
+    dirnames = [record_grouping, current_user.username, "save-api-call"]
+    filename = "contents.txt"
+
+    await store_file(dirnames=dirnames, filename=filename, contents=data.content)
 
 
 @app.post("/send/signin-link")
