@@ -2,12 +2,9 @@ import {
   component$,
   useStore,
   useContextProvider,
-  Resource,
-  useResource$,
   useClientEffect$
 } from "@builder.io/qwik";
-import { useLocation, DocumentHead } from "@builder.io/qwik-city";
-import { getContent, RegisteredComponent, RenderContent, getBuilderSearchParams } from "@builder.io/sdk-qwik";
+import { DocumentHead } from "@builder.io/qwik-city";
 
 import sha224 from 'crypto-js/sha224';
 
@@ -69,7 +66,7 @@ export default component$(() => {
     }
     const formBody = formBodyItems.join("&");
 
-    const tokenResponse = await fetch('https://api.assistance.chat/token', {
+    const tokenResponse = await fetch('https://api.assistance.chat/login', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
