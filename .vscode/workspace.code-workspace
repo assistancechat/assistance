@@ -37,6 +37,7 @@
       "**/python-embed/*/**": true
     },
     "python.testing.promptToConfigure": false,
+    "javascript.updateImportsOnFileMove.enabled": "prompt",
     "cSpell.language": "en-GB",
     "cSpell.words": [
       "Aana",
