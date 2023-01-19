@@ -165,7 +165,9 @@ async def student_chat(
     current_user: User = Depends(get_current_user),
 ):
     # TODO: Need to make this async, currently blocking users
-    response = run_student_chat(username=current_user, client_text=data.client_text)
+    response = await run_student_chat(
+        username=current_user.username, client_text=data.client_text
+    )
 
     return {"response": response}
 

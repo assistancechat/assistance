@@ -16,33 +16,42 @@ from langchain import OpenAI
 from langchain.agents import Tool, initialize_agent
 from langchain.chains.conversation.memory import ConversationSummaryBufferMemory
 
-from .tools import alphacrucis_faq_search, alphacrucis_main_page_search
+from ..keys import get_openai_api_key
+from .tools import alphacrucis_faq_search, alphacrucis_main_page_search, raw_search
+
+OPEN_AI_KEY = get_openai_api_key()
 
 
 def create_agent_chain():
     tools = [
+        # Tool(
+        #     name="Alphacrusis FAQ Search",
+        #     func=alphacrucis_faq_search().run,
+        #     description=(
+        #         "make sure before answering any question that you use this tool to search for a potentially relevant answer"
+        #     ),
+        # ),
+        # Tool(
+        #     name="Alphacrusis Main Page Search",
+        #     func=alphacrucis_main_page_search().run,
+        #     description=(
+        #         "make sure before answering any question that you use this tool to search for a potentially relevant answer"
+        #     ),
+        # ),
         Tool(
-            name="Alphacrusis FAQ Search",
-            func=alphacrucis_faq_search().run,
-            description=(
-                "useful for when you want to answer questions that may "
-                "have been previously been asked to Alphacrusis "
-                "support staff"
-            ),
-        ),
-        Tool(
-            name="Alphacrusis Main Page Search",
-            func=alphacrucis_main_page_search().run,
-            description=(
-                "useful for when you want to answer questions that may "
-                "be able to be found by searching Alphacrusis' website."
-            ),
+            name="Current Search",
+            func=raw_search().run,
+            description="useful for when you need to answer questions about current events or the current state of the world",
         ),
     ]
 
-    memory = ConversationSummaryBufferMemory(memory_key="chat_history")
+    memory = ConversationSummaryBufferMemory(
+        llm=OpenAI(openai_api_key=OPEN_AI_KEY),
+        max_token_limit=1000,
+        memory_key="chat_history",
+    )
 
-    llm = OpenAI(temperature=0)
+    llm = OpenAI(temperature=0, openai_api_key=OPEN_AI_KEY)
     agent_chain = initialize_agent(
         tools,
         llm,
@@ -52,3 +61,6 @@ def create_agent_chain():
     )
 
     return agent_chain
+
+
+agent_chain = create_agent_chain()

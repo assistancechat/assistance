@@ -31,15 +31,18 @@ def alphacrucis_main_page_search():
     return search
 
 
-def _create_custom_site_search(url):
+def raw_search():
     search = SerpAPIWrapper(params={"gl": "au"}, serpapi_api_key=API_KEY)
 
-    old_run = search.run
+    return search
 
-    def new_run(self, query: str) -> str:
-        query = f"site:{url} {query}"
-        return old_run(self, query=query)
 
-    search.run = new_run
+def _create_custom_site_search(url):
+    class CustomWrapper(SerpAPIWrapper):
+        def run(self, query: str) -> str:
+            query = f"site:{url} {query}"
+            super().run(query=query)
+
+    search = CustomWrapper(params={"gl": "au"}, serpapi_api_key=API_KEY)
 
     return search

@@ -28,9 +28,11 @@ def load_secret(name):
 
 
 def set_openai_api_key():
-    openai_api_key = load_secret("openai_api_key")
+    openai.api_key = get_openai_api_key()
 
-    openai.api_key = openai_api_key
+
+def get_openai_api_key():
+    return load_secret("openai_api_key")
 
 
 def get_serp_api_key():

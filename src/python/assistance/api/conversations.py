@@ -17,22 +17,23 @@ import logging
 
 import openai
 
-from .langchain.student import create_agent_chain
+from .langchain.student import agent_chain
 from .store import store_prompt_transcript
 from .utilities import LRUCache
 
 # TODO: Make this time expiration based.
 message_history = LRUCache(10000)
-agent_history = LRUCache(100)
 
 
 async def run_student_chat(username: str, client_text: str):
     try:
-        agent = agent_history[username]
+        chat_history = message_history[username]
     except KeyError:
-        agent = create_agent_chain()
+        chat_history = ""
 
-    message = agent.run(input=client_text)
+    message = agent_chain.run(input=client_text)
+
+    print(message)
 
     return message
 
