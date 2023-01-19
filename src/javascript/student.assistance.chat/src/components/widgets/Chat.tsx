@@ -99,7 +99,7 @@ export default component$((props: {disabled: boolean, fieldsToWaitFor: FieldToWa
               onChange$={(event) => {textAreaState.content = event.target.value}}
             />
             <button
-              class="absolute px-4 py-4 my-12 rounded-xl text-gray-500 bottom-1.5 right-10 hover:bg-gray-100 dark:hover:text-gray-400 dark:hover:bg-gray-900 disabled:hover:bg-transparent dark:disabled:hover:bg-transparent"
+              class="absolute px-4 py-4 my-12 rounded-xl text-gray-500 bottom-1.5 right-10 hover:text-gray-400 disabled:hover:bg-transparent dark:disabled:hover:bg-transparent"
               disabled={props.conversation.length % 2 == 0}
               onClick$={submitMessage$}
             >
