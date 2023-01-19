@@ -21,6 +21,9 @@
     "subfont": "subfont -i --inline-css --no-fallbacks --silent --root dist",
     "qwik": "qwik"
   },
+  "dependencies": {
+    "crypto-js": "^4.1.1"
+  },
   "devDependencies": {
     "@builder.io/qwik": "^0.16.2",
     "@builder.io/qwik-city": "^0.0.128",

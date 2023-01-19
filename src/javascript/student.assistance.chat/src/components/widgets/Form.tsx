@@ -1,6 +1,6 @@
 import { component$, useContext, useTask$, useStore } from '@builder.io/qwik';
-import { FormRecordIdContext, FormPromptIdContext, FormUpdateCounterContext } from "~/providers/form";
-import { GptContext } from "~/providers/gpt";
+import { FormRecordIdContext, FormPromptIdContext, FormUpdateCounterContext } from "~/providers/FormContexts";
+import { GptContext } from "~/providers/GptContext";
 
 
 type Item = {
@@ -18,7 +18,7 @@ type ButtonState = {
   disabled: boolean
 }
 
-export const Form = component$((props: {hasButton: boolean, buttonText: string, fieldsToWaitFor: FieldToWaitFor[], items: Item[]}) => {
+export default component$((props: {hasButton: boolean, buttonText: string, fieldsToWaitFor: FieldToWaitFor[], items: Item[]}) => {
   const formRecordIdState = useContext(FormRecordIdContext);
   const formPromptIdState = useContext(FormPromptIdContext);
   const formUpdateCounterState = useContext(FormUpdateCounterContext);

@@ -1,12 +1,9 @@
 import {
   component$,
   useContext,
-  useTask$,
-  // QwikChangeEvent,
-  // QwikKeyboardEvent,
   $, useStore } from '@builder.io/qwik';
-import { FormRecordIdContext, FormPromptIdContext, FormUpdateCounterContext } from "~/providers/form";
-import { GptContext } from "~/providers/gpt";
+import { FormRecordIdContext } from "~/providers/FormContexts";
+import { GptContext } from "~/providers/GptContext";
 
 
 type Message = {
@@ -23,7 +20,7 @@ type TextAreaState = {
 }
 
 
-export const Chat = component$((props: {disabled: boolean, fieldsToWaitFor: FieldToWaitFor[], conversation: Message[]}) => {
+export default component$((props: {disabled: boolean, fieldsToWaitFor: FieldToWaitFor[], conversation: Message[]}) => {
   const formRecordIdState = useContext(FormRecordIdContext);
   const gptState = useContext(GptContext);
 
@@ -41,17 +38,6 @@ export const Chat = component$((props: {disabled: boolean, fieldsToWaitFor: Fiel
       }
     }
   }
-
-  // const resize$ = $((event: QwikChangeEvent<HTMLTextAreaElement> | QwikKeyboardEvent<HTMLTextAreaElement>) => {
-  //   if (event.target == null) {
-  //     return
-  //   }
-
-  //   const el = event.target as HTMLTextAreaElement
-
-  //   el.style.height = '5px'
-  //   el.style.height = `${(el.scrollHeight + 4)}px`
-  // })
 
   const submitMessage$ = $(async () => {
     let message = textAreaState.content.trim()
@@ -105,13 +91,11 @@ export const Chat = component$((props: {disabled: boolean, fieldsToWaitFor: Fiel
           </div>
           <div class="py-5" style={{display: `${props.disabled ? "none" : "block"}`}}>
             <textarea
-              // style="overflow-y: hidden"
               rows={2}
               class="block w-full h-32 bg-gray-200 text-gray-700 border border-gray-200 py-5 pl-5 pr-14 rounded-xl mb-3 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
               disabled={props.conversation.length % 2 == 0}
               placeholder="Type your message here..."
               value={textAreaState.content}
-              // onKeyUp$={resize$}
               onChange$={(event) => {textAreaState.content = event.target.value}}
             />
             <button
@@ -127,46 +111,3 @@ export const Chat = component$((props: {disabled: boolean, fieldsToWaitFor: Fiel
     </div>
   );
 });
-
-export const GPTChat = component$((props: {agentName: string, prompt: string}) => {
-  const formRecordIdState = useContext(FormRecordIdContext);
-  const formPromptIdState = useContext(FormPromptIdContext);
-  const formUpdateCounterState = useContext(FormUpdateCounterContext);
-  const gptState = useContext(GptContext);
-
-  useTask$(() => {
-    gptState.promptTemplate = props.prompt
-    gptState.agentName = props.agentName
-  })
-
-  useTask$(({track}) => {
-    const template = track(() => gptState.promptTemplate);
-    const clientName = track(() => formRecordIdState['preferredName']);
-    const agentName = track(() => gptState.agentName);
-    track(() => formUpdateCounterState.counter);
-
-    gptState.initialPrompt = template
-      .replaceAll("{clientName}", clientName)
-      .replaceAll("{agentName}", agentName)
-      .replaceAll("{formContents}", JSON.stringify(formPromptIdState, null, 2))
-  })
-
-  const preferredName = formRecordIdState['preferredName']
-  const email = formRecordIdState['email']
-
-  if (preferredName == null || preferredName == "" || email == null || email == "") {
-    return <></>
-  }
-
-  return (
-    <div>
-      <Chat
-        disabled={false}
-        conversation={gptState.conversation}
-        // conversation={[{message:'Test'}, {message:'Test'}]}
-        fieldsToWaitFor={[]}>
-      </Chat>
-      <div id="gpt-assistance-chat"></div>
-    </div>
-  );
-})

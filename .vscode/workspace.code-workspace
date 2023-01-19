@@ -5,6 +5,10 @@
     }
   ],
   "settings": {
+    "editor.tabSize": 2,
+    "[json]": {
+      "editor.tabSize": 2
+    },
     "css.lint.unknownAtRules": "ignore",
     "editor.detectIndentation": true,
     "editor.formatOnSave": true,
@@ -26,7 +30,8 @@
       "**/*.pyi"
     ],
     "[python]": {
-      "editor.rulers": [72, 88]
+      "editor.rulers": [72, 88],
+      "editor.tabSize": 4
     },
     "python.testing.unittestEnabled": false,
     "python.testing.pytestEnabled": false,
