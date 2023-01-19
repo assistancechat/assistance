@@ -14,6 +14,8 @@
 
 import pathlib
 
-CONFIG = pathlib.Path.home() / ".assistance.chat"
-SECRETS = CONFIG / "secrets"
-USERS = CONFIG / "users"
+STORE = pathlib.Path.home() / ".assistance.chat"
+SECRETS = STORE / "secrets"
+USERS = STORE / "users"
+
+RECORDS = STORE / "records"

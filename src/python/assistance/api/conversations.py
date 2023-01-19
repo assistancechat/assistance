@@ -17,7 +17,7 @@ import logging
 
 import openai
 
-from .notion import store_data_as_new_notion_page
+from .store import store_prompt_transcript
 from .utilities import LRUCache
 
 # TODO: Make this time expiration based.
@@ -43,25 +43,48 @@ async def run_chat_response(
 
 
 async def _run_gpt(username: str, client_name: str):
-    completions = openai.Completion.create(
-        engine="text-davinci-003",
+    model_kwargs = {
+        "engine": "text-davinci-003",
+        "max_tokens": 256,
+        "best_of": 2,
+        "stop": f"{client_name}:",
+        "temperature": 0.7,
+        "top_p": 1,
+        "frequency_penalty": 0.1,
+        "presence_penalty": 0.1,
+    }
+
+    message = await call_gpt_and_keep_record(
+        record_grouping="career.assistance.chat",
+        username=username,
+        model_kwargs=model_kwargs,
         prompt=message_history[username],
-        max_tokens=256,
-        best_of=2,
-        stop=f"{client_name}:",
-        temperature=0.7,
-        top_p=1,
-        frequency_penalty=0.1,
-        presence_penalty=0.1,
     )
+    message = message.strip()
 
-    message: str = completions.choices[0].text.strip()
     message_history[username] += f" {message}"
-
-    asyncio.create_task(
-        store_data_as_new_notion_page(username, message_history[username])
-    )
-
     logging.info(message_history[username])
 
     return message
+
+
+async def call_gpt_and_keep_record(
+    record_grouping: str,
+    username: str,
+    model_kwargs: dict,
+    prompt: str,
+):
+    completions = openai.Completion.create(prompt=prompt, **model_kwargs)
+    response: str = completions.choices[0].text
+
+    asyncio.create_task(
+        store_prompt_transcript(
+            record_grouping=record_grouping,
+            username=username,
+            model_kwargs=model_kwargs,
+            prompt=prompt,
+            response=response,
+        )
+    )
+
+    return response
