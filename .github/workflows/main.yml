@@ -10,7 +10,7 @@ on:
       - webhook
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  group: ${{ github.workflow }}-career-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
