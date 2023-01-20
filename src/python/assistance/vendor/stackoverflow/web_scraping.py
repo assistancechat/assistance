@@ -2,6 +2,7 @@
 # Attribution-ShareAlike 4.0 International License.
 # <http://creativecommons.org/licenses/by-sa/4.0/>.
 
+import logging
 
 import aiohttp
 from bs4 import BeautifulSoup
@@ -11,6 +12,11 @@ from bs4 import BeautifulSoup
 async def scrape(session: aiohttp.ClientSession, url: str):
     results = await session.get(url=url)
     html = await results.read()
+
+    try:
+        html.decode(encoding="utf8")
+    except UnicodeDecodeError:
+        return ""
 
     soup = BeautifulSoup(html, features="html.parser")
 
@@ -25,6 +31,7 @@ async def scrape(session: aiohttp.ClientSession, url: str):
     lines = (line.strip() for line in text.splitlines())
     # break multi-headlines into a line each
     chunks = (phrase.strip() for line in lines for phrase in line.split("  "))
-    text = "\n".join(chunk for chunk in chunks)
+    # drop blank lines
+    text = "\n".join(chunk for chunk in chunks if chunk)
 
     return text
