@@ -46,6 +46,12 @@ PROMPT = textwrap.dedent(
         helpful, respond by informing {client_name} that you do not know
         the answer.
 
+        You are always truthful.
+
+        Only provide information if you are certain of the answer.
+        If you don't know the answer, say so and if appropriate follow
+        up with getting clarification.
+
         Aditional Information:
         {additional_information}
 

@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import asyncio
+import logging
 import textwrap
 
 import openai
@@ -36,17 +37,18 @@ MODEL_KWARGS = {
 
 PROMPT = textwrap.dedent(
     """
-        Answer the query below utilising the provided information.
-        If the information is not relevant to the query respond with
-        "Not relevant".
+        Collate summaries that might be relevant to the query
+        below by utilising the provided text. If none of the
+        information is in any way relevant to the query respond only
+        with the statement NOT_RELEVANT
 
         Query:
         {query}
 
-        Information:
+        Text:
         {text}
 
-        Answer:
+        Collated Summaries:
     """
 ).strip()
 
@@ -55,7 +57,7 @@ async def summarise_piecewise_with_query(
     record_grouping: str, username: str, query: str, text_sections: list[str]
 ):
     if len(text_sections) == 0:
-        return "Not relevant"
+        return "NOT_RELEVANT"
 
     if len(text_sections) == 1:
         return await summarise_with_query(
@@ -94,7 +96,7 @@ async def summarise_piecewise_with_query(
 
     summaries = await asyncio.gather(*coroutines)
 
-    cleaned_summaries = [item for item in summaries if item != "Not relevant"]
+    cleaned_summaries = [item for item in summaries if item != "NOT_RELEVANT"]
     combined_summaries = "\n\n".join(cleaned_summaries)
 
     summary = await summarise_with_query(
@@ -111,7 +113,7 @@ async def summarise_urls_with_query(
     record_grouping: str, username: str, query: str, urls: list[str]
 ):
     if len(urls) == 0:
-        return "Not relevant"
+        return "NOT_RELEVANT"
 
     if len(urls) == 1:
         return await summarise_url_with_query(
@@ -135,7 +137,7 @@ async def summarise_urls_with_query(
 
     summaries = await asyncio.gather(*coroutines)
 
-    cleaned_summaries = [item for item in summaries if item != "Not relevant"]
+    cleaned_summaries = [item for item in summaries if item != "NOT_RELEVANT"]
     combined_summaries = "\n\n".join(cleaned_summaries)
 
     summary = await summarise_with_query(
@@ -164,6 +166,8 @@ async def summarise_url_with_query(
         query=query,
         text=word_limited_contents,
     )
+
+    logging.info(f"Summary of {url}: {summary}")
 
     return summary
 

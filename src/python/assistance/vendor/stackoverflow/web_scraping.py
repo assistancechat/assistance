@@ -16,7 +16,7 @@ async def scrape(session: aiohttp.ClientSession, url: str):
     try:
         html.decode(encoding="utf8")
     except UnicodeDecodeError:
-        return ""
+        return "NOT_RELEVANT"
 
     soup = BeautifulSoup(html, features="html.parser")
 

@@ -29,15 +29,19 @@ MODEL_KWARGS = {
 
 PROMPT = textwrap.dedent(
     """
-        Write a search engine query that helps provide extra
+        Write a simple search engine query that helps provide extra
         information to Michael to help him provide his next response.
 
-        Keep the query broad.
+        Instructions:
+        * Keep the query broad.
+        * Do not use any notation that is search engine specific.
+        * Do not use any search engine flags
+        * Do not use any logic statements
 
         Transcript:
         {transcript}
 
-        Question:
+        Query:
     """
 ).strip()
 

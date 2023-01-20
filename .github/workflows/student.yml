@@ -7,7 +7,7 @@ on:
   pull_request:
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  group: ${{ github.workflow }}-student-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -30,7 +30,6 @@ jobs:
       - name: Build app
         run: |
           npm run build
-          npm run build  # Seems to remember old builder.io content, building twice appears to fix it.
         working-directory: src/javascript/student.assistance.chat
 
       - name: Add GitHub Pages config files

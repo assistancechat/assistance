@@ -26,7 +26,9 @@ from .ids import SEARCH_ENGINE_IDS, SearchEngine
 API_KEY = get_google_search_api_key()
 
 
-async def alphacrucis_search(record_grouping: str, username: str, query):
+async def alphacrucis_search(record_grouping: str, username: str, query: str):
+    query = query.lower().replace("alphacrusis", "") + " alphacrusis"
+
     return await _search_with_summary(
         record_grouping=record_grouping,
         username=username,
@@ -51,9 +53,6 @@ async def _search_with_summary(
         links = [item["link"] for item in json_results["items"]]
     except KeyError:
         links = []
-
-    # TODO: Would be great to also use a pdf scraper as well
-    links = [link for link in links if not link.endswith(".pdf")]
 
     logging.info(f"Search Links: {links}")
 
