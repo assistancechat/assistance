@@ -19,7 +19,7 @@ import openai
 
 from assistance import ctx
 from assistance.keys import get_google_search_api_key
-from assistance.store import store_search_result
+from assistance.store.search import store_search_result
 
 from .ids import SEARCH_ENGINE_IDS, SearchEngine
 

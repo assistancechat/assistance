@@ -25,12 +25,9 @@ from assistance.api.login import (
     get_user_access_token,
 )
 from assistance.conversations import call_gpt_and_store_as_transcript
-from assistance.store import store_file
+from assistance.store.file import store_file
 
-router = APIRouter(
-    prefix="",
-    responses={404: {"description": "Not found"}},
-)
+router = APIRouter(prefix="")
 
 
 @router.post("/login", response_model=Token)

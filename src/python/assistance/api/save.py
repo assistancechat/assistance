@@ -16,22 +16,27 @@
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 
-from assistance.api.login import User, get_current_user
-from assistance.search.search import alphacrucis_search
+from assistance.store.file import store_file
 
-router = APIRouter(prefix="/search")
+from .login import User, get_current_user
+
+router = APIRouter(
+    prefix="/save",
+    responses={404: {"description": "Not found"}},
+)
 
 
-class SearchData(BaseModel):
+class StoreData(BaseModel):
     record_grouping: str
-    query: str
+    content: str
 
 
-@router.post("/alphacrucis")
-async def run_alphacrucis_search(
-    data: SearchData,
-    _current_user: User = Depends(get_current_user),
+@router.post("/form")
+async def save_form(
+    data: StoreData,
+    current_user: User = Depends(get_current_user),
 ):
-    result = await alphacrucis_search(query=data.query)
+    dirnames = [data.record_grouping, current_user.username, "forms"]
+    filename = "form.txt"
 
-    return result
+    await store_file(dirnames=dirnames, filename=filename, contents=data.content)

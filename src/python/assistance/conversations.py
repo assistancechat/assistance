@@ -17,7 +17,7 @@ import logging
 
 import openai
 
-from .store import store_prompt_transcript
+from .store.transcript import store_prompt_transcript
 from .utilities import LRUCache
 
 # TODO: Make this time expiration based.

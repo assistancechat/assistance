@@ -13,13 +13,26 @@
 # limitations under the License.
 
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
+from pydantic import BaseModel
 
-from assistance.mailgun import send_access_link
+from assistance.api.login import User, get_current_user
+from assistance.summary.summary import summarise
 
-router = APIRouter(prefix="/send")
+router = APIRouter(prefix="/summarise")
 
 
-@router.post("/signin-link")
-async def send_user_signin_link(email: str):
-    await send_access_link(email=email)
+class StoreData(BaseModel):
+    record_grouping: str
+    content: str
+
+
+@router.post("/form")
+async def save_form(
+    data: StoreData,
+    current_user: User = Depends(get_current_user),
+):
+    dirnames = [data.record_grouping, current_user.username, "forms"]
+    filename = "form.txt"
+
+    await store_file(dirnames=dirnames, filename=filename, contents=data.content)

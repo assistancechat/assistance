@@ -18,7 +18,7 @@ import openai
 from .config import MODEL_KWARGS, PROMPT
 
 
-async def summarise(query: str, text: str):
+async def summarise(record_grouping: str, username: str, query: str, text: str):
     prompt = PROMPT.format(query=query, text=text)
 
     completions = await openai.Completion.acreate(prompt=prompt, **MODEL_KWARGS)

@@ -26,10 +26,7 @@ class ChatStartData(BaseModel):
     prompt: str
 
 
-router = APIRouter(
-    prefix="/chat",
-    responses={404: {"description": "Not found"}},
-)
+router = APIRouter(prefix="/chat")
 
 
 @router.post("/career/start")
