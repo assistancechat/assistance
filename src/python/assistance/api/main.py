@@ -16,16 +16,16 @@ import logging
 
 import aiohttp
 import uvicorn
-from assistance.search.search import alphacrucis_search
+from assistance import ctx
+from assistance.conversations import call_gpt_and_store_as_transcript
+from assistance.keys import set_openai_api_key
+from assistance.mailgun import send_access_link
+from assistance.store import store_file
 from fastapi import Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
-from .. import ctx
-from ..conversations import call_gpt_and_store_as_transcript
-from ..keys import set_openai_api_key
-from ..mailgun import send_access_link
-from . import chat, save
+from . import chat, save, search
 from .login import login
 from .login.utilities import User, get_current_user
 
@@ -41,6 +41,7 @@ app = FastAPI()
 app.include_router(chat.router)
 app.include_router(save.router)
 app.include_router(login.router)
+app.include_router(search.router)
 
 origins = [
     "https://career.assistance.chat",
@@ -109,21 +110,6 @@ async def save_content(
     filename = "contents.txt"
 
     await store_file(dirnames=dirnames, filename=filename, contents=data.content)
-
-
-class SearchData(BaseModel):
-    record_grouping: str
-    query: str
-
-
-@app.post("/search/alphacrucis")
-async def run_alphacrucis_search(
-    data: SearchData,
-    _current_user: User = Depends(get_current_user),
-):
-    result = await alphacrucis_search(query=data.query)
-
-    return result
 
 
 @app.post("/send/signin-link")
