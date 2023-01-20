@@ -16,11 +16,12 @@
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 
-from assistance.api.login import User, get_current_user
 from assistance.conversations.career import (
     run_career_chat_response,
     run_career_chat_start,
 )
+
+from .utilities import User, get_current_user
 
 
 class ChatStartData(BaseModel):
@@ -29,7 +30,10 @@ class ChatStartData(BaseModel):
     prompt: str
 
 
-router = APIRouter(prefix="/chat")
+router = APIRouter(
+    prefix="/chat",
+    responses={404: {"description": "Not found"}},
+)
 
 
 @router.post("/career/start")

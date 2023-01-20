@@ -33,7 +33,8 @@ PROMPT = textwrap.dedent(
         last message?
 
         The search engine you are using is limited to only searching the
-        Alphacrusis University webpage and it's FAQ support pages.
+        Alphacrusis University webpage and as well as its FAQ support
+        pages.
 
         Transcript:
         {transcript}

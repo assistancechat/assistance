@@ -17,11 +17,9 @@ import logging
 
 import openai
 
-from .store.transcript import store_prompt_transcript
-from .utilities import LRUCache
+from assistance.store.transcript import store_prompt_transcript
 
-# TODO: Make this time expiration based.
-message_history = LRUCache(10000)
+from .cache import message_history
 
 
 async def run_career_chat_start(

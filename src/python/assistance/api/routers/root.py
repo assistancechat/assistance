@@ -24,7 +24,7 @@ from assistance.api.login import (
     get_current_user,
     get_user_access_token,
 )
-from assistance.conversations import call_gpt_and_store_as_transcript
+from assistance.conversations.career import call_gpt_and_store_as_transcript
 from assistance.store.file import store_file
 
 router = APIRouter(prefix="")
