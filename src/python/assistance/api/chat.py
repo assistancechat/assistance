@@ -17,7 +17,7 @@ from assistance.conversations import run_career_chat_response, run_career_chat_s
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 
-from .login import User, get_current_user
+from .login.utilities import User, get_current_user
 
 
 class ChatStartData(BaseModel):

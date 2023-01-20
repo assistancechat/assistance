@@ -17,14 +17,13 @@ import logging
 import secrets
 from datetime import datetime, timedelta
 
+from assistance.api.exceptions import CredentialsException
+from assistance.keys import get_jwt_key
+from assistance.paths import USERS
 from fastapi import Depends
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
 from pydantic import BaseModel
-
-from ..keys import get_jwt_key
-from ..paths import USERS
-from .exceptions import CredentialsException
 
 SECRET_KEY = get_jwt_key()
 ALGORITHM = "HS256"

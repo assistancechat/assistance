@@ -19,22 +19,15 @@ import uvicorn
 from assistance.search.search import alphacrucis_search
 from fastapi import Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.security import OAuth2PasswordRequestForm
 from pydantic import BaseModel
 
 from .. import ctx
 from ..conversations import call_gpt_and_store_as_transcript
 from ..keys import set_openai_api_key
 from ..mailgun import send_access_link
-from ..store import store_file
-from . import chat
-from .login import (
-    Token,
-    User,
-    create_temp_account,
-    get_current_user,
-    get_user_access_token,
-)
+from . import chat, save
+from .login import login
+from .login.utilities import User, get_current_user
 
 logging.basicConfig(
     level=logging.INFO,
@@ -44,6 +37,10 @@ logging.basicConfig(
 
 
 app = FastAPI()
+
+app.include_router(chat.router)
+app.include_router(save.router)
+app.include_router(login.router)
 
 origins = [
     "https://career.assistance.chat",
@@ -60,8 +57,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(chat.router)
-
 
 @app.on_event("startup")
 async def startup_event():
@@ -72,21 +67,6 @@ async def startup_event():
 @app.on_event("shutdown")
 async def shutdown_event():
     await ctx.session.close()
-
-
-@app.post("/login", response_model=Token)
-@app.post("/token", response_model=Token)
-async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends()):
-    access_token = get_user_access_token(form_data.username, form_data.password)
-
-    return {"access_token": access_token, "token_type": "bearer"}
-
-
-@app.post("/temp-account")
-async def temp_account():
-    username = create_temp_account()
-
-    return {"username": username}
 
 
 class Prompt(BaseModel):
@@ -127,22 +107,6 @@ async def save_content(
 
     dirnames = [record_grouping, current_user.username, "save-api-call"]
     filename = "contents.txt"
-
-    await store_file(dirnames=dirnames, filename=filename, contents=data.content)
-
-
-class StoreData(BaseModel):
-    record_grouping: str
-    content: str
-
-
-@app.post("/save/form")
-async def save_form(
-    data: StoreData,
-    current_user: User = Depends(get_current_user),
-):
-    dirnames = [data.record_grouping, current_user.username, "forms"]
-    filename = "form.txt"
 
     await store_file(dirnames=dirnames, filename=filename, contents=data.content)
 
