@@ -23,14 +23,11 @@ from fastapi.security import OAuth2PasswordRequestForm
 from pydantic import BaseModel
 
 from .. import ctx
-from ..conversations import (
-    call_gpt_and_store_as_transcript,
-    run_career_chat_response,
-    run_career_chat_start,
-)
+from ..conversations import call_gpt_and_store_as_transcript
 from ..keys import set_openai_api_key
 from ..mailgun import send_access_link
 from ..store import store_file
+from . import chat
 from .login import (
     Token,
     User,
@@ -62,6 +59,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.include_router(chat.router)
 
 
 @app.on_event("startup")
@@ -106,50 +105,6 @@ async def run_prompt(
         username=current_user.username,
         model_kwargs=data.model_kwargs,
         prompt=data.prompt,
-    )
-
-    return {"response": response}
-
-
-class ChatStartData(BaseModel):
-    client_name: str
-    agent_name: str
-    prompt: str
-
-
-@app.post("/chat/career/start")
-@app.post("/chat/start")
-async def career_chat_start(
-    data: ChatStartData,
-    current_user: User = Depends(get_current_user),
-):
-    response = await run_career_chat_start(
-        username=current_user.username,
-        client_name=data.client_name,
-        agent_name=data.agent_name,
-        prompt=data.prompt,
-    )
-
-    return {"response": response}
-
-
-class ChatContinueData(BaseModel):
-    client_name: str
-    agent_name: str
-    client_text: str
-
-
-@app.post("/chat/career/start")
-@app.post("/chat/continue")
-async def career_chat_continue(
-    data: ChatContinueData,
-    current_user: User = Depends(get_current_user),
-):
-    response = await run_career_chat_response(
-        username=current_user.username,
-        client_name=data.client_name,
-        agent_name=data.agent_name,
-        client_text=data.client_text,
     )
 
     return {"response": response}
