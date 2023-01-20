@@ -17,6 +17,9 @@ import textwrap
 
 import openai
 
+from assistance import ctx
+from assistance.vendor.stackoverflow.web_scraping import scrape
+
 MODEL_KWARGS = {
     "engine": "text-davinci-003",
     "max_tokens": 256,
@@ -46,9 +49,23 @@ PROMPT = textwrap.dedent(
 async def summarise_piecewise_with_query(
     record_grouping: str, username: str, query: str, text_sections: list[str]
 ):
+    if len(text_sections) == 0:
+        return "Not relevant"
+
+    if len(text_sections) == 1:
+        return await summarise_with_query(
+            record_grouping=record_grouping,
+            username=username,
+            query=query,
+            text=text_sections[0],
+        )
+
     coroutines = []
 
     for text in text_sections:
+        if len(text) == 0:
+            continue
+
         coroutines.append(
             summarise_with_query(
                 record_grouping=record_grouping,
@@ -73,8 +90,20 @@ async def summarise_piecewise_with_query(
     return summary
 
 
-async def summarise_url_with_query():
-    pass
+async def summarise_url_with_query(
+    record_grouping: str, username: str, query: str, url: str
+):
+    page_contents = await scrape(session=ctx.session, url=url)
+    split_page_contents = page_contents.split("\n\n")
+
+    summary = await summarise_piecewise_with_query(
+        record_grouping=record_grouping,
+        username=username,
+        query=query,
+        text_sections=split_page_contents,
+    )
+
+    return summary
 
 
 async def summarise_with_query(
