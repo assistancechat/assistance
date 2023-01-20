@@ -18,11 +18,10 @@ export default component$(() => {
           </div>
           <div class="block md:flex items-center flex-1">
             <div class="relative m-auto w-full">
-              <Chat
-                disabled={true}
-                conversation={[{"message": "Testing"}]}
-                fieldsToWaitFor={[]}>
-              </Chat>
+              <div class="pb-5">
+                <Form items={[{"recordId": "name", "formText": "Name"}]}/>
+              </div>
+              <GptChat/>
             </div>
           </div>
         </div>

@@ -49,14 +49,16 @@ export default component$((props: {disabled: boolean, fieldsToWaitFor: FieldToWa
     textAreaState.content = ""
 
     const body = JSON.stringify({
-      client_name: formRecordIdState["preferredName"],
-      agent_name: gptState.agentName,
+      client_name: formRecordIdState["name"],
+      // agent_name: gptState.agentName,
       client_text: message,
     })
 
+    console.log(body)
+
     props.conversation.push({message})
 
-    const continuedMessageResponse = await fetch("https://api.assistance.chat/chat/continue", {
+    const continuedMessageResponse = await fetch("https://api.assistance.chat/chat/student/continue", {
       method: 'POST',
       body: body,
       headers: {
@@ -83,7 +85,7 @@ export default component$((props: {disabled: boolean, fieldsToWaitFor: FieldToWa
                     class={`ml-2 py-3 px-4 text-white ${index % 2 == 0 ? "bg-gray-400 ml-2 rounded-br-3xl rounded-tr-3xl rounded-tl-xl" : "bg-blue-400 mr-2 rounded-bl-3xl rounded-tl-3xl rounded-tr-xl"}`}
                     style={{order: "2", "overflow-wrap": "anywhere"}}
                   >
-                    {message.replaceAll("{clientName}", formRecordIdState['preferredName']).replaceAll("{agentName}", gptState.agentName)}
+                    {message}
                   </div>
                 </div>
               )
@@ -97,6 +99,11 @@ export default component$((props: {disabled: boolean, fieldsToWaitFor: FieldToWa
               placeholder="Type your message here..."
               value={textAreaState.content}
               onChange$={(event) => {textAreaState.content = event.target.value}}
+              onKeyDown$={(event) => {
+                if (event.key === "Enter") {
+                  submitMessage$
+                }
+              }}
             />
             <button
               class="absolute px-4 py-4 my-12 rounded-xl text-gray-500 bottom-1.5 right-10 hover:text-gray-400 disabled:hover:bg-transparent dark:disabled:hover:bg-transparent"

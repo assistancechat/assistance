@@ -6,21 +6,14 @@ import { GptContext } from "~/providers/GptContext";
 type Item = {
   recordId: string
   formText: string
-  promptId: string
-  startingContent: string
-}
-
-type FieldToWaitFor = {
-  recordId: string
 }
 
 type ButtonState = {
   disabled: boolean
 }
 
-export default component$((props: {hasButton: boolean, buttonText: string, fieldsToWaitFor: FieldToWaitFor[], items: Item[]}) => {
+export default component$((props: {items: Item[]}) => {
   const formRecordIdState = useContext(FormRecordIdContext);
-  const formPromptIdState = useContext(FormPromptIdContext);
   const formUpdateCounterState = useContext(FormUpdateCounterContext);
   const gptState = useContext(GptContext);
 
@@ -30,31 +23,18 @@ export default component$((props: {hasButton: boolean, buttonText: string, field
     for (let i = 0; i < props.items.length; i++) {
       const item = props.items[i]
 
-      const startingContent = item.startingContent ? item.startingContent : ""
+      const startingContent = ""
 
       formRecordIdState[item.recordId] = startingContent
-      formPromptIdState[item.promptId] = startingContent
     }
   })
 
-  if (props.items === undefined || props.items.length === 0) {
-    return <></>
-  }
-
-  if (props.fieldsToWaitFor != null) {
-    for (let i = 0; i < props.fieldsToWaitFor.length; i++) {
-      const item = formRecordIdState[props.fieldsToWaitFor[i].recordId]
-      if (item == null || item == "") {
-        return <></>
-      }
-    }
-  }
 
   return (
     <div class="container mx-auto items-center">
       <div class="px-5 py-5 flex justify-between bg-white border-b-2 shadow-lg rounded-lg">
         <form class="w-full">
-          {props.items.map(({recordId, promptId, formText}) => (
+          {props.items.map(({recordId, formText}) => (
             <div class="flex flex-wrap -mx-3 mb-6">
               <div class="w-full px-3">
                 <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="grid-password">
@@ -86,7 +66,6 @@ export default component$((props: {hasButton: boolean, buttonText: string, field
                     const target: HTMLInputElement = event.target as HTMLInputElement
                     const value = target.value
                     formRecordIdState[recordId] = value
-                    formPromptIdState[promptId] = value
                     formUpdateCounterState.counter += 1
                   }}
                   type="text"
@@ -96,8 +75,7 @@ export default component$((props: {hasButton: boolean, buttonText: string, field
             </div>
           ))}
           <button
-            style={{display: `${props.hasButton ? "block" : "none"}`}}
-            class="btn btn-primary sm:mb-0"
+            class="block btn btn-primary sm:mb-0"
             type="button"
             disabled={buttonState.disabled}
             onClick$={async () => {
@@ -105,12 +83,12 @@ export default component$((props: {hasButton: boolean, buttonText: string, field
               console.log(gptState.initialPrompt)
 
               const body = JSON.stringify({
-                client_name: formRecordIdState["preferredName"],
-                agent_name: gptState.agentName,
-                prompt: gptState.initialPrompt,
+                client_name: formRecordIdState["name"],
               })
 
-              const firstMessageResponse = await fetch("https://api.assistance.chat/chat/start", {
+              console.log(body)
+
+              const firstMessageResponse = await fetch("https://api.assistance.chat/chat/student/start", {
                 method: 'POST',
                 body: body,
                 headers: {
@@ -130,7 +108,7 @@ export default component$((props: {hasButton: boolean, buttonText: string, field
               }
             }}
           >
-            {props.buttonText}
+            Begin Chat
           </button>
         </form>
       </div>
