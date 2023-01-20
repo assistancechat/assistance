@@ -13,9 +13,10 @@
 # limitations under the License.
 
 
-from assistance.search.search import alphacrucis_search
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel
+
+from assistance.search.search import alphacrucis_search
 
 from .login.utilities import User, get_current_user
 

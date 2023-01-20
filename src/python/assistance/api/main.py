@@ -16,14 +16,15 @@ import logging
 
 import aiohttp
 import uvicorn
+from fastapi import Depends, FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
+
 from assistance import ctx
 from assistance.conversations import call_gpt_and_store_as_transcript
 from assistance.keys import set_openai_api_key
 from assistance.mailgun import send_access_link
 from assistance.store import store_file
-from fastapi import Depends, FastAPI
-from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
 
 from . import chat, save, search
 from .login import login

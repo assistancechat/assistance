@@ -13,9 +13,10 @@
 # limitations under the License.
 
 
-from assistance.conversations import run_career_chat_response, run_career_chat_start
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel
+
+from assistance.conversations import run_career_chat_response, run_career_chat_start
 
 from .login.utilities import User, get_current_user
 

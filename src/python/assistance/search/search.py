@@ -16,6 +16,7 @@ import asyncio
 import urllib.parse
 
 import openai
+
 from assistance import ctx
 from assistance.keys import get_google_search_api_key
 from assistance.store import store_search_result
