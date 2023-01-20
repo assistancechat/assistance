@@ -63,6 +63,8 @@ async def summarise_piecewise_with_query(
     coroutines = []
 
     for text in text_sections:
+        text = text.strip()
+
         if len(text) == 0:
             continue
 
