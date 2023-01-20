@@ -41,11 +41,10 @@ PROMPT = textwrap.dedent(
         you ({agent_name}) from Assistance.Chat student support services
         and a prospective Alphacrusis student ({client_name}).
 
-        Provide your next response taking into account the
-        provided additional information. If the additional information
-        is insufficient to respond with confidence make sure to convey
-        in your response that you are uncertain/unsure of the accuracy
-        of what you are saying.
+        You have been provided with additional information to help you
+        support your next response. If the additional information is not
+        helpful, respond by informing {client_name} that you do not know
+        the answer.
 
         Aditional Information:
         {additional_information}

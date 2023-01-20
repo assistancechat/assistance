@@ -36,18 +36,17 @@ MODEL_KWARGS = {
 
 PROMPT = textwrap.dedent(
     """
-        Extract the key information in dot point form of the following
-        text in light of the following query. If the text is not
-        relevant to the query respond with "Not relevant".
+        Answer the query below utilising the provided information.
+        If the information is not relevant to the query respond with
+        "Not relevant".
 
         Query:
         {query}
 
-        Text:
+        Information:
         {text}
 
-        Key Information:
-        *
+        Answer:
     """
 ).strip()
 
@@ -153,13 +152,17 @@ async def summarise_url_with_query(
     record_grouping: str, username: str, query: str, url: str
 ):
     page_contents = await scrape(session=ctx.session, url=url)
-    split_page_contents = page_contents.split("\n\n")
 
-    summary = await summarise_piecewise_with_query(
+    split_page_contents = [item for item in page_contents.split(" ") if item]
+    word_limited = split_page_contents[0:200]
+
+    word_limited_contents = " ".join(word_limited)
+
+    summary = await summarise_with_query(
         record_grouping=record_grouping,
         username=username,
         query=query,
-        text_sections=split_page_contents,
+        text=word_limited_contents,
     )
 
     return summary

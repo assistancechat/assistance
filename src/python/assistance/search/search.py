@@ -46,13 +46,22 @@ async def _search_with_summary(
     search_raw_results = await ctx.session.get(url=url)
     json_results = await search_raw_results.json()
 
-    links = [item["link"] for item in json_results["items"]]
+    links: list[str]
+    try:
+        links = [item["link"] for item in json_results["items"]]
+    except KeyError:
+        links = []
+
+    # TODO: Would be great to also use a pdf scraper as well
+    links = [link for link in links if not link.endswith(".pdf")]
+
+    logging.info(f"Search Links: {links}")
 
     if len(links) == 0:
         summary = "No additional information found"
 
     else:
-        links_to_use = links[0:3]
+        links_to_use = links[0:10]
         logging.info(links_to_use)
 
         summary = await summarise_urls_with_query(
@@ -72,5 +81,7 @@ async def _search_with_summary(
             summary=summary,
         )
     )
+
+    logging.info(f"Search Summary: {summary}")
 
     return summary

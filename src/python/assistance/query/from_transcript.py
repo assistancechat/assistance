@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import logging
 import textwrap
 
 import openai
@@ -28,18 +29,15 @@ MODEL_KWARGS = {
 
 PROMPT = textwrap.dedent(
     """
-        Given the following transcript what query would be best typed
-        into a search engine to find out more information regarding the
-        last message?
+        Write a search engine query that helps provide extra
+        information to Michael to help him provide his next response.
 
-        The search engine you are using is limited to only searching the
-        Alphacrusis University webpage and as well as its FAQ support
-        pages.
+        Keep the query broad.
 
         Transcript:
         {transcript}
 
-        Query:
+        Question:
     """
 ).strip()
 
@@ -49,5 +47,7 @@ async def query_from_transcript(record_grouping: str, username: str, transcript:
 
     completions = await openai.Completion.acreate(prompt=prompt, **MODEL_KWARGS)
     response: str = completions.choices[0].text.strip().replace('"', "")
+
+    logging.info(f"Query: {response}")
 
     return response
