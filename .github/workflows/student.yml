@@ -15,7 +15,7 @@ concurrency:
 
 jobs:
   web:
-    name: Career.Assistant.Chat
+    name: Student.Assistant.Chat
     runs-on: ubuntu-latest
 
     steps:
@@ -24,29 +24,31 @@ jobs:
         with:
           node-version: 19
           cache: "npm"
-          cache-dependency-path: src/javascript/career.assistance.chat/package-lock.json
+          cache-dependency-path: src/javascript/student.assistance.chat/package-lock.json
 
       - name: Clean install dependencies
         run: npm ci
-        working-directory: src/javascript/career.assistance.chat
+        working-directory: src/javascript/student.assistance.chat
 
       - name: Build app
         run: |
           npm run build
           npm run build  # Seems to remember old builder.io content, building twice appears to fix it.
-        working-directory: src/javascript/career.assistance.chat
+        working-directory: src/javascript/student.assistance.chat
 
       - name: Add GitHub Pages config files
         if: github.ref == 'refs/heads/main'
         run: |
-          echo career.assistance.chat > dist/CNAME
+          echo student.assistance.chat > dist/CNAME
           touch dist/.nojekyll
           cp dist/index.html dist/404.html
-        working-directory: src/javascript/career.assistance.chat
+        working-directory: src/javascript/student.assistance.chat
 
       - name: Deploy to gh-pages branch
         if: github.ref == 'refs/heads/main'
         uses: JamesIves/github-pages-deploy-action@v4.4.1
         with:
           branch: gh-pages
-          folder: src/javascript/career.assistance.chat/dist
+          folder: src/javascript/student.assistance.chat/dist
+          repository-name: assistancechat/student.assistance.chat
+          token: ${{ secrets.ASSISTANCECHAT_BOT_PAT }}
