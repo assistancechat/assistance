@@ -35,6 +35,10 @@ def get_openai_api_key():
     return load_secret("openai_api_key")
 
 
+def get_google_search_api_key():
+    return load_secret("google_search_api_key")
+
+
 def get_serp_api_key():
     return load_secret("serp_api_key")
 

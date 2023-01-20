@@ -23,7 +23,7 @@ from pydantic import BaseModel
 
 from . import ctx
 from .conversations import (
-    call_gpt_and_keep_record,
+    call_gpt_and_store_as_transcript,
     run_career_chat_response,
     run_career_chat_start,
 )
@@ -36,6 +36,7 @@ from .login import (
     get_user_access_token,
 )
 from .mailgun import send_access_link
+from .search import alphacrucis_search
 from .store import store_file
 
 logging.basicConfig(
@@ -100,7 +101,7 @@ async def run_prompt(
     data: Prompt,
     current_user: User = Depends(get_current_user),
 ):
-    response = await call_gpt_and_keep_record(
+    response = await call_gpt_and_store_as_transcript(
         record_grouping=data.record_grouping,
         username=current_user.username,
         model_kwargs=data.model_kwargs,
@@ -189,6 +190,21 @@ async def save_form(
     filename = "form.txt"
 
     await store_file(dirnames=dirnames, filename=filename, contents=data.content)
+
+
+class SearchData(BaseModel):
+    record_grouping: str
+    query: str
+
+
+@app.post("/search/alphacrucis")
+async def run_alphacrucis_search(
+    data: SearchData,
+    _current_user: User = Depends(get_current_user),
+):
+    result = await alphacrucis_search(query=data.query)
+
+    return result
 
 
 @app.post("/send/signin-link")

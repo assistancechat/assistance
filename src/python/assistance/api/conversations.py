@@ -56,7 +56,7 @@ async def _run_gpt(username: str, client_name: str):
         "presence_penalty": 0.1,
     }
 
-    message = await call_gpt_and_keep_record(
+    message = await call_gpt_and_store_as_transcript(
         record_grouping="career.assistance.chat",
         username=username,
         model_kwargs=model_kwargs,
@@ -70,13 +70,13 @@ async def _run_gpt(username: str, client_name: str):
     return message
 
 
-async def call_gpt_and_keep_record(
+async def call_gpt_and_store_as_transcript(
     record_grouping: str,
     username: str,
     model_kwargs: dict,
     prompt: str,
 ):
-    completions = openai.Completion.create(prompt=prompt, **model_kwargs)
+    completions = await openai.Completion.acreate(prompt=prompt, **model_kwargs)
     response: str = completions.choices[0].text
 
     asyncio.create_task(
