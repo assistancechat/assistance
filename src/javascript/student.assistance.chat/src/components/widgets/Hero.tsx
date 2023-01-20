@@ -1,6 +1,5 @@
 import { component$ } from "@builder.io/qwik";
 
-import Chat from "~/components/widgets/Chat";
 import Form from "~/components/widgets/Form";
 import GptChat from "~/components/widgets/GptChat";
 
