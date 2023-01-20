@@ -16,9 +16,8 @@
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 
+from assistance.api.login import User, get_current_user
 from assistance.store import store_file
-
-from .login.utilities import User, get_current_user
 
 router = APIRouter(
     prefix="/save",

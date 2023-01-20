@@ -14,26 +14,27 @@
 
 
 from fastapi import APIRouter, Depends
-from fastapi.security import OAuth2PasswordRequestForm
+from pydantic import BaseModel
 
-from .utilities import Token, create_temp_account, get_user_access_token
+from assistance.api.login import User, get_current_user
+from assistance.search.search import alphacrucis_search
 
 router = APIRouter(
-    prefix="",
+    prefix="/search",
     responses={404: {"description": "Not found"}},
 )
 
 
-@router.post("/login", response_model=Token)
-@router.post("/token", response_model=Token)
-async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends()):
-    access_token = get_user_access_token(form_data.username, form_data.password)
-
-    return {"access_token": access_token, "token_type": "bearer"}
+class SearchData(BaseModel):
+    record_grouping: str
+    query: str
 
 
-@router.post("/temp-account")
-async def temp_account():
-    username = create_temp_account()
+@router.post("/search/alphacrucis")
+async def run_alphacrucis_search(
+    data: SearchData,
+    _current_user: User = Depends(get_current_user),
+):
+    result = await alphacrucis_search(query=data.query)
 
-    return {"username": username}
+    return result

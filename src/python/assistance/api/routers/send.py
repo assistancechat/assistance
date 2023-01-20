@@ -13,29 +13,16 @@
 # limitations under the License.
 
 
-from fastapi import APIRouter, Depends
-from pydantic import BaseModel
+from fastapi import APIRouter
 
-from assistance.search.search import alphacrucis_search
-
-from .login.utilities import User, get_current_user
+from assistance.mailgun import send_access_link
 
 router = APIRouter(
-    prefix="/search",
+    prefix="/send",
     responses={404: {"description": "Not found"}},
 )
 
 
-class SearchData(BaseModel):
-    record_grouping: str
-    query: str
-
-
-@router.post("/search/alphacrucis")
-async def run_alphacrucis_search(
-    data: SearchData,
-    _current_user: User = Depends(get_current_user),
-):
-    result = await alphacrucis_search(query=data.query)
-
-    return result
+@router.post("/signin-link")
+async def send_user_signin_link(email: str):
+    await send_access_link(email=email)

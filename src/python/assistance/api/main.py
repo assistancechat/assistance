@@ -16,19 +16,13 @@ import logging
 
 import aiohttp
 import uvicorn
-from fastapi import Depends, FastAPI
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
 
 from assistance import ctx
-from assistance.conversations import call_gpt_and_store_as_transcript
 from assistance.keys import set_openai_api_key
-from assistance.mailgun import send_access_link
-from assistance.store import store_file
 
-from . import chat, save, search
-from .login import login
-from .login.utilities import User, get_current_user
+from .routers import chat, root, save, search, send
 
 logging.basicConfig(
     level=logging.INFO,
@@ -39,10 +33,11 @@ logging.basicConfig(
 
 app = FastAPI()
 
+app.include_router(root.router)
 app.include_router(chat.router)
 app.include_router(save.router)
-app.include_router(login.router)
 app.include_router(search.router)
+app.include_router(send.router)
 
 origins = [
     "https://career.assistance.chat",
@@ -69,53 +64,6 @@ async def startup_event():
 @app.on_event("shutdown")
 async def shutdown_event():
     await ctx.session.close()
-
-
-class Prompt(BaseModel):
-    record_grouping: str
-    model_kwargs: dict
-    prompt: str
-
-
-@app.post("/prompt")
-async def run_prompt(
-    data: Prompt,
-    current_user: User = Depends(get_current_user),
-):
-    response = await call_gpt_and_store_as_transcript(
-        record_grouping=data.record_grouping,
-        username=current_user.username,
-        model_kwargs=data.model_kwargs,
-        prompt=data.prompt,
-    )
-
-    return {"response": response}
-
-
-class StoreDataRecordGroupingOptional(BaseModel):
-    record_grouping: str | None = None
-    content: str
-
-
-@app.post("/save")
-async def save_content(
-    data: StoreDataRecordGroupingOptional,
-    current_user: User = Depends(get_current_user),
-):
-    record_grouping = data.record_grouping
-
-    if record_grouping is None:
-        record_grouping = "career.assistance.chat"
-
-    dirnames = [record_grouping, current_user.username, "save-api-call"]
-    filename = "contents.txt"
-
-    await store_file(dirnames=dirnames, filename=filename, contents=data.content)
-
-
-@app.post("/send/signin-link")
-async def send_user_signin_link(email: str):
-    await send_access_link(email=email)
 
 
 def main():
