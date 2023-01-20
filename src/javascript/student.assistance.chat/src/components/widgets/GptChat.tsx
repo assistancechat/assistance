@@ -1,9 +1,7 @@
 import {
   component$,
   useContext,
-  useTask$,
 } from '@builder.io/qwik';
-import { FormRecordIdContext, FormPromptIdContext, FormUpdateCounterContext } from "~/providers/FormContexts";
 import { GptContext } from "~/providers/GptContext";
 
 import Chat from "~/components/widgets/Chat";
