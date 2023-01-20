@@ -22,17 +22,20 @@ from assistance.summary.summary import summarise
 router = APIRouter(prefix="/summarise")
 
 
-class StoreData(BaseModel):
+class SummariseData(BaseModel):
     record_grouping: str
-    content: str
+    query: str
+    text: str
 
 
-@router.post("/form")
-async def save_form(
-    data: StoreData,
+@router.post("/")
+async def run_summarise(
+    data: SummariseData,
     current_user: User = Depends(get_current_user),
 ):
-    dirnames = [data.record_grouping, current_user.username, "forms"]
-    filename = "form.txt"
-
-    await store_file(dirnames=dirnames, filename=filename, contents=data.content)
+    return await summarise(
+        record_grouping=data.record_grouping,
+        username=current_user.username,
+        query=data.query,
+        text=data.text,
+    )

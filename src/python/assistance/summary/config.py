@@ -27,6 +27,7 @@ MODEL_KWARGS = {
 PROMPT = textwrap.dedent(
     """
         Summarise the following text in light of the following query.
+        If the text is not relevant to the query respond with "Not relevant"
 
         Query:
         {query}

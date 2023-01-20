@@ -22,6 +22,6 @@ async def summarise(record_grouping: str, username: str, query: str, text: str):
     prompt = PROMPT.format(query=query, text=text)
 
     completions = await openai.Completion.acreate(prompt=prompt, **MODEL_KWARGS)
-    response: str = completions.choices[0].text
+    response: str = completions.choices[0].text.strip()
 
     return response
