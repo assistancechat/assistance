@@ -16,9 +16,9 @@ import asyncio
 import urllib.parse
 
 import openai
-from assistance.api import ctx
-from assistance.api.keys import get_google_search_api_key
-from assistance.api.store import store_search_result
+from assistance import ctx
+from assistance.keys import get_google_search_api_key
+from assistance.store import store_search_result
 
 from .ids import SEARCH_ENGINE_IDS, SearchEngine
 
@@ -39,8 +39,8 @@ async def _search_with_summary(
 ):
     cx = SEARCH_ENGINE_IDS[search_engine]
 
-    encoded_query = urllib.parse.quote(query)
-    url = f"https://www.googleapis.com/customsearch/v1/siterestrict?key={API_KEY}&cx={cx}&q={encoded_query}"
+    url_encoded_query = urllib.parse.quote(query)
+    url = f"https://www.googleapis.com/customsearch/v1/siterestrict?key={API_KEY}&cx={cx}&q={url_encoded_query}"
 
     search_raw_results = await ctx.session.get(url=url)
     json_results = await search_raw_results.json()

@@ -1,4 +1,4 @@
-# Copyright (C) 2022 ISA Contributors
+# Copyright (C) 2023 Assistance.Chat contributors
 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,7 +12,28 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from assistance.api.api import main
+import textwrap
 
-if __name__ == "__main__":
-    main()
+MODEL_KWARGS = {
+    "engine": "text-davinci-003",
+    "max_tokens": 256,
+    "best_of": 2,
+    "temperature": 0.7,
+    "top_p": 1,
+    "frequency_penalty": 0.0,
+    "presence_penalty": 0.0,
+}
+
+PROMPT = textwrap.dedent(
+    """
+        Summarise the following text in light of the following query.
+
+        Query:
+        {query}
+
+        Text:
+        {text}
+
+        Summary:
+    """
+).strip()

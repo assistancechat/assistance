@@ -16,18 +16,21 @@ import logging
 
 import aiohttp
 import uvicorn
+from assistance.search.search import alphacrucis_search
 from fastapi import Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import OAuth2PasswordRequestForm
 from pydantic import BaseModel
 
-from . import ctx
-from .conversations import (
+from .. import ctx
+from ..conversations import (
     call_gpt_and_store_as_transcript,
     run_career_chat_response,
     run_career_chat_start,
 )
-from .keys import set_openai_api_key
+from ..keys import set_openai_api_key
+from ..mailgun import send_access_link
+from ..store import store_file
 from .login import (
     Token,
     User,
@@ -35,9 +38,6 @@ from .login import (
     get_current_user,
     get_user_access_token,
 )
-from .mailgun import send_access_link
-from .search import alphacrucis_search
-from .store import store_file
 
 logging.basicConfig(
     level=logging.INFO,
