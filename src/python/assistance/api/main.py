@@ -22,7 +22,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from assistance import ctx
 from assistance.keys import set_openai_api_key
 
-from .routers import chat, root, save, search, send, summarise
+from .routers import chat, query, root, save, search, send, summarise
 
 logging.basicConfig(
     level=logging.INFO,
@@ -39,6 +39,7 @@ app.include_router(save.router)
 app.include_router(search.router)
 app.include_router(send.router)
 app.include_router(summarise.router)
+app.include_router(query.router)
 
 origins = [
     "https://career.assistance.chat",

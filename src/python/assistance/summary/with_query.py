@@ -20,11 +20,15 @@ import openai
 from assistance import ctx
 from assistance.vendor.stackoverflow.web_scraping import scrape
 
+MAX_TEXT_SECTIONS = 10
+MIN_TEXT_LENGTH = 5
+MAX_TEXT_LENGTH = 200
+
 MODEL_KWARGS = {
     "engine": "text-davinci-003",
     "max_tokens": 256,
-    "best_of": 2,
-    "temperature": 0.7,
+    "best_of": 1,
+    "temperature": 0.0,
     "top_p": 1,
     "frequency_penalty": 0.0,
     "presence_penalty": 0.0,
@@ -32,8 +36,10 @@ MODEL_KWARGS = {
 
 PROMPT = textwrap.dedent(
     """
-        Summarise the following text in light of the following query.
-        If the text is not relevant to the query respond with "Not relevant"
+        Summarise the following text in light of the following query
+        coming from a prospective student who is not currently enrolled
+        at Alphacrusis. If the text is not relevant to the query respond
+        with "Not relevant".
 
         Query:
         {query}
@@ -60,9 +66,19 @@ async def summarise_piecewise_with_query(
             text=text_sections[0],
         )
 
-    coroutines = []
-
+    cleaned_text_sections = []
     for text in text_sections:
+        text = text.strip()
+
+        if len(text) < MIN_TEXT_LENGTH:
+            continue
+
+        cleaned_text_sections.append(text[0:MAX_TEXT_LENGTH])
+
+    limited_text_sections = cleaned_text_sections[0:MAX_TEXT_SECTIONS]
+
+    coroutines = []
+    for text in limited_text_sections:
         text = text.strip()
 
         if len(text) == 0:
@@ -77,7 +93,48 @@ async def summarise_piecewise_with_query(
             )
         )
 
-    summaries = asyncio.gather(coroutines)
+    summaries = await asyncio.gather(*coroutines)
+
+    cleaned_summaries = [item for item in summaries if item != "Not relevant"]
+    combined_summaries = "\n\n".join(cleaned_summaries)
+
+    summary = await summarise_with_query(
+        record_grouping=record_grouping,
+        username=username,
+        query=query,
+        text=combined_summaries,
+    )
+
+    return summary
+
+
+async def summarise_urls_with_query(
+    record_grouping: str, username: str, query: str, urls: list[str]
+):
+    if len(urls) == 0:
+        return "Not relevant"
+
+    if len(urls) == 1:
+        return await summarise_url_with_query(
+            record_grouping=record_grouping,
+            username=username,
+            query=query,
+            url=urls[0],
+        )
+
+    coroutines = []
+
+    for url in urls:
+        coroutines.append(
+            summarise_url_with_query(
+                record_grouping=record_grouping,
+                username=username,
+                query=query,
+                url=url,
+            )
+        )
+
+    summaries = await asyncio.gather(*coroutines)
 
     cleaned_summaries = [item for item in summaries if item != "Not relevant"]
     combined_summaries = "\n\n".join(cleaned_summaries)

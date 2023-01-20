@@ -24,7 +24,7 @@ from .utilities import (
 )
 
 
-def store_search_result(
+async def store_search_result(
     record_grouping: str,
     username: str,
     search_engine: SearchEngine,

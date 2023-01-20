@@ -17,25 +17,23 @@ from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 
 from assistance.api.login import User, get_current_user
-from assistance.search.search import alphacrucis_search
+from assistance.query.from_transcript import query_from_transcript
 
-router = APIRouter(prefix="/search")
+router = APIRouter(prefix="/query")
 
 
-class SearchData(BaseModel):
+class Data(BaseModel):
     record_grouping: str
-    query: str
+    transcript: str
 
 
-@router.post("/alphacrucis")
-async def run_alphacrucis_search(
-    data: SearchData,
+@router.post("/from-transcript")
+async def save_form(
+    data: Data,
     current_user: User = Depends(get_current_user),
 ):
-    result = await alphacrucis_search(
+    return await query_from_transcript(
         record_grouping=data.record_grouping,
         username=current_user.username,
-        query=data.query,
+        transcript=data.transcript,
     )
-
-    return result
