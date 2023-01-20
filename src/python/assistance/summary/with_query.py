@@ -36,10 +36,9 @@ MODEL_KWARGS = {
 
 PROMPT = textwrap.dedent(
     """
-        Summarise the following text in light of the following query
-        coming from a prospective student who is not currently enrolled
-        at Alphacrusis. If the text is not relevant to the query respond
-        with "Not relevant".
+        Extract the key information in dot point form of the following
+        text in light of the following query. If the text is not
+        relevant to the query respond with "Not relevant".
 
         Query:
         {query}
@@ -47,7 +46,8 @@ PROMPT = textwrap.dedent(
         Text:
         {text}
 
-        Summary:
+        Key Information:
+        *
     """
 ).strip()
 

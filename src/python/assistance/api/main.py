@@ -33,16 +33,9 @@ logging.basicConfig(
 
 app = FastAPI()
 
-app.include_router(root.router)
-app.include_router(chat.router)
-app.include_router(save.router)
-app.include_router(search.router)
-app.include_router(send.router)
-app.include_router(summarise.router)
-app.include_router(query.router)
-
 origins = [
     "https://career.assistance.chat",
+    "https://student.assistance.chat",
     "http://localhost:5173",
     "http://localhost:5174",
     "http://10.0.0.117:5173",
@@ -55,6 +48,14 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.include_router(root.router)
+app.include_router(chat.router)
+app.include_router(save.router)
+app.include_router(search.router)
+app.include_router(send.router)
+app.include_router(summarise.router)
+app.include_router(query.router)
 
 
 @app.on_event("startup")

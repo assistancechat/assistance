@@ -81,7 +81,7 @@ async def run_student_chat_start(username: str, client_name: str):
         prompt=prompt,
     )
 
-    message_history[username] += f"{AGENT_NAME}: {response}"
+    message_history[username] = f"{AGENT_NAME}: {response}"
 
     return response
 
