@@ -13,23 +13,13 @@
 # limitations under the License.
 
 
-import urllib.parse
-
-from . import ctx
-from .keys import get_google_search_api_key
-
-API_KEY = get_google_search_api_key()
+import enum
 
 
-async def alphacrucis_search(query):
-    cx = "350772bce9c914d64"
-    return await _search_with_summary(cx=cx, query=query)
+class SearchEngine(str, enum.Enum):
+    ALPHACRUCIS = "alphacrucis"
 
 
-async def _search_with_summary(cx, query):
-    encoded_query = urllib.parse.quote(query)
-    url = f"https://www.googleapis.com/customsearch/v1/siterestrict?key={API_KEY}&cx={cx}&q={encoded_query}"
-
-    search_result = await ctx.session.get(url=url)
-
-    return await search_result.json()
+SEARCH_ENGINE_IDS = {
+    SearchEngine.ALPHACRUCIS: "350772bce9c914d64",
+}

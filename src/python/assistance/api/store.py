@@ -21,6 +21,7 @@ import aiofiles
 import git
 
 from .paths import RECORDS
+from .search.ids import SearchEngine
 
 
 async def store_prompt_transcript(
@@ -42,9 +43,27 @@ async def store_prompt_transcript(
 
 
 def store_search_result(
-    record_grouping: str, username: str, model_kwargs: dict, prompt: str, response: str
+    record_grouping: str,
+    username: str,
+    search_engine: SearchEngine,
+    search_query: str,
+    search_api_result: dict,
+    summary: str,
 ):
-    pass
+    record_directory = _create_record_directory_with_epoch(
+        RECORDS, [record_grouping, username, "search"]
+    )
+
+    data_to_save = {
+        "search-engine.txt": search_engine.value,
+        "search_query.txt": search_query,
+        "search_api_result.json": json.dumps(search_api_result, indent=2),
+        "summary.txt": summary,
+    }
+
+    asyncio.create_task(
+        _store_files_as_well_as_commit_hash(record_directory, data_to_save)
+    )
 
 
 # TODO: This function should be able to assume that the filename isn't
