@@ -17,7 +17,7 @@ from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 
 from assistance.api.login import User, get_current_user
-from assistance.summary.summary import summarise
+from assistance.summary.with_query import summarise_with_query
 
 router = APIRouter(prefix="/summarise")
 
@@ -28,12 +28,12 @@ class SummariseData(BaseModel):
     text: str
 
 
-@router.post("/")
-async def run_summarise(
+@router.post("/with-query/raw")
+async def run_summarise_with_query_raw(
     data: SummariseData,
     current_user: User = Depends(get_current_user),
 ):
-    return await summarise(
+    return await summarise_with_query(
         record_grouping=data.record_grouping,
         username=current_user.username,
         query=data.query,
