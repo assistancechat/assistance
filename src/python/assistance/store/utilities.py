@@ -12,41 +12,32 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import json
 import pathlib
 import time
 
 import aiofiles
+import git
 
-from .paths import RECORDS
 
-
-async def store_prompt_transcript(
-    record_grouping: str, username: str, model_kwargs: dict, prompt: str, response: str
+async def store_files_as_well_as_commit_hash(
+    record_directory: pathlib.Path, data_to_save: dict[str, str]
 ):
-    record_directory = _create_record_directory(
-        RECORDS, [record_grouping, username, "transcripts"]
-    )
+    repo = git.Repo(search_parent_directories=True)
+    sha = repo.head.object.hexsha
 
-    model_kwargs_path = record_directory / "model-kwargs.json"
-    prompt_path = record_directory / "prompt.txt"
-    response_path = record_directory / "response.txt"
+    data_to_save["git-hash.txt"] = sha
 
-    store = {
-        model_kwargs_path: json.dumps(model_kwargs, indent=2),
-        prompt_path: prompt,
-        response_path: response,
-    }
+    for filename, contents in data_to_save.items():
+        path = record_directory / filename
 
-    for path, contents in store.items():
         async with aiofiles.open(path, "w") as f:
             await f.write(contents)
 
 
-def _create_record_directory(root: pathlib.Path, dirnames: list[str]):
+def create_record_directory_with_epoch(root: pathlib.Path, dirnames: list[str]):
     epoch_time = str(time.time_ns())
     record_directory = (
-        _build_path_tree_while_validating_no_traversal(root, dirnames) / epoch_time
+        build_path_tree_while_validating_no_traversal(root, dirnames) / epoch_time
     )
 
     record_directory.mkdir(exist_ok=True, parents=True)
@@ -54,16 +45,8 @@ def _create_record_directory(root: pathlib.Path, dirnames: list[str]):
     return record_directory
 
 
-async def store_file(dirnames: list[str], filename: str, contents: str):
-    directory = _create_record_directory(RECORDS, dirnames)
-    path = _build_path_tree_while_validating_no_traversal(directory, [filename])
-
-    async with aiofiles.open(path, "w") as f:
-        await f.write(contents)
-
-
 # TODO: Likely best to instead validate the path right at the API interface
-def _build_path_tree_while_validating_no_traversal(
+def build_path_tree_while_validating_no_traversal(
     root_path: pathlib.Path, filepath: list[str]
 ):
     new_path = root_path

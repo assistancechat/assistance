@@ -17,14 +17,14 @@ import logging
 
 import openai
 
-from .store import store_prompt_transcript
-from .utilities import LRUCache
+from assistance.store.transcript import store_prompt_transcript
 
-# TODO: Make this time expiration based.
-message_history = LRUCache(10000)
+from .cache import message_history
 
 
-async def run_chat_start(username: str, client_name: str, agent_name: str, prompt: str):
+async def run_career_chat_start(
+    username: str, client_name: str, agent_name: str, prompt: str
+):
     message_history[username] = f"{prompt}\n\n{agent_name}:"
 
     message = await _run_gpt(username=username, client_name=client_name)
@@ -32,7 +32,7 @@ async def run_chat_start(username: str, client_name: str, agent_name: str, promp
     return message
 
 
-async def run_chat_response(
+async def run_career_chat_response(
     username: str, client_name: str, agent_name: str, client_text: str | None
 ):
     message_history[username] += f"\n\n{client_name}: {client_text}\n\n{agent_name}:"
@@ -54,7 +54,7 @@ async def _run_gpt(username: str, client_name: str):
         "presence_penalty": 0.1,
     }
 
-    message = await call_gpt_and_keep_record(
+    message = await call_gpt_and_store_as_transcript(
         record_grouping="career.assistance.chat",
         username=username,
         model_kwargs=model_kwargs,
@@ -68,13 +68,13 @@ async def _run_gpt(username: str, client_name: str):
     return message
 
 
-async def call_gpt_and_keep_record(
+async def call_gpt_and_store_as_transcript(
     record_grouping: str,
     username: str,
     model_kwargs: dict,
     prompt: str,
 ):
-    completions = openai.Completion.create(prompt=prompt, **model_kwargs)
+    completions = await openai.Completion.acreate(prompt=prompt, **model_kwargs)
     response: str = completions.choices[0].text
 
     asyncio.create_task(

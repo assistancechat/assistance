@@ -16,23 +16,13 @@ import logging
 
 import aiohttp
 import uvicorn
-from fastapi import Depends, FastAPI
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.security import OAuth2PasswordRequestForm
-from pydantic import BaseModel
 
-from . import ctx
-from .conversations import call_gpt_and_keep_record, run_chat_response, run_chat_start
-from .keys import set_openai_api_key
-from .login import (
-    Token,
-    User,
-    create_temp_account,
-    get_current_user,
-    get_user_access_token,
-)
-from .mailgun import send_access_link
-from .store import store_file
+from assistance import ctx
+from assistance.keys import set_openai_api_key
+
+from .routers import chat, query, root, save, search, send, summarise
 
 logging.basicConfig(
     level=logging.INFO,
@@ -42,6 +32,14 @@ logging.basicConfig(
 
 
 app = FastAPI()
+
+app.include_router(root.router)
+app.include_router(chat.router)
+app.include_router(save.router)
+app.include_router(search.router)
+app.include_router(send.router)
+app.include_router(summarise.router)
+app.include_router(query.router)
 
 origins = [
     "https://career.assistance.chat",
@@ -68,126 +66,6 @@ async def startup_event():
 @app.on_event("shutdown")
 async def shutdown_event():
     await ctx.session.close()
-
-
-@app.post("/login", response_model=Token)
-@app.post("/token", response_model=Token)
-async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends()):
-    access_token = get_user_access_token(form_data.username, form_data.password)
-
-    return {"access_token": access_token, "token_type": "bearer"}
-
-
-@app.post("/temp-account")
-async def temp_account():
-    username = create_temp_account()
-
-    return {"username": username}
-
-
-class Prompt(BaseModel):
-    record_grouping: str
-    model_kwargs: dict
-    prompt: str
-
-
-@app.post("/prompt")
-async def run_prompt(
-    data: Prompt,
-    current_user: User = Depends(get_current_user),
-):
-    response = await call_gpt_and_keep_record(
-        record_grouping=data.record_grouping,
-        username=current_user.username,
-        model_kwargs=data.model_kwargs,
-        prompt=data.prompt,
-    )
-
-    return {"response": response}
-
-
-class ChatStartData(BaseModel):
-    client_name: str
-    agent_name: str
-    prompt: str
-
-
-@app.post("/chat/start")
-async def chat_start(
-    data: ChatStartData,
-    current_user: User = Depends(get_current_user),
-):
-    response = await run_chat_start(
-        username=current_user.username,
-        client_name=data.client_name,
-        agent_name=data.agent_name,
-        prompt=data.prompt,
-    )
-
-    return {"response": response}
-
-
-class ChatContinueData(BaseModel):
-    client_name: str
-    agent_name: str
-    client_text: str
-
-
-@app.post("/chat/continue")
-async def chat_continue(
-    data: ChatContinueData,
-    current_user: User = Depends(get_current_user),
-):
-    response = await run_chat_response(
-        username=current_user.username,
-        client_name=data.client_name,
-        agent_name=data.agent_name,
-        client_text=data.client_text,
-    )
-
-    return {"response": response}
-
-
-class StoreDataRecordGroupingOptional(BaseModel):
-    record_grouping: str | None = None
-    content: str
-
-
-@app.post("/save")
-async def save_content(
-    data: StoreDataRecordGroupingOptional,
-    current_user: User = Depends(get_current_user),
-):
-    record_grouping = data.record_grouping
-
-    if record_grouping is None:
-        record_grouping = "career.assistance.chat"
-
-    dirnames = [record_grouping, current_user.username, "save-api-call"]
-    filename = "contents.txt"
-
-    await store_file(dirnames=dirnames, filename=filename, contents=data.content)
-
-
-class StoreData(BaseModel):
-    record_grouping: str
-    content: str
-
-
-@app.post("/save/form")
-async def save_form(
-    data: StoreData,
-    current_user: User = Depends(get_current_user),
-):
-    dirnames = [data.record_grouping, current_user.username, "forms"]
-    filename = "form.txt"
-
-    await store_file(dirnames=dirnames, filename=filename, contents=data.content)
-
-
-@app.post("/send/signin-link")
-async def send_user_signin_link(email: str):
-    await send_access_link(email=email)
 
 
 def main():
