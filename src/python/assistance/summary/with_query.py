@@ -46,8 +46,11 @@ PROMPT = textwrap.dedent(
     """
         Collate summaries that might be relevant to the query
         below by utilising the provided text. If none of the
-        information is in any way relevant to the query respond only
-        with the statement NOT_RELEVANT
+        information is relevant to the query respond only
+        with the statement NOT_RELEVANT.
+
+        Only include information that is explicitly found within the
+        text.
 
         Query:
         {query}

@@ -31,7 +31,7 @@ SEARCH_RESULTS_TO_USE = 3
 
 
 async def alphacrucis_search(record_grouping: str, username: str, query: str):
-    query = query.lower().replace("alphacrucis", "") + " alphacrucis"
+    query = query + " alphacrucis"
 
     return await _search_with_summary(
         record_grouping=record_grouping,
