@@ -7,7 +7,7 @@ function App() {
 
     <div className="m-auto p-10 border-gray-200 space-y-4 rounded-xl shadow-2xl">
       <div className="ml-10 rounded-lg bg-cyan-500 py-1 p-3 text-right text-sm text-white leading-snug">
-        Congratulations Caroline! We've just enrolled you into the Bachelor of Ministry.
+        Congratulations Caroline! We{"'"}ve just enrolled you into the Bachelor of Ministry.
       </div>
 
       <div className="mr-14 rounded-lg bg-green-500 py-1 p-3 text-left text-sm text-white leading-snug">
