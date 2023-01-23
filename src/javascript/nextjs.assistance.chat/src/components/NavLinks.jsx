@@ -6,10 +6,10 @@ export function NavLinks() {
   let [hoveredIndex, setHoveredIndex] = useState(null)
 
   return [
-    ['How It Works', '#HowItWorks'],
-    ['Reviews', '#Reviews'],
-    ['FAQs', '#faqs'],
-    ['Contact Us', '/login'],
+    // ['How It Works', '#HowItWorks'],
+    // ['Reviews', '#Reviews'],
+    // ['FAQs', '#faqs'],
+    // ['Contact Us', '/login'],
   ].map(([label, href], index) => (
     <Link
       key={label}

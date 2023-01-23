@@ -34,15 +34,18 @@ export default function Home() {
   return (
     <>
       <Head>
-        <title>Effortlessly find the answer to your Alphacrucis questions</title>
+        <title>Enroll effortlessly, talk to our team and let us do the rest</title>
         <meta name="keywords" content="Alphacrucis, university, enrolment, students, program of study, campus location, automated enrolment process, convenient, accurate, stress-free" />
         <meta name="description" content="Easily enroll in Alphacrucis University with our innovative automated enrolment process. Simply talk to our team and let us fill out your enrolment form for you, ensuring all information is accurate and up-to-date. Convenient, accurate, and stress-free enrolment for students of all programs and campus locations." />
       </Head>
       <Header />
       <main>
-        <Section>
-          <Hero />
-        </Section>
+
+      <Section><Hero /></Section>
+        <Section><HowItWorks /> </Section>
+        <Section><Reviews /></Section>
+        <Section><CallToAction /></Section>
+        <Section><Faqs /></Section>
       </main>
       <Footer />
     </>

@@ -15,8 +15,8 @@ export function Footer() {
             <div className="flex items-center text-gray-900">
               <Logo2 className="flex-none w-20 fill-cyan-500" />
               <div className="ml-4">
-                <p className="text-base font-semibold">Enrolment Assistance Chat</p>
-                <p className="mt-1 text-sm">Easy, Fast & Stress Free Uni Enrolments</p>
+                <p className="text-base font-semibold">Student Assistance Chat</p>
+                <p className="mt-1 text-sm">Easy, Fast & Stress Free Answers to your Questions</p>
               </div>
             </div>
             <nav className="mt-11 flex gap-8">
