@@ -1,0 +1,13 @@
+
+
+
+
+//convert the above svg code into a react element
+
+
+import React from 'react';
+
+export function EnrolmentAssistance(props){
+    return(
+        <svg fill= "none" viewBox="0 0 24 24" stroke=
+    )
