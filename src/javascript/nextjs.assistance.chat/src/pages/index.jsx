@@ -1,12 +1,8 @@
 import Head from 'next/head'
 import {useRef} from 'react'
-import { CallToAction } from '@/components/CallToAction'
-import { Faqs } from '@/components/Faqs'
 import { Footer } from '@/components/Footer'
 import { Header } from '@/components/Header'
 import { Hero } from '@/components/Hero'
-import { HowItWorks } from '@/components/HowItWorks'
-import { Reviews } from '@/components/Reviews'
 import { useInView } from "framer-motion";
 import React from 'react'
 
