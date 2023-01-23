@@ -121,25 +121,25 @@ async def summarise_urls_with_query_around_snippets(
     username: str,
     query: str,
     snippets_by_url: dict[str, list[str]],
+    added_pages: list[str] | None = None,
 ):
     urls = list(snippets_by_url.keys())
+    total_number_of_pages = len(urls) + len(added_pages)
 
-    if len(urls) == 0:
+    if total_number_of_pages == 0:
         return "NOT_RELEVANT"
 
-    if len(urls) == 1:
-        url = urls[0]
-        snippets = snippets_by_url[url]
-
-        return await summarise_url_with_query_around_snippets(
-            record_grouping=record_grouping,
-            username=username,
-            query=query,
-            url=url,
-            snippets=snippets,
+    coroutines = []
+    for page in added_pages:
+        coroutines.append(
+            summarise_with_query(
+                record_grouping=record_grouping,
+                username=username,
+                query=query,
+                text=page,
+            )
         )
 
-    coroutines = []
     for url, snippets in snippets_by_url.items():
         coroutines.append(
             summarise_url_with_query_around_snippets(

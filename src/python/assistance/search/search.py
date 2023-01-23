@@ -22,6 +22,7 @@ from assistance.keys import get_google_search_api_key
 from assistance.store.search import store_search_result
 from assistance.summary.with_query import summarise_urls_with_query_around_snippets
 
+from .course_list import COURSE_LIST
 from .ids import SEARCH_ENGINE_IDS, SearchEngine
 
 API_KEY = get_google_search_api_key()
@@ -37,11 +38,16 @@ async def alphacrucis_search(record_grouping: str, username: str, query: str):
         username=username,
         search_engine=SearchEngine.ALPHACRUCIS,
         query=query,
+        added_pages=[COURSE_LIST],
     )
 
 
 async def _search_with_summary(
-    record_grouping: str, username: str, search_engine: SearchEngine, query: str
+    record_grouping: str,
+    username: str,
+    search_engine: SearchEngine,
+    query: str,
+    added_pages: list[str] | None = None,
 ):
     cx = SEARCH_ENGINE_IDS[search_engine]
 
@@ -72,7 +78,7 @@ async def _search_with_summary(
         f"Cleaned Snippets per URL: {json.dumps(cleaned_snippets_per_url, indent=2)}"
     )
 
-    if len(links) == 0:
+    if len(cleaned_snippets_per_url.keys()) + len(added_pages) == 0:
         summary = "No additional information found"
 
     else:
@@ -84,6 +90,7 @@ async def _search_with_summary(
             username=username,
             query=query,
             snippets_by_url=cleaned_snippets_per_url,
+            added_pages=added_pages,
         )
 
     asyncio.create_task(

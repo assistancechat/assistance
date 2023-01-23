@@ -46,9 +46,9 @@ async def _run_gpt(username: str, client_name: str):
     model_kwargs = {
         "engine": "text-davinci-003",
         "max_tokens": 256,
-        "best_of": 2,
+        "best_of": 1,
         "stop": f"{client_name}:",
-        "temperature": 0.7,
+        "temperature": 0.0,
         "top_p": 1,
         "frequency_penalty": 0.1,
         "presence_penalty": 0.1,
