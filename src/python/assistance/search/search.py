@@ -82,9 +82,6 @@ async def _search_with_summary(
         summary = "No additional information found"
 
     else:
-        links_to_use = links[0:10]
-        logging.info(links_to_use)
-
         summary = await summarise_urls_with_query_around_snippets(
             record_grouping=record_grouping,
             username=username,
