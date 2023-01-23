@@ -13,17 +13,20 @@
 # limitations under the License.
 
 import asyncio
+import json
 import logging
 import urllib.parse
 
 from assistance import ctx
 from assistance.keys import get_google_search_api_key
 from assistance.store.search import store_search_result
-from assistance.summary.with_query import summarise_urls_with_query
+from assistance.summary.with_query import summarise_urls_with_query_around_snippets
 
 from .ids import SEARCH_ENGINE_IDS, SearchEngine
 
 API_KEY = get_google_search_api_key()
+
+SEARCH_RESULTS_TO_USE = 3
 
 
 async def alphacrucis_search(record_grouping: str, username: str, query: str):
@@ -48,13 +51,26 @@ async def _search_with_summary(
     search_raw_results = await ctx.session.get(url=url)
     json_results = await search_raw_results.json()
 
+    results_to_use = json_results["items"][0:SEARCH_RESULTS_TO_USE]
+
     links: list[str]
+    snippets: list[str]
     try:
-        links = [item["link"] for item in json_results["items"]]
+        links = [item["link"] for item in results_to_use]
+        snippets = [item["snippet"] for item in results_to_use]
     except KeyError:
         links = []
+        snippets = []
 
-    logging.info(f"Search Links: {links}")
+    cleaned_snippets_per_url = {}
+
+    for link, snippet in zip(links, snippets):
+        cleaned_snippet = [item.strip() for item in snippet.split("...")]
+        cleaned_snippets_per_url[link] = [item for item in cleaned_snippet if item]
+
+    logging.info(
+        f"Cleaned Snippets per URL: {json.dumps(cleaned_snippets_per_url, indent=2)}"
+    )
 
     if len(links) == 0:
         summary = "No additional information found"
@@ -63,11 +79,11 @@ async def _search_with_summary(
         links_to_use = links[0:10]
         logging.info(links_to_use)
 
-        summary = await summarise_urls_with_query(
+        summary = await summarise_urls_with_query_around_snippets(
             record_grouping=record_grouping,
             username=username,
             query=query,
-            urls=links_to_use,
+            snippets_by_url=cleaned_snippets_per_url,
         )
 
     asyncio.create_task(

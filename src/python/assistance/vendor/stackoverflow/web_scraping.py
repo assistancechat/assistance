@@ -2,8 +2,6 @@
 # Attribution-ShareAlike 4.0 International License.
 # <http://creativecommons.org/licenses/by-sa/4.0/>.
 
-import logging
-
 import aiohttp
 from bs4 import BeautifulSoup
 
@@ -25,7 +23,7 @@ async def scrape(session: aiohttp.ClientSession, url: str):
         script.extract()  # rip it out
 
     # get text
-    text = soup.get_text()
+    text = soup.get_text(separator="\n")
 
     # break into lines and remove leading and trailing space on each
     lines = (line.strip() for line in text.splitlines())

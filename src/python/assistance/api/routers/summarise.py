@@ -17,7 +17,10 @@ from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 
 from assistance.api.login import User, get_current_user
-from assistance.summary.with_query import summarise_url_with_query, summarise_with_query
+from assistance.summary.with_query import (
+    summarise_url_with_query_around_snippets,
+    summarise_with_query,
+)
 
 router = APIRouter(prefix="/summarise")
 
@@ -52,7 +55,7 @@ async def run_summarise_url_with_query(
     data: SummariseUrlData,
     current_user: User = Depends(get_current_user),
 ):
-    return await summarise_url_with_query(
+    return await summarise_url_with_query_around_snippets(
         record_grouping=data.record_grouping,
         username=current_user.username,
         query=data.query,
