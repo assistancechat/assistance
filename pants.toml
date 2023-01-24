@@ -1,5 +1,2 @@
 [GLOBAL]
 pants_version = "2.14.1"
-
-[python-bootstrap]
-search_path = ["<ASDF_LOCAL>", "<ASDF>", "<PYENV>", "<PATH>"]
