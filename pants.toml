@@ -1,2 +1,6 @@
 [GLOBAL]
 pants_version = "2.14.1"
+
+[anonymous-telemetry]
+enabled = true
+repo_id = "0ee14fba-dd88-45c2-af6f-a872724ea8df"
