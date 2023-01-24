@@ -2,11 +2,14 @@
 
 Here are the Assistance.Chat Python libraries.
 
-## Notes
+## Dev Tooling
 
-### Server Hosting
+* [Pants](https://www.pantsbuild.org/docs/installation)
+* [VSCode](https://code.visualstudio.com/)
 
-To view the live logs of the running service run:
+## Server Hosting
+
+To view the live logs of the running api service run:
 
 ```bash
 sudo journalctl -u run-api.service -f -n 50

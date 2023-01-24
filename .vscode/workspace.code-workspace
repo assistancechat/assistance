@@ -20,11 +20,10 @@
     ],
     "files.trimTrailingWhitespace": true,
     "python.formatting.provider": "black",
-    "python.sortImports.path": "isort",
     "python.linting.enabled": true,
     "python.linting.lintOnSave": true,
     "python.linting.pylintEnabled": true,
-    "python.linting.mypyEnabled": false,
+    "python.linting.mypyEnabled": true,
     "[python]": {
       "editor.rulers": [
         72,
