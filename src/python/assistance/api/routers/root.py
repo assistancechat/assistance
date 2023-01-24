@@ -17,21 +17,12 @@ from fastapi import APIRouter, Depends
 from fastapi.security import OAuth2PasswordRequestForm
 from pydantic import BaseModel
 
-from assistance.api.login import (
-    Token,
-    User,
-    create_temp_account,
-    get_current_user,
-    get_user_access_token,
-)
-from assistance.conversations.career import call_gpt_and_store_as_transcript
-from assistance.store.file import store_file
+from assistance.api.login import Token, create_temp_account, get_user_access_token
 
 router = APIRouter(prefix="")
 
 
 @router.post("/login", response_model=Token)
-@router.post("/token", response_model=Token)
 async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends()):
     access_token = get_user_access_token(form_data.username, form_data.password)
 
@@ -49,39 +40,3 @@ class Prompt(BaseModel):
     record_grouping: str
     model_kwargs: dict
     prompt: str
-
-
-@router.post("/prompt")
-async def run_prompt(
-    data: Prompt,
-    current_user: User = Depends(get_current_user),
-):
-    response = await call_gpt_and_store_as_transcript(
-        record_grouping=data.record_grouping,
-        username=current_user.username,
-        model_kwargs=data.model_kwargs,
-        prompt=data.prompt,
-    )
-
-    return {"response": response}
-
-
-class StoreDataRecordGroupingOptional(BaseModel):
-    record_grouping: str | None = None
-    content: str
-
-
-@router.post("/save")
-async def save_content(
-    data: StoreDataRecordGroupingOptional,
-    current_user: User = Depends(get_current_user),
-):
-    record_grouping = data.record_grouping
-
-    if record_grouping is None:
-        record_grouping = "career.assistance.chat"
-
-    dirnames = [record_grouping, current_user.username, "save-api-call"]
-    filename = "contents.txt"
-
-    await store_file(dirnames=dirnames, filename=filename, contents=data.content)

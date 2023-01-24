@@ -17,60 +17,12 @@ from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 
 from assistance.api.login import User, get_current_user
-from assistance.conversations.career import (
-    run_career_chat_response,
-    run_career_chat_start,
-)
 from assistance.conversations.student import (
     run_student_chat_response,
     run_student_chat_start,
 )
 
 router = APIRouter(prefix="/chat")
-
-
-class ChatStartData(BaseModel):
-    client_name: str
-    agent_name: str
-    prompt: str
-
-
-@router.post("/career/start")
-@router.post("/start")
-async def career_chat_start(
-    data: ChatStartData,
-    current_user: User = Depends(get_current_user),
-):
-    response = await run_career_chat_start(
-        username=current_user.username,
-        client_name=data.client_name,
-        agent_name=data.agent_name,
-        prompt=data.prompt,
-    )
-
-    return {"response": response}
-
-
-class ChatContinueData(BaseModel):
-    client_name: str
-    agent_name: str
-    client_text: str
-
-
-@router.post("/career/continue")
-@router.post("/continue")
-async def career_chat_continue(
-    data: ChatContinueData,
-    current_user: User = Depends(get_current_user),
-):
-    response = await run_career_chat_response(
-        username=current_user.username,
-        client_name=data.client_name,
-        agent_name=data.agent_name,
-        client_text=data.client_text,
-    )
-
-    return {"response": response}
 
 
 class StudentChatStartData(BaseModel):
