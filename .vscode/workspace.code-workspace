@@ -14,23 +14,22 @@
     "editor.formatOnSave": true,
     "editor.formatOnPaste": false,
     "editor.insertSpaces": true,
-    "editor.rulers": [79, 119],
+    "editor.rulers": [
+      79,
+      119
+    ],
     "files.trimTrailingWhitespace": true,
-    "autoDocstring.docstringFormat": "numpy",
-    "autoDocstring.guessTypes": true,
     "python.formatting.provider": "black",
     "python.sortImports.path": "isort",
     "python.linting.enabled": true,
     "python.linting.lintOnSave": true,
     "python.linting.pylintEnabled": true,
     "python.linting.mypyEnabled": false,
-    "python.linting.ignorePatterns": [
-      "**/site-packages/**/*.py",
-      ".vscode/*.py",
-      "**/*.pyi"
-    ],
     "[python]": {
-      "editor.rulers": [72, 88],
+      "editor.rulers": [
+        72,
+        88
+      ],
       "editor.tabSize": 4
     },
     "python.testing.unittestEnabled": false,

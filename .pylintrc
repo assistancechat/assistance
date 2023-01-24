@@ -1,6 +1,5 @@
 [MASTER]
-ignore =
-    typings
+ignore-patterns = BUILD
 
 [MESSAGES CONTROL]
 disable =
