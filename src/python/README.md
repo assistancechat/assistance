@@ -1,7 +1,4 @@
-# Assistance
-
-
-## Notes
+# Notes
 
 To view the live logs of the running service run:
 
