@@ -15,6 +15,9 @@ backend_packages = [
   "pants.backend.python.lint.flake8",
 ]
 
+[python-bootstrap]
+search_path = ["$HOME/.asdf/installs/python/*/bin/python", "<PYENV>", "<PATH>"]
+
 [anonymous-telemetry]
 enabled = true
 repo_id = "0ee14fba-dd88-45c2-af6f-a872724ea8df"
@@ -24,5 +27,33 @@ root_patterns = [
   "/src/python/*",
 ]
 
-[python-bootstrap]
-search_path = ["$HOME/.asdf/installs/python/*/bin/python", "<PYENV>", "<PATH>"]
+[python]
+enable_resolves = true
+resolves = { python-default = "3rdparty/python/default.lock"}
+
+[python-infer]
+assets = true
+unowned_dependency_behavior = "error"
+
+[black]
+lockfile = "3rdparty/python/black.lock"
+
+[isort]
+lockfile = "3rdparty/python/isort.lock"
+
+[pylint]
+args = ["--ignore-patterns=.*.pyi"]
+lockfile = "3rdparty/python/pylint.lock"
+
+[pytest]
+args = ["--no-header"]
+lockfile = "3rdparty/python/pytest.lock"
+
+[pytest.extra_requirements]
+add = [
+  "ipdb",
+  "pytest-asyncio",
+  "pytest-html",
+  "pytest-icdiff",
+  "pygments",
+]

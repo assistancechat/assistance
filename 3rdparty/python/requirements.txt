@@ -1,0 +1,10 @@
+aiofiles
+aiohttp
+beautifulsoup4
+fastapi
+gitpython
+jose
+openai
+pydantic
+thefuzz
+uvicorn
