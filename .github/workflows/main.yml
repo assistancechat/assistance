@@ -1,0 +1,41 @@
+name: Main
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  build:
+    name: Perform CI Checks
+
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: [3.11.1]
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: pantsbuild/actions/init-pants@v2
+        with:
+          pants-python-version: ${{ matrix.python-version }}
+          gha-cache-key: cache0-py${{ matrix.python-version }}
+          named-caches-hash: ${{ hashFiles('3rdparty/python/default.lock') }}
+          cache-lmdb-store: "false"
+
+      - name: Check BUILD files
+        run: |
+          ./pants tailor --check update-build-files --check ::
+
+      - name: Lint and typecheck
+        run: |
+          ./pants lint check ::
+
+      - name: Test
+        run: |
+          ./pants test ::
