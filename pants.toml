@@ -1,6 +1,24 @@
 [GLOBAL]
 pants_version = "2.14.1"
 
+backend_packages = [
+  "pants.backend.python",
+  "pants.backend.python.lint.black",
+  "pants.backend.python.lint.isort",
+  "pants.backend.python.lint.pylint",
+  # "pants.backend.python.typecheck.pyright",
+  "pants.backend.experimental.python.lint.pyupgrade",
+  "pants.backend.python.lint.docformatter",
+  "pants.backend.python.lint.bandit",
+  "pants.backend.experimental.python.lint.autoflake",
+  "pants.backend.python.lint.flake8",
+]
+
 [anonymous-telemetry]
 enabled = true
 repo_id = "0ee14fba-dd88-45c2-af6f-a872724ea8df"
+
+[source]
+root_patterns = [
+  "/src/python",
+]
