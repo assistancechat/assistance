@@ -1,5 +1,5 @@
 [GLOBAL]
-pants_version = "2.14.1"
+pants_version = "2.15.0rc2"
 
 backend_packages = [
   "pants.core",
@@ -7,12 +7,12 @@ backend_packages = [
   "pants.backend.python.lint.black",
   "pants.backend.python.lint.isort",
   "pants.backend.python.lint.pylint",
-  # "pants.backend.python.typecheck.pyright",
+  "pants.backend.experimental.python.typecheck.pyright",
   "pants.backend.python.typecheck.mypy",
-  "pants.backend.experimental.python.lint.pyupgrade",
+  "pants.backend.python.lint.pyupgrade",
   "pants.backend.python.lint.docformatter",
   "pants.backend.python.lint.bandit",
-  "pants.backend.experimental.python.lint.autoflake",
+  "pants.backend.python.lint.autoflake",
   "pants.backend.python.lint.flake8",
 ]
 
@@ -46,6 +46,12 @@ lockfile = "3rdparty/python/pylint.lock"
 [pytest]
 args = ["--no-header"]
 lockfile = "3rdparty/python/pytest.lock"
+
+[pyright]
+lockfile = "3rdparty/python/pyright.lock"
+
+[mypy]
+lockfile = "3rdparty/python/mypy.lock"
 
 [pytest.extra_requirements]
 add = [
