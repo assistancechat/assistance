@@ -3,8 +3,10 @@ aiohttp
 beautifulsoup4
 fastapi
 gitpython
-jose
 openai
+passlib[bcrypt]
 pydantic
+python-jose[cryptography]
+python-multipart
 thefuzz
 uvicorn
