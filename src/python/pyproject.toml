@@ -1,0 +1,46 @@
+[tool.poetry]
+name = "assistance"
+version = "0.1.0"
+description = ""
+authors = [
+  "Simon Biggs <simon@assistance.chat>",
+  "Ken Cheung <ken@assistance.chat>",
+  "Alex Carpenter <alex@assistance.chat>"
+]
+license = "Apache-2.0"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+
+aiofiles = "*"
+aiohttp = "*"
+fastapi = "*"
+keyring = "*"
+openai = "*"
+passlib = {extras = ["bcrypt"], version = "*"}
+python-jose = {extras = ["cryptography"], version = "*"}
+python-multipart = "*"
+uvicorn = {extras = ["standard"], version = "*"}
+
+streamlit = ">=1.17.0"
+
+[tool.poetry.group.dev.dependencies]
+autoflake = "*"
+bandit = "*"
+black = "*"
+docformatter = "*"
+flake8 = "*"
+ipython = "*"
+isort = "*"
+mypy = "*"
+pre-commit = "*"
+pylint = "*"
+pyright = "*"
+pytest = "*"
+pytest-bandit = "*"
+pyupgrade = "*"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

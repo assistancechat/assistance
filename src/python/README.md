@@ -1,16 +1,24 @@
-# Assistance.Chat Python Libraries
+# Assistance
 
-Here are the Assistance.Chat Python libraries.
+The Python AI assistance library.
 
-## Dev Tooling
+## Notes
 
-* [Pants](https://www.pantsbuild.org/docs/installation)
-* [VSCode](https://code.visualstudio.com/)
+### Dev Tooling
 
-## Server Hosting
+- [Pants](https://www.pantsbuild.org/docs/installation)
+- [VSCode](https://code.visualstudio.com/)
+
+### Server Hosting
 
 To view the live logs of the running api service run:
 
 ```bash
 sudo journalctl -u run-api.service -f -n 50
+```
+
+### Poetry Python version
+
+```bash
+poetry env use $(which python)
 ```
