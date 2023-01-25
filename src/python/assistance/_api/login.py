@@ -22,9 +22,9 @@ from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
 from pydantic import BaseModel
 
-from assistance.api.exceptions import CredentialsException
-from assistance.keys import get_jwt_key
-from assistance.paths import USERS
+from assistance._api.exceptions import CredentialsException
+from assistance._api.keys import get_jwt_key
+from assistance._paths import USERS
 
 SECRET_KEY = get_jwt_key()
 ALGORITHM = "HS256"

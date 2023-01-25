@@ -15,7 +15,7 @@
 import asyncio
 import json
 
-from assistance.paths import RECORDS
+from assistance._paths import RECORDS
 from assistance.search.ids import SearchEngine
 
 from .utilities import (

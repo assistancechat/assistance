@@ -16,14 +16,10 @@
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 
+from assistance._api.utilities.login import User, get_current_user
 from assistance.store.file import store_file
 
-from .login import User, get_current_user
-
-router = APIRouter(
-    prefix="/save",
-    responses={404: {"description": "Not found"}},
-)
+router = APIRouter(prefix="/save")
 
 
 class StoreData(BaseModel):

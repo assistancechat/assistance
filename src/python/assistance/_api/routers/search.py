@@ -16,48 +16,26 @@
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 
-from assistance.api.login import User, get_current_user
-from assistance.summary.with_query import (
-    summarise_url_with_query_around_snippets,
-    summarise_with_query,
-)
+from assistance._api.utilities.login import User, get_current_user
+from assistance.search.search import alphacrucis_search
 
-router = APIRouter(prefix="/summarise")
+router = APIRouter(prefix="/search")
 
 
-class SummariseData(BaseModel):
+class SearchData(BaseModel):
     record_grouping: str
     query: str
-    text: str
 
 
-@router.post("/with-query/raw")
-async def run_summarise_with_query_raw(
-    data: SummariseData,
+@router.post("/alphacrucis")
+async def run_alphacrucis_search(
+    data: SearchData,
     current_user: User = Depends(get_current_user),
 ):
-    return await summarise_with_query(
+    result = await alphacrucis_search(
         record_grouping=data.record_grouping,
         username=current_user.username,
         query=data.query,
-        text=data.text,
     )
 
-
-class SummariseUrlData(BaseModel):
-    record_grouping: str
-    query: str
-    url: str
-
-
-@router.post("/with-query/url")
-async def run_summarise_url_with_query(
-    data: SummariseUrlData,
-    current_user: User = Depends(get_current_user),
-):
-    return await summarise_url_with_query_around_snippets(
-        record_grouping=data.record_grouping,
-        username=current_user.username,
-        query=data.query,
-        url=data.url,
-    )
+    return result

@@ -19,9 +19,9 @@ import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from assistance.keys import set_openai_api_key
+from assistance._api.keys import set_openai_api_key
 
-from . import _ctx
+from .. import _ctx
 from .routers import chat, query, root, save, search, send, summarise
 
 logging.basicConfig(

@@ -17,7 +17,7 @@ import json
 import logging
 import urllib.parse
 
-from assistance.keys import get_google_search_api_key
+from assistance._api.keys import get_google_search_api_key
 from assistance.store.search import store_search_result
 from assistance.summary.with_query import summarise_urls_with_query_around_snippets
 

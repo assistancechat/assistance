@@ -16,23 +16,24 @@
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 
-from assistance.api.login import User, get_current_user
-from assistance.store.file import store_file
+from assistance._api.utilities.login import User, get_current_user
+from assistance.query.from_transcript import query_from_transcript
 
-router = APIRouter(prefix="/save")
+router = APIRouter(prefix="/query")
 
 
-class StoreData(BaseModel):
+class Data(BaseModel):
     record_grouping: str
-    content: str
+    transcript: str
 
 
-@router.post("/form")
+@router.post("/from-transcript")
 async def save_form(
-    data: StoreData,
+    data: Data,
     current_user: User = Depends(get_current_user),
 ):
-    dirnames = [data.record_grouping, current_user.username, "forms"]
-    filename = "form.txt"
-
-    await store_file(dirnames=dirnames, filename=filename, contents=data.content)
+    return await query_from_transcript(
+        record_grouping=data.record_grouping,
+        username=current_user.username,
+        transcript=data.transcript,
+    )

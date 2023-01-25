@@ -13,29 +13,25 @@
 # limitations under the License.
 
 import asyncio
-import json
 
-from assistance.paths import RECORDS
+from assistance._paths import RECORDS
 
 from .utilities import (
+    build_path_tree_while_validating_no_traversal,
     create_record_directory_with_epoch,
     store_files_as_well_as_commit_hash,
 )
 
 
-async def store_prompt_transcript(
-    record_grouping: str, username: str, model_kwargs: dict, prompt: str, response: str
-):
-    record_directory = create_record_directory_with_epoch(
-        RECORDS, [record_grouping, username, "transcripts"]
-    )
+# TODO: This function should be able to assume that the filename isn't
+# malicious, deal with sanitisation right next to the API interface
+# instead of handling it within each function.
+async def store_file(dirnames: list[str], filename: str, contents: str):
+    directory = create_record_directory_with_epoch(RECORDS, dirnames)
 
-    data_to_save = {
-        "model-kwargs.json": json.dumps(model_kwargs, indent=2),
-        "prompt.txt": prompt,
-        "response.txt": response,
-    }
+    # Just to validate that the provided filename is not malicious
+    build_path_tree_while_validating_no_traversal(directory, [filename])
 
-    asyncio.create_task(
-        store_files_as_well_as_commit_hash(record_directory, data_to_save)
-    )
+    data_to_save = {filename: contents}
+
+    asyncio.create_task(store_files_as_well_as_commit_hash(directory, data_to_save))

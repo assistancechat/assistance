@@ -16,7 +16,7 @@
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 
-from assistance.api.login import User, get_current_user
+from assistance._api.utilities.login import User, get_current_user
 from assistance.conversations.student import (
     run_student_chat_response,
     run_student_chat_start,

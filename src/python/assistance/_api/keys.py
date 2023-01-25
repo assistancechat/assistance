@@ -15,10 +15,10 @@
 
 import openai
 
-from .paths import SECRETS
+from assistance._paths import SECRETS
 
 
-def load_secret(name):
+def load_secret(name: str):
     secret_path = SECRETS / name
 
     with open(secret_path, encoding="utf8") as f:

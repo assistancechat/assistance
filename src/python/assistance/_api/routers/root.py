@@ -14,26 +14,33 @@
 
 
 from fastapi import APIRouter, Depends
+from fastapi.security import OAuth2PasswordRequestForm
 from pydantic import BaseModel
 
-from assistance.api.login import User, get_current_user
-from assistance.query.from_transcript import query_from_transcript
+from assistance._api.utilities.login import (
+    Token,
+    create_temp_account,
+    get_user_access_token,
+)
 
-router = APIRouter(prefix="/query")
+router = APIRouter(prefix="")
 
 
-class Data(BaseModel):
+@router.post("/login", response_model=Token)
+async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends()):
+    access_token = get_user_access_token(form_data.username, form_data.password)
+
+    return {"access_token": access_token, "token_type": "bearer"}
+
+
+@router.post("/temp-account")
+async def temp_account():
+    username = create_temp_account()
+
+    return {"username": username}
+
+
+class Prompt(BaseModel):
     record_grouping: str
-    transcript: str
-
-
-@router.post("/from-transcript")
-async def save_form(
-    data: Data,
-    current_user: User = Depends(get_current_user),
-):
-    return await query_from_transcript(
-        record_grouping=data.record_grouping,
-        username=current_user.username,
-        transcript=data.transcript,
-    )
+    model_kwargs: dict
+    prompt: str

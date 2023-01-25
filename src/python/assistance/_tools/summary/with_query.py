@@ -21,7 +21,7 @@ import textwrap
 import openai
 from thefuzz import process as fuzz_process
 
-from assistance.vendor.stackoverflow.web_scraping import scrape
+from assistance._vendor.stackoverflow.web_scraping import scrape
 
 from . import _ctx
 
