@@ -21,6 +21,7 @@ jobs:
 
       - name: Install Pants
         run: |
+          echo "$HOME/bin" >> $GITHUB_PATH
           /bin/bash -c "$(curl -fsSL https://static.pantsbuild.org/setup/pantsup.sh)"
 
       - name: Check BUILD files
