@@ -19,28 +19,22 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Install ASDF
-        uses: asdf-vm/actions/plugin-test@v1
-
-      - name: Setup Pants Build
-      - uses: pantsbuild/actions/init-pants@v2
-        with:
-          gha-cache-key: cache0-py${{ matrix.python-version }}
-          named-caches-hash: ${{ hashFiles('3rdparty/python/default.lock') }}
-          cache-lmdb-store: "false"
+      - name: Install Pants
+        run: |
+          /bin/bash -c "$(curl -fsSL https://static.pantsbuild.org/setup/pantsup.sh)"
 
       - name: Check BUILD files
         run: |
-          ./pants tailor --check update-build-files --check ::
+          pants tailor --check update-build-files --check ::
 
       - name: Lint and typecheck
         run: |
-          ./pants lint check ::
+          pants lint check ::
 
       - name: Test
         run: |
-          ./pants test ::
+          pants test ::
 
       - name: Package
         run: |
-          ./pants package ::
+          pants package ::
