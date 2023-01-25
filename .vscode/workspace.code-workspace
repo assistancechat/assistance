@@ -31,6 +31,9 @@
       ],
       "editor.tabSize": 4
     },
+    "[typescript]": {
+      "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
     "python.testing.unittestEnabled": false,
     "python.testing.pytestEnabled": false,
     "files.watcherExclude": {
