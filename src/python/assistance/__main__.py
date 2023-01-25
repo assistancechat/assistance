@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from assistance.cli import app
+from assistance._cli import app
 
 
 def main():

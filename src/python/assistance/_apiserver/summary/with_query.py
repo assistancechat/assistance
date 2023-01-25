@@ -21,8 +21,9 @@ import textwrap
 import openai
 from thefuzz import process as fuzz_process
 
-from assistance import ctx
 from assistance.vendor.stackoverflow.web_scraping import scrape
+
+from . import _ctx
 
 MAX_TEXT_SECTIONS = 10
 MIN_TEXT_LENGTH = 5
@@ -209,7 +210,7 @@ def _pull_only_relevant(split_page_contents_by_words: str, snippets: str):
 async def summarise_url_with_query_around_snippets(
     record_grouping: str, username: str, query: str, url: str, snippets: list[str]
 ):
-    page_contents = await scrape(session=ctx.session, url=url)
+    page_contents = await scrape(session=_ctx.session, url=url)
 
     split_page_contents_by_words = [item for item in page_contents.split(None) if item]
 

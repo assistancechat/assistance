@@ -19,9 +19,9 @@ import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from assistance import ctx
 from assistance.keys import set_openai_api_key
 
+from . import _ctx
 from .routers import chat, query, root, save, search, send, summarise
 
 logging.basicConfig(
@@ -61,12 +61,12 @@ app.include_router(query.router)
 @app.on_event("startup")
 async def startup_event():
     set_openai_api_key()
-    ctx.session = aiohttp.ClientSession()
+    _ctx.session = aiohttp.ClientSession()
 
 
 @app.on_event("shutdown")
 async def shutdown_event():
-    await ctx.session.close()
+    await _ctx.session.close()
 
 
 def main():

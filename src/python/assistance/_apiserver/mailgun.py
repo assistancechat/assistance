@@ -16,9 +16,10 @@ import secrets
 
 import aiohttp
 
+from assistance.paths import USERS
+
 from . import ctx
 from .keys import get_mailgun_api_key
-from .paths import USERS
 
 EMAIL_SUBJECT = "Your career.assistance.chat access link"
 EMAIL_TEMPLATE = (

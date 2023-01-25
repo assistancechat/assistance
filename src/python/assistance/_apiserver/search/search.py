@@ -17,11 +17,11 @@ import json
 import logging
 import urllib.parse
 
-from assistance import ctx
 from assistance.keys import get_google_search_api_key
 from assistance.store.search import store_search_result
 from assistance.summary.with_query import summarise_urls_with_query_around_snippets
 
+from . import _ctx
 from .course_list import COURSE_LIST
 from .ids import SEARCH_ENGINE_IDS, SearchEngine
 
@@ -54,7 +54,7 @@ async def _search_with_summary(
     url_encoded_query = urllib.parse.quote(query)
     url = f"https://www.googleapis.com/customsearch/v1/siterestrict?key={API_KEY}&cx={cx}&q={url_encoded_query}"
 
-    search_raw_results = await ctx.session.get(url=url)
+    search_raw_results = await _ctx.session.get(url=url)
     json_results = await search_raw_results.json()
 
     results_to_use = json_results["items"][0:SEARCH_RESULTS_TO_USE]
