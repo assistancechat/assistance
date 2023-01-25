@@ -14,7 +14,7 @@
 
 import pathlib
 
-STORE = pathlib.Path.home() / ".assistance.chat"
+STORE = pathlib.Path.home() / ".assistance"
 SECRETS = STORE / "secrets"
 USERS = STORE / "users"
 

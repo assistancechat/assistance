@@ -18,12 +18,14 @@ python = "^3.10"
 
 aiofiles = "*"
 aiohttp = "*"
+beautifulsoup4 = "*"
 fastapi = "*"
 keyring = "*"
 openai = "*"
 passlib = {extras = ["bcrypt"], version = "*"}
 python-jose = {extras = ["cryptography"], version = "*"}
 python-multipart = "*"
+thefuzz = {extras = ["speedup"], version = "*"}
 uvicorn = {extras = ["standard"], version = "*"}
 
 streamlit = ">=1.17.0"
