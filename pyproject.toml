@@ -11,3 +11,25 @@ ignore = [
 ]
 
 typeCheckingMode = "strict"
+
+
+[tool.pylint.master]
+ignore-patterns = "BUILD"
+
+[tool.pylint.messages-control]
+disable = [
+    "fixme",
+    "line-too-long",
+    "missing-function-docstring",
+    "no-name-in-module",
+    "missing-class-docstring",
+    "too-few-public-methods",
+    "invalid-name",
+    "missing-module-docstring",
+    "no-member",
+    "logging-fstring-interpolation",
+]
+
+[tool.pylint.design]
+max-locals = 25
+max-args = 8
