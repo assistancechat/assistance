@@ -70,7 +70,7 @@ async def shutdown_event():
 
 
 def main():
-    uvicorn.run("assistance.api.main:app", port=8080, log_level="info", reload=True)
+    uvicorn.run("assistance.api.api:app", port=8080, log_level="info", reload=True)
 
 
 if __name__ == "__main__":

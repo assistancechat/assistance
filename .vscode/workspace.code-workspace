@@ -14,10 +14,7 @@
     "editor.formatOnSave": true,
     "editor.formatOnPaste": false,
     "editor.insertSpaces": true,
-    "editor.rulers": [
-      79,
-      119
-    ],
+    "editor.rulers": [79, 119],
     "files.trimTrailingWhitespace": true,
     "python.formatting.provider": "black",
     "python.linting.enabled": true,
@@ -25,10 +22,7 @@
     "python.linting.pylintEnabled": true,
     "python.linting.mypyEnabled": true,
     "[python]": {
-      "editor.rulers": [
-        72,
-        88
-      ],
+      "editor.rulers": [72, 88],
       "editor.tabSize": 4
     },
     "[typescript]": {
@@ -221,6 +215,7 @@
       "tomlkit",
       "Trachbrnchs",
       "typecheck",
+      "typer",
       "Unported",
       "uvicorn",
       "Venacava",

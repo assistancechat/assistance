@@ -1,4 +1,4 @@
-# Copyright (C) 2023 Assistance.Chat
+# Copyright (C) 2023 Assistance.Chat contributors
 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,12 +12,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from assistance.cli import app
+# pylint: disable = import-outside-toplevel
+
+import typer
+
+app = typer.Typer()
 
 
-def main():
-    app()
+@app.command()
+def api():
+    from assistance.api.api import main
 
-
-if __name__ == "__main__":
     main()
+
+
+@app.command()
+def admin():
+    pass
