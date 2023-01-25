@@ -1,5 +1,0 @@
-PYTHON="$HOME/.asdf/installs/python/3.9.16/bin/python"
-
-if [ ! -f "$PYTHON" ]; then
-    unset PYTHON
-fi
