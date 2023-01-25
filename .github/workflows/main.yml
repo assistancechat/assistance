@@ -15,15 +15,16 @@ jobs:
 
     strategy:
       fail-fast: false
-      matrix:
-        python-version: [3.11.1]
 
     steps:
       - uses: actions/checkout@v3
 
+      - name: Install ASDF
+        uses: asdf-vm/actions/plugin-test@v1
+
+      - name: Setup Pants Build
       - uses: pantsbuild/actions/init-pants@v2
         with:
-          pants-python-version: ${{ matrix.python-version }}
           gha-cache-key: cache0-py${{ matrix.python-version }}
           named-caches-hash: ${{ hashFiles('3rdparty/python/default.lock') }}
           cache-lmdb-store: "false"

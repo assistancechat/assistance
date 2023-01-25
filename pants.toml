@@ -2,6 +2,7 @@
 pants_version = "2.14.1"
 
 backend_packages = [
+  "pants.core",
   "pants.backend.python",
   "pants.backend.python.lint.black",
   "pants.backend.python.lint.isort",
@@ -14,9 +15,6 @@ backend_packages = [
   "pants.backend.experimental.python.lint.autoflake",
   "pants.backend.python.lint.flake8",
 ]
-
-[python-bootstrap]
-search_path = ["$HOME/.asdf/installs/python/*/bin/python", "<PYENV>", "<PATH>"]
 
 [anonymous-telemetry]
 enabled = true
