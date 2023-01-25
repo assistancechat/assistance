@@ -10,6 +10,9 @@ authors = [
 license = "Apache-2.0"
 readme = "README.md"
 
+[tool.poetry.scripts]
+assistance = "assistance.__main__:main"
+
 [tool.poetry.dependencies]
 python = "^3.10"
 

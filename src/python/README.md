@@ -22,3 +22,9 @@ sudo journalctl -u run-api.service -f -n 50
 ```bash
 poetry env use $(which python)
 ```
+
+### Sync data locally
+
+```bash
+rsync -r assistance:~/.assistance/* ~/.assistance/
+```
