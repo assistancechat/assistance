@@ -55,7 +55,6 @@ def admin():
 
     config.set_option("server.address", "localhost")
     config.set_option("browser.gatherUsageStats", False)
-    config.set_option("server.enableCORS", False)
     config.set_option("server.port", 8501)
 
     bootstrap.run(
