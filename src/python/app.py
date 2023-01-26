@@ -13,7 +13,7 @@
 # limitations under the License.
 
 
-from assistance._admin.app import main
+from assistance._streamlit import main
 
 if __name__ == "__main__":
     main()
