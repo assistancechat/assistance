@@ -1,5 +1,6 @@
 {
   "scripts": {
+    "schema": "cd ../python && poetry run assistance schema ../openapi/openapi.json",
     "python": "npm run python.clear && npm run python.generate && npm run python.refactor && npm run python.fix && npm run python.clean && npm run pre-commit",
     "python.clear": "rm -r ../python/assistance/tests/client && rm -r ../python/assistance/_client",
     "python.generate": "openapi-generator-cli generate -g python -o ../python -i openapi.json -c python-config.json",
