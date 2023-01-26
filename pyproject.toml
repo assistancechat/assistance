@@ -14,7 +14,7 @@ ignore = [
 
 
 [tool.pylint.master]
-ignore-patterns = "BUILD"
+ignore-patterns = "./src/python/assistance/_client/**/*.py"
 
 [tool.pylint.messages-control]
 disable = [
