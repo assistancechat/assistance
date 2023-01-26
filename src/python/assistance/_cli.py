@@ -48,17 +48,19 @@ def schema(path: str):
 
 @app.command()
 def admin():
+    from streamlit import config
     from streamlit.web import bootstrap
 
     from assistance._paths import LIB
 
+    config.set_option("server.address", "localhost")
+    config.set_option("browser.gatherUsageStats", False)
+    config.set_option("server.enableCORS", False)
+    config.set_option("server.port", 8501)
+
     bootstrap.run(
         str(LIB / "_admin" / "app.py"),
         command_line=None,
-        args=list(),
-        flag_options={
-            "server.address": "localhost",
-            "browser.gatherUsageStats": "false",
-            "server.enableCORS": "false",
-        },
+        args=[],
+        flag_options={},
     )
