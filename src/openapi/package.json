@@ -1,0 +1,10 @@
+{
+  "scripts": {
+    "python": "npm run python.generate && npm run python.clean",
+    "python.generate": "openapi-generator-cli generate -g python -o ../python/assistance -i openapi.json -c python-config.json",
+    "python.clean": "rm -r ../python/assistance/.openapi-generator && rm ../python/assistance/_client_README.md && rm ../python/assistance/.openapi-generator-ignore"
+  },
+  "devDependencies": {
+    "@openapitools/openapi-generator-cli": "^2.5.2"
+  }
+}

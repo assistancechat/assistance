@@ -19,9 +19,9 @@ import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from assistance import _ctx
 from assistance._keys import set_openai_api_key
 
-from .. import _ctx
 from .routers import chat, query, root, save, search, send, summarise
 
 logging.basicConfig(
@@ -36,9 +36,7 @@ app = FastAPI()
 origins = [
     "https://assistance.chat",
     "https://*.assistance.chat",
-    "http://localhost:5173",
-    "http://localhost:5174",
-    "http://10.0.0.117:5173",
+    "http://localhost:*",
 ]
 
 app.add_middleware(
@@ -70,7 +68,7 @@ async def shutdown_event():
 
 
 def main():
-    uvicorn.run("assistance._api.main:app", port=8080, log_level="info", reload=True)
+    uvicorn.run("assistance._api.main:app", port=8000, log_level="info", reload=True)
 
 
 if __name__ == "__main__":
