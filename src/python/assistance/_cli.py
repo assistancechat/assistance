@@ -48,4 +48,13 @@ def schema(path: str):
 
 @app.command()
 def admin():
-    pass
+    from streamlit.web import bootstrap
+
+    from assistance._paths import LIB
+
+    bootstrap.run(
+        str(LIB / "_admin" / "app.py"),
+        command_line=None,
+        args=list(),
+        flag_options=dict(),
+    )
