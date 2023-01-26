@@ -30,6 +30,7 @@ uvicorn = {extras = ["standard"], version = "*"}
 
 streamlit = ">=1.17.0"
 typer = "^0.7.0"
+frozendict = "^2.3.4"
 
 [tool.poetry.group.dev.dependencies]
 autoflake = "*"
