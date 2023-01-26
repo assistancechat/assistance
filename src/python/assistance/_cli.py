@@ -53,7 +53,11 @@ def admin():
 
     from assistance._paths import LIB
 
+    # This config option is important. The exposure onto the interwebs
+    # is undergone behind an NGINX reverse proxy. It is that reverse
+    # proxy that protects the interface via user authentication.
     config.set_option("server.address", "localhost")
+
     config.set_option("browser.gatherUsageStats", False)
     config.set_option("server.port", 8501)
 
