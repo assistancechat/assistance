@@ -12,13 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
 import streamlit as st
+
+from assistance._admin import categories
+
+CATEGORY = categories.DEMO
+TITLE = "A test"
 
 
 def main():
-    st.write("# Hello World")
-
-
-if __name__ == "__main__":
-    main()
+    st.write("Hello Testing!")

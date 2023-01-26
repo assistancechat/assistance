@@ -62,7 +62,7 @@ def admin():
     config.set_option("server.port", 8501)
 
     bootstrap.run(
-        str(LIB / "_admin" / "app.py"),
+        str(LIB / "_streamlit.py"),
         command_line=None,
         args=[],
         flag_options={},
