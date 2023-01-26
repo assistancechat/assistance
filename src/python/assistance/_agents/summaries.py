@@ -21,9 +21,8 @@ import textwrap
 import openai
 from thefuzz import process as fuzz_process
 
+from assistance import _ctx
 from assistance._vendor.stackoverflow.web_scraping import scrape
-
-from .summary import _ctx
 
 MAX_TEXT_SECTIONS = 10
 MIN_TEXT_LENGTH = 5

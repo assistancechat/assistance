@@ -15,8 +15,8 @@
 import asyncio
 import json
 
+from assistance._enums import SearchEngine
 from assistance._paths import RECORDS
-from assistance.search.ids import SearchEngine
 
 from .utilities import (
     create_record_directory_with_epoch,
