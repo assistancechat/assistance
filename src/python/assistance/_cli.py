@@ -56,5 +56,9 @@ def admin():
         str(LIB / "_admin" / "app.py"),
         command_line=None,
         args=list(),
-        flag_options=dict(),
+        flag_options={
+            "server.address": "localhost",
+            "browser.gatherUsageStats": "false",
+            "server.enableCORS": "false",
+        },
     )

@@ -7,10 +7,9 @@ known_first_party = ["assistance"]
 ignore = [
     "**/node_modules",
     "**/__pycache__",
-    "**/BUILD",
 ]
 
-typeCheckingMode = "strict"
+# typeCheckingMode = "strict"
 
 
 [tool.pylint.master]
