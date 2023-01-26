@@ -18,8 +18,8 @@ import aiohttp
 
 from assistance._paths import USERS
 
-from .. import _ctx
-from .keys import get_mailgun_api_key
+from . import _ctx
+from ._keys import get_mailgun_api_key
 
 EMAIL_SUBJECT = "Your career.assistance.chat access link"
 EMAIL_TEMPLATE = (

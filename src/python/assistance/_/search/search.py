@@ -17,11 +17,13 @@ import json
 import logging
 import urllib.parse
 
-from assistance import _ctx
-from assistance._agents.summaries import summarise_urls_with_query_around_snippets
-from assistance._enums import SEARCH_ENGINE_IDS, SearchEngine
 from assistance._keys import get_google_search_api_key
-from assistance._store.search import store_search_result
+from assistance.store.search import store_search_result
+from assistance.summary.with_query import summarise_urls_with_query_around_snippets
+
+from . import _ctx
+from .course_list import COURSE_LIST
+from .ids import SEARCH_ENGINE_IDS, SearchEngine
 
 API_KEY = get_google_search_api_key()
 
@@ -36,7 +38,7 @@ async def alphacrucis_search(record_grouping: str, username: str, query: str):
         username=username,
         search_engine=SearchEngine.ALPHACRUCIS,
         query=query,
-        added_pages=[],
+        added_pages=[COURSE_LIST],
     )
 
 

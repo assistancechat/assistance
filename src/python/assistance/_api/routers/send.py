@@ -15,7 +15,7 @@
 
 from fastapi import APIRouter
 
-from assistance.mailgun import send_access_link
+from assistance._mailgun import send_access_link
 
 router = APIRouter(prefix="/send")
 

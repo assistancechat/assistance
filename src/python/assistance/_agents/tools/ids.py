@@ -11,15 +11,3 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
-
-import enum
-
-
-class SearchEngine(str, enum.Enum):
-    ALPHACRUCIS = "alphacrucis"
-
-
-SEARCH_ENGINE_IDS = {
-    SearchEngine.ALPHACRUCIS: "350772bce9c914d64",
-}

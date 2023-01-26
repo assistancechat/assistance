@@ -23,7 +23,7 @@ from jose import JWTError, jwt
 from pydantic import BaseModel
 
 from assistance._api.exceptions import CredentialsException
-from assistance._api.keys import get_jwt_key
+from assistance._keys import get_jwt_key
 from assistance._paths import USERS
 
 SECRET_KEY = get_jwt_key()
