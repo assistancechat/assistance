@@ -2,12 +2,14 @@
   "scripts": {
     "schema": "cd ../python && poetry run assistance schema ../openapi/openapi.json",
     "python": "npm run python.clear && npm run python.generate && npm run python.refactor && npm run python.fix && npm run python.clean && npm run pre-commit",
-    "python.clear": "rm -r ../python/assistance/tests/client && rm -r ../python/assistance/_client",
+    "python.clear": "rm -r ../python/assistance/tests/client || exit 0 && rm -r ../python/assistance/_client || exit 0",
     "python.generate": "openapi-generator-cli generate -g python -o ../python -i openapi.json -c python-config.json",
     "python.refactor": "mv -f ../python/test/test_paths ../python/assistance/tests/client",
     "python.fix": "replace-in-files --string='assistance/_client' --replacement='assistance._client' '../python/assistance/_client/**/*.{py,pyi}'",
     "python.clean": "rm -r ../python/.openapi-generator && rm ../python/.openapi-generator-ignore && rm ../python/assistance/_client_README.md && rm -r ../python/test",
-    "typescript": "openapi-generator-cli generate -g typescript-axios -o ../typescript -i openapi.json -c typescript-config.json",
+    "typescript": "npm run typescript.clear && npm run typescript.generate && npm run pre-commit",
+    "typescript.clear": "rm -r ../typescript/src/client || exit 0",
+    "typescript.generate": "cd ../typescript && npm run generate && npm run build",
     "pre-commit": "pre-commit run --all-files"
   },
   "devDependencies": {
