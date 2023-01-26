@@ -16,11 +16,11 @@
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 
-from assistance._api.utilities.login import User, get_current_user
-from assistance.summary.with_query import (
+from assistance._agents.summaries import (
     summarise_url_with_query_around_snippets,
     summarise_with_query,
 )
+from assistance._api.login import User, get_current_user
 
 router = APIRouter(prefix="/summarise")
 
