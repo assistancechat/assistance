@@ -20,6 +20,14 @@ app = typer.Typer()
 
 
 @app.command()
+def start():
+    from multiprocessing import Process
+
+    Process(target=api).start()
+    Process(target=admin).start()
+
+
+@app.command()
 def api():
     from assistance._api.main import main as _main
 
