@@ -21,9 +21,21 @@ app = typer.Typer()
 
 @app.command()
 def api():
-    from assistance._api.main import main
+    from assistance._api.main import main as _main
 
-    main()
+    _main()
+
+
+@app.command()
+def schema(path: str):
+    import json
+
+    from assistance._api.main import app as _app
+
+    openapi_schema = _app.openapi()
+
+    with open(path, "w", encoding="utf8") as f:
+        json.dump(openapi_schema, f, indent=2)
 
 
 @app.command()
