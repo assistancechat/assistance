@@ -16,8 +16,8 @@
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 
-from assistance._api.utilities.login import User, get_current_user
-from assistance.query.from_transcript import query_from_transcript
+from assistance._agents.queries import query_from_transcript
+from assistance._api.login import User, get_current_user
 
 router = APIRouter(prefix="/query")
 

@@ -18,7 +18,7 @@ import aiohttp
 
 from assistance._paths import USERS
 
-from . import ctx
+from .. import _ctx
 from .keys import get_mailgun_api_key
 
 EMAIL_SUBJECT = "Your career.assistance.chat access link"
@@ -59,6 +59,6 @@ async def send_access_link(email: str):
         "text": EMAIL_TEMPLATE.format(access_link=access_link),
     }
 
-    await ctx.session.post(
+    await _ctx.session.post(
         url=url, auth=aiohttp.BasicAuth(login="api", password=API_KEY), data=data
     )

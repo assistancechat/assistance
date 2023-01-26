@@ -17,11 +17,7 @@ from fastapi import APIRouter, Depends
 from fastapi.security import OAuth2PasswordRequestForm
 from pydantic import BaseModel
 
-from assistance._api.utilities.login import (
-    Token,
-    create_temp_account,
-    get_user_access_token,
-)
+from assistance._api.login import Token, create_temp_account, get_user_access_token
 
 router = APIRouter(prefix="")
 

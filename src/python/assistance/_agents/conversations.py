@@ -17,11 +17,9 @@ import textwrap
 
 import openai
 
-from assistance.query.from_transcript import query_from_transcript
-from assistance.search.search import alphacrucis_search
-from assistance.store.transcript import store_prompt_transcript
-
-from .cache import message_history
+from assistance._agents.queries import query_from_transcript
+from assistance._agents.tools.search import alphacrucis_search
+from assistance._store.transcript import store_prompt_transcript
 
 AGENT_NAME = "Michael"
 MODEL_KWARGS = {

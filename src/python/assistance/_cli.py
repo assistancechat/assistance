@@ -21,7 +21,7 @@ app = typer.Typer()
 
 @app.command()
 def api():
-    from assistance._api.api.main import main
+    from assistance._api.main import main
 
     main()
 

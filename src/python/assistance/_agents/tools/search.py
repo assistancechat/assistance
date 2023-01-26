@@ -13,17 +13,25 @@
 # limitations under the License.
 
 import asyncio
+import enum
 import json
 import logging
 import urllib.parse
 
+from assistance import _ctx
+from assistance._agents.summaries import summarise_urls_with_query_around_snippets
 from assistance._api.keys import get_google_search_api_key
-from assistance.store.search import store_search_result
-from assistance.summary.with_query import summarise_urls_with_query_around_snippets
+from assistance._store.search import store_search_result
 
-from . import _ctx
-from .course_list import COURSE_LIST
-from .ids import SEARCH_ENGINE_IDS, SearchEngine
+
+class SearchEngine(str, enum.Enum):
+    ALPHACRUCIS = "alphacrucis"
+
+
+SEARCH_ENGINE_IDS = {
+    SearchEngine.ALPHACRUCIS: "350772bce9c914d64",
+}
+
 
 API_KEY = get_google_search_api_key()
 

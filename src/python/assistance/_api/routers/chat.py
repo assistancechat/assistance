@@ -16,11 +16,11 @@
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 
-from assistance._api.utilities.login import User, get_current_user
-from assistance.conversations.student import (
+from assistance._agents.conversations import (
     run_student_chat_response,
     run_student_chat_start,
 )
+from assistance._api.login import User, get_current_user
 
 router = APIRouter(prefix="/chat")
 

@@ -16,8 +16,8 @@
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 
-from assistance._api.utilities.login import User, get_current_user
-from assistance.search.search import alphacrucis_search
+from assistance._agents.tools.search import alphacrucis_search
+from assistance._api.login import User, get_current_user
 
 router = APIRouter(prefix="/search")
 

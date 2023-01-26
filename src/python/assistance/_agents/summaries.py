@@ -23,7 +23,7 @@ from thefuzz import process as fuzz_process
 
 from assistance._vendor.stackoverflow.web_scraping import scrape
 
-from . import _ctx
+from .summary import _ctx
 
 MAX_TEXT_SECTIONS = 10
 MIN_TEXT_LENGTH = 5
