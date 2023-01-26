@@ -14,8 +14,9 @@ from urllib.parse import urlencode
 
 import certifi
 import urllib3
-from _client.exceptions import ApiException, ApiValueError
 from urllib3._collections import HTTPHeaderDict
+
+from assistance._client.exceptions import ApiException, ApiValueError
 
 logger = logging.getLogger(__name__)
 

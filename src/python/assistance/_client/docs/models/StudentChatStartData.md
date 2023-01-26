@@ -1,4 +1,4 @@
-# _client.model.student_chat_start_data.StudentChatStartData
+# assistance._client.model.student_chat_start_data.StudentChatStartData
 
 ## Model Type Info
 Input Type | Accessed Type | Description | Notes

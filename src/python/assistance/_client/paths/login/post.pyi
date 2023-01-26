@@ -11,7 +11,7 @@ import typing_extensions
 import urllib3
 from urllib3._collections import HTTPHeaderDict
 
-from _client import api_client, exceptions
+from assistance._client import api_client, exceptions
 from datetime import date, datetime  # noqa: F401
 import decimal  # noqa: F401
 import functools  # noqa: F401
@@ -23,13 +23,13 @@ import uuid  # noqa: F401
 
 import frozendict  # noqa: F401
 
-from _client import schemas  # noqa: F401
+from assistance._client import schemas  # noqa: F401
 
-from _client.model.http_validation_error import HTTPValidationError
-from _client.model.token import Token
-from _client.model.body_login_for_access_token_login_post import (
+from assistance._client.model.body_login_for_access_token_login_post import (
     BodyLoginForAccessTokenLoginPost,
 )
+from assistance._client.model.token import Token
+from assistance._client.model.http_validation_error import HTTPValidationError
 
 # body param
 SchemaForRequestBodyApplicationXWwwFormUrlencoded = BodyLoginForAccessTokenLoginPost

@@ -1,4 +1,4 @@
-from _client.paths.chat_student_continue.post import ApiForpost
+from assistance._client.paths.chat_student_continue.post import ApiForpost
 
 
 class ChatStudentContinue(

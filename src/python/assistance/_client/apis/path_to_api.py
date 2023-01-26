@@ -1,15 +1,16 @@
 import typing_extensions
-from _client.apis.paths.chat_student_continue import ChatStudentContinue
-from _client.apis.paths.chat_student_start import ChatStudentStart
-from _client.apis.paths.login import Login
-from _client.apis.paths.query_from_transcript import QueryFromTranscript
-from _client.apis.paths.save_form import SaveForm
-from _client.apis.paths.search_alphacrucis import SearchAlphacrucis
-from _client.apis.paths.send_signin_link import SendSigninLink
-from _client.apis.paths.summarise_with_query_raw import SummariseWithQueryRaw
-from _client.apis.paths.summarise_with_query_url import SummariseWithQueryUrl
-from _client.apis.paths.temp_account import TempAccount
-from _client.paths import PathValues
+
+from assistance._client.apis.paths.chat_student_continue import ChatStudentContinue
+from assistance._client.apis.paths.chat_student_start import ChatStudentStart
+from assistance._client.apis.paths.login import Login
+from assistance._client.apis.paths.query_from_transcript import QueryFromTranscript
+from assistance._client.apis.paths.save_form import SaveForm
+from assistance._client.apis.paths.search_alphacrucis import SearchAlphacrucis
+from assistance._client.apis.paths.send_signin_link import SendSigninLink
+from assistance._client.apis.paths.summarise_with_query_raw import SummariseWithQueryRaw
+from assistance._client.apis.paths.summarise_with_query_url import SummariseWithQueryUrl
+from assistance._client.apis.paths.temp_account import TempAccount
+from assistance._client.paths import PathValues
 
 PathToApi = typing_extensions.TypedDict(
     "PathToApi",

@@ -1,4 +1,4 @@
-# _client.model.search_data.SearchData
+# assistance._client.model.search_data.SearchData
 
 ## Model Type Info
 Input Type | Accessed Type | Description | Notes

@@ -1,4 +1,4 @@
-from _client.paths.login.post import ApiForpost
+from assistance._client.paths.login.post import ApiForpost
 
 
 class Login(

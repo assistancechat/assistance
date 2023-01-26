@@ -1,4 +1,4 @@
-from _client.paths.query_from_transcript.post import ApiForpost
+from assistance._client.paths.query_from_transcript.post import ApiForpost
 
 
 class QueryFromTranscript(

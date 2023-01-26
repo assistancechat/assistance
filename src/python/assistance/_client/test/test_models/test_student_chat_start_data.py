@@ -9,9 +9,9 @@
 
 import unittest
 
-import _client
-from _client import configuration
-from _client.model.student_chat_start_data import StudentChatStartData
+import assistance._client
+from assistance._client import configuration
+from assistance._client.model.student_chat_start_data import StudentChatStartData
 
 
 class TestStudentChatStartData(unittest.TestCase):

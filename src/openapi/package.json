@@ -1,10 +1,15 @@
 {
   "scripts": {
-    "python": "npm run python.generate && npm run python.clean",
-    "python.generate": "openapi-generator-cli generate -g python -o ../python/assistance -i openapi.json -c python-config.json",
-    "python.clean": "rm -r ../python/assistance/.openapi-generator && rm ../python/assistance/_client_README.md && rm ../python/assistance/.openapi-generator-ignore"
+    "python": "npm run python.clear && npm run python.generate && npm run python.refactor && npm run python.fix && npm run python.clean && npm run pre-commit",
+    "python.clear": "rm -r ../python/assistance/tests/client && rm -r ../python/assistance/_client",
+    "python.generate": "openapi-generator-cli generate -g python -o ../python -i openapi.json -c python-config.json",
+    "python.refactor": "mv -f ../python/test/test_paths ../python/assistance/tests/client",
+    "python.fix": "replace-in-files --string='assistance/_client' --replacement='assistance._client' '../python/assistance/_client/**/*.{py,pyi}'",
+    "python.clean": "rm -r ../python/.openapi-generator && rm ../python/.openapi-generator-ignore && rm ../python/assistance/_client_README.md && rm -r ../python/test",
+    "pre-commit": "pre-commit run --all-files"
   },
   "devDependencies": {
-    "@openapitools/openapi-generator-cli": "^2.5.2"
+    "@openapitools/openapi-generator-cli": "^2.5.2",
+    "replace-in-files-cli": "^2.0.0"
   }
 }

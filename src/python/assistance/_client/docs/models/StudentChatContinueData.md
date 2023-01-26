@@ -1,4 +1,4 @@
-# _client.model.student_chat_continue_data.StudentChatContinueData
+# assistance._client.model.student_chat_continue_data.StudentChatContinueData
 
 ## Model Type Info
 Input Type | Accessed Type | Description | Notes

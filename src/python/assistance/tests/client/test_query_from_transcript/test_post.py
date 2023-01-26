@@ -7,18 +7,19 @@
 import unittest
 from unittest.mock import patch
 
-import _client
 import urllib3
-from _client import api_client, configuration, schemas
-from _client.paths.chat_student_start import post  # noqa: E501
+
+import assistance._client
+from assistance._client import api_client, configuration, schemas
+from assistance._client.paths.query_from_transcript import post  # noqa: E501
 
 from .. import ApiTestMixin
 
 
-class TestChatStudentStart(ApiTestMixin, unittest.TestCase):
+class TestQueryFromTranscript(ApiTestMixin, unittest.TestCase):
     """
-    ChatStudentStart unit test stubs
-        Student Chat Start  # noqa: E501
+    QueryFromTranscript unit test stubs
+        Save Form  # noqa: E501
     """
 
     _configuration = configuration.Configuration()

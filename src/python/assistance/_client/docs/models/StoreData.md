@@ -1,4 +1,4 @@
-# _client.model.store_data.StoreData
+# assistance._client.model.store_data.StoreData
 
 ## Model Type Info
 Input Type | Accessed Type | Description | Notes

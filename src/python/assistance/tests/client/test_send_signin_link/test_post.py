@@ -7,18 +7,19 @@
 import unittest
 from unittest.mock import patch
 
-import _client
 import urllib3
-from _client import api_client, configuration, schemas
-from _client.paths.save_form import post  # noqa: E501
+
+import assistance._client
+from assistance._client import api_client, configuration, schemas
+from assistance._client.paths.send_signin_link import post  # noqa: E501
 
 from .. import ApiTestMixin
 
 
-class TestSaveForm(ApiTestMixin, unittest.TestCase):
+class TestSendSigninLink(ApiTestMixin, unittest.TestCase):
     """
-    SaveForm unit test stubs
-        Save Form  # noqa: E501
+    SendSigninLink unit test stubs
+        Send User Signin Link  # noqa: E501
     """
 
     _configuration = configuration.Configuration()

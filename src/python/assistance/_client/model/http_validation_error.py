@@ -17,7 +17,8 @@ from datetime import date, datetime  # noqa: F401
 
 import frozendict  # noqa: F401
 import typing_extensions  # noqa: F401
-from _client import schemas  # noqa: F401
+
+from assistance._client import schemas  # noqa: F401
 
 
 class HTTPValidationError(schemas.DictSchema):
@@ -136,4 +137,4 @@ class HTTPValidationError(schemas.DictSchema):
         )
 
 
-from _client.model.validation_error import ValidationError
+from assistance._client.model.validation_error import ValidationError

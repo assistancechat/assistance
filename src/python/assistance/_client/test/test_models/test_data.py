@@ -9,9 +9,9 @@
 
 import unittest
 
-import _client
-from _client import configuration
-from _client.model.data import Data
+import assistance._client
+from assistance._client import configuration
+from assistance._client.model.data import Data
 
 
 class TestData(unittest.TestCase):

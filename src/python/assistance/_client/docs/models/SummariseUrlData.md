@@ -1,4 +1,4 @@
-# _client.model.summarise_url_data.SummariseUrlData
+# assistance._client.model.summarise_url_data.SummariseUrlData
 
 ## Model Type Info
 Input Type | Accessed Type | Description | Notes

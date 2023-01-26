@@ -16,9 +16,10 @@ from datetime import date, datetime  # noqa: F401
 import frozendict  # noqa: F401
 import typing_extensions  # noqa: F401
 import urllib3
-from _client import schemas  # noqa: F401
-from _client import api_client, exceptions
 from urllib3._collections import HTTPHeaderDict
+
+from assistance._client import schemas  # noqa: F401
+from assistance._client import api_client, exceptions
 
 from . import path
 

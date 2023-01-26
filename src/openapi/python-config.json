@@ -1,4 +1,4 @@
 {
   "generateSourceCodeOnly": true,
-  "packageName": "_client"
+  "packageName": "assistance._client"
 }

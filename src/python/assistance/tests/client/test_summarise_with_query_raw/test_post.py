@@ -7,18 +7,19 @@
 import unittest
 from unittest.mock import patch
 
-import _client
 import urllib3
-from _client import api_client, configuration, schemas
-from _client.paths.chat_student_continue import post  # noqa: E501
+
+import assistance._client
+from assistance._client import api_client, configuration, schemas
+from assistance._client.paths.summarise_with_query_raw import post  # noqa: E501
 
 from .. import ApiTestMixin
 
 
-class TestChatStudentContinue(ApiTestMixin, unittest.TestCase):
+class TestSummariseWithQueryRaw(ApiTestMixin, unittest.TestCase):
     """
-    ChatStudentContinue unit test stubs
-        Student Chat Continue  # noqa: E501
+    SummariseWithQueryRaw unit test stubs
+        Run Summarise With Query Raw  # noqa: E501
     """
 
     _configuration = configuration.Configuration()

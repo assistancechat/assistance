@@ -1,4 +1,4 @@
-# _client.model.http_validation_error.HTTPValidationError
+# assistance._client.model.http_validation_error.HTTPValidationError
 
 ## Model Type Info
 Input Type | Accessed Type | Description | Notes

@@ -7,10 +7,11 @@
 import unittest
 from unittest.mock import patch
 
-import _client
 import urllib3
-from _client import api_client, configuration, schemas
-from _client.paths.search_alphacrucis import post  # noqa: E501
+
+import assistance._client
+from assistance._client import api_client, configuration, schemas
+from assistance._client.paths.search_alphacrucis import post  # noqa: E501
 
 from .. import ApiTestMixin
 

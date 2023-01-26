@@ -12,13 +12,13 @@
 __version__ = "1.0.0"
 
 # import ApiClient
-from _client.api_client import ApiClient
+from assistance._client.api_client import ApiClient
 
 # import Configuration
-from _client.configuration import Configuration
+from assistance._client.configuration import Configuration
 
 # import exceptions
-from _client.exceptions import (
+from assistance._client.exceptions import (
     ApiAttributeError,
     ApiException,
     ApiKeyError,

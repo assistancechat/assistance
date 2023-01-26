@@ -1,6 +1,7 @@
 import typing_extensions
-from _client.apis.tags import TagValues
-from _client.apis.tags.default_api import DefaultApi
+
+from assistance._client.apis.tags import TagValues
+from assistance._client.apis.tags.default_api import DefaultApi
 
 TagToApi = typing_extensions.TypedDict(
     "TagToApi",

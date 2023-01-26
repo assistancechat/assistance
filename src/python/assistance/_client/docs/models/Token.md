@@ -1,4 +1,4 @@
-# _client.model.token.Token
+# assistance._client.model.token.Token
 
 ## Model Type Info
 Input Type | Accessed Type | Description | Notes

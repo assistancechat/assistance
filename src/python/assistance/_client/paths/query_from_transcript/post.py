@@ -16,11 +16,12 @@ from datetime import date, datetime  # noqa: F401
 import frozendict  # noqa: F401
 import typing_extensions  # noqa: F401
 import urllib3
-from _client import schemas  # noqa: F401
-from _client import api_client, exceptions
-from _client.model.data import Data
-from _client.model.http_validation_error import HTTPValidationError
 from urllib3._collections import HTTPHeaderDict
+
+from assistance._client import schemas  # noqa: F401
+from assistance._client import api_client, exceptions
+from assistance._client.model.data import Data
+from assistance._client.model.http_validation_error import HTTPValidationError
 
 from . import path
 

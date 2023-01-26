@@ -18,9 +18,10 @@ from collections import defaultdict
 from datetime import date, datetime, timedelta  # noqa: F401
 
 import frozendict
-from _client.configuration import Configuration
-from _client.exceptions import ApiTypeError, ApiValueError
 from dateutil.parser.isoparser import _takes_ascii, isoparser
+
+from assistance._client.configuration import Configuration
+from assistance._client.exceptions import ApiTypeError, ApiValueError
 
 
 class Unset:

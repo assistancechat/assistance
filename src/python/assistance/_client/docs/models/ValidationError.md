@@ -1,4 +1,4 @@
-# _client.model.validation_error.ValidationError
+# assistance._client.model.validation_error.ValidationError
 
 ## Model Type Info
 Input Type | Accessed Type | Description | Notes

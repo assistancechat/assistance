@@ -7,18 +7,19 @@
 import unittest
 from unittest.mock import patch
 
-import _client
 import urllib3
-from _client import api_client, configuration, schemas
-from _client.paths.login import post  # noqa: E501
+
+import assistance._client
+from assistance._client import api_client, configuration, schemas
+from assistance._client.paths.chat_student_start import post  # noqa: E501
 
 from .. import ApiTestMixin
 
 
-class TestLogin(ApiTestMixin, unittest.TestCase):
+class TestChatStudentStart(ApiTestMixin, unittest.TestCase):
     """
-    Login unit test stubs
-        Login For Access Token  # noqa: E501
+    ChatStudentStart unit test stubs
+        Student Chat Start  # noqa: E501
     """
 
     _configuration = configuration.Configuration()

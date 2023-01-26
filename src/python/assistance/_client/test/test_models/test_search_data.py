@@ -9,9 +9,9 @@
 
 import unittest
 
-import _client
-from _client import configuration
-from _client.model.search_data import SearchData
+import assistance._client
+from assistance._client import configuration
+from assistance._client.model.search_data import SearchData
 
 
 class TestSearchData(unittest.TestCase):

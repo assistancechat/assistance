@@ -24,10 +24,13 @@ from urllib.parse import quote, urlparse
 import frozendict
 import typing_extensions
 import urllib3
-from _client import rest
-from _client.configuration import Configuration
-from _client.exceptions import ApiTypeError, ApiValueError
-from _client.schemas import (
+from urllib3._collections import HTTPHeaderDict
+from urllib3.fields import RequestField as RequestFieldBase
+
+from assistance._client import rest
+from assistance._client.configuration import Configuration
+from assistance._client.exceptions import ApiTypeError, ApiValueError
+from assistance._client.schemas import (
     BinarySchema,
     BoolClass,
     FileIO,
@@ -39,8 +42,6 @@ from _client.schemas import (
     none_type,
     unset,
 )
-from urllib3._collections import HTTPHeaderDict
-from urllib3.fields import RequestField as RequestFieldBase
 
 
 class RequestField(RequestFieldBase):

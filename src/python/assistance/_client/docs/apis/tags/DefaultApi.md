@@ -1,5 +1,5 @@
 <a name="__pageTop"></a>
-# _client.apis.tags.default_api.DefaultApi
+# assistance._client.apis.tags.default_api.DefaultApi
 
 All URIs are relative to *http://localhost*
 
@@ -25,20 +25,20 @@ Login For Access Token
 ### Example
 
 ```python
-import _client
-from _client.apis.tags import default_api
-from _client.model.http_validation_error import HTTPValidationError
-from _client.model.token import Token
-from _client.model.body_login_for_access_token_login_post import BodyLoginForAccessTokenLoginPost
+import assistance._client
+from assistance._client.apis.tags import default_api
+from assistance/_client.model.body_login_for_access_token_login_post import BodyLoginForAccessTokenLoginPost
+from assistance/_client.model.token import Token
+from assistance/_client.model.http_validation_error import HTTPValidationError
 from pprint import pprint
 # Defining the host is optional and defaults to http://localhost
 # See configuration.py for a list of all supported configuration parameters.
-configuration = _client.Configuration(
+configuration = assistance._client.Configuration(
     host = "http://localhost"
 )
 
 # Enter a context with an instance of the API client
-with _client.ApiClient(configuration) as api_client:
+with assistance._client.ApiClient(configuration) as api_client:
     # Create an instance of the API class
     api_instance = default_api.DefaultApi(api_client)
 
@@ -57,7 +57,7 @@ with _client.ApiClient(configuration) as api_client:
             body=body,
         )
         pprint(api_response)
-    except _client.ApiException as e:
+    except assistance._client.ApiException as e:
         print("Exception when calling DefaultApi->login_for_access_token_login_post: %s\n" % e)
 ```
 ### Parameters
@@ -129,14 +129,14 @@ Run Alphacrucis Search
 
 * OAuth Authentication (OAuth2PasswordBearer):
 ```python
-import _client
-from _client.apis.tags import default_api
-from _client.model.http_validation_error import HTTPValidationError
-from _client.model.search_data import SearchData
+import assistance._client
+from assistance._client.apis.tags import default_api
+from assistance/_client.model.search_data import SearchData
+from assistance/_client.model.http_validation_error import HTTPValidationError
 from pprint import pprint
 # Defining the host is optional and defaults to http://localhost
 # See configuration.py for a list of all supported configuration parameters.
-configuration = _client.Configuration(
+configuration = assistance._client.Configuration(
     host = "http://localhost"
 )
 
@@ -146,12 +146,12 @@ configuration = _client.Configuration(
 # satisfies your auth use case.
 
 # Configure OAuth2 access token for authorization: OAuth2PasswordBearer
-configuration = _client.Configuration(
+configuration = assistance._client.Configuration(
     host = "http://localhost"
 )
 configuration.access_token = 'YOUR_ACCESS_TOKEN'
 # Enter a context with an instance of the API client
-with _client.ApiClient(configuration) as api_client:
+with assistance._client.ApiClient(configuration) as api_client:
     # Create an instance of the API class
     api_instance = default_api.DefaultApi(api_client)
 
@@ -166,7 +166,7 @@ with _client.ApiClient(configuration) as api_client:
             body=body,
         )
         pprint(api_response)
-    except _client.ApiException as e:
+    except assistance._client.ApiException as e:
         print("Exception when calling DefaultApi->run_alphacrucis_search_search_alphacrucis_post: %s\n" % e)
 ```
 ### Parameters
@@ -239,14 +239,14 @@ Run Summarise Url With Query
 
 * OAuth Authentication (OAuth2PasswordBearer):
 ```python
-import _client
-from _client.apis.tags import default_api
-from _client.model.summarise_url_data import SummariseUrlData
-from _client.model.http_validation_error import HTTPValidationError
+import assistance._client
+from assistance._client.apis.tags import default_api
+from assistance/_client.model.summarise_url_data import SummariseUrlData
+from assistance/_client.model.http_validation_error import HTTPValidationError
 from pprint import pprint
 # Defining the host is optional and defaults to http://localhost
 # See configuration.py for a list of all supported configuration parameters.
-configuration = _client.Configuration(
+configuration = assistance._client.Configuration(
     host = "http://localhost"
 )
 
@@ -256,12 +256,12 @@ configuration = _client.Configuration(
 # satisfies your auth use case.
 
 # Configure OAuth2 access token for authorization: OAuth2PasswordBearer
-configuration = _client.Configuration(
+configuration = assistance._client.Configuration(
     host = "http://localhost"
 )
 configuration.access_token = 'YOUR_ACCESS_TOKEN'
 # Enter a context with an instance of the API client
-with _client.ApiClient(configuration) as api_client:
+with assistance._client.ApiClient(configuration) as api_client:
     # Create an instance of the API class
     api_instance = default_api.DefaultApi(api_client)
 
@@ -277,7 +277,7 @@ with _client.ApiClient(configuration) as api_client:
             body=body,
         )
         pprint(api_response)
-    except _client.ApiException as e:
+    except assistance._client.ApiException as e:
         print("Exception when calling DefaultApi->run_summarise_url_with_query_summarise_with_query_url_post: %s\n" % e)
 ```
 ### Parameters
@@ -350,14 +350,14 @@ Run Summarise With Query Raw
 
 * OAuth Authentication (OAuth2PasswordBearer):
 ```python
-import _client
-from _client.apis.tags import default_api
-from _client.model.http_validation_error import HTTPValidationError
-from _client.model.summarise_data import SummariseData
+import assistance._client
+from assistance._client.apis.tags import default_api
+from assistance/_client.model.summarise_data import SummariseData
+from assistance/_client.model.http_validation_error import HTTPValidationError
 from pprint import pprint
 # Defining the host is optional and defaults to http://localhost
 # See configuration.py for a list of all supported configuration parameters.
-configuration = _client.Configuration(
+configuration = assistance._client.Configuration(
     host = "http://localhost"
 )
 
@@ -367,12 +367,12 @@ configuration = _client.Configuration(
 # satisfies your auth use case.
 
 # Configure OAuth2 access token for authorization: OAuth2PasswordBearer
-configuration = _client.Configuration(
+configuration = assistance._client.Configuration(
     host = "http://localhost"
 )
 configuration.access_token = 'YOUR_ACCESS_TOKEN'
 # Enter a context with an instance of the API client
-with _client.ApiClient(configuration) as api_client:
+with assistance._client.ApiClient(configuration) as api_client:
     # Create an instance of the API class
     api_instance = default_api.DefaultApi(api_client)
 
@@ -388,7 +388,7 @@ with _client.ApiClient(configuration) as api_client:
             body=body,
         )
         pprint(api_response)
-    except _client.ApiException as e:
+    except assistance._client.ApiException as e:
         print("Exception when calling DefaultApi->run_summarise_with_query_raw_summarise_with_query_raw_post: %s\n" % e)
 ```
 ### Parameters
@@ -461,14 +461,14 @@ Save Form
 
 * OAuth Authentication (OAuth2PasswordBearer):
 ```python
-import _client
-from _client.apis.tags import default_api
-from _client.model.http_validation_error import HTTPValidationError
-from _client.model.data import Data
+import assistance._client
+from assistance._client.apis.tags import default_api
+from assistance/_client.model.data import Data
+from assistance/_client.model.http_validation_error import HTTPValidationError
 from pprint import pprint
 # Defining the host is optional and defaults to http://localhost
 # See configuration.py for a list of all supported configuration parameters.
-configuration = _client.Configuration(
+configuration = assistance._client.Configuration(
     host = "http://localhost"
 )
 
@@ -478,12 +478,12 @@ configuration = _client.Configuration(
 # satisfies your auth use case.
 
 # Configure OAuth2 access token for authorization: OAuth2PasswordBearer
-configuration = _client.Configuration(
+configuration = assistance._client.Configuration(
     host = "http://localhost"
 )
 configuration.access_token = 'YOUR_ACCESS_TOKEN'
 # Enter a context with an instance of the API client
-with _client.ApiClient(configuration) as api_client:
+with assistance._client.ApiClient(configuration) as api_client:
     # Create an instance of the API class
     api_instance = default_api.DefaultApi(api_client)
 
@@ -498,7 +498,7 @@ with _client.ApiClient(configuration) as api_client:
             body=body,
         )
         pprint(api_response)
-    except _client.ApiException as e:
+    except assistance._client.ApiException as e:
         print("Exception when calling DefaultApi->save_form_query_from_transcript_post: %s\n" % e)
 ```
 ### Parameters
@@ -571,14 +571,14 @@ Save Form
 
 * OAuth Authentication (OAuth2PasswordBearer):
 ```python
-import _client
-from _client.apis.tags import default_api
-from _client.model.http_validation_error import HTTPValidationError
-from _client.model.store_data import StoreData
+import assistance._client
+from assistance._client.apis.tags import default_api
+from assistance/_client.model.store_data import StoreData
+from assistance/_client.model.http_validation_error import HTTPValidationError
 from pprint import pprint
 # Defining the host is optional and defaults to http://localhost
 # See configuration.py for a list of all supported configuration parameters.
-configuration = _client.Configuration(
+configuration = assistance._client.Configuration(
     host = "http://localhost"
 )
 
@@ -588,12 +588,12 @@ configuration = _client.Configuration(
 # satisfies your auth use case.
 
 # Configure OAuth2 access token for authorization: OAuth2PasswordBearer
-configuration = _client.Configuration(
+configuration = assistance._client.Configuration(
     host = "http://localhost"
 )
 configuration.access_token = 'YOUR_ACCESS_TOKEN'
 # Enter a context with an instance of the API client
-with _client.ApiClient(configuration) as api_client:
+with assistance._client.ApiClient(configuration) as api_client:
     # Create an instance of the API class
     api_instance = default_api.DefaultApi(api_client)
 
@@ -608,7 +608,7 @@ with _client.ApiClient(configuration) as api_client:
             body=body,
         )
         pprint(api_response)
-    except _client.ApiException as e:
+    except assistance._client.ApiException as e:
         print("Exception when calling DefaultApi->save_form_save_form_post: %s\n" % e)
 ```
 ### Parameters
@@ -680,18 +680,18 @@ Send User Signin Link
 ### Example
 
 ```python
-import _client
-from _client.apis.tags import default_api
-from _client.model.http_validation_error import HTTPValidationError
+import assistance._client
+from assistance._client.apis.tags import default_api
+from assistance/_client.model.http_validation_error import HTTPValidationError
 from pprint import pprint
 # Defining the host is optional and defaults to http://localhost
 # See configuration.py for a list of all supported configuration parameters.
-configuration = _client.Configuration(
+configuration = assistance._client.Configuration(
     host = "http://localhost"
 )
 
 # Enter a context with an instance of the API client
-with _client.ApiClient(configuration) as api_client:
+with assistance._client.ApiClient(configuration) as api_client:
     # Create an instance of the API class
     api_instance = default_api.DefaultApi(api_client)
 
@@ -705,7 +705,7 @@ with _client.ApiClient(configuration) as api_client:
             query_params=query_params,
         )
         pprint(api_response)
-    except _client.ApiException as e:
+    except assistance._client.ApiException as e:
         print("Exception when calling DefaultApi->send_user_signin_link_send_signin_link_post: %s\n" % e)
 ```
 ### Parameters
@@ -784,14 +784,14 @@ Student Chat Continue
 
 * OAuth Authentication (OAuth2PasswordBearer):
 ```python
-import _client
-from _client.apis.tags import default_api
-from _client.model.http_validation_error import HTTPValidationError
-from _client.model.student_chat_continue_data import StudentChatContinueData
+import assistance._client
+from assistance._client.apis.tags import default_api
+from assistance/_client.model.student_chat_continue_data import StudentChatContinueData
+from assistance/_client.model.http_validation_error import HTTPValidationError
 from pprint import pprint
 # Defining the host is optional and defaults to http://localhost
 # See configuration.py for a list of all supported configuration parameters.
-configuration = _client.Configuration(
+configuration = assistance._client.Configuration(
     host = "http://localhost"
 )
 
@@ -801,12 +801,12 @@ configuration = _client.Configuration(
 # satisfies your auth use case.
 
 # Configure OAuth2 access token for authorization: OAuth2PasswordBearer
-configuration = _client.Configuration(
+configuration = assistance._client.Configuration(
     host = "http://localhost"
 )
 configuration.access_token = 'YOUR_ACCESS_TOKEN'
 # Enter a context with an instance of the API client
-with _client.ApiClient(configuration) as api_client:
+with assistance._client.ApiClient(configuration) as api_client:
     # Create an instance of the API class
     api_instance = default_api.DefaultApi(api_client)
 
@@ -821,7 +821,7 @@ with _client.ApiClient(configuration) as api_client:
             body=body,
         )
         pprint(api_response)
-    except _client.ApiException as e:
+    except assistance._client.ApiException as e:
         print("Exception when calling DefaultApi->student_chat_continue_chat_student_continue_post: %s\n" % e)
 ```
 ### Parameters
@@ -894,14 +894,14 @@ Student Chat Start
 
 * OAuth Authentication (OAuth2PasswordBearer):
 ```python
-import _client
-from _client.apis.tags import default_api
-from _client.model.http_validation_error import HTTPValidationError
-from _client.model.student_chat_start_data import StudentChatStartData
+import assistance._client
+from assistance._client.apis.tags import default_api
+from assistance/_client.model.http_validation_error import HTTPValidationError
+from assistance/_client.model.student_chat_start_data import StudentChatStartData
 from pprint import pprint
 # Defining the host is optional and defaults to http://localhost
 # See configuration.py for a list of all supported configuration parameters.
-configuration = _client.Configuration(
+configuration = assistance._client.Configuration(
     host = "http://localhost"
 )
 
@@ -911,12 +911,12 @@ configuration = _client.Configuration(
 # satisfies your auth use case.
 
 # Configure OAuth2 access token for authorization: OAuth2PasswordBearer
-configuration = _client.Configuration(
+configuration = assistance._client.Configuration(
     host = "http://localhost"
 )
 configuration.access_token = 'YOUR_ACCESS_TOKEN'
 # Enter a context with an instance of the API client
-with _client.ApiClient(configuration) as api_client:
+with assistance._client.ApiClient(configuration) as api_client:
     # Create an instance of the API class
     api_instance = default_api.DefaultApi(api_client)
 
@@ -930,7 +930,7 @@ with _client.ApiClient(configuration) as api_client:
             body=body,
         )
         pprint(api_response)
-    except _client.ApiException as e:
+    except assistance._client.ApiException as e:
         print("Exception when calling DefaultApi->student_chat_start_chat_student_start_post: %s\n" % e)
 ```
 ### Parameters
@@ -1002,17 +1002,17 @@ Temp Account
 ### Example
 
 ```python
-import _client
-from _client.apis.tags import default_api
+import assistance._client
+from assistance._client.apis.tags import default_api
 from pprint import pprint
 # Defining the host is optional and defaults to http://localhost
 # See configuration.py for a list of all supported configuration parameters.
-configuration = _client.Configuration(
+configuration = assistance._client.Configuration(
     host = "http://localhost"
 )
 
 # Enter a context with an instance of the API client
-with _client.ApiClient(configuration) as api_client:
+with assistance._client.ApiClient(configuration) as api_client:
     # Create an instance of the API class
     api_instance = default_api.DefaultApi(api_client)
 
@@ -1021,7 +1021,7 @@ with _client.ApiClient(configuration) as api_client:
         # Temp Account
         api_response = api_instance.temp_account_temp_account_post()
         pprint(api_response)
-    except _client.ApiException as e:
+    except assistance._client.ApiException as e:
         print("Exception when calling DefaultApi->temp_account_temp_account_post: %s\n" % e)
 ```
 ### Parameters

@@ -1,4 +1,4 @@
-from _client.paths.search_alphacrucis.post import ApiForpost
+from assistance._client.paths.search_alphacrucis.post import ApiForpost
 
 
 class SearchAlphacrucis(

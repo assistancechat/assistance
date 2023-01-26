@@ -14,7 +14,8 @@ import sys
 from http import client as http_client
 
 import urllib3
-from _client.exceptions import ApiValueError
+
+from assistance._client.exceptions import ApiValueError
 
 JSON_SCHEMA_VALIDATION_KEYWORDS = {
     "multipleOf",
@@ -145,7 +146,7 @@ class Configuration:
         self.logger = {}
         """Logging Settings
         """
-        self.logger["package_logger"] = logging.getLogger("_client")
+        self.logger["package_logger"] = logging.getLogger("assistance._client")
         self.logger["urllib3_logger"] = logging.getLogger("urllib3")
         self.logger_format = "%(asctime)s %(levelname)s %(message)s"
         """Log format
