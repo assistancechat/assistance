@@ -74,7 +74,7 @@ PROMPT = textwrap.dedent(
 
 async def run_student_chat_start(username: str, client_name: str):
     additional_information = (
-        "No aditional information needed as the conversation has not yet begun."
+        "No additional information needed as the conversation has not yet begun."
     )
     transcript = "Conversation has not yet begun"
 
