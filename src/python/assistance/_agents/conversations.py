@@ -21,6 +21,8 @@ from assistance._agents.queries import query_from_transcript
 from assistance._store.transcript import store_prompt_transcript
 from assistance._tools.search import alphacrucis_search
 
+RECORD_GROUPING = "student.assistance.chat"
+
 AGENT_NAME = "Michael"
 MODEL_KWARGS = {
     "engine": "text-davinci-003",
@@ -72,46 +74,23 @@ PROMPT = textwrap.dedent(
 ).strip()
 
 
-async def run_student_chat_start(username: str, client_name: str):
-    additional_information = (
-        "No additional information needed as the conversation has not yet begun."
-    )
-    transcript = "Conversation has not yet begun"
-
-    prompt = PROMPT.format(
-        agent_name=AGENT_NAME,
-        client_name=client_name,
-        additional_information=additional_information,
-        transcript=transcript,
-    )
-
-    record_grouping = "student.assistance.chat"
-
-    response = await call_gpt_and_store_as_transcript(
-        record_grouping=record_grouping,
-        username=username,
-        model_kwargs=MODEL_KWARGS,
-        prompt=prompt,
-    )
-
-    message_history[username] = f"{AGENT_NAME}: {response}"
-
-    return response
-
-
-async def run_student_chat_response(
-    username: str, client_name: str, client_text: str | None
+async def run_student_chat(
+    username: str, client_name: str, transcript: None | str = None
 ):
-    transcript = message_history[username] + f"\n\n{client_name}: {client_text}"
-    record_grouping = "student.assistance.chat"
+    if not transcript:
+        additional_information = (
+            "No additional information needed as the conversation has not yet begun."
+        )
+        transcript = "Conversation has not yet begun"
 
-    query = await query_from_transcript(
-        record_grouping=record_grouping, username=username, transcript=transcript
-    )
+    else:
+        query = await query_from_transcript(
+            record_grouping=RECORD_GROUPING, username=username, transcript=transcript
+        )
 
-    additional_information = await alphacrucis_search(
-        record_grouping=record_grouping, username=username, query=query
-    )
+        additional_information = await alphacrucis_search(
+            record_grouping=RECORD_GROUPING, username=username, query=query
+        )
 
     prompt = PROMPT.format(
         agent_name=AGENT_NAME,
@@ -120,19 +99,19 @@ async def run_student_chat_response(
         transcript=transcript,
     )
 
-    response = await call_gpt_and_store_as_transcript(
-        record_grouping=record_grouping,
+    response = await _call_gpt_and_store_as_transcript(
+        record_grouping=RECORD_GROUPING,
         username=username,
         model_kwargs=MODEL_KWARGS,
         prompt=prompt,
     )
 
-    message_history[username] = transcript + f"\n\n{AGENT_NAME}: {response}"
+    response_with_name = f"{AGENT_NAME}: {response}"
 
-    return response
+    return response_with_name
 
 
-async def call_gpt_and_store_as_transcript(
+async def _call_gpt_and_store_as_transcript(
     record_grouping: str,
     username: str,
     model_kwargs: dict,

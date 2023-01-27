@@ -14,10 +14,7 @@
 
 from pydantic import BaseModel
 
-from assistance._agents.conversations import (
-    run_student_chat_response,
-    run_student_chat_start,
-)
+from assistance._agents.conversations import run_student_chat, run_student_chat_response
 from assistance._api.login import User
 
 
@@ -31,7 +28,7 @@ class StudentChatContinueData(BaseModel):
 
 
 async def student_chat_start(data: StudentChatStartData, current_user: User):
-    response = await run_student_chat_start(
+    response = await run_student_chat(
         username=current_user.username,
         client_name=data.client_name,
     )
