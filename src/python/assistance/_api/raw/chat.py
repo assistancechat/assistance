@@ -24,7 +24,7 @@ class StudentChatData(BaseModel):
     transcript: str
 
 
-async def student_chat_start(data: StudentChatData, current_user: User):
+async def student_chat(data: StudentChatData, current_user: User):
     response = await run_student_chat(
         agent_name=data.agent_name,
         username=current_user.username,

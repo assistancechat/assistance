@@ -17,6 +17,7 @@ import functools
 import re
 import textwrap
 import time
+from typing import Callable, Coroutine
 
 import streamlit as st
 
@@ -99,7 +100,7 @@ def _get_apps_from_module(module):
     return apps
 
 
-def main():
+async def main():
     getkeys.check_and_set_open_ai_key()
 
     st.session_state.app = get_url_app()
@@ -133,8 +134,4 @@ def main():
     else:
         application_function = application_options[st.session_state.app].main
 
-    application_function()
-
-
-if __name__ == "__main__":
-    main()
+    await application_function()

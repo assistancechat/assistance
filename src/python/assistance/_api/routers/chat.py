@@ -22,8 +22,8 @@ router = APIRouter(prefix="/chat")
 
 
 @router.post("/student")
-async def student_chat_start(
+async def student_chat(
     data: chat.StudentChatData,
     current_user: User = Depends(get_current_user),
 ):
-    return await chat.student_chat_start(data=data, current_user=current_user)
+    return await chat.student_chat(data=data, current_user=current_user)

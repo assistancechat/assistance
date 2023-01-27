@@ -79,7 +79,7 @@ MODEL_KWARGS = {
 }
 
 
-def main():
+async def main():
     app_filename = st.text_input("Python filename for your app (eg. new.py)")
     if not app_filename:
         st.stop()

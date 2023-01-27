@@ -20,5 +20,5 @@ CATEGORY = categories.DEMO
 TITLE = "A test"
 
 
-def main():
+async def main():
     st.write("Hello Testing!")
