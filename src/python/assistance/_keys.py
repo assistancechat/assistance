@@ -28,6 +28,8 @@ def load_secret(name: str):
 
 
 def write_secret(name: str, secret: str):
+    SECRETS.mkdir(parents=True, exist_ok=True)
+
     secret_path = SECRETS / name
 
     with open(secret_path, "w", encoding="utf8") as f:

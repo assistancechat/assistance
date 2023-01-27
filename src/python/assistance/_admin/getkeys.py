@@ -11,7 +11,9 @@ def check_and_set_open_ai_key():
     except FileNotFoundError:
         st.write("OpenAI API key not found.")
 
-        key = st.text_input("Enter your OpenAI API key:")
+        key = st.text_input(
+            "Enter your OpenAI API key (will only be temporarily stored within this server instance):"
+        )
         if not key:
             st.stop()
 

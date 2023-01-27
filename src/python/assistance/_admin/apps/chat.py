@@ -17,7 +17,7 @@ def main():
     if user_input:
         # Use openAI engine text-davinci-003
         response = openai.Completion.create(
-            engine="davinci-003",
+            engine="text-davinci-003",
             prompt=user_input,
             temperature=0.7,
             max_tokens=50,
