@@ -132,10 +132,7 @@ async def main():
         st.sidebar.write("---")
 
     if st.session_state.app == "index":
-        application_function = functools.partial(
-            index, application_options=application_options
-        )
-    else:
-        application_function = application_options[st.session_state.app].main
+        index(application_options=application_options)
 
-    await application_function()
+    else:
+        await application_options[st.session_state.app].main
