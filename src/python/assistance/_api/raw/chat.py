@@ -14,36 +14,22 @@
 
 from pydantic import BaseModel
 
-from assistance._agents.conversations import run_student_chat, run_student_chat_response
+from assistance._agents.conversations import run_student_chat
 from assistance._api.login import User
 
 
-class StudentChatStartData(BaseModel):
+class StudentChatData(BaseModel):
+    agent_name: str
     client_name: str
+    transcript: str
 
 
-class StudentChatContinueData(BaseModel):
-    client_name: str
-    client_text: str
-
-
-async def student_chat_start(data: StudentChatStartData, current_user: User):
+async def student_chat_start(data: StudentChatData, current_user: User):
     response = await run_student_chat(
+        agent_name=data.agent_name,
         username=current_user.username,
         client_name=data.client_name,
-    )
-
-    return {"response": response}
-
-
-async def student_chat_continue(
-    data: StudentChatContinueData,
-    current_user: User,
-):
-    response = await run_student_chat_response(
-        username=current_user.username,
-        client_name=data.client_name,
-        client_text=data.client_text,
+        transcript=data.transcript,
     )
 
     return {"response": response}

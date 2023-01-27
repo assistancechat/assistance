@@ -9,13 +9,20 @@ import streamlit as st
 
 
 def main():
-    user_input = st.text_input("Enter your message here:")
+    if "conversation" not in st.session_state:
+        st.session_state.conversation = []
 
-    if user_input:
-        response = openai.Completion.create(
-            engine="text-davinci-003",
-            prompt=user_input,
-            temperature=0.7,
-            max_tokens=50,
-        )
-        st.write("AI Assistant: ", response["choices"][0]["text"])
+    if len(st.session_state.conversation) % 2 == 0:
+        st.write("AI do something")
+    else:
+        user_input = st.text_input()
+        st.button("Submit")
+
+    # if user_input:
+    #     response = openai.Completion.create(
+    #         engine="text-davinci-003",
+    #         prompt=user_input,
+    #         temperature=0.7,
+    #         max_tokens=50,
+    #     )
+    #     st.write("AI Assistant: ", response["choices"][0]["text"])

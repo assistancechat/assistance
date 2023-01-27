@@ -21,24 +21,9 @@ from assistance._api.raw import chat
 router = APIRouter(prefix="/chat")
 
 
-@router.post("/student/start")
+@router.post("/student")
 async def student_chat_start(
-    data: chat.StudentChatStartData,
+    data: chat.StudentChatData,
     current_user: User = Depends(get_current_user),
 ):
-    return await chat.student_chat_start(
-        username=current_user.username,
-        client_name=data.client_name,
-    )
-
-
-@router.post("/student/continue")
-async def student_chat_continue(
-    data: chat.StudentChatContinueData,
-    current_user: User = Depends(get_current_user),
-):
-    return await chat.student_chat_continue(
-        username=current_user.username,
-        client_name=data.client_name,
-        client_text=data.client_text,
-    )
+    return await chat.student_chat_start(data=data, current_user=current_user)
