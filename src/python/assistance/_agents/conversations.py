@@ -23,7 +23,6 @@ from assistance._tools.search import alphacrucis_search
 
 RECORD_GROUPING = "student.assistance.chat"
 
-AGENT_NAME = "Michael"
 MODEL_KWARGS = {
     "engine": "text-davinci-003",
     "max_tokens": 256,
@@ -75,7 +74,7 @@ PROMPT = textwrap.dedent(
 
 
 async def run_student_chat(
-    username: str, client_name: str, transcript: None | str = None
+    agent_name: str, username: str, client_name: str, transcript: None | str = None
 ):
     if not transcript:
         additional_information = (
@@ -93,7 +92,7 @@ async def run_student_chat(
         )
 
     prompt = PROMPT.format(
-        agent_name=AGENT_NAME,
+        agent_name=agent_name,
         client_name=client_name,
         additional_information=additional_information,
         transcript=transcript,
@@ -106,9 +105,7 @@ async def run_student_chat(
         prompt=prompt,
     )
 
-    response_with_name = f"{AGENT_NAME}: {response}"
-
-    return response_with_name
+    return response
 
 
 async def _call_gpt_and_store_as_transcript(

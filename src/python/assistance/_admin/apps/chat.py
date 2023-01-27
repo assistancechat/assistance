@@ -16,13 +16,14 @@
 import streamlit as st
 
 from assistance._admin import categories
+from assistance._api.login import User
 from assistance._api.raw import chat
 
 CATEGORY = categories.DEMO
 TITLE = "Student Assistance Chat"
 
 
-MOCK_USERNAME = "MockUsername"
+MOCK_USER = User(username="MockUsername")
 AGENT_NAME = "Michael"
 
 
@@ -41,9 +42,13 @@ async def main():
     st.write(transcript)
 
     if len(st.session_state.conversation) % 2 == 0:
-        api_result = await chat.run_student_chat(
-            username=MOCK_USERNAME, client_name=client_name, transcript=transcript
+        data = chat.StudentChatData(
+            agent_name=AGENT_NAME,
+            client_name=client_name,
+            transcript=transcript,
         )
+
+        api_result = await chat.student_chat(data=data, current_user=MOCK_USER)
         response = api_result["response"]
 
         st.session_state.conversation.append(response)

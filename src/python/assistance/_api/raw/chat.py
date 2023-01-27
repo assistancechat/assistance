@@ -14,18 +14,18 @@
 
 from pydantic import BaseModel
 
-from assistance._agents.conversations import run_student_chat
+from assistance._agents.conversations import run_student_chat as _run_student_chat
 from assistance._api.login import User
 
 
 class StudentChatData(BaseModel):
     agent_name: str
     client_name: str
-    transcript: str
+    transcript: str | None = None
 
 
 async def student_chat(data: StudentChatData, current_user: User):
-    response = await run_student_chat(
+    response = await _run_student_chat(
         agent_name=data.agent_name,
         username=current_user.username,
         client_name=data.client_name,
