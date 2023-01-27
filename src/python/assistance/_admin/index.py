@@ -114,7 +114,6 @@ def main():
         swap_app("index")
 
     if st.session_state.app != "index":
-        st.set_page_config(layout="centered")
         st.title(application_options[st.session_state.app].TITLE)
 
         docstring = application_options[st.session_state.app].main.__doc__
@@ -128,7 +127,6 @@ def main():
         st.sidebar.write("---")
 
     if st.session_state.app == "index":
-        st.set_page_config(layout="wide")
         application_function = functools.partial(
             index, application_options=application_options
         )
