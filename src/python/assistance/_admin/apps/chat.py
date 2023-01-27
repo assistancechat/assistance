@@ -30,6 +30,9 @@ AGENT_NAME = "Michael"
 async def main():
     client_name = st.text_input("Your name")
 
+    if not client_name:
+        st.stop()
+
     if "conversation" not in st.session_state:
         st.session_state.conversation = []
 
@@ -55,7 +58,7 @@ async def main():
         st.experimental_rerun()
 
     else:
-        user_input = st.text_input()
+        user_input = st.text_input("Enter your message")
         st.button("Submit")
 
         st.session_state.conversation.append(user_input)

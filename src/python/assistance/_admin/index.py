@@ -17,9 +17,11 @@ import functools
 import re
 import textwrap
 import time
-from typing import Callable, Coroutine
 
+import aiohttp
 import streamlit as st
+
+from assistance import _ctx
 
 from . import apps as _apps
 from . import categories as _categories
@@ -101,6 +103,9 @@ def _get_apps_from_module(module):
 
 
 async def main():
+    if "session" not in dir(_ctx):
+        _ctx.session = aiohttp.ClientSession()
+
     getkeys.check_and_set_open_ai_key()
 
     st.session_state.app = get_url_app()
