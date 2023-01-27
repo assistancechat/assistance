@@ -1,11 +1,13 @@
 import streamlit as st
 
-from assistance._keys import get_openai_api_key, write_openai_api_key
+from assistance._keys import set_openai_api_key, write_openai_api_key
 
 
-def check_and_get_open_ai_key():
+def check_and_set_open_ai_key():
     try:
-        key = get_openai_api_key()
+        set_openai_api_key()
+        return
+
     except FileNotFoundError:
         st.write("OpenAI API key not found.")
 
@@ -15,4 +17,4 @@ def check_and_get_open_ai_key():
 
         write_openai_api_key(key)
 
-    return key
+    set_openai_api_key()

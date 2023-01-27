@@ -1,24 +1,29 @@
-# Copyright (C) 2023 Assistance.Chat contributors
-
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-
-#     http://www.apache.org/licenses/LICENSE-2.0
-
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
-import streamlit as st
-
 from assistance._admin import categories
 
-CATEGORY = categories.DEMO
-TITLE = "Chat"
+CATEGORY = categories.AI_CREATIONS
+TITLE = "A GPT Chat"
+
+
+import openai
+import streamlit as st
 
 
 def main():
-    st.write("Hello Testing!")
+    st.title("A GPT Chat")
+    st.write("Talk to an AI assistant using GPT-3")
+
+    user_input = st.text_input("Enter your message here:")
+
+    if user_input:
+        # Use openAI engine text-davinci-003
+        response = openai.Completion.create(
+            engine="davinci-003",
+            prompt=user_input,
+            temperature=0.7,
+            max_tokens=50,
+        )
+        st.write("AI Assistant: ", response["choices"][0]["text"])
+
+
+if __name__ == "__main__":
+    main()

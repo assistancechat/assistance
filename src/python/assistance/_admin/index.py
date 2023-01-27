@@ -100,7 +100,7 @@ def _get_apps_from_module(module):
 
 
 def main():
-    getkeys.check_and_get_open_ai_key()
+    getkeys.check_and_set_open_ai_key()
 
     st.session_state.app = get_url_app()
 
@@ -114,6 +114,7 @@ def main():
         swap_app("index")
 
     if st.session_state.app != "index":
+        st.set_page_config(layout="centered")
         st.title(application_options[st.session_state.app].TITLE)
 
         docstring = application_options[st.session_state.app].main.__doc__
@@ -127,6 +128,7 @@ def main():
         st.sidebar.write("---")
 
     if st.session_state.app == "index":
+        st.set_page_config(layout="wide")
         application_function = functools.partial(
             index, application_options=application_options
         )

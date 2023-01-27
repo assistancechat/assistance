@@ -16,21 +16,26 @@ assistance = "assistance.__main__:main"
 [tool.poetry.dependencies]
 python = "^3.10"
 
+# For GPT to use
+numpy = "*"
+scipy = "*"
+requests = "*"
+
+thefuzz = {extras = ["speedup"], version = "*"}
+openai = "*"
+beautifulsoup4 = "*"
+
 aiofiles = "*"
 aiohttp = "*"
-beautifulsoup4 = "*"
 fastapi = "*"
 keyring = "*"
-openai = "*"
 passlib = {extras = ["bcrypt"], version = "*"}
 python-jose = {extras = ["cryptography"], version = "*"}
 python-multipart = "*"
-thefuzz = {extras = ["speedup"], version = "*"}
 uvicorn = {extras = ["standard"], version = "*"}
 
 streamlit = ">=1.17.0"
 typer = "^0.7.0"
-frozendict = "^2.3.4"
 
 [tool.poetry.group.dev.dependencies]
 autoflake = "*"
