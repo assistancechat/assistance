@@ -1,1 +1,1 @@
-from . import test
+from . import chat, test
