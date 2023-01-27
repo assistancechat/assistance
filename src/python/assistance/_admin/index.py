@@ -13,12 +13,10 @@
 # limitations under the License.
 
 
-import functools
 import re
 import textwrap
 import time
 
-import aiohttp
 import streamlit as st
 
 from assistance import _ctx
