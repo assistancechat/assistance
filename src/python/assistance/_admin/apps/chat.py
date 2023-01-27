@@ -36,15 +36,13 @@ async def main():
     if "conversation" not in st.session_state:
         st.session_state.conversation = []
 
-    transcript = _create_transcript(
-        agent_name=AGENT_NAME,
-        client_name=client_name,
-        conversation=st.session_state.conversation,
-    )
-
-    st.write(transcript)
-
     if len(st.session_state.conversation) % 2 == 0:
+        transcript = _create_transcript(
+            agent_name=AGENT_NAME,
+            client_name=client_name,
+            conversation=st.session_state.conversation,
+        )
+
         data = chat.StudentChatData(
             agent_name=AGENT_NAME,
             client_name=client_name,
@@ -55,14 +53,35 @@ async def main():
         response = api_result["response"]
 
         st.session_state.conversation.append(response)
-        st.experimental_rerun()
 
-    else:
-        user_input = st.text_input("Enter your message")
-        st.button("Submit")
+    transcript = _create_transcript(
+        agent_name=AGENT_NAME,
+        client_name=client_name,
+        conversation=st.session_state.conversation,
+    )
 
-        st.session_state.conversation.append(user_input)
-        st.experimental_rerun()
+    with st.form("conversation-form"):
+        st.write(transcript)
+
+        st.text_input("Enter your message", key="user_input")
+
+        cols = st.columns([1, 1])
+
+        with cols[0]:
+            st.form_submit_button("Send message", on_click=_submit)
+
+        with cols[1]:
+            st.form_submit_button("Reset Chat", on_click=_reset)
+
+
+def _submit():
+    st.session_state.conversation.append(st.session_state["user_input"])
+    st.session_state["user_input"] = ""
+
+
+def _reset():
+    st.session_state.conversation = []
+    st.session_state["user_input"] = ""
 
 
 def _create_transcript(
