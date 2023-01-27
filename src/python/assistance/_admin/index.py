@@ -21,8 +21,6 @@ import time
 import aiohttp
 import streamlit as st
 
-from assistance import _ctx
-
 from . import apps as _apps
 from . import categories as _categories
 from . import getkeys
@@ -103,8 +101,9 @@ def _get_apps_from_module(module):
 
 
 async def main():
-    if "session" not in dir(_ctx):
-        _ctx.session = aiohttp.ClientSession()
+    if "aiohttp_session" not in st.session_state:
+        st.write("Starting an aiohttp Session")
+        st.session_state.aiohttp_session = aiohttp.ClientSession()
 
     getkeys.check_and_set_open_ai_key()
 

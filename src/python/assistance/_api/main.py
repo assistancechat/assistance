@@ -59,12 +59,12 @@ app.include_router(query.router)
 @app.on_event("startup")
 async def startup_event():
     set_openai_api_key()
-    _ctx.session = aiohttp.ClientSession()
+    _ctx.open_session()
 
 
 @app.on_event("shutdown")
 async def shutdown_event():
-    await _ctx.session.close()
+    await _ctx.close_session()
 
 
 def main():

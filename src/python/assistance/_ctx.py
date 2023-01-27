@@ -14,4 +14,22 @@
 
 import aiohttp
 
-session: aiohttp.ClientSession
+_session: aiohttp.ClientSession
+
+
+def get_session() -> aiohttp.ClientSession:
+    try:
+        return _session
+    except NameError:
+        import streamlit as st
+
+        return st.session_state.aiohttp_session
+
+
+def set_session():
+    global _session
+    _session = aiohttp.ClientSession()
+
+
+def close_session():
+    _session.close()

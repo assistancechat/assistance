@@ -209,7 +209,7 @@ def _pull_only_relevant(split_page_contents_by_words: str, snippets: str):
 async def summarise_url_with_query_around_snippets(
     record_grouping: str, username: str, query: str, url: str, snippets: list[str]
 ):
-    page_contents = await scrape(session=_ctx.session, url=url)
+    page_contents = await scrape(session=_ctx.get_session(), url=url)
 
     split_page_contents_by_words = [item for item in page_contents.split(None) if item]
 

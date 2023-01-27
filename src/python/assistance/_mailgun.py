@@ -59,6 +59,6 @@ async def send_access_link(email: str):
         "text": EMAIL_TEMPLATE.format(access_link=access_link),
     }
 
-    await _ctx.session.post(
+    await _ctx.get_session().post(
         url=url, auth=aiohttp.BasicAuth(login="api", password=API_KEY), data=data
     )

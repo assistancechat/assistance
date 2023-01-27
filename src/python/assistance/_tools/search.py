@@ -52,7 +52,7 @@ async def _search_with_summary(
     url_encoded_query = urllib.parse.quote(query)
     url = f"https://www.googleapis.com/customsearch/v1/siterestrict?key={API_KEY}&cx={cx}&q={url_encoded_query}"
 
-    search_raw_results = await _ctx.session.get(url=url)
+    search_raw_results = await _ctx.get_session().get(url=url)
     json_results = await search_raw_results.json()
 
     results_to_use = json_results["items"][0:SEARCH_RESULTS_TO_USE]
