@@ -49,7 +49,6 @@ scipy
 requests
 thefuzz
 openai
-beautifulsoup4
 ```
 
 App Title:
