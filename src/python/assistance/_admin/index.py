@@ -22,6 +22,7 @@ import streamlit as st
 
 from . import apps as _apps
 from . import categories as _categories
+from . import getkeys
 
 
 def get_url_app():
@@ -99,6 +100,8 @@ def _get_apps_from_module(module):
 
 
 def main():
+    getkeys.check_and_get_open_ai_key()
+
     st.session_state.app = get_url_app()
 
     apps = _get_apps_from_module(_apps)

@@ -27,6 +27,17 @@ def load_secret(name: str):
     return secret
 
 
+def write_secret(name: str, secret: str):
+    secret_path = SECRETS / name
+
+    with open(secret_path, "w", encoding="utf8") as f:
+        f.write(secret)
+
+
+def write_openai_api_key(key: str):
+    write_secret("openai_api_key", key)
+
+
 def set_openai_api_key():
     openai.api_key = get_openai_api_key()
 
