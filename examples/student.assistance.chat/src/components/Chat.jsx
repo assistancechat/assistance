@@ -1,38 +1,10 @@
-import { React, useState, useEffect } from "react";
+import { React, useState, useEffect, useContext } from "react";
 import { Transition } from "@headlessui/react";
 import { PaperAirplaneIcon } from "@heroicons/react/24/outline";
-import { ellipsis } from "../images/ellipsis.svg";
 
-const chatData = [
-  {
-    id: 1,
-    name: "George Paul Thompson",
-    profilepictureurl: "https://www.w3schools.com/howto/img_avatar.png",
-    text: "Hi, how are you?",
-    timestamp: "2021-03-01 12:02:00",
-  },
-  {
-    id: 2,
-    name: "user",
-    profilepictureurl: "https://www.w3schools.com/howto/img_avatar2.png",
-    text: "I am fine, thanks. How are you?",
-    timestamp: "2021-03-01 12:03:00",
-  },
-  {
-    id: 3,
-    name: "George Paul Thompson",
-    profilepictureurl: "https://www.w3schools.com/howto/img_avatar.png",
-    text: "I am fine, thanks. How are you?",
-    timestamp: "2021-03-01 12:04:00",
-  },
-  {
-    id: 4,
-    name: "user",
-    profilepictureurl: "https://www.w3schools.com/howto/img_avatar2.png",
-    text: "I am fine, thanks. How are you?",
-    timestamp: "2021-03-01 12:05:00",
-  },
-];
+import { ChatContext } from "@/contexts/chat";
+
+import { ellipsis } from "@/images/ellipsis.svg";
 
 //create a timestamp function
 const timeStampFunction = () => {
@@ -232,6 +204,8 @@ function ChatInput({ addNewMessage }) {
 
 // chat component
 function Chat() {
+  const currentUser = useContext(CurrentUserContext);
+
   const [chatHistory, setChatHistory] = useState();
 
   // function to add a new message to the chat history

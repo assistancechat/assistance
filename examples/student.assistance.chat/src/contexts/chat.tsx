@@ -27,14 +27,30 @@ type MessageHistory = MessageHistoryItem[];
 type OriginatorNames = Record<MessageOriginator, string>;
 type OriginatorProfilePictureUrls = Record<MessageOriginator, string>;
 
-export const MessageHistoryContext = createContext<MessageHistory>([]);
-export const OriginatorNamesContext = createContext<OriginatorNames>({
-  user: "user",
-  agent: "George Paul Thompson",
-});
+export type ChatContextData = {
+  messageHistory: MessageHistory;
+  originatorNames: OriginatorNames;
+  originatorProfilePictureUrls: OriginatorProfilePictureUrls;
+};
 
-export const OriginatorProfilePictureUrlsContext =
-  createContext<OriginatorProfilePictureUrls>({
+export const DefaultChatData = {
+  messageHistory: [],
+  originatorNames: {
+    user: "user",
+    agent: "George Paul Thompson",
+  },
+  originatorProfilePictureUrls: {
     user: "https://www.w3schools.com/howto/img_avatar2.png",
     agent: "https://www.w3schools.com/howto/img_avatar.png",
-  });
+  },
+};
+
+export type ChatContextType = {
+  chatData: ChatContextData;
+  setChatData: (chatData: ChatContextData) => void;
+};
+
+export const ChatContext = createContext<ChatContextType>({
+  chatData: DefaultChatData,
+  setChatData: (chatData: ChatContextData) => {},
+});

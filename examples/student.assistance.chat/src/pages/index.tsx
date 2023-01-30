@@ -1,5 +1,8 @@
+import { useState } from "react";
+
 import Head from "next/head";
 import { Inter } from "@next/font/google";
+
 import MoreInfo from "@/components/MoreInfo";
 import Hero from "@/components/Hero";
 import Reviews from "@/components/Reviews";
@@ -8,9 +11,19 @@ import Navbar from "@/components/NavBar";
 import Footer from "@/components/Footer";
 import Blog from "@/components/Blog";
 
+import {
+  ChatContext,
+  ChatContextData,
+  DefaultChatData,
+  ChatContextType,
+} from "@/contexts/chat";
+
 const inter = Inter({ subsets: ["latin"] });
 
 export default function Home() {
+  const [chatData, setChatData] = useState<ChatContextData>(DefaultChatData);
+  const value = { chatData, setChatData };
+
   return (
     <>
       <Head>
@@ -19,13 +32,15 @@ export default function Home() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <Navbar />
-      <Hero />
-      <MoreInfo />
-      <Reviews />
-      <StudentExperience />
-      <Blog />
-      <Footer />
+      <ChatContext.Provider value={value}>
+        <Navbar />
+        <Hero />
+        <MoreInfo />
+        <Reviews />
+        <StudentExperience />
+        <Blog />
+        <Footer />
+      </ChatContext.Provider>
     </>
   );
 }
