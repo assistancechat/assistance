@@ -14,7 +14,6 @@
 
 import logging
 
-import aiohttp
 import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware

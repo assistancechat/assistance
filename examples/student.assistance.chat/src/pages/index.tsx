@@ -27,46 +27,52 @@ export default function Home() {
 
   // Get an API token for a freshly created anonymous account
   useEffect(() => {
-    axios
-      .post("https://api.assistance.chat/temp-account", {
-        headers: { "Content-Type": "application/json;charset=UTF-8" },
-      })
-      .then((res) => {
-        // This corresponds to a temporary anonymous account. The username is a
-        // cryptographic token
-        const username: string = res.data["username"];
-
-        // NOTE: This doesn't provide any extra security. It is the fact that
-        // currently no user is able to access old data that means the
-        // following is okay.
-        const password = sha224(username).toString();
-
-        const details: Record<string, string> = {
-          username: username,
-          password: password,
-          grant_type: "password",
-        };
-
-        // Required because OpenAPI spec can't receive JSON body
-        const formBodyItems = [];
-        for (const property in details) {
-          const encodedKey = encodeURIComponent(property);
-          const encodedValue = encodeURIComponent(details[property]);
-          formBodyItems.push(encodedKey + "=" + encodedValue);
+    const fetchAndSetApiAccessToken = async () => {
+      const usernameResponse = await fetch(
+        "https://api.assistance.chat/temp-account",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
         }
-        const formBody = formBodyItems.join("&");
+      );
 
-        return axios.post("https://api.assistance.chat/login", {
-          header: {
-            "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8",
-          },
-          body: formBody,
-        });
-      })
-      .then((res) => {
-        setApiAccessToken(res.data["access_token"]);
-        console.log(res.data);
+      const usernameData = await usernameResponse.json();
+
+      // This corresponds to a temporary anonymous account. The username is a
+      // cryptographic token
+      const username: string = usernameData["username"];
+
+      // NOTE: This doesn't provide any extra security
+      const password = sha224(username).toString();
+
+      const details: Record<string, string> = {
+        username: username,
+        password: password,
+        grant_type: "password",
+      };
+
+      const formBodyItems = [];
+      for (const property in details) {
+        const encodedKey = encodeURIComponent(property);
+        const encodedValue = encodeURIComponent(details[property]);
+        formBodyItems.push(encodedKey + "=" + encodedValue);
+      }
+      const formBody = formBodyItems.join("&");
+
+      const tokenResponse = await fetch("https://api.assistance.chat/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8",
+        },
+        body: formBody,
       });
+
+      const accessTokenData = await tokenResponse.json();
+
+      setApiAccessToken(accessTokenData["access_token"]);
+    };
+
+    fetchAndSetApiAccessToken().catch((err) => console.error(err));
   });
 
   return (

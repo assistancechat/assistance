@@ -26,11 +26,11 @@ export default function Hero() {
   return (
     <div className="w-screen h-screen">
       <iframe
-        lazy
+        lazy="true"
         className="absolute opacity-30 -z-10 w-screen h-screen"
         src={courseResources.videoBackground.link}
         title={courseResources.videoBackground.videoTitle}
-        frameborder="0"
+        frameBorder="0"
         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; web-share"
       />
       <div className="grid grid-rows-6 w-screen h-screen">

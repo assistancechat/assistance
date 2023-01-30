@@ -70,9 +70,9 @@ export default function MoreInfo() {
               className="w-full row-span-4 h-full p-6"
               src={moreInfoData.video.link}
               title={moreInfoData.video.title}
-              frameborder="0"
+              frameBorder="0"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-              allowfullscreen
+              allowFullScreen
             ></iframe>
 
             <div className="row-span-1 relative">
