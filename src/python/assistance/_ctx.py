@@ -22,5 +22,5 @@ def open_session():
     session = aiohttp.ClientSession()
 
 
-def close_session():
-    session.close()
+async def close_session():
+    await session.close()

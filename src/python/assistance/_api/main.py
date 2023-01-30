@@ -49,11 +49,11 @@ app.add_middleware(
 
 app.include_router(root.router)
 app.include_router(chat.router)
-app.include_router(save.router)
-app.include_router(search.router)
-app.include_router(send.router)
-app.include_router(summarise.router)
-app.include_router(query.router)
+# app.include_router(save.router)
+# app.include_router(search.router)
+# app.include_router(send.router)
+# app.include_router(summarise.router)
+# app.include_router(query.router)
 
 
 @app.on_event("startup")
