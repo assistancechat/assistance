@@ -17,6 +17,7 @@ import { createContext } from "react";
 type MessageOriginator = "user" | "agent";
 
 type MessageHistoryItem = {
+  originator: MessageOriginator;
   text: string;
   timestamp: Date;
 };
