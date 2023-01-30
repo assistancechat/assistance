@@ -17,18 +17,24 @@
     "@types/react": "18.0.27",
     "@types/react-dom": "18.0.10",
     "emoji-picker-react": "^4.4.7",
-    "eslint": "8.32.0",
     "eslint-config-next": "13.1.5",
     "next": "13.1.5",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-player": "^2.11.0",
-    "react-youtube": "^10.1.0",
-    "typescript": "4.9.4"
+    "react-youtube": "^10.1.0"
   },
   "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^5.49.0",
     "autoprefixer": "^10.4.13",
+    "eslint": "^8.33.0",
+    "eslint-config-standard-with-typescript": "^33.0.0",
+    "eslint-plugin-import": "^2.27.5",
+    "eslint-plugin-n": "^15.6.1",
+    "eslint-plugin-promise": "^6.1.1",
+    "eslint-plugin-react": "^7.32.2",
     "postcss": "^8.4.21",
-    "tailwindcss": "^3.2.4"
+    "tailwindcss": "^3.2.4",
+    "typescript": "^4.9.4"
   }
 }
