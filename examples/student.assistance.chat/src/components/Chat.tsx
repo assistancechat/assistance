@@ -1,14 +1,26 @@
-import { React, useState, useEffect, useContext } from "react";
+// Copyright (C) 2023 Assistance.Chat contributors
+
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+
+//     http://www.apache.org/licenses/LICENSE-2.0
+
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+import { useState, useEffect, useContext } from "react";
 import { Transition } from "@headlessui/react";
 import { PaperAirplaneIcon } from "@heroicons/react/24/outline";
 
 import { ChatContext } from "@/contexts/chat";
 
-import { ellipsis } from "@/images/ellipsis.svg";
+import ellipsis from "@/images/ellipsis.svg";
 
-//create a timestamp function
-const timeStampFunction = () => {
-  const date = new Date();
+const dateToTimestamp = (date: Date) => {
   const year = date.getFullYear();
   const month = date.getMonth() + 1;
   const day = date.getDate();
@@ -18,79 +30,59 @@ const timeStampFunction = () => {
   return `${year}-${month}-${day} ${hour}:${minute}:${second}`;
 };
 
-//chat history component
 function ChatHistory() {
-  const [chatHistory, setChatHistory] = useState(chatData);
+  const { chatData } = useContext(ChatContext);
   const [isTyping, setIsTyping] = useState(false);
 
-  // function to add a new message to the chat history
-  const addNewMessage = (newMessage) => {
-    setChatHistory([...chatHistory, newMessage]);
-  };
-
-  //if the chat history sends a "...?..." message, the user is typing, set istyping state to true, display the ellipsis.svg as the most recent message in the chat history
   useEffect(() => {
-    if (chatHistory[chatHistory.length - 1].message === "...?...") {
-      setIsTyping(true);
-    } else {
-      setIsTyping(false);
-    }
-  }, [chatHistory]);
+    const messageHistory = chatData.messageHistory;
+    const mostRecentChatItem = messageHistory[messageHistory.length - 1];
+    setIsTyping(mostRecentChatItem.originator === "user");
+  }, [chatData]);
 
-  //if that chat history sends a "...!..." message, the user is not typing, set istyping state to false, remove the ellipsis.svg from the chat history
-  useEffect(() => {
-    if (chatHistory[chatHistory.length - 1].message === "...!...") {
-      setIsTyping(false);
-    }
-  }, [chatHistory]);
-
-  //set the istyping state to false once new message is received that is not "...?..." or "...!..."
-  useEffect(() => {
-    if (
-      chatHistory[chatHistory.length - 1].message !== "...?..." &&
-      chatHistory[chatHistory.length - 1].message !== "...!..."
-    ) {
-      setIsTyping(false);
-    }
-  }, [chatHistory]);
-
-  // function to render the chat history
   const renderChatHistory = () => {
-    return chatHistory.map((chat) => {
-      return (
-        <div
-          key={chat.id}
-          className={`flex ${
-            chat.name === "user" ? "justify-end" : "justify-start"
-          } mb-4`}
-        >
-          <div className="flex flex-col items-end">
-            <div className="flex items-center">
-              <span className="text-xs text-gray-400 mr-2">
-                {chat.timestamp}
-              </span>
-              <span className="text-xs text-gray-400">{chat.name}</span>
-            </div>
+    return chatData.messageHistory.map(
+      ({ message, originator, timestamp }, index) => {
+        const timestampAsString = dateToTimestamp(timestamp);
+        const name = chatData.originatorNames[originator];
+        const profilePictureUrl =
+          chatData.originatorProfilePictureUrls[originator];
+
+        return (
+          <div
+            key={index}
+            className={`flex ${
+              originator === "user" ? "justify-end" : "justify-start"
+            } mb-4`}
+          >
             <div className="flex flex-col items-end">
-              <div
-                className={`py-2 px-4 rounded-xl rounded-br-none ${
-                  chat.name === "user"
-                    ? "bg-orange-300 text-white"
-                    : "bg-gray-800 text-white"
-                } max-w-xs`}
-              >
-                {chat.text}
+              <div className="flex items-center">
+                <span className="text-xs text-gray-400 mr-2">
+                  {timestampAsString}
+                </span>
+                <span className="text-xs text-gray-400">{name}</span>
               </div>
-              <img
-                className="w-6 h-6 rounded-full -mt-3"
-                src={chat.profilepictureurl}
-                alt={chat.name}
-              />
+              <div className="flex flex-col items-end">
+                <div
+                  className={`py-2 px-4 rounded-xl rounded-br-none ${
+                    originator === "user"
+                      ? "bg-orange-300 text-white"
+                      : "bg-gray-800 text-white"
+                  } max-w-xs`}
+                >
+                  {message}
+                </div>
+                <img
+                  className="w-6 h-6 rounded-full -mt-3"
+                  src={profilePictureUrl}
+                  alt={name}
+                />
+              </div>
             </div>
           </div>
-        </div>
-      );
-    });
+        );
+      }
+    );
   };
 
   return (
@@ -130,16 +122,19 @@ function ChatHistory() {
   );
 }
 
-// chat input component
 function ChatInput({ addNewMessage }) {
+  const { setChatData } = useContext(ChatContext);
+
   const [message, setMessage] = useState("");
 
-  // function to handle the message input
+  const addNewMessage = (newMessage) => {
+    setChatData([...chatData, newMessage]);
+  };
+
   const handleMessageInput = (e) => {
     setMessage(e.target.value);
   };
 
-  // function to handle the message submit
   const handleMessageSubmit = (e) => {
     e.preventDefault();
     if (message !== "") {
@@ -202,21 +197,11 @@ function ChatInput({ addNewMessage }) {
   );
 }
 
-// chat component
 function Chat() {
-  const currentUser = useContext(CurrentUserContext);
-
-  const [chatHistory, setChatHistory] = useState();
-
-  // function to add a new message to the chat history
-  const addNewMessage = (newMessage) => {
-    setChatHistory([newMessage, ...chatHistory]);
-  };
-
   return (
     <div className="flex flex-col flex-1 h-full">
-      <ChatHistory chatHistory={chatHistory} />
-      <ChatInput addNewMessage={addNewMessage} />
+      <ChatHistory />
+      <ChatInput />
     </div>
   );
 }

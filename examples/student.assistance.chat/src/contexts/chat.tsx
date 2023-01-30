@@ -18,7 +18,7 @@ type MessageOriginator = "user" | "agent";
 
 type MessageHistoryItem = {
   originator: MessageOriginator;
-  text: string;
+  message: string;
   timestamp: Date;
 };
 
