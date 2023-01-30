@@ -59,298 +59,15 @@
         }
       }
     },
-    "/chat/student/start": {
+    "/chat/student": {
       "post": {
-        "summary": "Student Chat Start",
-        "operationId": "student_chat_start_chat_student_start_post",
+        "summary": "Student Chat",
+        "operationId": "student_chat_chat_student_post",
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/StudentChatStartData"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {}
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "OAuth2PasswordBearer": []
-          }
-        ]
-      }
-    },
-    "/chat/student/continue": {
-      "post": {
-        "summary": "Student Chat Continue",
-        "operationId": "student_chat_continue_chat_student_continue_post",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/StudentChatContinueData"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {}
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "OAuth2PasswordBearer": []
-          }
-        ]
-      }
-    },
-    "/save/form": {
-      "post": {
-        "summary": "Save Form",
-        "operationId": "save_form_save_form_post",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/StoreData"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {}
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "OAuth2PasswordBearer": []
-          }
-        ]
-      }
-    },
-    "/search/alphacrucis": {
-      "post": {
-        "summary": "Run Alphacrucis Search",
-        "operationId": "run_alphacrucis_search_search_alphacrucis_post",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/SearchData"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {}
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "OAuth2PasswordBearer": []
-          }
-        ]
-      }
-    },
-    "/send/signin-link": {
-      "post": {
-        "summary": "Send User Signin Link",
-        "operationId": "send_user_signin_link_send_signin_link_post",
-        "parameters": [
-          {
-            "required": true,
-            "schema": {
-              "title": "Email",
-              "type": "string"
-            },
-            "name": "email",
-            "in": "query"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {}
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/summarise/with-query/raw": {
-      "post": {
-        "summary": "Run Summarise With Query Raw",
-        "operationId": "run_summarise_with_query_raw_summarise_with_query_raw_post",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/SummariseData"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {}
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "OAuth2PasswordBearer": []
-          }
-        ]
-      }
-    },
-    "/summarise/with-query/url": {
-      "post": {
-        "summary": "Run Summarise Url With Query",
-        "operationId": "run_summarise_url_with_query_summarise_with_query_url_post",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/SummariseUrlData"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {}
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "OAuth2PasswordBearer": []
-          }
-        ]
-      }
-    },
-    "/query/from-transcript": {
-      "post": {
-        "summary": "Save Form",
-        "operationId": "save_form_query_from_transcript_post",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Data"
+                "$ref": "#/components/schemas/StudentChatData"
               }
             }
           },
@@ -422,24 +139,6 @@
           }
         }
       },
-      "Data": {
-        "title": "Data",
-        "required": [
-          "record_grouping",
-          "transcript"
-        ],
-        "type": "object",
-        "properties": {
-          "record_grouping": {
-            "title": "Record Grouping",
-            "type": "string"
-          },
-          "transcript": {
-            "title": "Transcript",
-            "type": "string"
-          }
-        }
-      },
       "HTTPValidationError": {
         "title": "HTTPValidationError",
         "type": "object",
@@ -453,115 +152,24 @@
           }
         }
       },
-      "SearchData": {
-        "title": "SearchData",
+      "StudentChatData": {
+        "title": "StudentChatData",
         "required": [
-          "record_grouping",
-          "query"
-        ],
-        "type": "object",
-        "properties": {
-          "record_grouping": {
-            "title": "Record Grouping",
-            "type": "string"
-          },
-          "query": {
-            "title": "Query",
-            "type": "string"
-          }
-        }
-      },
-      "StoreData": {
-        "title": "StoreData",
-        "required": [
-          "record_grouping",
-          "content"
-        ],
-        "type": "object",
-        "properties": {
-          "record_grouping": {
-            "title": "Record Grouping",
-            "type": "string"
-          },
-          "content": {
-            "title": "Content",
-            "type": "string"
-          }
-        }
-      },
-      "StudentChatContinueData": {
-        "title": "StudentChatContinueData",
-        "required": [
-          "client_name",
-          "client_text"
-        ],
-        "type": "object",
-        "properties": {
-          "client_name": {
-            "title": "Client Name",
-            "type": "string"
-          },
-          "client_text": {
-            "title": "Client Text",
-            "type": "string"
-          }
-        }
-      },
-      "StudentChatStartData": {
-        "title": "StudentChatStartData",
-        "required": [
+          "agent_name",
           "client_name"
         ],
         "type": "object",
         "properties": {
+          "agent_name": {
+            "title": "Agent Name",
+            "type": "string"
+          },
           "client_name": {
             "title": "Client Name",
             "type": "string"
-          }
-        }
-      },
-      "SummariseData": {
-        "title": "SummariseData",
-        "required": [
-          "record_grouping",
-          "query",
-          "text"
-        ],
-        "type": "object",
-        "properties": {
-          "record_grouping": {
-            "title": "Record Grouping",
-            "type": "string"
           },
-          "query": {
-            "title": "Query",
-            "type": "string"
-          },
-          "text": {
-            "title": "Text",
-            "type": "string"
-          }
-        }
-      },
-      "SummariseUrlData": {
-        "title": "SummariseUrlData",
-        "required": [
-          "record_grouping",
-          "query",
-          "url"
-        ],
-        "type": "object",
-        "properties": {
-          "record_grouping": {
-            "title": "Record Grouping",
-            "type": "string"
-          },
-          "query": {
-            "title": "Query",
-            "type": "string"
-          },
-          "url": {
-            "title": "Url",
+          "transcript": {
+            "title": "Transcript",
             "type": "string"
           }
         }

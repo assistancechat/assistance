@@ -11,7 +11,7 @@ const courseResources = {
     alt: "Counselling picture",
   },
   courseTitle: "COURSE RESOURCES",
-  headLine: "Discover God’s Purpose for you in Counselling",
+  headLine: "Discover God's Purpose for you in Counselling",
   subHeading:
     "Talk with our customer exerience officer to find the right course for you",
   LearnButton: {

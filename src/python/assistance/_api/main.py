@@ -14,7 +14,6 @@
 
 import logging
 
-import aiohttp
 import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -36,7 +35,8 @@ app = FastAPI()
 origins = [
     "https://assistance.chat",
     "https://*.assistance.chat",
-    "http://localhost:*",
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
 ]
 
 app.add_middleware(
@@ -49,11 +49,11 @@ app.add_middleware(
 
 app.include_router(root.router)
 app.include_router(chat.router)
-app.include_router(save.router)
-app.include_router(search.router)
-app.include_router(send.router)
-app.include_router(summarise.router)
-app.include_router(query.router)
+# app.include_router(save.router)
+# app.include_router(search.router)
+# app.include_router(send.router)
+# app.include_router(summarise.router)
+# app.include_router(query.router)
 
 
 @app.on_event("startup")

@@ -48,7 +48,7 @@ const posts = [
         imageUrl:'https://xsgames.co/randomusers/assets/avatars/female/68.jpg' }
     },
   ]
-  
+
   export default function Blog() {
     return (
       <div className="relative bg-gray-50 px-6 pt-16 pb-20 lg:px-8 lg:pt-24 lg:pb-28">
@@ -107,4 +107,3 @@ Multiply your talents in faith, study & work            </p>
       </div>
     )
   }
-  
