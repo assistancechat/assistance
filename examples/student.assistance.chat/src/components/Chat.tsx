@@ -57,6 +57,8 @@ const mostRecentChatIsUser = (chatData: ChatContextData) => {
 function ChatHistory() {
   const { chatData } = useContext(ChatContext);
 
+  console.log(chatData);
+
   const renderChatHistory = () => {
     return chatData.messageHistory.map(
       ({ message, originator, timestamp }, index) => {
@@ -104,37 +106,7 @@ function ChatHistory() {
 
   return (
     <div className="flex-1 h-full overflow-y-auto">
-      <div className="flex flex-col-reverse h-full">
-        {renderChatHistory()}
-        <Transition
-          show={mostRecentChatIsUser(chatData)}
-          enter="transition ease-out duration-100"
-          enterFrom="transform opacity-0 scale-95"
-          enterTo="transform opacity-100 scale-100"
-          leave="transition ease-in duration-75"
-          leaveFrom="transform opacity-100 scale-100"
-          leaveTo="transform opacity-0 scale-95"
-        >
-          <div className="flex justify-end mb-4">
-            <div className="flex flex-col items-end">
-              <div className="flex items-center">
-                <span className="text-xs text-gray-400 mr-2">...</span>
-                <span className="text-xs text-gray-400">user</span>
-              </div>
-              <div className="flex flex-col items-end">
-                <div className="py-2 px-4 rounded-xl rounded-br-none bg-blue-600 text-white max-w-xs">
-                  <img src={ellipsis} className="w-4 h-4" alt="ellipsis" />
-                </div>
-                <img
-                  className="w-6 h-6 rounded-full -mt-3"
-                  src="https://www.w3schools.com/howto/img_avatar2.png"
-                  alt="user"
-                />
-              </div>
-            </div>
-          </div>
-        </Transition>
-      </div>
+      <div className="flex flex-col-reverse h-full">{renderChatHistory()}</div>
     </div>
   );
 }
