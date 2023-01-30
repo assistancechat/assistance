@@ -22,6 +22,7 @@ const navbarData = {
   },
 };
 
+
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -131,8 +132,9 @@ export default function Navbar() {
                                 <XMarkIcon
                                   className="-ml-1 mr-2 h-5 w-5 text-orange-600"
                                   aria-hidden="true"
-                                />{" "}
-                              </button>{" "}
+                                  onClick={closeModal}
+                                />
+                              </button>
                             </div>
                             <Dialog.Title
                               as="h3"
