@@ -1,12 +1,12 @@
 import Head from "next/head";
 import { Inter } from "@next/font/google";
-import MoreInfo from "../components/MoreInfo";
-import Hero from "../components/Hero";
-import Reviews from "../components/Reviews";
-import StudentExperience from "../components/StudentExperience";
-import Navbar from "../components/NavBar";
-import Footer from "../components/Footer";
-import Blog from "../components/Blog";
+import MoreInfo from "@/components/MoreInfo";
+import Hero from "@/components/Hero";
+import Reviews from "@/components/Reviews";
+import StudentExperience from "@/components/StudentExperience";
+import Navbar from "@/components/NavBar";
+import Footer from "@/components/Footer";
+import Blog from "@/components/Blog";
 
 const inter = Inter({ subsets: ["latin"] });
 
