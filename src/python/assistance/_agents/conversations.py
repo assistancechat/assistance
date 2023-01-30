@@ -15,9 +15,9 @@
 # Prompt inspired by the work provided under an MIT license over at:
 # https://github.com/hwchase17/langchain/blob/ae1b589f60a/langchain/agents/conversational/prompt.py#L1-L36
 
-
 import asyncio
 import textwrap
+from enum import Enum
 
 import openai
 
@@ -31,11 +31,11 @@ MODEL_KWARGS = {
     "engine": "text-davinci-003",
     "max_tokens": 256,
     "best_of": 1,
-    # "stop": "{client_name}:",
+    "stop": ["Observation:", "PROCESS COMPLETE"],
     "temperature": 0.7,
     "top_p": 1,
-    "frequency_penalty": 0.1,
-    "presence_penalty": 0.1,
+    "frequency_penalty": 0.0,
+    "presence_penalty": 0.0,
 }
 
 # TODO: Pull this into the API and allow the task to be defined within
@@ -62,8 +62,15 @@ TASK_DESCRIPTION = textwrap.dedent(
     """
 ).strip()
 
+
+class Tool(str, Enum):
+    SEARCH = "Alphacrucis Search and Summarise"
+    EMAIL = "Email Supervisors"
+    RESPOND = "Respond"
+
+
 TOOLS = {
-    "Alphacrucis Search and Summarise": textwrap.dedent(
+    Tool.SEARCH: textwrap.dedent(
         """
             A tool where Assistant provides a natural language question.
             The tool initially searches the Alphacrucis student support
@@ -72,7 +79,7 @@ TOOLS = {
             respect to relevance to the provided question.
         """
     ).strip(),
-    "Email Supervisors": textwrap.dedent(
+    Tool.EMAIL: textwrap.dedent(
         """
             A tool to send an email to the Assistant's Supervisors.
             Assistant may use this tool to seek help from the
@@ -127,7 +134,7 @@ PROMPT = textwrap.dedent(
         ------
         Assistant has access to the following tools:
 
-        {tools}
+        {tools_string}
 
         To use a tool, Assistant uses the following format:
 
@@ -145,13 +152,15 @@ PROMPT = textwrap.dedent(
         ```
         Thought: Does Assistant need to use a tool? No
         {agent_name}: [Assistant's determined response for {agent_name} here]
+
+        PROCESS COMPLETE
         ```
 
         TRANSCRIPT THUS FAR:
         --------------------
         {transcript}
 
-        Assistant processing:
+        Assistant Process:
         Thought: Does Assistant need to use a tool?
     """
 ).strip()
@@ -161,9 +170,6 @@ async def run_student_chat(
     agent_name: str, username: str, client_name: str, transcript: None | str = None
 ):
     if not transcript:
-        additional_information = (
-            "No additional information needed as the conversation has not yet begun."
-        )
         transcript = "Conversation has not yet begun"
 
     else:
@@ -175,21 +181,47 @@ async def run_student_chat(
             record_grouping=RECORD_GROUPING, username=username, query=query
         )
 
-    prompt = PROMPT.format(
+    tools = []
+
+    for tool, description in TOOLS.items():
+        tools.append(f"{tool}: {description}")
+
+    tools_string = "\n".join(tools)
+    tool_names = ", ".join(TOOLS.keys())
+
+    prompt_template = PROMPT.format(task_description=TASK_DESCRIPTION)
+
+    prompt = prompt_template.format(
         agent_name=agent_name,
         client_name=client_name,
-        additional_information=additional_information,
+        tools_string=tools_string,
+        tool_names=tool_names,
         transcript=transcript,
     )
 
-    response = await _call_gpt_and_store_as_transcript(
-        record_grouping=RECORD_GROUPING,
-        username=username,
-        model_kwargs=MODEL_KWARGS,
-        prompt=prompt,
-    )
+    response = await _run_tool_chaining(username=username, prompt=prompt)
 
     return response
+
+
+async def _run_llm_process_observation_loop(
+    agent_name: str, username: str, prompt: str
+):
+    response = ""
+
+    no_tool_text = f"No\n{agent_name}: "
+
+    while no_tool_text in response:
+        response = await _call_gpt_and_store_as_transcript(
+            record_grouping=RECORD_GROUPING,
+            username=username,
+            model_kwargs=MODEL_KWARGS,
+            prompt=prompt,
+        )
+
+    result = response.split(no_tool_text)[-1]
+
+    return result
 
 
 async def _call_gpt_and_store_as_transcript(
