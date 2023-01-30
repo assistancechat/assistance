@@ -16,10 +16,10 @@ import { createContext } from "react";
 
 type MessageOriginator = "user" | "agent";
 
-type MessageHistoryItem = {
+export type MessageHistoryItem = {
   originator: MessageOriginator;
   message: string;
-  timestamp: Date;
+  timestamp: number;
 };
 
 type MessageHistory = MessageHistoryItem[];

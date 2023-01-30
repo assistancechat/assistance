@@ -12,38 +12,50 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { useState, useEffect, useContext } from "react";
+import {
+  useState,
+  useContext,
+  MouseEvent,
+  ChangeEvent,
+  FormEvent,
+} from "react";
 import { Transition } from "@headlessui/react";
 import { PaperAirplaneIcon } from "@heroicons/react/24/outline";
 
-import { ChatContext } from "@/contexts/chat";
+import {
+  ChatContext,
+  MessageHistoryItem,
+  ChatContextData,
+} from "@/contexts/chat";
 
 import ellipsis from "@/images/ellipsis.svg";
 
-const dateToTimestamp = (date: Date) => {
+const epochToTimestamp = (epoch: number) => {
+  const date = new Date(epoch);
+
   const year = date.getFullYear();
-  const month = date.getMonth() + 1;
+  const month = date.getMonth();
   const day = date.getDate();
   const hour = date.getHours();
   const minute = date.getMinutes();
   const second = date.getSeconds();
+
   return `${year}-${month}-${day} ${hour}:${minute}:${second}`;
+};
+
+const mostRecentChatIsUser = (chatData: ChatContextData) => {
+  const messageHistory = chatData.messageHistory;
+  const mostRecentChatItem = messageHistory[messageHistory.length - 1];
+  return mostRecentChatItem.originator === "user";
 };
 
 function ChatHistory() {
   const { chatData } = useContext(ChatContext);
-  const [isTyping, setIsTyping] = useState(false);
-
-  useEffect(() => {
-    const messageHistory = chatData.messageHistory;
-    const mostRecentChatItem = messageHistory[messageHistory.length - 1];
-    setIsTyping(mostRecentChatItem.originator === "user");
-  }, [chatData]);
 
   const renderChatHistory = () => {
     return chatData.messageHistory.map(
       ({ message, originator, timestamp }, index) => {
-        const timestampAsString = dateToTimestamp(timestamp);
+        const timestampAsString = epochToTimestamp(timestamp);
         const name = chatData.originatorNames[originator];
         const profilePictureUrl =
           chatData.originatorProfilePictureUrls[originator];
@@ -90,7 +102,7 @@ function ChatHistory() {
       <div className="flex flex-col-reverse h-full">
         {renderChatHistory()}
         <Transition
-          show={isTyping}
+          show={mostRecentChatIsUser(chatData)}
           enter="transition ease-out duration-100"
           enterFrom="transform opacity-0 scale-95"
           enterTo="transform opacity-100 scale-100"
@@ -122,63 +134,43 @@ function ChatHistory() {
   );
 }
 
-function ChatInput({ addNewMessage }) {
-  const { setChatData } = useContext(ChatContext);
-
+function ChatInput() {
+  const { chatData, setChatData } = useContext(ChatContext);
   const [message, setMessage] = useState("");
 
-  const addNewMessage = (newMessage) => {
-    setChatData([...chatData, newMessage]);
+  const addNewMessage = (message: string) => {
+    const newMessageHistoryItem: MessageHistoryItem = {
+      originator: "user",
+      message: message,
+      timestamp: Date.now(),
+    };
+
+    const updatedMessageHistory = [
+      ...chatData.messageHistory,
+      newMessageHistoryItem,
+    ];
+
+    setChatData({ ...chatData, messageHistory: updatedMessageHistory });
   };
 
-  const handleMessageInput = (e) => {
-    setMessage(e.target.value);
+  const handleMessageInput = (event: ChangeEvent<HTMLInputElement>) => {
+    setMessage(event.target.value);
   };
 
-  const handleMessageSubmit = (e) => {
-    e.preventDefault();
-    if (message !== "") {
-      addNewMessage({
-        id: 5,
-        name: "user",
-        profilepictureurl: "https://www.w3schools.com/howto/img_avatar2.png",
-        message: message,
-        timestamp: timeStampFunction,
-      });
-      setMessage("");
-    }
+  const handleMessageSubmit = (event: MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+    addNewMessage(message);
+    setMessage("");
   };
 
-  // function that prevents the user from submitting the form if it is empty
-  const handleFormSubmit = (e) => {
-    e.preventDefault();
-  };
-
-  // function that passes a message to the chat history component if the user is typing
-  const handleTyping = () => {
-    addNewMessage({
-      id: 5,
-      name: "user",
-      profilepictureurl: "https://www.w3schools.com/howto/img_avatar2.png",
-      message: "...?...",
-      timestamp: timeStampFunction,
-    });
-  };
-
-  // function that passages a message to the chat history component if the user stops typing after 3 seconds
-  const handleTypingTimeout = () => {
-    addNewMessage({
-      id: 4,
-      name: "user",
-      profilepictureurl: "https://www.w3schools.com/howto/img_avatar2.png",
-      message: "...!...",
-      timestamp: "2021-03-01 12:05:00",
-    });
+  // Not sure why this is needed.
+  const preventFormSubmission = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
   };
 
   return (
     <div className="flex items-center justify-between p-4 border-t border-gray-200">
-      <form className="flex w-full" onSubmit={handleFormSubmit}>
+      <form className="flex w-full" onSubmit={preventFormSubmission}>
         <div className="flex w-full items-center">
           <input
             type="text"
@@ -186,9 +178,13 @@ function ChatInput({ addNewMessage }) {
             placeholder="Type a message..."
             value={message}
             onChange={handleMessageInput}
-            onKeyDown={handleTyping}
           />
-          <button type="submit" className="ml-4">
+          <button
+            type="submit"
+            className="ml-4"
+            onClick={handleMessageSubmit}
+            disabled={message === "" || mostRecentChatIsUser(chatData)}
+          >
             <PaperAirplaneIcon className="w-6 h-6 text-blue-500" />
           </button>
         </div>
