@@ -16,6 +16,9 @@
     "@types/node": "18.11.18",
     "@types/react": "18.0.27",
     "@types/react-dom": "18.0.10",
+    "assistance": "^0.2.0",
+    "axios": "^1.2.6",
+    "crypto-js": "^4.1.1",
     "emoji-picker-react": "^4.4.7",
     "eslint-config-next": "13.1.5",
     "next": "13.1.5",
@@ -25,6 +28,7 @@
     "react-youtube": "^10.1.0"
   },
   "devDependencies": {
+    "@types/crypto-js": "^4.1.1",
     "@typescript-eslint/eslint-plugin": "^5.49.0",
     "autoprefixer": "^10.4.13",
     "eslint": "^8.33.0",

@@ -1,4 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import axios from "axios";
+import sha224 from "crypto-js/sha224";
 
 import Head from "next/head";
 import { Inter } from "@next/font/google";
@@ -12,6 +14,7 @@ import Footer from "@/components/Footer";
 import Blog from "@/components/Blog";
 
 import { ChatContext, ChatContextData, DefaultChatData } from "@/contexts/chat";
+import { ApiAccessContext } from "@/contexts/api-access";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -19,6 +22,52 @@ export default function Home() {
   // Details on implementation https://stackoverflow.com/a/51573816/3912576
   const [chatData, setChatData] = useState<ChatContextData>(DefaultChatData);
   const value = { chatData, setChatData };
+
+  const [apiAccessToken, setApiAccessToken] = useState<string | null>(null);
+
+  // Get an API token for a freshly created anonymous account
+  useEffect(() => {
+    axios
+      .post("https://api.assistance.chat/temp-account", {
+        headers: { "Content-Type": "application/json;charset=UTF-8" },
+      })
+      .then((res) => {
+        // This corresponds to a temporary anonymous account. The username is a
+        // cryptographic token
+        const username: string = res.data["username"];
+
+        // NOTE: This doesn't provide any extra security. It is the fact that
+        // currently no user is able to access old data that means the
+        // following is okay.
+        const password = sha224(username).toString();
+
+        const details: Record<string, string> = {
+          username: username,
+          password: password,
+          grant_type: "password",
+        };
+
+        // Required because OpenAPI spec can't receive JSON body
+        const formBodyItems = [];
+        for (const property in details) {
+          const encodedKey = encodeURIComponent(property);
+          const encodedValue = encodeURIComponent(details[property]);
+          formBodyItems.push(encodedKey + "=" + encodedValue);
+        }
+        const formBody = formBodyItems.join("&");
+
+        return axios.post("https://api.assistance.chat/login", {
+          header: {
+            "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8",
+          },
+          body: formBody,
+        });
+      })
+      .then((res) => {
+        setApiAccessToken(res.data["access_token"]);
+        console.log(res.data);
+      });
+  });
 
   return (
     <>
@@ -28,15 +77,17 @@ export default function Home() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <ChatContext.Provider value={value}>
-        <Navbar />
-        <Hero />
-        <MoreInfo />
-        <Reviews />
-        <StudentExperience />
-        <Blog />
-        <Footer />
-      </ChatContext.Provider>
+      <ApiAccessContext.Provider value={apiAccessToken}>
+        <ChatContext.Provider value={value}>
+          <Navbar />
+          <Hero />
+          <MoreInfo />
+          <Reviews />
+          <StudentExperience />
+          <Blog />
+          <Footer />
+        </ChatContext.Provider>
+      </ApiAccessContext.Provider>
     </>
   );
 }
