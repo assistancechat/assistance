@@ -16,10 +16,14 @@
 # https://github.com/hwchase17/langchain/blob/ae1b589f60a/langchain/agents/conversational/prompt.py#L1-L36
 
 import asyncio
+import logging
+import re
 import textwrap
 from enum import Enum
+from typing import Callable, Coroutine
 
 import openai
+from thefuzz import process as fuzz_process
 
 from assistance._agents.queries import query_from_transcript
 from assistance._store.transcript import store_prompt_transcript
@@ -69,7 +73,7 @@ class Tool(str, Enum):
     RESPOND = "Respond"
 
 
-TOOLS = {
+TOOL_DESCRIPTIONS = {
     Tool.SEARCH: textwrap.dedent(
         """
             A tool where Assistant provides a natural language question.
@@ -183,11 +187,11 @@ async def run_student_chat(
 
     tools = []
 
-    for tool, description in TOOLS.items():
-        tools.append(f"{tool}: {description}")
+    for tool, description in TOOL_DESCRIPTIONS.items():
+        tools.append(f"{tool.value}: {description}")
 
     tools_string = "\n".join(tools)
-    tool_names = ", ".join(TOOLS.keys())
+    tool_names = ", ".join(TOOL_DESCRIPTIONS.keys())
 
     prompt_template = PROMPT.format(task_description=TASK_DESCRIPTION)
 
@@ -199,17 +203,40 @@ async def run_student_chat(
         transcript=transcript,
     )
 
-    response = await _run_tool_chaining(username=username, prompt=prompt)
+    async def _search(query: str):
+        return await alphacrucis_search(
+            record_grouping=RECORD_GROUPING, username=username, query=query
+        )
+
+    async def _email(query: str):
+        return "Unfortunately emailing the Supervisors is not currently available"
+
+    tool_functions = {
+        Tool.SEARCH: _search,
+        Tool.EMAIL: _email,
+    }
+
+    response = await _run_llm_process_observation_loop(
+        agent_name=agent_name,
+        username=username,
+        prompt=prompt,
+        tool_functions=tool_functions,
+    )
 
     return response
 
 
 async def _run_llm_process_observation_loop(
-    agent_name: str, username: str, prompt: str
+    agent_name: str,
+    username: str,
+    prompt: str,
+    tool_functions: dict[Tool, Callable[[str], Coroutine]],
 ):
     response = ""
-
     no_tool_text = f"No\n{agent_name}: "
+    regex = r"Action: (.*?)\nAction Input: (.*)"
+
+    available_tools = [item.value for item in tool_functions.keys()]
 
     while no_tool_text in response:
         response = await _call_gpt_and_store_as_transcript(
@@ -218,6 +245,18 @@ async def _run_llm_process_observation_loop(
             model_kwargs=MODEL_KWARGS,
             prompt=prompt,
         )
+
+        match = re.search(regex, response)
+
+        action_requested = match.group(1)
+        action_input = match.group(2)
+        action_input = action_input.strip(" ").strip('"')
+
+        matched_action = fuzz_process.extractOne(action_requested, available_tools)
+        action_function = tool_functions[Tool(matched_action)]
+
+        observation_result = await action_function(action_input)
+        prompt += f"Observation: {observation_result}\n"
 
     result = response.split(no_tool_text)[-1]
 
@@ -230,6 +269,8 @@ async def _call_gpt_and_store_as_transcript(
     model_kwargs: dict,
     prompt: str,
 ):
+    logging.info(prompt)
+
     completions = await openai.Completion.acreate(prompt=prompt, **model_kwargs)
     response: str = completions.choices[0].text.strip()
 
