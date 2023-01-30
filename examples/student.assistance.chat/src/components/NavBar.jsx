@@ -3,7 +3,10 @@ import { Disclosure, Menu, Dialog, Transition } from "@headlessui/react";
 import { Bars3Icon, BellIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { ChatBubbleOvalLeftEllipsisIcon } from "@heroicons/react/24/solid";
 import { AcademicCapIcon } from "@heroicons/react/24/solid";
-import Logo2 from "../images/Logo.gif";
+
+import Chat from "@/components/Chat";
+
+import Logo2 from "@/images/Logo.gif";
 import Image from "next/image";
 
 function classNames(...classes) {
@@ -135,13 +138,9 @@ export default function Navbar() {
                               as="h3"
                               className="text-lg font-medium leading-6 text-gray-900"
                             >
-                              THIS IS A TEST CHAT POP UP MODAL
+                              A TESTING TITLE
                             </Dialog.Title>
-                            <div className="mt-2">
-                              <p className="text-sm text-gray-500">
-                                Hello Simon! How can I help you today?
-                              </p>
-                            </div>
+                            <Chat />
                           </Dialog.Panel>
                         </Transition.Child>
                       </div>
