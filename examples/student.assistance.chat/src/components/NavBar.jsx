@@ -5,6 +5,7 @@ import { ChatBubbleOvalLeftEllipsisIcon } from "@heroicons/react/24/solid";
 import { AcademicCapIcon } from "@heroicons/react/24/solid";
 
 import Chat from "@/components/Chat";
+import ChatHeader from "@/components/ChatHeader";
 
 import Logo2 from "@/images/Logo.gif";
 import Image from "next/image";
@@ -138,7 +139,7 @@ export default function Navbar() {
                               as="h3"
                               className="text-lg font-medium leading-6 text-gray-900"
                             >
-                              A TESTING TITLE
+                              <ChatHeader />
                             </Dialog.Title>
                             <Chat />
                           </Dialog.Panel>
