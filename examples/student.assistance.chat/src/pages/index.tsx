@@ -32,7 +32,7 @@ export default function Home() {
         "https://api.assistance.chat/temp-account",
         {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: { "Content-Type": "application/json;charset=UTF-8" },
         }
       );
 
