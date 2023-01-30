@@ -16,7 +16,6 @@
 # https://github.com/hwchase17/langchain/blob/ae1b589f60a/langchain/agents/conversational/prompt.py#L1-L36
 
 import asyncio
-import logging
 import re
 import textwrap
 from enum import Enum
@@ -25,7 +24,6 @@ from typing import Callable, Coroutine
 import openai
 from thefuzz import process as fuzz_process
 
-from assistance._agents.queries import query_from_transcript
 from assistance._store.transcript import store_prompt_transcript
 from assistance._tools.search import alphacrucis_search
 
@@ -35,34 +33,29 @@ MODEL_KWARGS = {
     "engine": "text-davinci-003",
     "max_tokens": 256,
     "best_of": 1,
-    "stop": ["Observation:", "PROCESS COMPLETE"],
+    "stop": "Observation:",
     "temperature": 0.7,
     "top_p": 1,
-    "frequency_penalty": 0.0,
-    "presence_penalty": 0.0,
+    "frequency_penalty": 0.1,
+    "presence_penalty": 0.1,
 }
 
 # TODO: Pull this into the API and allow the task to be defined within
 # the frontend.
 TASK_DESCRIPTION = textwrap.dedent(
     """
-        {agent_name} is a student assistant who is helping students
-        find out more about the Alphacrucis Christian University while
-        also potentially helping them to undergo enrolment.
+        {agent_name} is an expert in Alphacrucis Christian University
+        courses. They are providing student support to {client_name}.
 
         The Supervisors want this conversation to be where
         {client_name} gets their information. As such, please don't
         redirect them to external sources.
 
-        If appropriate the Supervisors want {client_name} to sign
-        up to an Alphacrucis University course through having this
-        conversation with {agent_name}.
-
         If relevant, it is {agent_name}'s goal to sell a course to
         {client_name}.
 
         {agent_name} is to always be polite and helpful. Even when
-        talked to inappropriately.
+        talked to inappropriately by {client_name}.
     """
 ).strip()
 
@@ -156,8 +149,6 @@ PROMPT = textwrap.dedent(
         ```
         Thought: Does Assistant need to use a tool? No
         {agent_name}: [Assistant's determined response for {agent_name} here]
-
-        PROCESS COMPLETE
         ```
 
         TRANSCRIPT THUS FAR:
@@ -176,15 +167,6 @@ async def run_student_chat(
     if not transcript:
         transcript = "Conversation has not yet begun"
 
-    else:
-        query = await query_from_transcript(
-            record_grouping=RECORD_GROUPING, username=username, transcript=transcript
-        )
-
-        additional_information = await alphacrucis_search(
-            record_grouping=RECORD_GROUPING, username=username, query=query
-        )
-
     tools = []
 
     for tool, description in TOOL_DESCRIPTIONS.items():
@@ -193,9 +175,8 @@ async def run_student_chat(
     tools_string = "\n".join(tools)
     tool_names = ", ".join(TOOL_DESCRIPTIONS.keys())
 
-    prompt_template = PROMPT.format(task_description=TASK_DESCRIPTION)
-
-    prompt = prompt_template.format(
+    prompt = PROMPT.format(
+        task_description=TASK_DESCRIPTION,
         agent_name=agent_name,
         client_name=client_name,
         tools_string=tools_string,
@@ -233,12 +214,12 @@ async def _run_llm_process_observation_loop(
     tool_functions: dict[Tool, Callable[[str], Coroutine]],
 ):
     response = ""
-    no_tool_text = f"No\n{agent_name}: "
+    no_tool_text = f"{agent_name}:"
     regex = r"Action: (.*?)\nAction Input: (.*)"
 
     available_tools = [item.value for item in tool_functions.keys()]
 
-    while no_tool_text in response:
+    while True:
         response = await _call_gpt_and_store_as_transcript(
             record_grouping=RECORD_GROUPING,
             username=username,
@@ -246,19 +227,22 @@ async def _run_llm_process_observation_loop(
             prompt=prompt,
         )
 
+        if no_tool_text in response:
+            break
+
         match = re.search(regex, response)
 
         action_requested = match.group(1)
         action_input = match.group(2)
         action_input = action_input.strip(" ").strip('"')
 
-        matched_action = fuzz_process.extractOne(action_requested, available_tools)
+        matched_action = fuzz_process.extractOne(action_requested, available_tools)[0]
         action_function = tool_functions[Tool(matched_action)]
 
         observation_result = await action_function(action_input)
         prompt += f"Observation: {observation_result}\n"
 
-    result = response.split(no_tool_text)[-1]
+    result = response.split(no_tool_text)[-1].strip()
 
     return result
 
@@ -269,8 +253,6 @@ async def _call_gpt_and_store_as_transcript(
     model_kwargs: dict,
     prompt: str,
 ):
-    logging.info(prompt)
-
     completions = await openai.Completion.acreate(prompt=prompt, **model_kwargs)
     response: str = completions.choices[0].text.strip()
 

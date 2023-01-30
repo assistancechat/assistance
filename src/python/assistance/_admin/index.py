@@ -133,4 +133,4 @@ async def main():
         index(application_options=application_options)
 
     else:
-        await application_options[st.session_state.app].main
+        await application_options[st.session_state.app].main()
