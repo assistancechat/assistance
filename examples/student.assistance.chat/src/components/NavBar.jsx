@@ -3,7 +3,7 @@ import { Disclosure, Menu, Dialog, Transition } from "@headlessui/react";
 import { Bars3Icon, BellIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { ChatBubbleOvalLeftEllipsisIcon } from "@heroicons/react/24/solid";
 import { AcademicCapIcon } from "@heroicons/react/24/solid";
-import Logo2 from "../images/logo.gif";
+import Logo2 from "../images/Logo.gif";
 import Image from "next/image";
 
 function classNames(...classes) {

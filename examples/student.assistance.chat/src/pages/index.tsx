@@ -4,7 +4,7 @@ import MoreInfo from "../components/MoreInfo";
 import Hero from "../components/Hero";
 import Reviews from "../components/Reviews";
 import StudentExperience from "../components/StudentExperience";
-import Navbar from "../components/NavBarEnrolment";
+import Navbar from "../components/NavBar";
 import Footer from "../components/Footer";
 import Blog from "../components/Blog";
 
