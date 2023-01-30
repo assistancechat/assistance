@@ -43,6 +43,8 @@ const epochToTimestamp = (epoch: number) => {
   return `${year}-${month}-${day} ${hour}:${minute}:${second}`;
 };
 
+// Use this in-place of "is-typing" for ellipsis as well as input disabling and
+// submit button disabling.
 const mostRecentChatIsUser = (chatData: ChatContextData) => {
   const messageHistory = chatData.messageHistory;
 
@@ -106,7 +108,7 @@ function ChatHistory() {
 
   return (
     <div className="flex-1 h-full overflow-y-auto">
-      <div className="flex flex-col-reverse h-full">{renderChatHistory()}</div>
+      <div className="flex flex-col h-full">{renderChatHistory()}</div>
     </div>
   );
 }
