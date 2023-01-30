@@ -135,12 +135,6 @@ export default function Navbar() {
                                 />{" "}
                               </button>{" "}
                             </div>
-                            <Dialog.Title
-                              as="h3"
-                              className="text-lg font-medium leading-6 text-gray-900"
-                            >
-                              <ChatHeader />
-                            </Dialog.Title>
                             <Chat />
                           </Dialog.Panel>
                         </Transition.Child>

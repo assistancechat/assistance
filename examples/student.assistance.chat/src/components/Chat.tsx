@@ -183,13 +183,13 @@ function ChatInput() {
             placeholder="Type a message..."
             value={message}
             onChange={handleMessageInput}
-            disabled={mostRecentChatIsUser(chatData)}
+            // disabled={mostRecentChatIsUser(chatData)}
           />
           <button
             type="submit"
             className="ml-4"
             onClick={handleMessageSubmit}
-            disabled={message === "" || mostRecentChatIsUser(chatData)}
+            // disabled={message === "" || mostRecentChatIsUser(chatData)}
           >
             <PaperAirplaneIcon className="w-6 h-6 text-blue-500" />
           </button>
