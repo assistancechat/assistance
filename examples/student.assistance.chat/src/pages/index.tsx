@@ -73,7 +73,7 @@ export default function Home() {
     };
 
     fetchAndSetApiAccessToken().catch((err) => console.error(err));
-  });
+  }, []);
 
   return (
     <>
