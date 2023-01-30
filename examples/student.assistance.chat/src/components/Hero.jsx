@@ -1,11 +1,14 @@
 import React from "react";
+import { useState, useRef } from "react";
 import { ArrowDownCircleIcon } from "@heroicons/react/24/solid";
 import { ChatBubbleOvalLeftEllipsisIcon } from "@heroicons/react/24/outline";
+import Document from "@/pages/_document";
 
 const courseResources = {
-  videoBackground: {
-    link: "https://www.youtube.com/embed/e6Gueu7UoFY?controls=0&loop=1",
-    videoTitle: "Counselling Video",
+  ImageBackground: {
+    portait: "https://images.unsplash.com/photo-1604881991405-b273c7a4386a?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=387&q=80",
+    landscape:"https://images.unsplash.com/photo-1626387753307-5a329fa44578?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1331&q=80",
+    alt: "Counselling picture",
   },
   courseTitle: "COURSE RESOURCES",
   headLine: "Discover God's Purpose for you in Counselling",
@@ -23,15 +26,15 @@ const courseResources = {
 
 //currently video is hidden, remove hidden to play video
 export default function Hero() {
+  const windowWidth = useRef(Document.innerWidth);
+  console.log(windowWidth);
+
   return (
     <div className="w-screen h-screen">
-      <iframe
-        lazy="true"
-        className="absolute opacity-30 -z-10 w-screen h-screen"
-        src={courseResources.videoBackground.link}
-        title={courseResources.videoBackground.videoTitle}
-        frameBorder="0"
-        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; web-share"
+      <img 
+        className="absolute opacity-30 -z-10 w-screen h-screen lg:opacity-10"
+        src={courseResources.ImageBackground.portait}
+        alt="background"
       />
       <div className="grid grid-rows-6 w-screen h-screen">
         <button
@@ -45,7 +48,7 @@ export default function Hero() {
             className="inline-flex h-max w-max space-x-2"
           >
             <ArrowDownCircleIcon className="h-10 w-10 self-center text-orange-600" />
-            <h3 className="text-lg self-center text-left text-black leading-none uppercase ">
+            <h3 className="text-md self-center text-left text-black leading-none uppercase ">
               {courseResources.LearnButton.text}
             </h3>
           </a>
@@ -62,7 +65,7 @@ export default function Hero() {
 
           <button
             type="button"
-            className="row-span-1 relative inset-10 inline-flex h-12 w-5/6 inline-flex items-center rounded-md border border-transparent px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-white focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 lg:w-1/3 lg:justify-self-end lf:mt-10"
+            className="row-span-1 animate-pulse relative inset-10 inline-flex h-12 w-5/6 inline-flex items-center rounded-md border border-transparent px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-white focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 lg:w-1/3 lg:justify-self-end lf:mt-10"
           >
             <a
               href={courseResources.ChatButton.link}

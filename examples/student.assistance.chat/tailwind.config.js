@@ -12,10 +12,9 @@ module.exports = {
   ],
   theme: {
     extend: {
-      colors: {
-        rose: colors.rose,
+      animation: {
+          },
+      plugins: [require('@tailwindcss/forms')]
     }
-  },
-},
-  plugins: [require('@tailwindcss/forms')]
+  }
 }
