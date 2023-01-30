@@ -11,16 +11,12 @@ import Navbar from "@/components/NavBar";
 import Footer from "@/components/Footer";
 import Blog from "@/components/Blog";
 
-import {
-  ChatContext,
-  ChatContextData,
-  DefaultChatData,
-  ChatContextType,
-} from "@/contexts/chat";
+import { ChatContext, ChatContextData, DefaultChatData } from "@/contexts/chat";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export default function Home() {
+  // Details on implementation https://stackoverflow.com/a/51573816/3912576
   const [chatData, setChatData] = useState<ChatContextData>(DefaultChatData);
   const value = { chatData, setChatData };
 
