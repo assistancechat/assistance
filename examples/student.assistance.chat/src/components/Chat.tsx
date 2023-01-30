@@ -45,6 +45,11 @@ const epochToTimestamp = (epoch: number) => {
 
 const mostRecentChatIsUser = (chatData: ChatContextData) => {
   const messageHistory = chatData.messageHistory;
+
+  if (messageHistory.length === 0) {
+    return false;
+  }
+
   const mostRecentChatItem = messageHistory[messageHistory.length - 1];
   return mostRecentChatItem.originator === "user";
 };
@@ -178,6 +183,7 @@ function ChatInput() {
             placeholder="Type a message..."
             value={message}
             onChange={handleMessageInput}
+            disabled={mostRecentChatIsUser(chatData)}
           />
           <button
             type="submit"
