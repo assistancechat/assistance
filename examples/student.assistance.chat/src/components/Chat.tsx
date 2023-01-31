@@ -30,16 +30,7 @@ import {
 import ProfilePicture from "@/components/atoms/ProfilePicture";
 
 const epochToTimestamp = (epoch: number) => {
-  const date = new Date(epoch);
-
-  const year = date.getFullYear();
-  const month = date.getMonth();
-  const day = date.getDate();
-  const hour = date.getHours();
-  const minute = date.getMinutes();
-  const second = date.getSeconds();
-
-  return `${year}-${month}-${day} ${hour}:${minute}:${second}`;
+  return new Date(epoch).toLocaleString();
 };
 
 // Use this in-place of "is-typing" for ellipsis as well as input disabling and
@@ -80,10 +71,10 @@ function ChatHistory() {
               </div>
               <div className="flex flex-col items-end">
                 <div
-                  className={`py-2 px-4 rounded-xl rounded-br-none ${
+                  className={`py-2 px-4 rounded-xl ${
                     originator === "client"
-                      ? "bg-orange-300 text-white"
-                      : "bg-gray-800 text-white"
+                      ? "bg-orange-300 text-white rounded-br-none"
+                      : "bg-gray-800 text-white rounded-bl-none"
                   } max-w-xs`}
                 >
                   {message

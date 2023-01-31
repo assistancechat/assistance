@@ -39,7 +39,7 @@ export const DefaultChatData = {
       originator: "agent" as MessageOriginator,
       message:
         "Hi, my name is {agentName}. Before we begin, may you please sign " +
-        "in with one of the following two options:",
+        "in",
       timestamp: Date.now(),
     },
   ],
