@@ -33,17 +33,31 @@ type OriginatorProfilePictures = Record<
 >;
 
 export type ChatContextData = {
+  taskPrompt: string;
   messageHistory: MessageHistory;
   originatorNames: OriginatorNames;
   originatorProfilePictures: OriginatorProfilePictures;
 };
 
 export const DefaultChatData = {
+  taskPrompt: `You are from Assistance.Chat. You are an expert in all things \
+about Alphacrucis (AC) Christian University. You are providing \
+student support to {client_name}.
+
+If relevant, it is your goal to sell an AC course to \
+{client_name}.
+
+You are always polite and helpful. Even when talked to \
+inappropriately by {client_name}.
+
+Assume that {client_name} is not able to access information \
+from anywhere else except by talking to you. As such, do not \
+redirect them to any website or other sources.`,
   messageHistory: [
     {
       originator: "agent" as MessageOriginator,
       message:
-        "Hi, my name is {agentName}. Before we begin, may you please sign in",
+        "Hi, my name is {agent_name}. Before we begin, may you please sign in",
       timestamp: Date.now(),
     },
   ],

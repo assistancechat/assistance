@@ -81,13 +81,13 @@ function ChatHistory() {
                 >
                   {message
                     .replaceAll(
-                      "{agentName}",
+                      "{agent_name}",
                       chatData.originatorNames["agent"]
                         ? chatData.originatorNames["agent"]
                         : "agent"
                     )
                     .replaceAll(
-                      "{clientName}",
+                      "{client_name}",
                       chatData.originatorNames["client"]
                         ? chatData.originatorNames["client"]
                         : "client"

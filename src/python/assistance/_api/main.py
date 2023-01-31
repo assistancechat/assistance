@@ -60,7 +60,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(root.router)
+# app.include_router(root.router)
 app.include_router(chat.router)
 # app.include_router(save.router)
 # app.include_router(search.router)

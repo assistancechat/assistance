@@ -34,7 +34,7 @@ async def run_alphacrucis_search(
 ):
     result = await alphacrucis_search(
         record_grouping=data.record_grouping,
-        username=current_user.username,
+        client_email=current_user.username,
         query=data.query,
     )
 

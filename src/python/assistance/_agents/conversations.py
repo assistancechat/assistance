@@ -42,7 +42,7 @@ MODEL_KWARGS = {
 
 # TODO: Pull this into the API and allow the task to be defined within
 # the frontend.
-TASK_DESCRIPTION = textwrap.dedent(
+TASK_PROMPT = textwrap.dedent(
     """
         You are from Assistance.Chat. You are an expert in all things
         about Alphacrucis (AC) Christian University. You are providing
@@ -125,7 +125,7 @@ PROMPT = textwrap.dedent(
         Aims for {agent_name}:
         ----------------------
 
-        {task_description}
+        {task_prompt}
 
         TOOLS:
         ------
@@ -161,8 +161,12 @@ PROMPT = textwrap.dedent(
 ).strip()
 
 
-async def run_student_chat(
-    agent_name: str, username: str, client_name: str, transcript: None | str = None
+async def run_conversation(
+    task_prompt: str,
+    agent_name: str,
+    client_email: str,
+    client_name: str,
+    transcript: None | str = None,
 ):
     if not transcript:
         transcript = "Conversation has not yet begun"
@@ -176,7 +180,7 @@ async def run_student_chat(
     tool_names = ", ".join(TOOL_DESCRIPTIONS.keys())
 
     prompt = PROMPT.format(
-        task_description=TASK_DESCRIPTION,
+        task_prompt=task_prompt,
         agent_name=agent_name,
         client_name=client_name,
         tools_string=tools_string,
@@ -186,7 +190,7 @@ async def run_student_chat(
 
     async def _search(query: str):
         return await alphacrucis_search(
-            record_grouping=RECORD_GROUPING, username=username, query=query
+            record_grouping=RECORD_GROUPING, client_email=client_email, query=query
         )
 
     async def _email(query: str):
@@ -199,7 +203,7 @@ async def run_student_chat(
 
     response = await _run_llm_process_observation_loop(
         agent_name=agent_name,
-        username=username,
+        client_email=client_email,
         prompt=prompt,
         tool_functions=tool_functions,
     )
@@ -209,7 +213,7 @@ async def run_student_chat(
 
 async def _run_llm_process_observation_loop(
     agent_name: str,
-    username: str,
+    client_email: str,
     prompt: str,
     tool_functions: dict[Tool, Callable[[str], Coroutine]],
 ):
@@ -222,7 +226,7 @@ async def _run_llm_process_observation_loop(
     while True:
         response = await _call_gpt_and_store_as_transcript(
             record_grouping=RECORD_GROUPING,
-            username=username,
+            client_email=client_email,
             model_kwargs=MODEL_KWARGS,
             prompt=prompt,
         )
@@ -249,7 +253,7 @@ async def _run_llm_process_observation_loop(
 
 async def _call_gpt_and_store_as_transcript(
     record_grouping: str,
-    username: str,
+    client_email: str,
     model_kwargs: dict,
     prompt: str,
 ):
@@ -259,7 +263,7 @@ async def _call_gpt_and_store_as_transcript(
     asyncio.create_task(
         store_prompt_transcript(
             record_grouping=record_grouping,
-            username=username,
+            client_email=client_email,
             model_kwargs=model_kwargs,
             prompt=prompt,
             response=response,

@@ -24,10 +24,14 @@ from .utilities import (
 
 
 async def store_prompt_transcript(
-    record_grouping: str, username: str, model_kwargs: dict, prompt: str, response: str
+    record_grouping: str,
+    client_email: str,
+    model_kwargs: dict,
+    prompt: str,
+    response: str,
 ):
     record_directory = create_record_directory_with_epoch(
-        RECORDS, [record_grouping, username, "transcripts"]
+        RECORDS, [record_grouping, client_email, "transcripts"]
     )
 
     data_to_save = {

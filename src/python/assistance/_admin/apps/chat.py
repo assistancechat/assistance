@@ -49,7 +49,7 @@ async def main():
             transcript=transcript,
         )
 
-        api_result = await chat.student_chat(data=data, current_user=MOCK_USER)
+        api_result = await chat.run_chat(data=data, current_user=MOCK_USER)
         response = api_result["response"]
 
         st.session_state.conversation.append(response)
