@@ -59,8 +59,6 @@ const mostRecentChatIsUser = (chatData: ChatContextData) => {
 function ChatHistory() {
   const { chatData } = useContext(ChatContext);
 
-  console.log(chatData);
-
   const renderChatHistory = () => {
     return chatData.messageHistory.map(
       ({ message, originator, timestamp }, index) => {

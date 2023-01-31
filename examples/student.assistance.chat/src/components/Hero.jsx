@@ -6,8 +6,10 @@ import Document from "@/pages/_document";
 
 const courseResources = {
   ImageBackground: {
-    portait: "https://images.unsplash.com/photo-1604881991405-b273c7a4386a?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=387&q=80",
-    landscape:"https://images.unsplash.com/photo-1626387753307-5a329fa44578?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1331&q=80",
+    portait:
+      "https://images.unsplash.com/photo-1604881991405-b273c7a4386a?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=387&q=80",
+    landscape:
+      "https://images.unsplash.com/photo-1626387753307-5a329fa44578?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1331&q=80",
     alt: "Counselling picture",
   },
   courseTitle: "COURSE RESOURCES",
@@ -27,11 +29,10 @@ const courseResources = {
 //currently video is hidden, remove hidden to play video
 export default function Hero() {
   const windowWidth = useRef(Document.innerWidth);
-  console.log(windowWidth);
 
   return (
     <div className="w-screen h-screen">
-      <img 
+      <img
         className="absolute opacity-30 -z-10 w-screen h-screen lg:opacity-10"
         src={courseResources.ImageBackground.portait}
         alt="background"

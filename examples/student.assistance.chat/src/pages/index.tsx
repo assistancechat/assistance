@@ -1,4 +1,4 @@
-import { useEffect, useState, lazy, Suspense  } from "react";
+import { useEffect, useState, lazy, Suspense } from "react";
 import axios from "axios";
 import sha224 from "crypto-js/sha224";
 
@@ -11,7 +11,6 @@ import MoreInfo from "@/components/MoreInfo";
 import StudentExperience from "@/components/StudentExperience";
 import Blog from "@/components/Blog";
 import Footer from "@/components/Footer";
-
 
 import { ChatContext, ChatContextData, DefaultChatData } from "@/contexts/chat";
 import { ApiAccessContext } from "@/contexts/api-access";
@@ -73,13 +72,16 @@ export default function Home() {
       const accessTokenData = await tokenResponse.json();
 
       setApiAccessToken(accessTokenData["access_token"]);
+
+      console.log(
+        `User logged in with token: ${accessTokenData["access_token"]}`
+      );
     };
 
     fetchAndSetApiAccessToken().catch((err) => console.error(err));
   }, []);
 
   return (
-
     <>
       <Head>
         <title>Global Talent</title>
@@ -92,7 +94,7 @@ export default function Home() {
           <Hero />
           <MoreInfo />
           <Suspense fallback={<div>Loading...</div>}>
-          <Reviews />
+            <Reviews />
           </Suspense>
           <StudentExperience />
           <Blog />
