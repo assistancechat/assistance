@@ -7,35 +7,39 @@ on:
   pull_request:
 
 jobs:
-  build:
-    name: Perform CI Checks
-
+  web:
+    name: Student Assistance Chat
     runs-on: ubuntu-latest
-    timeout-minutes: 60
-
-    strategy:
-      fail-fast: false
 
     steps:
       - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 19
+          cache: "npm"
+          cache-dependency-path: examples/student.assistance.chat/package-lock.json
 
-      - name: Install Pants
-        run: |
-          echo "$HOME/bin" >> $GITHUB_PATH
-          /bin/bash -c "$(curl -fsSL https://static.pantsbuild.org/setup/pantsup.sh)"
+      - name: Clean install dependencies
+        run: npm ci
+        working-directory: examples/student.assistance.chat
 
-      - name: Check BUILD files
+      - name: Build app
         run: |
-          pants tailor --check update-build-files --check ::
+          npm run build
+          npm run build  # Seems to remember old builder.io content, building twice appears to fix it.
+        working-directory: examples/student.assistance.chat
 
-      - name: Lint and typecheck
+      - name: Add GitHub Pages config files
+        if: github.ref == 'refs/heads/main'
         run: |
-          pants lint check ::
+          echo student.assistance.chat > dist/CNAME
+          touch dist/.nojekyll
+          cp dist/index.html dist/404.html
+        working-directory: examples/student.assistance.chat
 
-      - name: Test
-        run: |
-          pants test ::
-
-      - name: Package
-        run: |
-          pants package ::
+      - name: Deploy to gh-pages branch
+        if: github.ref == 'refs/heads/main'
+        uses: JamesIves/github-pages-deploy-action@v4.4.1
+        with:
+          branch: gh-pages
+          folder: examples/student.assistance.chat/out
