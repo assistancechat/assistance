@@ -32,9 +32,9 @@ jobs:
       - name: Add GitHub Pages config files
         if: github.ref == 'refs/heads/main'
         run: |
-          echo student.assistance.chat > dist/CNAME
-          touch dist/.nojekyll
-          cp dist/index.html dist/404.html
+          echo student.assistance.chat > out/CNAME
+          touch out/.nojekyll
+          cp out/index.html out/404.html
         working-directory: examples/student.assistance.chat
 
       - name: Deploy to gh-pages branch
