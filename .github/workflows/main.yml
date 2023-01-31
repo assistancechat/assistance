@@ -26,7 +26,6 @@ jobs:
       - name: Build app
         run: |
           npm run build
-          npm run build  # Seems to remember old builder.io content, building twice appears to fix it.
         working-directory: examples/student.assistance.chat
 
       - name: Add GitHub Pages config files
