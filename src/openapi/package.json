@@ -1,10 +1,11 @@
 {
   "scripts": {
-    "build": "npm run schema && npm run typescript && npm run pre-commit",
+    "build": "npm run schema && npm run typescript && npm run pre-commit && npm run typescript.replace",
     "schema": "cd ../python && poetry run assistance schema ../openapi/openapi.json",
     "typescript": "npm run typescript.clear && npm run typescript.generate",
     "typescript.clear": "rm -r ../typescript/src/client || exit 0",
     "typescript.generate": "cd ../typescript && npm run generate && npm run build",
+    "typescript.replace": "replace-in-files --string=\"url: '/\" --replacement=\"url: 'https://api.assistance.chat/\" \"../typescript/src/client/**/*.{ts,tsx}\"",
     "pre-commit": "pre-commit run --all-files || exit 0"
   },
   "devDependencies": {

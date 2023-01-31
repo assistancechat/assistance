@@ -21,7 +21,7 @@ export class DefaultService {
     ): CancelablePromise<ChatResponse> {
         return __request(OpenAPI, {
             method: 'POST',
-            url: '/chat',
+            url: 'https://api.assistance.chat/chat',
             body: requestBody,
             mediaType: 'application/json',
             errors: {
