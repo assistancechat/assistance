@@ -14,8 +14,11 @@
 
 import { ChatData, DefaultService } from "./client";
 
-function chat(data: ChatData) {
+export type { ChatData } from "./client";
+export type { ChatResponse } from "./client";
+export type { HTTPValidationError } from "./client";
+export type { ValidationError } from "./client";
+
+export function chat(data: ChatData) {
   return DefaultService.chatChatPost(data);
 }
-
-export { chat };
