@@ -50,7 +50,11 @@ def get_notion_api_key():
     return _load_secret("notion-api-key")
 
 
-def _load_secret(name: str):
+def get_starlette_session_key():
+    return _load_secret("starlette-session-key")
+
+
+def _load_secret(name: str) -> str:
     secret_path = SECRETS / name
 
     with open(secret_path, encoding="utf8") as f:

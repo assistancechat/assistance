@@ -13,27 +13,69 @@
 # limitations under the License.
 
 
-from fastapi import APIRouter, Depends
-from fastapi.security import OAuth2PasswordRequestForm
-from pydantic import BaseModel
+import json
 
-from assistance._api.login import Token, create_temp_account, get_user_access_token
+from authlib.integrations.starlette_client import OAuth, OAuthError
+from fastapi import APIRouter, Request
+from pydantic import BaseModel
+from starlette.config import Config
+from starlette.responses import HTMLResponse, RedirectResponse
+
+from assistance._config import get_google_oauth_client_id
+from assistance._keys import get_google_oauth_client_secret
 
 router = APIRouter(prefix="")
 
+# OAuth implementation built based on the official demo oath client
+# that has been forked at the following location:
+# https://github.com/assistancechat/demo-oauth-client/blob/e9c8aa1c9d05da32c8ca0a740b6475c78b53e6c6/fastapi-google-login/app.py
+oauth = OAuth(
+    Config(
+        environ={
+            "GOOGLE_CLIENT_ID": get_google_oauth_client_id(),
+            "GOOGLE_CLIENT_SECRET": get_google_oauth_client_secret(),
+        }
+    )
+)
+oauth.register(
+    name="google",
+    server_metadata_url="https://accounts.google.com/.well-known/openid-configuration",
+    client_kwargs={"scope": "openid email profile"},
+)
 
-@router.post("/login", response_model=Token)
-async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends()):
-    access_token = get_user_access_token(form_data.username, form_data.password)
 
-    return {"access_token": access_token, "token_type": "bearer"}
+@router.get("/")
+async def homepage(request: Request):
+    user = request.session.get("user")
+    if user:
+        data = json.dumps(user)
+        html = f"<pre>{data}</pre>" '<a href="/logout">logout</a>'
+        return HTMLResponse(html)
+    return HTMLResponse('<a href="/login">login</a>')
 
 
-@router.post("/temp-account")
-async def temp_account():
-    username = create_temp_account()
+@router.get("/login")
+async def login(request: Request):
+    redirect_uri = request.url_for("auth")
+    return await oauth.google.authorize_redirect(request, redirect_uri)
 
-    return {"username": username}
+
+@router.get("/auth")
+async def auth(request: Request):
+    try:
+        token = await oauth.google.authorize_access_token(request)
+    except OAuthError as error:
+        return HTMLResponse(f"<h1>{error.error}</h1>")
+    user = token.get("userinfo")
+    if user:
+        request.session["user"] = dict(user)
+    return RedirectResponse(url="/")
+
+
+@router.get("/logout")
+async def logout(request: Request):
+    request.session.pop("user", None)
+    return RedirectResponse(url="/")
 
 
 class Prompt(BaseModel):
