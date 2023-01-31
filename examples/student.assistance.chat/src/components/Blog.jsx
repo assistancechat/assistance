@@ -58,7 +58,7 @@ const posts = [
         <div className="relative mx-auto max-w-7xl">
           <div className="text-center">
             <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl uppercase">Read and inspire</h2>
-            <p className="mx-auto mt-3 max-w-2xl text-xl text-gray-500 sm:mt-4 capitalize">
+            <p className="mx-auto mt-3 max-w-3xl text-xl text-orange-500 sm:mt-4 capitalize">
 Multiply your talents in faith, study & work            </p>
           </div>
           <div className="mx-auto mt-12 grid max-w-lg gap-5 lg:max-w-none lg:grid-cols-3">

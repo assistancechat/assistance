@@ -21,7 +21,7 @@ const data = [
     title: "I APPLIED FOR",
     headline: "Christ Centered Learning",
     quote:
-      "I was studying the same degree at another university when the lecturer said that our worldview affects everything we do. At that moment, I realised I needed to find a new place to learn - Abigail Comafay, Bachelor of Applied Social Science Student",
+      "At another university said that our worldview affects everything we do. At that moment, I realised I needed to find a new place to learn - Abigail Comafay, Bachelor of Applied Social Science Student",
   },
   {
     id: "3",
@@ -44,7 +44,7 @@ export default function Reviews(props) {
   return (
     <div
       id="Reviews"
-      className="flex flex-wrap w-screen bg-white p-4 space-x-6"
+      className="flex flex-wrap w-screen bg-white p-4 md:space-x-6"
     >
       <div className="flex flex-wrap justify-center items-center lg:w-1/3 space-y-6">
         <div className="flex justify-center">
@@ -69,7 +69,7 @@ export default function Reviews(props) {
           </a>
         </button>
       </div>
-      <div className="flex flex-wrap self-center space-y-8 mt-6 lg:w-7/12 lg:justify-evenly lg:place-items-stretch">
+      <div className="flex flex-wrap self-center space-y-8 mt-6 md:flex-start lg:w-7/12 lg:justify-evenly">
         {data.map((item) => (
           <ReviewsMediaObject
             key={item.id}

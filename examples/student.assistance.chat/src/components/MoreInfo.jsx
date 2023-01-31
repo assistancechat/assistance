@@ -58,7 +58,7 @@ export default function MoreInfo() {
                 target="_blank"
                 className="inline-flex h-max w-max space-x-2"
               >
-                <ChatBubbleOvalLeftEllipsisIcon className="w-10 h-10 self-center text-orange-600" />
+                <ChatBubbleOvalLeftEllipsisIcon className="w-12 h-12 self-center text-orange-600" />
                 <h3 className="self-center leading-none text-black text-sm uppercase">
                   {moreInfoData.ChatButton1.text}
                 </h3>
@@ -83,7 +83,7 @@ export default function MoreInfo() {
                 <div className='animate-pulse row-span-1 place-content-around flex justify-self-center space-x-1'>
                   <button
                     type="button"
-                    className="relative inline-flex items-center rounded-md border border-transparent w-5/12 px-4 shadow-sm hover:bg-white focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+                    className="relative inline-flex items-center rounded-md border border-transparent w-5/12 px-2 shadow-sm hover:bg-white focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
                   >
                     <a
                       href={moreInfoData.ChatButton2.link}
@@ -91,7 +91,7 @@ export default function MoreInfo() {
                       target="_blank"
                       className="inline-flex space-x-2"
                     >
-                      <ChatBubbleOvalLeftEllipsisIcon className="h-10 self-center text-orange-600" />
+                      <ChatBubbleOvalLeftEllipsisIcon className="self-center text-orange-600" />
                       <h3 className="self-center text-left leading-none text-black text-sm uppercase">
                         {moreInfoData.ChatButton2.text}
                       </h3>
@@ -99,7 +99,7 @@ export default function MoreInfo() {
                   </button>
                   <button
                     type="button"
-                    className="relative inline-flex items-center rounded-md border border-transparent w-5/12 px-4 shadow-sm hover:bg-white focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+                    className="relative inline-flex items-center rounded-md border border-transparent w-5/12 px-2 shadow-sm hover:bg-white focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
                   >
                     {" "}
                     <a
@@ -108,8 +108,8 @@ export default function MoreInfo() {
                       target="_blank"
                       className="inline-flex space-x-2"
                     >
-                      <AcademicCapIcon className="w-10 h-10 self-center text-orange-600" />
-                      <h3 className="self-center text-left leading-none text-black text-sm uppercase">
+                      <AcademicCapIcon className="flex self-center text-orange-600" />
+                      <h3 className="self-center text-left leading-tight text-black text-sm uppercase">
                         {moreInfoData.LearnButton.text}
                       </h3>
                     </a>
