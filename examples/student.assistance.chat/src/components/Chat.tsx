@@ -18,9 +18,10 @@ import {
   MouseEvent,
   ChangeEvent,
   FormEvent,
+  useRef,
 } from "react";
 import { Transition } from "@headlessui/react";
-import { PaperAirplaneIcon } from "@heroicons/react/24/outline";
+import { PaperAirplaneIcon } from "@heroicons/react/24/solid";
 
 import {
   ChatContext,
@@ -59,8 +60,6 @@ const mostRecentChatIsUser = (chatData: ChatContextData) => {
 function ChatHistory() {
   const { chatData } = useContext(ChatContext);
 
-  console.log(chatData);
-
   const renderChatHistory = () => {
     return chatData.messageHistory.map(
       ({ message, originator, timestamp }, index) => {
@@ -87,8 +86,8 @@ function ChatHistory() {
                 <div
                   className={`py-2 px-4 rounded-xl rounded-br-none ${
                     originator === "user"
-                      ? "bg-orange-300 text-white"
-                      : "bg-gray-800 text-white"
+                      ? "bg-orange-400 text-white"
+                      : "bg-gray-400 text-white"
                   } max-w-xs`}
                 >
                   {message}
@@ -105,9 +104,9 @@ function ChatHistory() {
       }
     );
   };
-
+  
   return (
-    <div className="flex-1 h-full overflow-y-auto">
+    <div className="flex-1 max-h-96 overflow-scroll">
       <div className="flex flex-col h-full">{renderChatHistory()}</div>
     </div>
   );
@@ -142,30 +141,30 @@ function ChatInput() {
     setMessage("");
   };
 
-  // Not sure why this is needed.
+  //trying to prevent the user from submitting form if the input is empty
   const preventFormSubmission = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
   };
 
   return (
-    <div className="flex items-center justify-between p-4 border-t border-gray-200">
+    <div className="flex items-center justify-between p-1 border-gray-200">
       <form className="flex w-full" onSubmit={preventFormSubmission}>
         <div className="flex w-full items-center">
           <input
             type="text"
-            className="w-full px-4 py-2 border border-gray-200 rounded-full focus:outline-none focus:border-blue-500"
-            placeholder="Type a message..."
+            className="w-full px-4 py-2 border border-gray-200 rounded-l-md focus:outline-none focus:border-orange-600"
+            placeholder="Ask us about enrolment or application ..."
             value={message}
             onChange={handleMessageInput}
             // disabled={mostRecentChatIsUser(chatData)}
           />
           <button
             type="submit"
-            className="ml-4"
+            className="bg-gray-800 rounded-r-md  focus:ring-offset-2 focus:ring-1 focus:ring-white"
             onClick={handleMessageSubmit}
             // disabled={message === "" || mostRecentChatIsUser(chatData)}
           >
-            <PaperAirplaneIcon className="w-6 h-6 text-blue-500" />
+            <PaperAirplaneIcon className="w-12 h-10 pt-2 pb-2 animate-pulse text-white focus:animate-bounce  hover:text-orange-400" />
           </button>
         </div>
       </form>
@@ -175,7 +174,7 @@ function ChatInput() {
 
 function Chat() {
   return (
-    <div className="flex flex-col flex-1 h-full">
+    <div className="flex flex-col flex-1 h-96 bg-gray-300">
       <ChatHistory />
       <ChatInput />
     </div>
