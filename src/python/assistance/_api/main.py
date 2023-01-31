@@ -12,26 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import json
 import logging
 
 import uvicorn
-from authlib.integrations.starlette_client import OAuth, OAuthError
-from fastapi import FastAPI, Request
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from starlette.config import Config
 from starlette.middleware.sessions import SessionMiddleware
-from starlette.responses import HTMLResponse, RedirectResponse
 
 from assistance import _ctx
-from assistance._config import get_google_oauth_client_id
-from assistance._keys import (
-    get_google_oauth_client_secret,
-    get_starlette_session_key,
-    set_openai_api_key,
-)
+from assistance._keys import get_starlette_session_key, set_openai_api_key
 
-from .routers import chat, query, root, save, search, send, summarise
+from .routers import chat
 
 logging.basicConfig(
     level=logging.INFO,
@@ -60,13 +51,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# app.include_router(root.router)
 app.include_router(chat.router)
-# app.include_router(save.router)
-# app.include_router(search.router)
-# app.include_router(send.router)
-# app.include_router(summarise.router)
-# app.include_router(query.router)
 
 
 @app.on_event("startup")
