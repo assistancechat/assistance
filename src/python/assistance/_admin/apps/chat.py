@@ -43,7 +43,7 @@ async def main():
             conversation=st.session_state.conversation,
         )
 
-        data = chat.StudentChatData(
+        data = chat.ChatData(
             agent_name=AGENT_NAME,
             client_name=client_name,
             transcript=transcript,

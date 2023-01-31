@@ -20,6 +20,6 @@ from assistance._api.raw import chat as _chat
 router = APIRouter(prefix="/chat")
 
 
-@router.post("")
-async def chat(data: _chat.StudentChatData):
+@router.post("", response_model=_chat.ChatResponse)
+async def chat(data: _chat.ChatData):
     return await _chat.run_chat(data=data)

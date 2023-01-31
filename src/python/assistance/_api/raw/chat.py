@@ -12,16 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import hashlib
-import logging
-import secrets
 from datetime import datetime, timedelta
 
-from fastapi import Depends
-from fastapi.security import OAuth2PasswordBearer
+from google.auth import exceptions
 from google.auth.transport import requests
 from google.oauth2 import id_token
-from jose import JWTError, jwt
+from jose import ExpiredSignatureError, JWTError, jwt
 from pydantic import BaseModel
 
 from assistance._agents.conversations import run_conversation
@@ -38,7 +34,7 @@ ASSISTANCE_TOKEN_EXPIRES = timedelta(minutes=30)
 ASSISTANCE_TOKEN_REFRESH = timedelta(minutes=10)
 
 
-class StudentChatData(BaseModel):
+class ChatData(BaseModel):
     agent_name: str
     task_prompt: str
     transcript: str | None = None
@@ -46,16 +42,23 @@ class StudentChatData(BaseModel):
     assistance_token: str | None = None
 
 
-async def run_chat(data: StudentChatData):
-    id_info = id_token.verify_oauth2_token(
-        data.token, requests.Request(), GOOGLE_OAUTH_CLIENT_ID
+class ChatResponse(BaseModel):
+    agent_message: str
+    assistance_token: str
+
+
+async def run_chat(data: ChatData) -> ChatResponse:
+    (
+        assistance_token,
+        assistance_token_data,
+    ) = _verify_and_get_assistance_token_with_data(
+        google_id_token=data.google_id_token, assistance_token=data.assistance_token
     )
-    client_email = id_info["email"]
-    client_name = id_info["given_name"]
 
-    logging.info(id_info)
+    client_email = assistance_token_data["email"]
+    client_name = assistance_token_data["name"]
 
-    response = await run_conversation(
+    agent_message = await run_conversation(
         task_prompt=data.task_prompt,
         agent_name=data.agent_name,
         client_email=client_email,
@@ -66,13 +69,23 @@ async def run_chat(data: StudentChatData):
     # TODO: Consider having the AI by default check for previous
     # conversations and include a summary of previous conversations
     # within the prompt.
-    return {"response": response}
+    return ChatResponse(
+        {"agent_message": agent_message, "assistance_token": assistance_token}
+    )
 
 
-def _verify_tokens_and_get_user_details(
+def _verify_and_get_assistance_token_with_data(
     google_id_token: str | None, assistance_token: str | None
 ):
-    pass
+    if assistance_token:
+        try:
+            return _get_assistance_token_data_with_refresh(assistance_token)
+        except ExpiredSignatureError:
+            pass
+        except JWTError as e:
+            raise CredentialsException from e
+
+    return _create_assistance_token_from_google_id(google_id_token)
 
 
 class AssistanceTokenData(BaseModel):
@@ -81,23 +94,27 @@ class AssistanceTokenData(BaseModel):
     exp: datetime | None = None
 
 
-def _refresh_assistance_token_if_needed(assistance_token: str):
+def _get_assistance_token_data_with_refresh(assistance_token: str):
     payload: AssistanceTokenData = jwt.decode(
         assistance_token, JWT_SECRET_KEY, algorithms=[ALGORITHM]
     )
 
     time_left: timedelta = payload["exp"] - datetime.utcnow()
     if time_left > ASSISTANCE_TOKEN_REFRESH:
-        return assistance_token
+        return assistance_token, payload
 
-    return _create_assistance_token(payload)
+    return _create_assistance_token(payload), payload
 
 
 def _create_assistance_token_from_google_id(google_id_token: str):
     # TODO: Make this run with asyncio instead
-    id_info = id_token.verify_oauth2_token(
-        google_id_token, requests.Request(), GOOGLE_OAUTH_CLIENT_ID
-    )
+    try:
+        id_info = id_token.verify_oauth2_token(
+            google_id_token, requests.Request(), GOOGLE_OAUTH_CLIENT_ID
+        )
+    except [exceptions.GoogleAuthError, ValueError] as e:
+        raise CredentialsException from e
+
     client_email = id_info["email"]
     client_name = id_info["given_name"]
 
@@ -106,9 +123,11 @@ def _create_assistance_token_from_google_id(google_id_token: str):
         "name": client_name,
     }
 
-    assistance_token = _create_assistance_token(data=assistance_token_data)
+    assistance_token, assistance_token_data = _create_assistance_token(
+        data=assistance_token_data
+    )
 
-    return assistance_token
+    return assistance_token, assistance_token_data
 
 
 def _create_assistance_token(data: AssistanceTokenData):
@@ -117,4 +136,4 @@ def _create_assistance_token(data: AssistanceTokenData):
 
     encoded_jwt = jwt.encode(to_encode, JWT_SECRET_KEY, algorithm=ALGORITHM)
 
-    return encoded_jwt
+    return encoded_jwt, to_encode
