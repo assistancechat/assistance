@@ -26,13 +26,11 @@ const courseResources = {
 
 //currently video is hidden, remove hidden to play video
 export default function Hero() {
-  const windowWidth = useRef(Document.innerWidth);
-  console.log(windowWidth);
 
   return (
     <div className="w-screen h-screen">
       <img 
-        className="absolute opacity-30 -z-10 w-screen h-screen lg:opacity-10"
+        className="absolute opacity-30 -z-10 w-screen h-screen dark:hidden"
         src={courseResources.ImageBackground.portait}
         alt="background"
       />

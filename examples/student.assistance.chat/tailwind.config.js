@@ -12,8 +12,6 @@ module.exports = {
   ],
   theme: {
     extend: {
-      animation: {
-          },
       plugins: [require('@tailwindcss/forms')]
     }
   }
