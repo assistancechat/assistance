@@ -56,17 +56,6 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
     return user
 
 
-def get_user_access_token(username, password):
-    user = _authenticate_user(username, password)
-
-    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-    access_token = _create_access_token(
-        data={"sub": f"username:{user.username}"}, expires_delta=access_token_expires
-    )
-
-    return access_token
-
-
 def create_temp_account():
     username = secrets.token_urlsafe()
     path = USERS / username
@@ -118,14 +107,3 @@ def _authenticate_user(username: str, password: str):
         raise CredentialsException
 
     return user
-
-
-def _create_access_token(data: dict, expires_delta: timedelta):
-    to_encode = data.copy()
-
-    expire = datetime.utcnow() + expires_delta
-    to_encode.update({"exp": expire})
-
-    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
-
-    return encoded_jwt
