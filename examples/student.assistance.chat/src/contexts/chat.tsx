@@ -14,7 +14,7 @@
 
 import { createContext } from "react";
 
-type MessageOriginator = "user" | "agent";
+type MessageOriginator = "client" | "agent";
 
 export type MessageHistoryItem = {
   originator: MessageOriginator;
@@ -24,8 +24,8 @@ export type MessageHistoryItem = {
 
 type MessageHistory = MessageHistoryItem[];
 
-type OriginatorNames = Record<MessageOriginator, string>;
-type OriginatorProfilePictureUrls = Record<MessageOriginator, string>;
+type OriginatorNames = Record<MessageOriginator, string | null>;
+type OriginatorProfilePictureUrls = Record<MessageOriginator, string | null>;
 
 export type ChatContextData = {
   messageHistory: MessageHistory;
@@ -34,13 +34,21 @@ export type ChatContextData = {
 };
 
 export const DefaultChatData = {
-  messageHistory: [],
+  messageHistory: [
+    {
+      originator: "agent" as MessageOriginator,
+      message:
+        "Hi, my name is {agentName}. Before we begin, may you please sign " +
+        "in with one of the following two options:",
+      timestamp: Date.now(),
+    },
+  ],
   originatorNames: {
-    user: "user",
-    agent: "George Paul Thompson",
+    client: null,
+    agent: "Michael",
   },
   originatorProfilePictureUrls: {
-    user: "https://www.w3schools.com/howto/img_avatar2.png",
+    client: null,
     agent: "https://www.w3schools.com/howto/img_avatar.png",
   },
 };

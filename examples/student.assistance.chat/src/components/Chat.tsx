@@ -71,7 +71,7 @@ function ChatHistory() {
           <div
             key={index}
             className={`flex ${
-              originator === "user" ? "justify-end" : "justify-start"
+              originator === "client" ? "justify-end" : "justify-start"
             } mb-4`}
           >
             <div className="flex flex-col items-end">
@@ -84,12 +84,20 @@ function ChatHistory() {
               <div className="flex flex-col items-end">
                 <div
                   className={`py-2 px-4 rounded-xl rounded-br-none ${
-                    originator === "user"
+                    originator === "client"
                       ? "bg-orange-300 text-white"
                       : "bg-gray-800 text-white"
                   } max-w-xs`}
                 >
-                  {message}
+                  {message
+                    .replaceAll(
+                      "{agentName}",
+                      chatData.originatorNames["agent"]
+                    )
+                    .replaceAll(
+                      "{clientName}",
+                      chatData.originatorNames["client"]
+                    )}
                 </div>
                 <img
                   className="w-6 h-6 rounded-full -mt-3"
