@@ -131,7 +131,7 @@ export default function Navbar() {
                             <div className="border-b-2 border-gray-100">
                               <button>
                                 <XMarkIcon
-                                  className="h-6 w-6 text-gray-500 rounded border border-gray-500 hover:bg-white focus:outline-none focus:ring-2 focus:ring-white focus:text-orange-2focus:ring-offset-2"
+                                  className="h-6 w-6 text-gray-500 rounded border border-gray-500 hover:bg-white focus:outline-none focus:ring-2 focus:ring-white focus:text-orange-200 sfocus:ring-offset-2"
                                   aria-hidden="true"
                                   onClick={closeModal}
                                 />

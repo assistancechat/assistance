@@ -1,8 +1,6 @@
 import React from "react";
-import { useState, useRef } from "react";
 import { ArrowDownCircleIcon } from "@heroicons/react/24/solid";
 import { ChatBubbleOvalLeftEllipsisIcon } from "@heroicons/react/24/outline";
-import Document from "@/pages/_document";
 
 const courseResources = {
   ImageBackground: {
@@ -42,7 +40,7 @@ export default function Hero() {
       <div className="grid grid-rows-6 w-screen h-screen">
         <button
           type="button"
-          className="row-span-2 left-10 top-40 md:top-30 h-12 w-3/4 relative inline-flex items-center rounded-md border border-transparent px-4 py-2 shadow-sm hover:bg-white focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 lg:w-1/4"
+          className="row-span-2 left-10 top-40 bg-orange-400 md:top-30 h-12 w-3/4 relative inline-flex items-center rounded-md border border-transparent px-4 py-2 shadow-sm hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 lg:w-1/4"
         >
           <a
             href={courseResources.LearnButton.link}
@@ -50,8 +48,8 @@ export default function Hero() {
             target="_blank"
             className="inline-flex h-max w-max space-x-2"
           >
-            <ArrowDownCircleIcon className="h-10 w-10 self-center text-orange-600" />
-            <h3 className="text-md self-center text-left text-black leading-none uppercase ">
+            <ArrowDownCircleIcon className="h-10 w-10 self-center text-white" />
+            <h3 className="text-base font-medium text-white shadow-sm uppercase place-self-center ">
               {courseResources.LearnButton.text}
             </h3>
           </a>
@@ -68,14 +66,14 @@ export default function Hero() {
 
           <button
             type="button"
-            className="animate-pulse flex relative sm:left-10 place-self-center place-content-evenly items-center rounded-md border border-transparent shadow-sm hover:bg-white focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 lg:justify-self-center lg:h-1/2"
+            className="row-span-2 left-10 top-40 bg-orange-400 md:top-30 h-12 w-3/4 relative inline-flex items-center rounded-md border border-transparent px-4 py-2 shadow-sm hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 lg:w-1/4"
           >
             <a
               href={courseResources.ChatButton.link}
               className="inline-flex max-h-max max-w-max space-x-2"
             >
-              <ChatBubbleOvalLeftEllipsisIcon className="-ml-1 self-center text-orange-600 h-12 w-12" />
-              <h3 className="self-center max-w-max text-left leading-none text-black text-sm uppercase">
+              <ChatBubbleOvalLeftEllipsisIcon className="h-10 w-10 self-center text-white" />
+              <h3 className="text-base font-medium leading-tight text-left text-white shadow-sm uppercase place-self-center ">
                 {courseResources.ChatButton.text}
               </h3>
             </a>
