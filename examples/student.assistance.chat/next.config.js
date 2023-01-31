@@ -2,8 +2,8 @@
 const nextConfig = {
   reactStrictMode: true,
   images: {
-    loader: 'akamai',
-    path: 'https://noop/',
+    // TODO: Find out how to undergo image optimisation
+    unoptimized: true,
   },
 }
 

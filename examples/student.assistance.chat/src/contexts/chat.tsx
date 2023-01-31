@@ -13,6 +13,8 @@
 // limitations under the License.
 
 import { createContext } from "react";
+import agentProfilePicture from "@/images/agent-profile-picture.png";
+import { StaticImageData } from "next/image";
 
 export type MessageOriginator = "client" | "agent";
 
@@ -25,12 +27,15 @@ export type MessageHistoryItem = {
 type MessageHistory = MessageHistoryItem[];
 
 type OriginatorNames = Record<MessageOriginator, string | null>;
-type OriginatorProfilePictureUrls = Record<MessageOriginator, string | null>;
+type OriginatorProfilePictures = Record<
+  MessageOriginator,
+  StaticImageData | null
+>;
 
 export type ChatContextData = {
   messageHistory: MessageHistory;
   originatorNames: OriginatorNames;
-  originatorProfilePictureUrls: OriginatorProfilePictureUrls;
+  originatorProfilePictures: OriginatorProfilePictures;
 };
 
 export const DefaultChatData = {
@@ -38,8 +43,7 @@ export const DefaultChatData = {
     {
       originator: "agent" as MessageOriginator,
       message:
-        "Hi, my name is {agentName}. Before we begin, may you please sign " +
-        "in",
+        "Hi, my name is {agentName}. Before we begin, may you please sign in",
       timestamp: Date.now(),
     },
   ],
@@ -47,9 +51,9 @@ export const DefaultChatData = {
     client: null,
     agent: "Michael",
   },
-  originatorProfilePictureUrls: {
+  originatorProfilePictures: {
     client: null,
-    agent: "https://www.w3schools.com/howto/img_avatar.png",
+    agent: agentProfilePicture,
   },
 };
 
