@@ -21,6 +21,8 @@ import {
 } from "react";
 import { PaperAirplaneIcon } from "@heroicons/react/24/outline";
 
+import { GoogleLogin } from "@react-oauth/google";
+
 import {
   ChatContext,
   MessageHistoryItem,
@@ -107,6 +109,21 @@ function ChatHistory() {
   );
 }
 
+function Login() {
+  return (
+    <div className="max-w-xs m-auto pb-6">
+      <GoogleLogin
+        onSuccess={(credentialResponse) => {
+          console.log(credentialResponse);
+        }}
+        onError={() => {
+          console.log("Login Failed");
+        }}
+      />
+    </div>
+  );
+}
+
 function ChatInput() {
   const { chatData, setChatData } = useContext(ChatContext);
   const [message, setMessage] = useState("");
@@ -171,6 +188,7 @@ function Chat() {
   return (
     <div className="flex flex-col flex-1 h-full">
       <ChatHistory />
+      <Login />
       <ChatInput />
     </div>
   );

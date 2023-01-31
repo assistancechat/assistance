@@ -5,6 +5,8 @@ import sha224 from "crypto-js/sha224";
 import Head from "next/head";
 import { Inter } from "@next/font/google";
 
+import { GoogleOAuthProvider } from "@react-oauth/google";
+
 import Navbar from "@/components/NavBar";
 import Hero from "@/components/Hero";
 import MoreInfo from "@/components/MoreInfo";
@@ -88,19 +90,22 @@ export default function Home() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <ApiAccessContext.Provider value={apiAccessToken}>
-        <ChatContext.Provider value={value}>
-          <Navbar />
-          <Hero />
-          <MoreInfo />
-          <Suspense fallback={<div>Loading...</div>}>
-            <Reviews />
-          </Suspense>
-          <StudentExperience />
-          <Blog />
-          <Footer />
-        </ChatContext.Provider>
-      </ApiAccessContext.Provider>
+      <GoogleOAuthProvider clientId="332533892028-gmefpu618mrv51k25lhpjtfn09mep8kq.apps.googleusercontent.com">
+        <ApiAccessContext.Provider value={apiAccessToken}>
+          <ChatContext.Provider value={value}>
+            <Navbar />
+            <Hero />
+            <MoreInfo />
+            <Suspense fallback={<div>Loading...</div>}>
+              <Reviews />
+            </Suspense>
+            <StudentExperience />
+            <Blog />
+            <Footer />
+          </ChatContext.Provider>
+        </ApiAccessContext.Provider>
+      </GoogleOAuthProvider>
+      ;
     </>
   );
 }
