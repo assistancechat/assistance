@@ -13,6 +13,7 @@
 # limitations under the License.
 
 from datetime import datetime, timedelta
+from typing import NamedTuple, TypedDict
 
 from google.auth import exceptions
 from google.auth.transport import requests
@@ -88,10 +89,15 @@ def _verify_and_get_assistance_token_with_data(
     return _create_assistance_token_from_google_id(google_id_token)
 
 
-class AssistanceTokenData(BaseModel):
+class AssistanceTokenData(TypedDict):
     email: str
     name: str
-    exp: datetime | None = None
+    exp: datetime
+
+
+class AssistanceTokenAndData(NamedTuple):
+    assistance_token: str
+    assistance_token_data: AssistanceTokenData
 
 
 def _get_assistance_token_data_with_refresh(assistance_token: str):
@@ -101,15 +107,20 @@ def _get_assistance_token_data_with_refresh(assistance_token: str):
 
     time_left: timedelta = payload["exp"] - datetime.utcnow()
     if time_left > ASSISTANCE_TOKEN_REFRESH:
-        return assistance_token, payload
+        return AssistanceTokenAndData(assistance_token, payload)
 
-    return _create_assistance_token(payload), payload
+    return _create_assistance_token(payload)
+
+
+class GoogleIdTokenData(TypedDict):
+    email: str
+    given_name: str
 
 
 def _create_assistance_token_from_google_id(google_id_token: str):
     # TODO: Make this run with asyncio instead
     try:
-        id_info = id_token.verify_oauth2_token(
+        id_info: GoogleIdTokenData = id_token.verify_oauth2_token(
             google_id_token, requests.Request(), GOOGLE_OAUTH_CLIENT_ID
         )
     except [exceptions.GoogleAuthError, ValueError] as e:
@@ -118,22 +129,22 @@ def _create_assistance_token_from_google_id(google_id_token: str):
     client_email = id_info["email"]
     client_name = id_info["given_name"]
 
-    assistance_token_data: AssistanceTokenData = {
+    initial_assistance_token_data = {
         "email": client_email,
         "name": client_name,
     }
 
-    assistance_token, assistance_token_data = _create_assistance_token(
-        data=assistance_token_data
+    return _create_assistance_token(initial_data=initial_assistance_token_data)
+
+
+def _create_assistance_token(initial_data: dict):
+    assistance_token_data: AssistanceTokenData = {
+        **initial_data,
+        "exp": datetime.utcnow() + ASSISTANCE_TOKEN_EXPIRES,
+    }
+
+    assistance_token = jwt.encode(
+        assistance_token_data, JWT_SECRET_KEY, algorithm=ALGORITHM
     )
 
-    return assistance_token, assistance_token_data
-
-
-def _create_assistance_token(data: AssistanceTokenData):
-    expire = datetime.utcnow() + ASSISTANCE_TOKEN_EXPIRES
-    to_encode = {**data, "exp": expire}
-
-    encoded_jwt = jwt.encode(to_encode, JWT_SECRET_KEY, algorithm=ALGORITHM)
-
-    return encoded_jwt, to_encode
+    return AssistanceTokenAndData(assistance_token, assistance_token_data)
