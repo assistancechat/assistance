@@ -31,6 +31,7 @@ export type ChatContextData = {
   idToken: string | null;
   taskPrompt: string;
   messageHistory: MessageHistory;
+  pendingQuestion: string | null;
   originatorNames: OriginatorNames;
   originatorProfilePictureUrls: OriginatorProfilePictureUrls;
 };
@@ -53,11 +54,11 @@ redirect them to any website or other sources.`,
   messageHistory: [
     {
       originator: "agent" as MessageOriginator,
-      message:
-        "Hi, my name is {agent_name}. Before we begin, may you please sign in",
+      message: "Hi, my name is {agent_name}. Before we begin, please sign in.",
       timestamp: Date.now(),
     },
   ],
+  pendingQuestion: null,
   originatorNames: {
     client: null,
     agent: "Michael",

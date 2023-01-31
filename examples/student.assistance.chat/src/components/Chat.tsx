@@ -141,15 +141,35 @@ function Login() {
 
     chatData.idToken = token;
 
-    const newMessageHistoryItem: MessageHistoryItem = {
-      originator: "agent",
-      message: "Hi {client_name}",
-      timestamp: Date.now(),
-    };
+    let newMessageHistoryItems: MessageHistoryItem[];
+    if (chatData.pendingQuestion === null) {
+      newMessageHistoryItems = [
+        {
+          originator: "agent",
+          message: `Hi {client_name}, it's great to meet you! Thank you for signing in. How can I help you today?`,
+          timestamp: Date.now(),
+        },
+      ];
+    } else {
+      newMessageHistoryItems = [
+        {
+          originator: "agent",
+          message: `Hi {client_name}, it's great to meet you! Thank you for signing in.`,
+          timestamp: Date.now(),
+        },
+        {
+          originator: "client",
+          message: chatData.pendingQuestion,
+          timestamp: Date.now(),
+        },
+      ];
+
+      chatData.pendingQuestion = null;
+    }
 
     const updatedMessageHistory = [
       ...chatData.messageHistory,
-      newMessageHistoryItem,
+      ...newMessageHistoryItems,
     ];
 
     setChatData({ ...chatData, messageHistory: updatedMessageHistory });
