@@ -17,10 +17,9 @@ import logging
 import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from starlette.middleware.sessions import SessionMiddleware
 
 from assistance import _ctx
-from assistance._keys import get_starlette_session_key, set_openai_api_key
+from assistance._keys import set_openai_api_key
 
 from .routers import chat
 
@@ -33,8 +32,6 @@ logging.basicConfig(
 
 app = FastAPI()
 
-
-app.add_middleware(SessionMiddleware, secret_key=get_starlette_session_key())
 
 origins = [
     "https://assistance.chat",
