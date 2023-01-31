@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import asyncio
 from datetime import datetime, timedelta
 from typing import NamedTuple, TypedDict
 
@@ -52,7 +53,7 @@ async def run_chat(data: ChatData) -> ChatResponse:
     (
         assistance_token,
         assistance_token_data,
-    ) = _verify_and_get_assistance_token_with_data(
+    ) = await _verify_and_get_assistance_token_with_data(
         google_id_token=data.google_id_token, assistance_token=data.assistance_token
     )
 
@@ -75,7 +76,7 @@ async def run_chat(data: ChatData) -> ChatResponse:
     )
 
 
-def _verify_and_get_assistance_token_with_data(
+async def _verify_and_get_assistance_token_with_data(
     google_id_token: str | None, assistance_token: str | None
 ):
     if assistance_token:
@@ -86,7 +87,7 @@ def _verify_and_get_assistance_token_with_data(
         except JWTError as e:
             raise CredentialsException from e
 
-    return _create_assistance_token_from_google_id(google_id_token)
+    return await _create_assistance_token_from_google_id(google_id_token)
 
 
 class AssistanceTokenData(TypedDict):
@@ -117,12 +118,17 @@ class GoogleIdTokenData(TypedDict):
     given_name: str
 
 
-def _create_assistance_token_from_google_id(google_id_token: str):
-    # TODO: Make this run with asyncio instead
-    try:
-        id_info: GoogleIdTokenData = id_token.verify_oauth2_token(
+async def _create_assistance_token_from_google_id(google_id_token: str):
+    loop = asyncio.get_event_loop()
+
+    def _sync_task() -> GoogleIdTokenData:
+        return id_token.verify_oauth2_token(
             google_id_token, requests.Request(), GOOGLE_OAUTH_CLIENT_ID
         )
+
+    try:
+        id_info = await loop.run_in_executor(None, _sync_task)
+
     except [exceptions.GoogleAuthError, ValueError] as e:
         raise CredentialsException from e
 
