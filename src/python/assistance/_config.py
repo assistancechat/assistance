@@ -11,3 +11,19 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+
+from assistance._paths import CONFIG
+
+
+def get_google_oauth_client_id():
+    return _load_config_item("google-oauth-client-id")
+
+
+def _load_config_item(name: str):
+    path = CONFIG / name
+
+    with open(path, encoding="utf8") as f:
+        item = f.read().strip()
+
+    return item
