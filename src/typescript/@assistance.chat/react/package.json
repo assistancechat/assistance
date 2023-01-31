@@ -1,0 +1,29 @@
+{
+  "name": "@assistance.chat/react",
+  "version": "0.1.0",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/assistancechat/assistance.chat.git"
+  },
+  "license": "Apache-2.0",
+  "author": "Simon Biggs <simon@assistance.chat> (https://github.com/SimonBiggs)",
+  "engines": {
+    "node": ">=12.0"
+  },
+  "keywords": [],
+  "bugs": {
+    "url": "https://github.com/assistancechat/assistance.chat/issues"
+  },
+  "homepage": "https://github.com/assistancechat/assistance.chat",
+  "dependencies": {
+    "assistance": "^0.4.0"
+  },
+  "devDependencies": {
+    "typescript": "^4.9.4"
+  },
+  "description": ""
+}

@@ -78,6 +78,9 @@ export type ChatContextType = {
   setChatData: (chatData: ChatContextData) => void;
 };
 
+// TODO: A provider like this would be helpful within a @assistance.chat/react
+// package. Once we spin up a second website it would be worth moving all of
+// the common code out into a library.
 export const ChatContext = createContext<ChatContextType>({
   chatData: DefaultChatData,
   setChatData: (chatData: ChatContextData) => {},
