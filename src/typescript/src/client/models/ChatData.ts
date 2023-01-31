@@ -2,8 +2,10 @@
 /* tslint:disable */
 /* eslint-disable */
 
-export type StudentChatData = {
+export type ChatData = {
     agent_name: string;
-    client_name: string;
+    task_prompt: string;
     transcript?: string;
+    google_id_token?: string;
+    assistance_token?: string;
 };
