@@ -1,5 +1,7 @@
 import Image from "next/image";
-import { ChatBubbleOvalLeftEllipsisIcon } from "@heroicons/react/24/outline";
+
+import StartChatWithQuestionButton from "@/components/atoms/StartChatWithQuestionButton";
+
 import ReviewsMediaObject from "./ReviewsMediaObject";
 import CounsellingPhoto1 from "../images/counselling-photo-1.png";
 import CounsellingProfile1 from "../images/counselling-profile-1.png";
@@ -33,10 +35,10 @@ const data = [
   },
 ];
 
-const reviewsData = {
+const DATA = {
   ChatButton: {
     href: "#chat",
-    text: "WHAT COURSES ARE ON OFFER?",
+    text: "What courses are on offer?",
   },
 };
 
@@ -54,20 +56,13 @@ export default function Reviews(props) {
             className="w-1/2 h-1/2"
           />
         </div>
-        <button
-          type="button"
-          className="animate-pulse flex relative items-center rounded-md border border-transparent px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-orange-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
-        >
-          <a
-            href={reviewsData.ChatButton.href}
-            className="inline-flex h-max w-max space-x-2"
-          >
-            <ChatBubbleOvalLeftEllipsisIcon className="-ml-1 self-center text-orange-600 h-10 w-10" />
-            <h3 className="text-sm text-left text-black self-center leading-none capitalize">
-              {reviewsData.ChatButton.text}
-            </h3>
-          </a>
-        </button>
+
+        <StartChatWithQuestionButton
+          question={DATA.ChatButton.text}
+          buttonClassName="inline-flex h-max w-max space-x-2 animate-pulse flex relative items-center rounded-md border border-transparent px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-orange-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+          bubbleClassName="-ml-1 self-center text-orange-600 h-10 w-10"
+          textClassName="text-sm text-left text-black self-center leading-none uppercase"
+        />
       </div>
       <div className="flex flex-wrap self-center space-y-8 mt-6 lg:w-7/12 lg:justify-evenly lg:place-items-stretch">
         {data.map((item) => (

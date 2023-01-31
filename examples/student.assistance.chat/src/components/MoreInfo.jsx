@@ -1,10 +1,8 @@
-import {
-  AcademicCapIcon,
-  ArrowDownCircleIcon,
-} from "@heroicons/react/24/solid";
-import { ChatBubbleOvalLeftEllipsisIcon } from "@heroicons/react/24/outline";
+import { AcademicCapIcon } from "@heroicons/react/24/solid";
 
-const moreInfoData = {
+import StartChatWithQuestionButton from "@/components/atoms/StartChatWithQuestionButton";
+
+const DATA = {
   blurb1: "It's time to align your faith with your future.",
   blurb2:
     "The courses at Alphacrucis are designed to provide you with an unique Christian experience. ",
@@ -35,43 +33,33 @@ export default function MoreInfo() {
         id="MoreInfo"
         className="relative w-screen bg-gray-200 pt-20 lg:h-screen lg:justify-center "
       >
-        <div className='flex flex-wrap place-items-evenly h-full lg:items-center lg:justify-items-end'>
-          <div className='grid grid-rows-6 w-full h-1/2 lg:w-1/2 lg:h-full lg:place-self-start space-y-4 '>
-            <div className='w-8/12 row-span-3 space-y-4 place-self-center lg:w-8/12 lg:space-y-8'>
-              <h3 className='text-xl tracking-wide lg:text-2xl lg:tracking-wider'>
-                {moreInfoData.blurb1}
+        <div className="flex flex-wrap place-items-evenly h-full lg:items-center lg:justify-items-end">
+          <div className="grid grid-rows-6 w-full h-1/2 lg:w-1/2 lg:h-full lg:place-self-start space-y-4 ">
+            <div className="w-8/12 row-span-3 space-y-4 place-self-center lg:w-8/12 lg:space-y-8">
+              <h3 className="text-xl tracking-wide lg:text-2xl lg:tracking-wider">
+                {DATA.blurb1}
               </h3>
-              <h3 className='text-xl tracking-wide lg:text-2xl lg:tracking-wider'>
-                {moreInfoData.blurb2}
+              <h3 className="text-xl tracking-wide lg:text-2xl lg:tracking-wider">
+                {DATA.blurb2}
               </h3>
-              <h3 className='text-xl tracking-wide lg:text-2xl lg:tracking-wider'>
-                {moreInfoData.blurb3}
+              <h3 className="text-xl tracking-wide lg:text-2xl lg:tracking-wider">
+                {DATA.blurb3}
               </h3>
             </div>
-            <button
-              type='button'
-              className='animate-pulse relative h-4/6 w-4/6 place-self-center place-content-evenly self-end items-center rounded-md border border-transparent shadow-sm hover:bg-white focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 lg:justify-self-center lg:h-1/2'
-            >
-              <a
-                href={moreInfoData.ChatButton1.link}
-                rel="noreferrer"
-                target="_blank"
-                className="inline-flex h-max w-max space-x-2"
-              >
-                <ChatBubbleOvalLeftEllipsisIcon className="w-10 h-10 self-center text-orange-600" />
-                <h3 className="self-center leading-none text-black text-sm uppercase">
-                  {moreInfoData.ChatButton1.text}
-                </h3>
-              </a>
-            </button>
+            <StartChatWithQuestionButton
+              question={DATA.ChatButton1.text}
+              buttonClassName="inline-flex h-max w-max space-x-2 animate-pulse relative h-4/6 w-4/6 place-self-center place-content-evenly self-end items-center rounded-md border border-transparent shadow-sm hover:bg-white focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 lg:justify-self-center lg:h-1/2"
+              bubbleClassName="w-10 h-10 self-center text-orange-600"
+              textClassName="self-center leading-none text-black text-sm uppercase"
+            />
           </div>
-          <div className='grid grid-rows-6 mb-20 -mt-30 w-full lg:w-1/2 lg:h-full lg:mt-0 lg:mb-0'>
+          <div className="grid grid-rows-6 mb-20 -mt-30 w-full lg:w-1/2 lg:h-full lg:mt-0 lg:mb-0">
             <iframe
               className="w-full row-span-4 h-full p-6"
-              src={moreInfoData.video.link}
-              title={moreInfoData.video.title}
-              frameBorder='0'
-              allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share'
+              src={DATA.video.link}
+              title={DATA.video.title}
+              frameBorder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
               allowFullScreen
             ></iframe>
 
@@ -80,37 +68,27 @@ export default function MoreInfo() {
                 <h2 className="row-span-1 text-3xl w-4/5 p-2 ml-5 self-center border-orange-600">
                   More Information
                 </h2>
-                <div className='animate-pulse row-span-1 place-content-around flex justify-self-center space-x-1'>
-                  <button
-                    type="button"
-                    className="relative inline-flex items-center rounded-md border border-transparent w-5/12 px-4 shadow-sm hover:bg-white focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
-                  >
-                    <a
-                      href={moreInfoData.ChatButton2.link}
-                      rel="noreferrer"
-                      target="_blank"
-                      className="inline-flex space-x-2"
-                    >
-                      <ChatBubbleOvalLeftEllipsisIcon className="h-10 self-center text-orange-600" />
-                      <h3 className="self-center text-left leading-none text-black text-sm uppercase">
-                        {moreInfoData.ChatButton2.text}
-                      </h3>
-                    </a>
-                  </button>
+                <div className="animate-pulse row-span-1 place-content-around flex justify-self-center space-x-1">
+                  <StartChatWithQuestionButton
+                    question={DATA.ChatButton2.text}
+                    buttonClassName="space-x-2 relative inline-flex items-center rounded-md border border-transparent w-5/12 px-4 shadow-sm hover:bg-white focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+                    bubbleClassName="h-10 self-center text-orange-600"
+                    textClassName="self-center text-left leading-none text-black text-sm uppercase"
+                  />
                   <button
                     type="button"
                     className="relative inline-flex items-center rounded-md border border-transparent w-5/12 px-4 shadow-sm hover:bg-white focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
                   >
                     {" "}
                     <a
-                      href={moreInfoData.LearnButton.link}
+                      href={DATA.LearnButton.link}
                       rel="noreferrer"
                       target="_blank"
                       className="inline-flex space-x-2"
                     >
                       <AcademicCapIcon className="w-10 h-10 self-center text-orange-600" />
                       <h3 className="self-center text-left leading-none text-black text-sm uppercase">
-                        {moreInfoData.LearnButton.text}
+                        {DATA.LearnButton.text}
                       </h3>
                     </a>
                   </button>

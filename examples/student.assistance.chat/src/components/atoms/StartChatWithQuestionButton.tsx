@@ -17,7 +17,12 @@ import { ChatBubbleOvalLeftEllipsisIcon } from "@heroicons/react/24/outline";
 
 import { ChatContext } from "@/contexts/chat";
 
-function StartChatWithQuestionButton(props: { question: string }) {
+function StartChatWithQuestionButton(props: {
+  question: string;
+  buttonClassName: string;
+  bubbleClassName: string;
+  textClassName: string;
+}) {
   const { chatData, setChatData } = useContext(ChatContext);
 
   const startChatWithQuestion = () => {
@@ -26,14 +31,12 @@ function StartChatWithQuestionButton(props: { question: string }) {
 
   return (
     <button
+      className={props.buttonClassName}
       type="button"
       onClick={startChatWithQuestion}
-      className="row-span-1 animate-pulse relative inset-10 inline-flex h-12 w-5/6 inline-flex items-center rounded-md border border-transparent px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-white focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 lg:w-1/3 lg:justify-self-end lf:mt-10"
     >
-      <ChatBubbleOvalLeftEllipsisIcon className="-ml-1 self-center text-orange-600 h-12 w-12" />
-      <h3 className="text-md text-black text-left self-center leading-none uppercase">
-        {props.question}
-      </h3>
+      <ChatBubbleOvalLeftEllipsisIcon className={props.bubbleClassName} />
+      <h3 className={props.textClassName}>{props.question}</h3>
     </button>
   );
 }
