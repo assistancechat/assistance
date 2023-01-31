@@ -1,6 +1,4 @@
-import { useEffect, useState, lazy, Suspense } from "react";
-
-import sha224 from "crypto-js/sha224";
+import { useState, lazy, Suspense } from "react";
 
 import Head from "next/head";
 import { Inter } from "@next/font/google";
@@ -8,6 +6,7 @@ import { Inter } from "@next/font/google";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 
 import Navbar from "@/components/NavBar";
+import ChatModal from "@/components/ChatModal";
 import Hero from "@/components/Hero";
 import MoreInfo from "@/components/MoreInfo";
 import StudentExperience from "@/components/StudentExperience";
@@ -36,6 +35,7 @@ export default function Home() {
       <GoogleOAuthProvider clientId="332533892028-gmefpu618mrv51k25lhpjtfn09mep8kq.apps.googleusercontent.com">
         <ChatContext.Provider value={value}>
           <Navbar />
+          <ChatModal />
           <Hero />
           <MoreInfo />
           <Suspense fallback={<div>Loading...</div>}>

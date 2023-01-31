@@ -1,23 +1,19 @@
-import { Fragment, useState } from "react";
-import { Disclosure, Dialog, Transition } from "@headlessui/react";
+import { useContext } from "react";
+import { Disclosure } from "@headlessui/react";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 import { ChatBubbleOvalLeftEllipsisIcon } from "@heroicons/react/24/solid";
 import { AcademicCapIcon } from "@heroicons/react/24/solid";
 
-import Chat from "@/components/Chat";
+import { ChatContext } from "@/contexts/chat";
 
 import Logo2 from "@/images/Logo.gif";
 import Image from "next/image";
 
 export default function Navbar() {
-  const [isOpen, setIsOpen] = useState(false);
-
-  function closeModal() {
-    setIsOpen(false);
-  }
+  const { chatData, setChatData } = useContext(ChatContext);
 
   function openModal() {
-    setIsOpen(true);
+    setChatData({ ...chatData, open: true });
   }
 
   return (
@@ -84,52 +80,6 @@ export default function Navbar() {
                   />
                   <span className="text-gray-600 text-md">Chat</span>
                 </button>
-                <Transition appear show={isOpen} as={Fragment}>
-                  <Dialog
-                    as="div"
-                    className="fixed inset-0 z-10 overflow-y-auto"
-                    onClose={closeModal}
-                  >
-                    <Transition.Child
-                      as={Fragment}
-                      enter="ease-out duration-300"
-                      enterFrom="opacity-0"
-                      enterTo="opacity-100"
-                      leave="ease-in duration-200"
-                      leaveFrom="opacity-100"
-                      leaveTo="opacity-0"
-                    >
-                      <div className="fixed inset-0 bg-black bg-opacity-25" />
-                    </Transition.Child>
-                    <div className="fixed inset-0 overflow-y-auto">
-                      <div className="flex min-h-full items-center justify-center p-4 text-center">
-                        <Transition.Child
-                          as={Fragment}
-                          enter="ease-out duration-300"
-                          enterFrom="opacity-0 scale-95"
-                          enterTo="opacity-100 scale-100"
-                          leave="ease-in duration-200"
-                          leaveFrom="opacity-100 scale-100"
-                          leaveTo="opacity-0 scale-95"
-                        >
-                          <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
-                            <div className="mt-4">
-                              <button>
-                                <XMarkIcon
-                                  className="-ml-1 mr-2 h-5 w-5 text-orange-600"
-                                  aria-hidden="true"
-                                  onClick={closeModal}
-                                />
-                              </button>
-                            </div>
-                            <Chat />
-                          </Dialog.Panel>
-                        </Transition.Child>
-                      </div>
-                    </div>{" "}
-                  </Dialog>
-                </Transition>
-
                 <button
                   type="button"
                   className="text-gray-600 text-md inline-flex items-center px-4 py-2 rounded-md shadow-sm hover:bg-orange-300 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2"

@@ -27,7 +27,10 @@ type MessageHistory = MessageHistoryItem[];
 type OriginatorNames = Record<MessageOriginator, string | null>;
 type OriginatorProfilePictureUrls = Record<MessageOriginator, string | null>;
 
+// TODO: Having all of this data within the one context is potentially
+// inefficient. Fix this if it becomes an issue.
 export type ChatContextData = {
+  open: boolean;
   idToken: string | null;
   taskPrompt: string;
   messageHistory: MessageHistory;
@@ -37,6 +40,7 @@ export type ChatContextData = {
 };
 
 export const DefaultChatData = {
+  open: false,
   idToken: null,
   taskPrompt: `You are from Assistance.Chat. You are an expert in all things \
 about Alphacrucis (AC) Christian University. You are providing \
