@@ -14,7 +14,7 @@
 
 import { createContext } from "react";
 
-type MessageOriginator = "client" | "agent";
+export type MessageOriginator = "client" | "agent";
 
 export type MessageHistoryItem = {
   originator: MessageOriginator;

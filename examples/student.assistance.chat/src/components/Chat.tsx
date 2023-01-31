@@ -19,7 +19,6 @@ import {
   ChangeEvent,
   FormEvent,
 } from "react";
-import { Transition } from "@headlessui/react";
 import { PaperAirplaneIcon } from "@heroicons/react/24/outline";
 
 import {
@@ -28,7 +27,7 @@ import {
   ChatContextData,
 } from "@/contexts/chat";
 
-import ellipsis from "@/images/ellipsis.svg";
+import ProfilePicture from "@/components/atoms/ProfilePicture";
 
 const epochToTimestamp = (epoch: number) => {
   const date = new Date(epoch);
@@ -45,7 +44,7 @@ const epochToTimestamp = (epoch: number) => {
 
 // Use this in-place of "is-typing" for ellipsis as well as input disabling and
 // submit button disabling.
-const mostRecentChatIsUser = (chatData: ChatContextData) => {
+const mostRecentChatIsClient = (chatData: ChatContextData) => {
   const messageHistory = chatData.messageHistory;
 
   if (messageHistory.length === 0) {
@@ -53,7 +52,7 @@ const mostRecentChatIsUser = (chatData: ChatContextData) => {
   }
 
   const mostRecentChatItem = messageHistory[messageHistory.length - 1];
-  return mostRecentChatItem.originator === "user";
+  return mostRecentChatItem.originator === "client";
 };
 
 function ChatHistory() {
@@ -64,8 +63,6 @@ function ChatHistory() {
       ({ message, originator, timestamp }, index) => {
         const timestampAsString = epochToTimestamp(timestamp);
         const name = chatData.originatorNames[originator];
-        const profilePictureUrl =
-          chatData.originatorProfilePictureUrls[originator];
 
         return (
           <div
@@ -93,17 +90,17 @@ function ChatHistory() {
                     .replaceAll(
                       "{agentName}",
                       chatData.originatorNames["agent"]
+                        ? chatData.originatorNames["agent"]
+                        : "agent"
                     )
                     .replaceAll(
                       "{clientName}",
                       chatData.originatorNames["client"]
+                        ? chatData.originatorNames["client"]
+                        : "client"
                     )}
                 </div>
-                <img
-                  className="w-6 h-6 rounded-full -mt-3"
-                  src={profilePictureUrl}
-                  alt={name}
-                />
+                <ProfilePicture originator={originator} />
               </div>
             </div>
           </div>
@@ -125,7 +122,7 @@ function ChatInput() {
 
   const addNewMessage = (message: string) => {
     const newMessageHistoryItem: MessageHistoryItem = {
-      originator: "user",
+      originator: "client",
       message: message,
       timestamp: Date.now(),
     };
