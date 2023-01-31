@@ -35,6 +35,8 @@ async def run_chat(data: StudentChatData):
     # TODO: Make this run with asyncio instead
     # TODO: Separate out the login into its own API request and create
     # our own JWT that doesn't need to talk to Google servers every time
+    # TODO: When logging in, able to provide an initial summary of
+    # previous conversations back with the API as a greeting message.
     id_info = id_token.verify_oauth2_token(data.token, requests.Request(), CLIENT_ID)
     client_email = id_info["email"]
     client_name = id_info["given_name"]

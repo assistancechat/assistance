@@ -13,8 +13,6 @@
 // limitations under the License.
 
 import { createContext } from "react";
-import agentProfilePicture from "@/images/agent-profile-picture.png";
-import { StaticImageData } from "next/image";
 
 export type MessageOriginator = "client" | "agent";
 
@@ -27,19 +25,18 @@ export type MessageHistoryItem = {
 type MessageHistory = MessageHistoryItem[];
 
 type OriginatorNames = Record<MessageOriginator, string | null>;
-type OriginatorProfilePictures = Record<
-  MessageOriginator,
-  StaticImageData | null
->;
+type OriginatorProfilePictureUrls = Record<MessageOriginator, string | null>;
 
 export type ChatContextData = {
+  idToken: string | null;
   taskPrompt: string;
   messageHistory: MessageHistory;
   originatorNames: OriginatorNames;
-  originatorProfilePictures: OriginatorProfilePictures;
+  originatorProfilePictureUrls: OriginatorProfilePictureUrls;
 };
 
 export const DefaultChatData = {
+  idToken: null,
   taskPrompt: `You are from Assistance.Chat. You are an expert in all things \
 about Alphacrucis (AC) Christian University. You are providing \
 student support to {client_name}.
@@ -65,9 +62,9 @@ redirect them to any website or other sources.`,
     client: null,
     agent: "Michael",
   },
-  originatorProfilePictures: {
+  originatorProfilePictureUrls: {
     client: null,
-    agent: agentProfilePicture,
+    agent: "https://www.w3schools.com/howto/img_avatar.png",
   },
 };
 

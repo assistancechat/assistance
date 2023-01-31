@@ -40,26 +40,6 @@ MODEL_KWARGS = {
     "presence_penalty": 0.1,
 }
 
-# TODO: Pull this into the API and allow the task to be defined within
-# the frontend.
-TASK_PROMPT = textwrap.dedent(
-    """
-        You are from Assistance.Chat. You are an expert in all things
-        about Alphacrucis (AC) Christian University. You are providing
-        student support to {client_name}.
-
-        If relevant, it is your goal to sell an AC course to
-        {client_name}.
-
-        You are always polite and helpful. Even when talked to
-        inappropriately by {client_name}.
-
-        Assume that {client_name} is not able to access information
-        from anywhere else except by talking to you. As such, do not
-        redirect them to any website or other sources.
-    """
-).strip()
-
 
 class Tool(str, Enum):
     SEARCH = "Alphacrucis Search and Summarise"

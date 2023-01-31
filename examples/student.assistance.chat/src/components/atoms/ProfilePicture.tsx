@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import { useContext } from "react";
-import Image from "next/image";
 
 import { ChatContext, MessageOriginator } from "@/contexts/chat";
 
@@ -21,9 +20,9 @@ function ProfilePicture(props: { originator: MessageOriginator }) {
   const originator = props.originator;
 
   const { chatData } = useContext(ChatContext);
-  const profilePicture = chatData.originatorProfilePictures[originator];
+  const profilePictureUrl = chatData.originatorProfilePictureUrls[originator];
 
-  if (profilePicture === null) {
+  if (profilePictureUrl === null) {
     return <></>;
   }
 
@@ -31,18 +30,18 @@ function ProfilePicture(props: { originator: MessageOriginator }) {
 
   if (name === null) {
     return (
-      <Image
+      <img
         className="w-6 h-6 rounded-full -mt-3"
-        src={profilePicture}
+        src={profilePictureUrl}
         alt="Profile Picture"
       />
     );
   }
 
   return (
-    <Image
+    <img
       className="w-6 h-6 rounded-full -mt-3"
-      src={profilePicture}
+      src={profilePictureUrl}
       alt={name}
     />
   );

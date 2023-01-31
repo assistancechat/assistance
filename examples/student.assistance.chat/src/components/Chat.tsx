@@ -18,10 +18,12 @@ import {
   MouseEvent,
   ChangeEvent,
   FormEvent,
+  useEffect,
 } from "react";
 import { PaperAirplaneIcon } from "@heroicons/react/24/outline";
 
-import { GoogleLogin } from "@react-oauth/google";
+import jwt_decode from "jwt-decode";
+import { GoogleLogin, CredentialResponse } from "@react-oauth/google";
 
 import {
   ChatContext,
@@ -109,19 +111,68 @@ function ChatHistory() {
   );
 }
 
+type GoogleTokenIdData = {
+  picture: string;
+  given_name: string;
+};
+
 function Login() {
-  return (
-    <div className="max-w-xs m-auto pb-6">
-      <GoogleLogin
-        onSuccess={(credentialResponse) => {
-          console.log(credentialResponse);
-        }}
-        onError={() => {
-          console.log("Login Failed");
-        }}
-      />
-    </div>
-  );
+  const { chatData, setChatData } = useContext(ChatContext);
+  const [loginVisible, setLoginVisible] = useState(true);
+
+  const handleCredentialResponse = (credentialResponse: CredentialResponse) => {
+    const token = credentialResponse.credential;
+
+    console.log(token);
+
+    if (token == undefined) {
+      return;
+    }
+
+    const decoded = jwt_decode(token) as GoogleTokenIdData;
+
+    console.log(decoded);
+
+    const profilePictureUrl = decoded["picture"];
+    const clientName = decoded["given_name"];
+
+    chatData.originatorNames["client"] = clientName;
+    chatData.originatorProfilePictureUrls["client"] = profilePictureUrl;
+
+    chatData.idToken = token;
+
+    const newMessageHistoryItem: MessageHistoryItem = {
+      originator: "agent",
+      message: "Hi {client_name}",
+      timestamp: Date.now(),
+    };
+
+    const updatedMessageHistory = [
+      ...chatData.messageHistory,
+      newMessageHistoryItem,
+    ];
+
+    setChatData({ ...chatData, messageHistory: updatedMessageHistory });
+  };
+
+  useEffect(() => {
+    setLoginVisible(chatData.idToken == null);
+  }, [chatData]);
+
+  if (loginVisible) {
+    return (
+      <div className="max-w-xs m-auto pb-6">
+        <GoogleLogin
+          onSuccess={handleCredentialResponse}
+          onError={() => {
+            console.log("Login Failed");
+          }}
+        />
+      </div>
+    );
+  }
+
+  return <></>;
 }
 
 function ChatInput() {
