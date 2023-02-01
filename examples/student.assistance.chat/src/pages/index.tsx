@@ -47,41 +47,43 @@ export default function Home() {
   const [chatData, setChatData] = useState<ChatContextData>(DefaultChatData);
   const value = { chatData, setChatData };
 
-  const appendPendingQuestionIfReady = () => {
-    if (chatData.googleIdToken == null) {
-      return;
-    }
+  useEffect(() => {
+    const appendPendingQuestionIfReady = async () => {
+      if (chatData.googleIdToken == null) {
+        return;
+      }
 
-    if (mostRecentChatIsClient(chatData)) {
-      return;
-    }
+      if (mostRecentChatIsClient(chatData)) {
+        return;
+      }
 
-    if (!chatData.pendingQuestion) {
-      return;
-    }
+      if (!chatData.pendingQuestion) {
+        return;
+      }
 
-    const messageHistoryToAppend: MessageHistoryItem = {
-      originator: "client",
-      message: chatData.pendingQuestion,
-      timestamp: Date.now(),
+      const messageHistoryToAppend: MessageHistoryItem = {
+        originator: "client",
+        message: chatData.pendingQuestion,
+        timestamp: Date.now(),
+      };
+
+      const updatedMessageHistory = [
+        ...chatData.messageHistory,
+        messageHistoryToAppend,
+      ];
+
+      const updatedChatData = {
+        ...chatData,
+        messageHistory: updatedMessageHistory,
+        pendingQuestion: null,
+      };
+
+      setChatData(updatedChatData);
+      await callChatApi(updatedChatData, setChatData);
     };
 
-    const updatedMessageHistory = [
-      ...chatData.messageHistory,
-      messageHistoryToAppend,
-    ];
-
-    const updatedChatData = {
-      ...chatData,
-      messageHistory: updatedMessageHistory,
-      pendingQuestion: null,
-    };
-
-    setChatData(updatedChatData);
-    callChatApi(updatedChatData, setChatData);
-  };
-
-  useEffect(appendPendingQuestionIfReady, [chatData]);
+    appendPendingQuestionIfReady();
+  }, [chatData]);
 
   return (
     <>

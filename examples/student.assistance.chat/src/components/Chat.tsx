@@ -171,7 +171,7 @@ function Login() {
     setChatData(updatedChatData);
 
     if (mostRecentChatIsClient(updatedChatData)) {
-      callChatApi(updatedChatData, setChatData);
+      await callChatApi(updatedChatData, setChatData);
     }
   };
 
