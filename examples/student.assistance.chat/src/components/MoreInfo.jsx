@@ -64,7 +64,7 @@ export default function MoreInfo() {
 
         <div className="relative lg:col-span-7 xl:inset-0">
           <iframe
-            className="w-full h-screen p-4 bg-gray-50 object-cover lg:p-6"
+            className="w-full h-screen p-4 bg-gray-50 object-cover aspect-video lg:p-6"
             src={DATA.video.link}
             title={DATA.video.title}
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
