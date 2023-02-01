@@ -31,13 +31,6 @@ const data = [
   },
 ];
 
-const DATA = {
-  ChatButton: {
-    href: "#chat",
-    text: "What courses are on offer?",
-  },
-};
-
 const reviews = {
   featured: [
     {
@@ -176,13 +169,6 @@ export default function Reviews2() {
             </div>
           </div>
         </div>
-
-        <StartChatWithQuestionButton
-          question={DATA.ChatButton.text}
-          buttonClassName="inline-flex h-max w-max space-x-2 animate-pulse flex relative items-center rounded-md border border-transparent px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-orange-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
-          bubbleClassName="-ml-1 self-center text-orange-600 h-10 w-10"
-          textClassName="text-sm text-left text-black self-center leading-none uppercase"
-        />
       </div>
     </div>
   );

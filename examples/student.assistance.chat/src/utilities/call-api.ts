@@ -21,7 +21,6 @@ export async function callChatApi(
   setChatData: (chatData: ChatContextData) => void
 ) {
   const agentName = chatData.originatorNames.agent || "{agent_name}";
-  const taskPrompt = chatData.taskPrompt;
 
   let transcript = "";
   for (let item of chatData.messageHistory) {
