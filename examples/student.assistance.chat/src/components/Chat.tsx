@@ -160,11 +160,11 @@ function ChatInput() {
           />
           <button
             type="submit"
-            className="bg-gray-800 rounded-r-md  focus:ring-offset-2 focus:ring-1 focus:ring-white"
+            className="bg-gray-800 rounded-r-md focus:ring-offset-2 hover:bg-orange-400 focus:ring-white"
             onClick={handleMessageSubmit}
             // disabled={message === "" || mostRecentChatIsUser(chatData)}
           >
-            <PaperAirplaneIcon className="w-12 h-10 pt-2 pb-2 animate-pulse text-white focus:animate-bounce  hover:text-orange-400" />
+            <PaperAirplaneIcon className="w-12 h-10 pt-2 pb-2 animate-pulse text-white hover:text-gray-800" />
           </button>
         </div>
       </form>

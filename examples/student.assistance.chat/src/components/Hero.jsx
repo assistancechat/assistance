@@ -11,7 +11,7 @@ const courseResources = {
   courseTitle: "COURSE RESOURCES",
   headLine: "Discover God's Purpose for you in Counselling",
   subHeading:
-    "Talk with our customer exerience officer to find the right course for you",
+    "Talk with our customer exerience officer now to find the right course for you",
   LearnButton: {
     text: "Study Christian Counselling",
     link: "https://www.ac.edu.au/healthbrochure",
@@ -63,10 +63,9 @@ export default function Hero() {
               {courseResources.subHeading}
             </h3>
           </div>
-
           <button
             type="button"
-            className="row-span-2 left-10 top-40 bg-orange-400 md:top-30 h-12 w-3/4 relative inline-flex items-center rounded-md border border-transparent px-4 py-2 shadow-sm hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 lg:w-1/4"
+            className="row-span-2 left-10 top-20 bg-orange-400 h-12 w-3/4 relative inline-flex items-center rounded-md border border-transparent px-4 py-2 shadow-sm md:top-30 hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 md:w-1/2 2xl:w-1/4"
           >
             <a
               href={courseResources.ChatButton.link}
