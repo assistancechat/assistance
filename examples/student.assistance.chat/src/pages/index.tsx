@@ -23,9 +23,6 @@ import Navbar from "@/components/NavBar";
 import ChatModal from "@/components/ChatModal";
 import Hero from "@/components/Hero";
 import MoreInfo from "@/components/MoreInfo";
-import StudentExperience from "@/components/StudentExperience";
-import Blog from "@/components/Blog";
-import Footer from "@/components/Footer";
 
 import {
   ChatContext,
@@ -36,11 +33,15 @@ import {
 
 import { mostRecentChatIsClient } from "@/utilities/flow";
 import { callChatApi } from "@/utilities/call-api";
+import { NoFallbackError } from "next/dist/server/base-server";
 
 const inter = Inter({ subsets: ["latin"] });
 
 //create a lazy loaded component for the reviews
 const Reviews = lazy(() => import("@/components/Reviews"));
+const StudentExperience = lazy(() => import("@/components/StudentExperience"));
+const Blog = lazy(() => import("@/components/Blog"));
+const Footer = lazy(() => import("@/components/Footer"));
 
 export default function Home() {
   // Details on implementation https://stackoverflow.com/a/51573816/3912576
@@ -99,11 +100,17 @@ export default function Home() {
           <Hero />
           <MoreInfo />
           <Suspense fallback={<div>Loading...</div>}>
-            <Reviews />
+          <Reviews />
+          </Suspense>
+          <Suspense fallback={<div>Loading...</div>}>
           <StudentExperience />
+          </Suspense>
+          <Suspense fallback={<div>Loading...</div>}>
           <Blog />
           </Suspense>
+          <Suspense fallback={<div>Loading...</div>}>
           <Footer />
+          </Suspense>
         </ChatContext.Provider>
       </GoogleOAuthProvider>
       ;

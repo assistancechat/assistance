@@ -51,14 +51,14 @@ export default function Hero() {
             className="inline-flex h-max w-max space-x-2"
           >
             <ArrowDownCircleIcon className="h-10 w-10 self-center text-white" />
-            <h3 className="text-base font-medium text-white shadow-sm uppercase place-self-center ">
+            <h3 className="text-base font-medium text-white leading-none uppercase place-self-center ">
               {DATA.LearnButton.text}
             </h3>
           </a>
         </button>
         <div className="space-y-6">
           <div className="row-span-4 relative left-5 sm:left-10 w-4/5 space-y-4 ">
-            <h1 className="pt-4 text-5xl tracking-normalleading-none border-orange-400 border-t-4 border-orange-500">
+            <h1 className="pt-4 text-5xl tracking-normalleading-none border-orange-400 border-t-4 ">
               {DATA.headLine}{" "}
             </h1>
             <h3 className="text-xl w-4/5 tracking-wide leading-tight font-light text-gray-800">
@@ -68,9 +68,9 @@ export default function Hero() {
 
           <StartChatWithQuestionButton
             question={DATA.ChatButton.text}
-            buttonClassName="row-span-1 animate-pulse relative inset-10 inline-flex h-12 w-5/6 items-center rounded-md border border-transparent px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-white focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 lg:w-1/3 lg:justify-self-end lf:mt-10"
-            bubbleClassName="-ml-1 self-center text-orange-600 h-12 w-12"
-            textClassName="text-md text-black text-left self-center leading-none uppercase"
+            buttonClassName="row-span-1 relative bg-orange-400 inset-10 inline-flex w-5/6 rounded-md py-1 px-4 shadow-sm hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 lg:w-1/3 lg:justify-self-end lf:mt-10 space-x-4"
+            bubbleClassName="-ml-1 animate-pulse self-center text-white h-12 w-12"
+            textClassName="text-base font-medium text-white uppercase leading-none text-left place-self-center"
           />
         </div>
 

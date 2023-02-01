@@ -56,7 +56,7 @@ function ChatModal() {
               leaveFrom="opacity-100 scale-100"
               leaveTo="opacity-0 scale-95"
             >
-              <Dialog.Panel className="w-full max-w-md transform bg-gray-300 overflow-hidden mb-2 rounded-2xl bg-white p-2 text-left align-middle shadow-xl transition-all">
+              <Dialog.Panel className="w-full max-w-md transform bg-gray-300 overflow-hidden mb-2 rounded-2x p-2 text-left align-middle shadow-xl transition-all">
                 <div className="border-b-2 border-gray-100">
                   <button>
                     <XMarkIcon

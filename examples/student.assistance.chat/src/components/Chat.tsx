@@ -44,6 +44,18 @@ const epochToTimestamp = (epoch: number) => {
 function ChatHistory() {
   const { chatData } = useContext(ChatContext);
 
+  // Scroll to bottom of chat history when new messages are added
+  let messagesEndRef: HTMLDivElement | null = null;
+  const scrollToBottom = () => {
+    if (messagesEndRef == null) {
+      return;
+    }
+
+    messagesEndRef.scrollIntoView({ behavior: "smooth" });
+  };
+
+  useEffect(scrollToBottom, [chatData.messageHistory]);
+
   const renderChatHistory = () => {
     return chatData.messageHistory.map(
       ({ message, originator, timestamp }, index) => {
@@ -95,9 +107,18 @@ function ChatHistory() {
     );
   };
 
+  useEffect(() => {
+    scrollToBottom();
+  }, [chatData.messageHistory]);
+
   return (
     <div className="flex-1 max-h-96 overflow-scroll">
       <div className="flex flex-col h-full">{renderChatHistory()}</div>
+      <div
+        ref={(el) => {
+          messagesEndRef = el;
+        }}
+      />
     </div>
   );
 }
@@ -240,7 +261,7 @@ function ChatInput() {
   return (
     <div className="flex items-center justify-between p-1 border-gray-200">
       <form className="flex w-full" onSubmit={preventFormSubmission}>
-        <div className="flex w-full items-center">
+        <div className="flex w-full bg-gray-800 items-center rounded-lg">
           <input
             type="text"
             className="w-full px-4 py-2 border border-gray-200 rounded-l-md focus:outline-none focus:border-orange-600"
@@ -251,11 +272,11 @@ function ChatInput() {
           />
           <button
             type="submit"
-            className="bg-gray-800 rounded-r-md focus:ring-offset-2 hover:bg-orange-400 focus:ring-white"
+            className="bg-gray-800 w-12 justify-center h-full flex rounded-r-lg focus:ring-offset-2 hover:bg-orange-400 focus:ring-white"
             onClick={handleMessageSubmit}
             disabled={message === "" || mostRecentChatIsClient(chatData)}
           >
-            <PaperAirplaneIcon className="w-12 h-10 pt-2 pb-2 animate-pulse text-white hover:text-gray-800" />
+            <PaperAirplaneIcon className="h-6 w-6 self-center text-white" />
           </button>
         </div>
       </form>
