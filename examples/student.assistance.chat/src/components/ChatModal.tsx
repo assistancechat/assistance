@@ -56,11 +56,11 @@ function ChatModal() {
               leaveFrom="opacity-100 scale-100"
               leaveTo="opacity-0 scale-95"
             >
-              <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
-                <div className="mt-4">
+              <Dialog.Panel className="w-full max-w-md transform bg-gray-300 overflow-hidden mb-2 rounded-2xl bg-white p-2 text-left align-middle shadow-xl transition-all">
+                <div className="border-b-2 border-gray-100">
                   <button>
                     <XMarkIcon
-                      className="-ml-1 mr-2 h-5 w-5 text-orange-600"
+                      className="h-6 w-6 text-gray-500 rounded border border-gray-500 hover:bg-white focus:outline-none focus:ring-2 focus:ring-white focus:text-orange-200 sfocus:ring-offset-2"
                       aria-hidden="true"
                       onClick={closeModal}
                     />
