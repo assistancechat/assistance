@@ -1,8 +1,6 @@
 import React from "react";
 import { ArrowDownCircleIcon } from "@heroicons/react/24/solid";
 
-import { ArrowDownCircleIcon } from "@heroicons/react/24/solid";
-
 import StartChatWithQuestionButton from "@/components/atoms/StartChatWithQuestionButton";
 
 const DATA = {

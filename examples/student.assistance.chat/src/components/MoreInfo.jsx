@@ -2,7 +2,7 @@ import { ArrowDownCircleIcon } from "@heroicons/react/24/solid";
 
 import StartChatWithQuestionButton from "@/components/atoms/StartChatWithQuestionButton";
 
-const moreInfoData = {
+const DATA = {
   blurb1: "It's time to align your faith with your future",
   blurb2:
     "The courses at Alphacrucis are designed to provide you with an unique Christian experience. ",
@@ -33,7 +33,7 @@ export default function MoreInfo() {
         <div className="px-6 pt-10 pb-24 sm:pb-32 lg:col-span-5 lg:px-0 lg:pb-56 ">
           <div className="mx-auto space-y-12 max-w-2xl lg:mx-0">
             <h1 className="pt-4 mt-10 text-5xl capitalize tracking-normal leading-none border-orange-400 border-t-4 border-orange-500">
-              {moreInfoData.blurb1}
+              {DATA.blurb1}
             </h1>
             <h3 className="text-xl w-4/5 tracking-wide leading-tight font-light text-gray-800">
               The courses at Alphacrucis are designed to provide you with an
@@ -49,14 +49,14 @@ export default function MoreInfo() {
             <div className="h-11">
               <button
                 type="button"
-                href={moreInfoData.LearnButton.link}
+                href={DATA.LearnButton.link}
                 className="inline-flex items-center rounded-md border uppercase border-transparent bg-orange-400 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
               >
                 <ArrowDownCircleIcon
                   className="-ml-1 mr-3 h-8 w-8"
                   aria-hidden="true"
                 />
-                {moreInfoData.LearnButton.text}{" "}
+                {DATA.LearnButton.text}{" "}
               </button>
             </div>
           </div>
@@ -65,8 +65,8 @@ export default function MoreInfo() {
         <div className="relative lg:col-span-7 xl:inset-0">
           <iframe
             className="w-full h-screen p-4 bg-gray-50 object-cover lg:p-6"
-            src={moreInfoData.video.link}
-            title={moreInfoData.video.title}
+            src={DATA.video.link}
+            title={DATA.video.title}
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
             allowFullScreen
           />
