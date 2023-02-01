@@ -172,17 +172,21 @@ function Login() {
       chatData.pendingQuestion = null;
     }
 
-    const messageHistoryUpdatedAfterLogin = [
+    const updatedMessageHistory = [
       ...chatData.messageHistory,
       ...messageHistoryToAppend,
     ];
 
-    const chatDataUpdatedAfterLogin = {
+    const updatedChatData = {
       ...chatData,
-      messageHistory: messageHistoryUpdatedAfterLogin,
+      messageHistory: updatedMessageHistory,
     };
 
-    setChatData(chatDataUpdatedAfterLogin);
+    setChatData(updatedChatData);
+
+    if (mostRecentChatIsClient(updatedChatData)) {
+      callChatApi(updatedChatData, setChatData);
+    }
   };
 
   useEffect(() => {
@@ -221,7 +225,13 @@ function ChatInput() {
       newMessageHistoryItem,
     ];
 
-    setChatData({ ...chatData, messageHistory: updatedMessageHistory });
+    const updatedChatData = {
+      ...chatData,
+      messageHistory: updatedMessageHistory,
+    };
+
+    setChatData(updatedChatData);
+    callChatApi(updatedChatData, setChatData);
   };
 
   const handleMessageInput = (event: ChangeEvent<HTMLInputElement>) => {
@@ -249,13 +259,13 @@ function ChatInput() {
             placeholder="Type a message..."
             value={message}
             onChange={handleMessageInput}
-            // disabled={mostRecentChatIsUser(chatData)}
+            disabled={mostRecentChatIsClient(chatData)}
           />
           <button
             type="submit"
             className="ml-4"
             onClick={handleMessageSubmit}
-            // disabled={message === "" || mostRecentChatIsUser(chatData)}
+            disabled={message === "" || mostRecentChatIsClient(chatData)}
           >
             <PaperAirplaneIcon className="w-6 h-6 text-blue-500" />
           </button>
