@@ -42,9 +42,9 @@ export default function MoreInfo() {
             </h3>
             <StartChatWithQuestionButton
               question={DATA.ChatButton1.text}
-              buttonClassName="inline-flex h-max w-max space-x-2 animate-pulse relative h-4/6 w-4/6 place-self-center place-content-evenly self-end items-center rounded-md border border-transparent shadow-sm hover:bg-white focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 lg:justify-self-center lg:h-1/2"
-              bubbleClassName="w-10 h-10 self-center text-orange-600"
-              textClassName="self-center leading-none text-black text-sm uppercase"
+              buttonClassName="inline-flex items-center rounded-md border uppercase border-transparent bg-orange-400 px-4 py-2 text-white shadow-sm hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+              bubbleClassName="-ml-1 mr-3 h-8 w-8"
+              textClassName="self-center leading-none text-white text-md uppercase"
             />
             <div className="h-11">
               <button
