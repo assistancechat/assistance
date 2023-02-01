@@ -10,7 +10,7 @@
 }
 @media (prefers-color-scheme: dark) {
     body {
-        background-color: black;
-        color: white;
+        background-color: white;
+        color: black;
     }
 }
