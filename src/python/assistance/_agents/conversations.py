@@ -160,13 +160,20 @@ async def run_conversation(
     tools_string = "\n".join(tools)
     tool_names = ", ".join(TOOL_DESCRIPTIONS.keys())
 
+    task_prompt_with_replacements = task_prompt.format(
+        agent_name=agent_name, client_name=client_name
+    )
+    transcript_with_replacements = transcript.format(
+        agent_name=agent_name, client_name=client_name
+    )
+
     prompt = PROMPT.format(
-        task_prompt=task_prompt,
+        task_prompt=task_prompt_with_replacements,
         agent_name=agent_name,
         client_name=client_name,
         tools_string=tools_string,
         tool_names=tool_names,
-        transcript=transcript,
+        transcript=transcript_with_replacements,
     )
 
     logging.info(prompt)
