@@ -29,7 +29,10 @@ import {
   MessageHistoryItem,
   MessageHistory,
   ChatContextData,
+  MessageOriginator,
 } from "@/providers/chat";
+
+import { callChatApi } from "@/utilities/call-api";
 
 import ProfilePicture from "@/components/atoms/ProfilePicture";
 
@@ -120,7 +123,9 @@ function Login() {
   const { chatData, setChatData } = useContext(ChatContext);
   const [loginVisible, setLoginVisible] = useState(true);
 
-  const handleCredentialResponse = (credentialResponse: CredentialResponse) => {
+  const handleCredentialResponse = async (
+    credentialResponse: CredentialResponse
+  ) => {
     const token = credentialResponse.credential;
 
     console.log(token);
@@ -139,7 +144,7 @@ function Login() {
     chatData.originatorNames["client"] = clientName;
     chatData.originatorProfilePictureUrls["client"] = profilePictureUrl;
 
-    chatData.idToken = token;
+    chatData.googleIdToken = token;
 
     let messageHistoryToAppend: MessageHistory;
     if (chatData.pendingQuestion === null) {
@@ -167,16 +172,42 @@ function Login() {
       chatData.pendingQuestion = null;
     }
 
-    const updatedMessageHistory = [
+    const messageHistoryUpdatedAfterLogin = [
       ...chatData.messageHistory,
       ...messageHistoryToAppend,
     ];
 
-    setChatData({ ...chatData, messageHistory: updatedMessageHistory });
+    const chatDataUpdatedAfterLogin = {
+      ...chatData,
+      messageHistory: messageHistoryUpdatedAfterLogin,
+    };
+
+    setChatData(chatDataUpdatedAfterLogin);
+    const chatResponse = await callChatApi(chatDataUpdatedAfterLogin);
+
+    chatResponse.agent_message;
+    chatResponse.assistance_token;
+
+    const messageHistoryUpdatedAfterResponse = [
+      ...chatDataUpdatedAfterLogin.messageHistory,
+      {
+        originator: "agent" as MessageOriginator,
+        message: chatResponse.agent_message,
+        timestamp: Date.now(),
+      },
+    ];
+
+    const chatDataUpdatedAfterResponse = {
+      ...chatDataUpdatedAfterLogin,
+      messageHistory: messageHistoryUpdatedAfterResponse,
+      assistanceToken: chatResponse.assistance_token,
+    };
+
+    setChatData(chatDataUpdatedAfterResponse);
   };
 
   useEffect(() => {
-    setLoginVisible(chatData.idToken == null);
+    setLoginVisible(chatData.googleIdToken == null);
   }, [chatData]);
 
   if (loginVisible) {
