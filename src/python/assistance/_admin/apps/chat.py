@@ -43,13 +43,13 @@ async def main():
             conversation=st.session_state.conversation,
         )
 
-        data = chat.StudentChatData(
+        data = chat.ChatData(
             agent_name=AGENT_NAME,
             client_name=client_name,
             transcript=transcript,
         )
 
-        api_result = await chat.student_chat(data=data, current_user=MOCK_USER)
+        api_result = await chat.run_chat(data=data, current_user=MOCK_USER)
         response = api_result["response"]
 
         st.session_state.conversation.append(response)

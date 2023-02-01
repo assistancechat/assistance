@@ -18,43 +18,27 @@ import {
   MouseEvent,
   ChangeEvent,
   FormEvent,
-  useRef,
+  useEffect,
 } from "react";
-import { Transition } from "@headlessui/react";
+
 import { PaperAirplaneIcon } from "@heroicons/react/24/solid";
+
+import jwt_decode from "jwt-decode";
+import { GoogleLogin, CredentialResponse } from "@react-oauth/google";
 
 import {
   ChatContext,
   MessageHistoryItem,
-  ChatContextData,
-} from "@/contexts/chat";
+  MessageHistory,
+} from "@/providers/chat";
 
-import ellipsis from "@/images/ellipsis.svg";
+import { callChatApi } from "@/utilities/call-api";
+import { mostRecentChatIsClient } from "@/utilities/flow";
+
+import ProfilePicture from "@/components/atoms/ProfilePicture";
 
 const epochToTimestamp = (epoch: number) => {
-  const date = new Date(epoch);
-
-  const year = date.getFullYear();
-  const month = date.getMonth();
-  const day = date.getDate();
-  const hour = date.getHours();
-  const minute = date.getMinutes();
-  const second = date.getSeconds();
-
-  return `${year}-${month}-${day} ${hour}:${minute}:${second}`;
-};
-
-// Use this in-place of "is-typing" for ellipsis as well as input disabling and
-// submit button disabling.
-const mostRecentChatIsUser = (chatData: ChatContextData) => {
-  const messageHistory = chatData.messageHistory;
-
-  if (messageHistory.length === 0) {
-    return false;
-  }
-
-  const mostRecentChatItem = messageHistory[messageHistory.length - 1];
-  return mostRecentChatItem.originator === "user";
+  return new Date(epoch).toLocaleString();
 };
 
 function ChatHistory() {
@@ -65,14 +49,12 @@ function ChatHistory() {
       ({ message, originator, timestamp }, index) => {
         const timestampAsString = epochToTimestamp(timestamp);
         const name = chatData.originatorNames[originator];
-        const profilePictureUrl =
-          chatData.originatorProfilePictureUrls[originator];
 
         return (
           <div
             key={index}
             className={`flex ${
-              originator === "user" ? "justify-end" : "justify-start"
+              originator === "client" ? "justify-end" : "justify-start"
             } mb-4`}
           >
             <div className="flex flex-col items-end">
@@ -85,18 +67,26 @@ function ChatHistory() {
               <div className="flex flex-col items-end">
                 <div
                   className={`py-2 px-4 rounded-xl rounded-br-none ${
-                    originator === "user"
+                    originator === "client"
                       ? "bg-orange-400 text-white"
                       : "bg-gray-400 text-white"
                   } max-w-xs`}
                 >
-                  {message}
+                  {message
+                    .replaceAll(
+                      "{agent_name}",
+                      chatData.originatorNames["agent"]
+                        ? chatData.originatorNames["agent"]
+                        : "agent"
+                    )
+                    .replaceAll(
+                      "{client_name}",
+                      chatData.originatorNames["client"]
+                        ? chatData.originatorNames["client"]
+                        : "client"
+                    )}
                 </div>
-                <img
-                  className="w-6 h-6 rounded-full -mt-3"
-                  src={profilePictureUrl}
-                  alt={name}
-                />
+                <ProfilePicture originator={originator} />
               </div>
             </div>
           </div>
@@ -104,12 +94,107 @@ function ChatHistory() {
       }
     );
   };
-  
+
   return (
     <div className="flex-1 max-h-96 overflow-scroll">
       <div className="flex flex-col h-full">{renderChatHistory()}</div>
     </div>
   );
+}
+
+type GoogleTokenIdData = {
+  picture: string;
+  given_name: string;
+};
+
+function Login() {
+  const { chatData, setChatData } = useContext(ChatContext);
+  const [loginVisible, setLoginVisible] = useState(true);
+
+  const handleCredentialResponse = async (
+    credentialResponse: CredentialResponse
+  ) => {
+    const token = credentialResponse.credential;
+
+    console.log(token);
+
+    if (token == undefined) {
+      return;
+    }
+
+    const decoded = jwt_decode(token) as GoogleTokenIdData;
+
+    console.log(decoded);
+
+    const profilePictureUrl = decoded["picture"];
+    const clientName = decoded["given_name"];
+
+    chatData.originatorNames["client"] = clientName;
+    chatData.originatorProfilePictureUrls["client"] = profilePictureUrl;
+
+    chatData.googleIdToken = token;
+
+    let messageHistoryToAppend: MessageHistory;
+    if (chatData.pendingQuestion === null) {
+      messageHistoryToAppend = [
+        {
+          originator: "agent",
+          message: `Hi {client_name}, it's great to meet you! Thank you for signing in. How can I help you today?`,
+          timestamp: Date.now(),
+        },
+      ];
+    } else {
+      messageHistoryToAppend = [
+        {
+          originator: "agent",
+          message: `Hi {client_name}, it's great to meet you! Thank you for signing in.`,
+          timestamp: Date.now(),
+        },
+        {
+          originator: "client",
+          message: chatData.pendingQuestion,
+          timestamp: Date.now(),
+        },
+      ];
+
+      chatData.pendingQuestion = null;
+    }
+
+    const updatedMessageHistory = [
+      ...chatData.messageHistory,
+      ...messageHistoryToAppend,
+    ];
+
+    const updatedChatData = {
+      ...chatData,
+      messageHistory: updatedMessageHistory,
+    };
+
+    setChatData(updatedChatData);
+
+    if (mostRecentChatIsClient(updatedChatData)) {
+      await callChatApi(updatedChatData, setChatData);
+    }
+  };
+
+  useEffect(() => {
+    setLoginVisible(chatData.googleIdToken == null);
+  }, [chatData]);
+
+  if (loginVisible) {
+    return (
+      <div className="max-w-xs m-auto pb-6">
+        <GoogleLogin
+          onSuccess={handleCredentialResponse}
+          onError={() => {
+            console.log("Login Failed");
+          }}
+        />
+      </div>
+    );
+  }
+
+  return <></>;
 }
 
 function ChatInput() {
@@ -118,7 +203,7 @@ function ChatInput() {
 
   const addNewMessage = (message: string) => {
     const newMessageHistoryItem: MessageHistoryItem = {
-      originator: "user",
+      originator: "client",
       message: message,
       timestamp: Date.now(),
     };
@@ -128,7 +213,13 @@ function ChatInput() {
       newMessageHistoryItem,
     ];
 
-    setChatData({ ...chatData, messageHistory: updatedMessageHistory });
+    const updatedChatData = {
+      ...chatData,
+      messageHistory: updatedMessageHistory,
+    };
+
+    setChatData(updatedChatData);
+    callChatApi(updatedChatData, setChatData);
   };
 
   const handleMessageInput = (event: ChangeEvent<HTMLInputElement>) => {
@@ -156,13 +247,13 @@ function ChatInput() {
             placeholder="Ask us about enrolment or application ..."
             value={message}
             onChange={handleMessageInput}
-            // disabled={mostRecentChatIsUser(chatData)}
+            disabled={mostRecentChatIsClient(chatData)}
           />
           <button
             type="submit"
             className="bg-gray-800 rounded-r-md focus:ring-offset-2 hover:bg-orange-400 focus:ring-white"
             onClick={handleMessageSubmit}
-            // disabled={message === "" || mostRecentChatIsUser(chatData)}
+            disabled={message === "" || mostRecentChatIsClient(chatData)}
           >
             <PaperAirplaneIcon className="w-12 h-10 pt-2 pb-2 animate-pulse text-white hover:text-gray-800" />
           </button>
@@ -176,6 +267,7 @@ function Chat() {
   return (
     <div className="flex flex-col flex-1 h-96 bg-gray-300">
       <ChatHistory />
+      <Login />
       <ChatInput />
     </div>
   );

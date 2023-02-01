@@ -12,6 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { createContext } from "react";
-
-export const ApiAccessContext = createContext<string | null>(null);
+export function dummy() {
+  return null;
+}

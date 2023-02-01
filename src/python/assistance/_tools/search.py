@@ -28,12 +28,12 @@ API_KEY = get_google_search_api_key()
 SEARCH_RESULTS_TO_USE = 3
 
 
-async def alphacrucis_search(record_grouping: str, username: str, query: str):
+async def alphacrucis_search(record_grouping: str, client_email: str, query: str):
     query = query + " alphacrucis"
 
     return await _search_with_summary(
         record_grouping=record_grouping,
-        username=username,
+        username=client_email,
         search_engine=SearchEngine.ALPHACRUCIS,
         query=query,
         added_pages=[],

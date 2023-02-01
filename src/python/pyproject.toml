@@ -36,6 +36,10 @@ uvicorn = {extras = ["standard"], version = "*"}
 
 streamlit = ">=1.17.0"
 typer = "^0.7.0"
+authlib = "^1.2.0"
+itsdangerous = "^2.1.2"
+httpx = "^0.23.3"
+google-auth = "^2.16.0"
 
 [tool.poetry.group.dev.dependencies]
 autoflake = "*"

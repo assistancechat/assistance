@@ -5,69 +5,15 @@
     "version": "0.1.0"
   },
   "paths": {
-    "/login": {
+    "/chat": {
       "post": {
-        "summary": "Login For Access Token",
-        "operationId": "login_for_access_token_login_post",
-        "requestBody": {
-          "content": {
-            "application/x-www-form-urlencoded": {
-              "schema": {
-                "$ref": "#/components/schemas/Body_login_for_access_token_login_post"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Token"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/temp-account": {
-      "post": {
-        "summary": "Temp Account",
-        "operationId": "temp_account_temp_account_post",
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {}
-              }
-            }
-          }
-        }
-      }
-    },
-    "/chat/student": {
-      "post": {
-        "summary": "Student Chat",
-        "operationId": "student_chat_chat_student_post",
+        "summary": "Chat",
+        "operationId": "chat_chat_post",
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/StudentChatData"
+                "$ref": "#/components/schemas/ChatData"
               }
             }
           },
@@ -78,7 +24,9 @@
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/ChatResponse"
+                }
               }
             }
           },
@@ -92,49 +40,56 @@
               }
             }
           }
-        },
-        "security": [
-          {
-            "OAuth2PasswordBearer": []
-          }
-        ]
+        }
       }
     }
   },
   "components": {
     "schemas": {
-      "Body_login_for_access_token_login_post": {
-        "title": "Body_login_for_access_token_login_post",
+      "ChatData": {
+        "title": "ChatData",
         "required": [
-          "username",
-          "password"
+          "agent_name",
+          "task_prompt"
         ],
         "type": "object",
         "properties": {
-          "grant_type": {
-            "title": "Grant Type",
-            "pattern": "password",
+          "agent_name": {
+            "title": "Agent Name",
             "type": "string"
           },
-          "username": {
-            "title": "Username",
+          "task_prompt": {
+            "title": "Task Prompt",
             "type": "string"
           },
-          "password": {
-            "title": "Password",
+          "transcript": {
+            "title": "Transcript",
             "type": "string"
           },
-          "scope": {
-            "title": "Scope",
-            "type": "string",
-            "default": ""
-          },
-          "client_id": {
-            "title": "Client Id",
+          "google_id_token": {
+            "title": "Google Id Token",
             "type": "string"
           },
-          "client_secret": {
-            "title": "Client Secret",
+          "assistance_token": {
+            "title": "Assistance Token",
+            "type": "string"
+          }
+        }
+      },
+      "ChatResponse": {
+        "title": "ChatResponse",
+        "required": [
+          "agent_message",
+          "assistance_token"
+        ],
+        "type": "object",
+        "properties": {
+          "agent_message": {
+            "title": "Agent Message",
+            "type": "string"
+          },
+          "assistance_token": {
+            "title": "Assistance Token",
             "type": "string"
           }
         }
@@ -149,46 +104,6 @@
             "items": {
               "$ref": "#/components/schemas/ValidationError"
             }
-          }
-        }
-      },
-      "StudentChatData": {
-        "title": "StudentChatData",
-        "required": [
-          "agent_name",
-          "client_name"
-        ],
-        "type": "object",
-        "properties": {
-          "agent_name": {
-            "title": "Agent Name",
-            "type": "string"
-          },
-          "client_name": {
-            "title": "Client Name",
-            "type": "string"
-          },
-          "transcript": {
-            "title": "Transcript",
-            "type": "string"
-          }
-        }
-      },
-      "Token": {
-        "title": "Token",
-        "required": [
-          "access_token",
-          "token_type"
-        ],
-        "type": "object",
-        "properties": {
-          "access_token": {
-            "title": "Access Token",
-            "type": "string"
-          },
-          "token_type": {
-            "title": "Token Type",
-            "type": "string"
           }
         }
       },
@@ -222,17 +137,6 @@
           "type": {
             "title": "Error Type",
             "type": "string"
-          }
-        }
-      }
-    },
-    "securitySchemes": {
-      "OAuth2PasswordBearer": {
-        "type": "oauth2",
-        "flows": {
-          "password": {
-            "scopes": {},
-            "tokenUrl": "login"
           }
         }
       }

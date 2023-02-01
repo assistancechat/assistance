@@ -1,20 +1,41 @@
-import { useEffect, useState, lazy, Suspense  } from "react";
-import axios from "axios";
-import sha224 from "crypto-js/sha224";
+// Copyright (C) 2023 Assistance.Chat contributors
+
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+
+//     http://www.apache.org/licenses/LICENSE-2.0
+
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+import { useState, lazy, Suspense, useEffect } from "react";
 
 import Head from "next/head";
 import { Inter } from "@next/font/google";
 
+import { GoogleOAuthProvider } from "@react-oauth/google";
+
 import Navbar from "@/components/NavBar";
+import ChatModal from "@/components/ChatModal";
 import Hero from "@/components/Hero";
 import MoreInfo from "@/components/MoreInfo";
 import StudentExperience from "@/components/StudentExperience";
 import Blog from "@/components/Blog";
 import Footer from "@/components/Footer";
 
+import {
+  ChatContext,
+  ChatContextData,
+  DefaultChatData,
+  MessageHistoryItem,
+} from "@/providers/chat";
 
-import { ChatContext, ChatContextData, DefaultChatData } from "@/contexts/chat";
-import { ApiAccessContext } from "@/contexts/api-access";
+import { mostRecentChatIsClient } from "@/utilities/flow";
+import { callChatApi } from "@/utilities/call-api";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -26,79 +47,66 @@ export default function Home() {
   const [chatData, setChatData] = useState<ChatContextData>(DefaultChatData);
   const value = { chatData, setChatData };
 
-  const [apiAccessToken, setApiAccessToken] = useState<string | null>(null);
-
-  // Get an API token for a freshly created anonymous account
   useEffect(() => {
-    const fetchAndSetApiAccessToken = async () => {
-      const usernameResponse = await fetch(
-        "https://api.assistance.chat/temp-account",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json;charset=UTF-8" },
-        }
-      );
+    const appendPendingQuestionIfReady = async () => {
+      if (chatData.googleIdToken == null) {
+        return;
+      }
 
-      const usernameData = await usernameResponse.json();
+      if (mostRecentChatIsClient(chatData)) {
+        return;
+      }
 
-      // This corresponds to a temporary anonymous account. The username is a
-      // cryptographic token
-      const username: string = usernameData["username"];
+      if (!chatData.pendingQuestion) {
+        return;
+      }
 
-      // NOTE: This doesn't provide any extra security
-      const password = sha224(username).toString();
-
-      const details: Record<string, string> = {
-        username: username,
-        password: password,
-        grant_type: "password",
+      const messageHistoryToAppend: MessageHistoryItem = {
+        originator: "client",
+        message: chatData.pendingQuestion,
+        timestamp: Date.now(),
       };
 
-      const formBodyItems = [];
-      for (const property in details) {
-        const encodedKey = encodeURIComponent(property);
-        const encodedValue = encodeURIComponent(details[property]);
-        formBodyItems.push(encodedKey + "=" + encodedValue);
-      }
-      const formBody = formBodyItems.join("&");
+      const updatedMessageHistory = [
+        ...chatData.messageHistory,
+        messageHistoryToAppend,
+      ];
 
-      const tokenResponse = await fetch("https://api.assistance.chat/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8",
-        },
-        body: formBody,
-      });
+      const updatedChatData = {
+        ...chatData,
+        messageHistory: updatedMessageHistory,
+        pendingQuestion: null,
+      };
 
-      const accessTokenData = await tokenResponse.json();
-
-      setApiAccessToken(accessTokenData["access_token"]);
+      setChatData(updatedChatData);
+      await callChatApi(updatedChatData, setChatData);
     };
 
-    fetchAndSetApiAccessToken().catch((err) => console.error(err));
-  }, []);
+    appendPendingQuestionIfReady();
+  }, [chatData]);
 
   return (
-
     <>
       <Head>
         <title>Global Talent</title>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <ApiAccessContext.Provider value={apiAccessToken}>
+      <GoogleOAuthProvider clientId="332533892028-gmefpu618mrv51k25lhpjtfn09mep8kq.apps.googleusercontent.com">
         <ChatContext.Provider value={value}>
           <Navbar />
+          <ChatModal />
           <Hero />
           <MoreInfo />
           <Suspense fallback={<div>Loading...</div>}>
-          <Reviews />
+            <Reviews />
           </Suspense>
           <StudentExperience />
           <Blog />
           <Footer />
         </ChatContext.Provider>
-      </ApiAccessContext.Provider>
+      </GoogleOAuthProvider>
+      ;
     </>
   );
 }

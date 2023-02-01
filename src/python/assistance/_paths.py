@@ -1,4 +1,4 @@
-# Copyright (C) 2022 Assistance.Chat contributors
+# Copyright (C) 2023 Assistance.Chat contributors
 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,7 +17,8 @@ import pathlib
 LIB = pathlib.Path(__file__).parent
 
 STORE = pathlib.Path.home() / ".assistance"
-SECRETS = STORE / "secrets"
-USERS = STORE / "users"
+CONFIG = STORE / "config"
+SECRETS = CONFIG / "secrets"
 
+USERS = STORE / "users"
 RECORDS = STORE / "records"

@@ -1,4 +1,4 @@
-# Copyright (C) 2022 Assistance.Chat contributors
+# Copyright (C) 2023 Assistance.Chat contributors
 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,51 +18,46 @@ import openai
 from assistance._paths import SECRETS
 
 
-def load_secret(name: str):
+def set_openai_api_key():
+    openai.api_key = get_openai_api_key()
+
+
+def get_openai_api_key():
+    return _load_secret("openai-api-key")
+
+
+def get_google_search_api_key():
+    return _load_secret("google-search-api-key")
+
+
+def get_google_oauth_client_secret():
+    return _load_secret("google-oauth-client-secret")
+
+
+def get_serp_api_key():
+    return _load_secret("serp-api-key")
+
+
+def get_jwt_key():
+    return _load_secret("jwt-key")
+
+
+def get_mailgun_api_key():
+    return _load_secret("mailgun-api-key")
+
+
+def get_notion_api_key():
+    return _load_secret("notion-api-key")
+
+
+def get_starlette_session_key():
+    return _load_secret("starlette-session-key")
+
+
+def _load_secret(name: str) -> str:
     secret_path = SECRETS / name
 
     with open(secret_path, encoding="utf8") as f:
         secret = f.read().strip()
 
     return secret
-
-
-def write_secret(name: str, secret: str):
-    SECRETS.mkdir(parents=True, exist_ok=True)
-
-    secret_path = SECRETS / name
-
-    with open(secret_path, "w", encoding="utf8") as f:
-        f.write(secret)
-
-
-def write_openai_api_key(key: str):
-    write_secret("openai_api_key", key)
-
-
-def set_openai_api_key():
-    openai.api_key = get_openai_api_key()
-
-
-def get_openai_api_key():
-    return load_secret("openai_api_key")
-
-
-def get_google_search_api_key():
-    return load_secret("google_search_api_key")
-
-
-def get_serp_api_key():
-    return load_secret("serp_api_key")
-
-
-def get_jwt_key():
-    return load_secret("jwt_key")
-
-
-def get_mailgun_api_key():
-    return load_secret("mailgun_api_key")
-
-
-def get_notion_api_key():
-    return load_secret("notion_api_key")

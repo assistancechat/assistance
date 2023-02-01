@@ -13,26 +13,17 @@
 # limitations under the License.
 
 
-from fastapi import APIRouter, Depends
-from pydantic import BaseModel
-
-from assistance._api.login import User, get_current_user
-from assistance._store.file import store_file
-
-router = APIRouter(prefix="/save")
+from assistance._paths import CONFIG
 
 
-class StoreData(BaseModel):
-    record_grouping: str
-    content: str
+def get_google_oauth_client_id():
+    return _load_config_item("google-oauth-client-id")
 
 
-@router.post("/form")
-async def save_form(
-    data: StoreData,
-    current_user: User = Depends(get_current_user),
-):
-    dirnames = [data.record_grouping, current_user.username, "forms"]
-    filename = "form.txt"
+def _load_config_item(name: str):
+    path = CONFIG / name
 
-    await store_file(dirnames=dirnames, filename=filename, contents=data.content)
+    with open(path, encoding="utf8") as f:
+        item = f.read().strip()
+
+    return item

@@ -4,28 +4,31 @@
   "private": true,
   "scripts": {
     "dev": "next dev -H 127.0.0.1",
-    "build": "next build",
-    "start": "next start -H 127.0.0.1",
-    "lint": "next lint"
+    "build": "next build && next export",
+    "start": "serve out"
   },
   "dependencies": {
     "@headlessui/react": "^1.7.7",
     "@heroicons/react": "^2.0.14",
     "@next/font": "13.1.5",
+    "@react-oauth/google": "^0.6.1",
     "@tailwindcss/forms": "^0.5.3",
     "@types/node": "18.11.18",
     "@types/react": "18.0.27",
     "@types/react-dom": "18.0.10",
-    "assistance": "^0.2.0",
+    "assistance": "^0.5.1",
     "axios": "^1.2.6",
     "crypto-js": "^4.1.1",
     "emoji-picker-react": "^4.4.7",
     "eslint-config-next": "13.1.5",
+    "jwt-decode": "^3.1.2",
     "next": "13.1.5",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-player": "^2.11.0",
-    "react-youtube": "^10.1.0"
+    "react-youtube": "^10.1.0",
+    "serve": "^14.2.0",
+    "sharp": "^0.31.3"
   },
   "devDependencies": {
     "@types/crypto-js": "^4.1.1",

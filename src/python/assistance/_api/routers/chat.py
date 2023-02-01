@@ -13,17 +13,13 @@
 # limitations under the License.
 
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter
 
-from assistance._api.login import User, get_current_user
-from assistance._api.raw import chat
+from assistance._api.raw import chat as _chat
 
 router = APIRouter(prefix="/chat")
 
 
-@router.post("/student")
-async def student_chat(
-    data: chat.StudentChatData,
-    current_user: User = Depends(get_current_user),
-):
-    return await chat.student_chat(data=data, current_user=current_user)
+@router.post("", response_model=_chat.ChatResponse)
+async def chat(data: _chat.ChatData):
+    return await _chat.run_chat(data=data)

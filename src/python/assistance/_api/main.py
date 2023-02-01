@@ -21,7 +21,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from assistance import _ctx
 from assistance._keys import set_openai_api_key
 
-from .routers import chat, query, root, save, search, send, summarise
+from .routers import chat
 
 logging.basicConfig(
     level=logging.INFO,
@@ -31,6 +31,7 @@ logging.basicConfig(
 
 
 app = FastAPI()
+
 
 origins = [
     "https://assistance.chat",
@@ -47,13 +48,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(root.router)
 app.include_router(chat.router)
-# app.include_router(save.router)
-# app.include_router(search.router)
-# app.include_router(send.router)
-# app.include_router(summarise.router)
-# app.include_router(query.router)
 
 
 @app.on_event("startup")
