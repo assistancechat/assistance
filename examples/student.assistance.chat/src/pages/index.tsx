@@ -100,9 +100,9 @@ export default function Home() {
           <MoreInfo />
           <Suspense fallback={<div>Loading...</div>}>
             <Reviews />
-          </Suspense>
           <StudentExperience />
           <Blog />
+          </Suspense>
           <Footer />
         </ChatContext.Provider>
       </GoogleOAuthProvider>
