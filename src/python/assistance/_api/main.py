@@ -34,7 +34,7 @@ app = FastAPI()
 
 
 origins = [
-    "https://api.assistance.chat",
+    "https://student.assistance.chat",
     "http://localhost:3000",
     "http://127.0.0.1:3000",
 ]
