@@ -20,7 +20,9 @@ import {
   FormEvent,
   useEffect,
 } from "react";
-import { PaperAirplaneIcon } from "@heroicons/react/24/outline";
+
+import { PaperAirplaneIcon } from "@heroicons/react/24/solid";
+
 import jwt_decode from "jwt-decode";
 import { GoogleLogin, CredentialResponse } from "@react-oauth/google";
 
@@ -64,10 +66,10 @@ function ChatHistory() {
               </div>
               <div className="flex flex-col items-end">
                 <div
-                  className={`py-2 px-4 rounded-xl ${
+                  className={`py-2 px-4 rounded-xl rounded-br-none ${
                     originator === "client"
-                      ? "bg-orange-300 text-white rounded-br-none"
-                      : "bg-gray-800 text-white rounded-bl-none"
+                      ? "bg-orange-400 text-white"
+                      : "bg-gray-400 text-white"
                   } max-w-xs`}
                 >
                   {message
@@ -94,7 +96,7 @@ function ChatHistory() {
   };
 
   return (
-    <div className="flex-1 h-full overflow-y-auto">
+    <div className="flex-1 max-h-96 overflow-scroll">
       <div className="flex flex-col h-full">{renderChatHistory()}</div>
     </div>
   );
@@ -230,30 +232,30 @@ function ChatInput() {
     setMessage("");
   };
 
-  // Not sure why this is needed.
+  //trying to prevent the user from submitting form if the input is empty
   const preventFormSubmission = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
   };
 
   return (
-    <div className="flex items-center justify-between p-4 border-t border-gray-200">
+    <div className="flex items-center justify-between p-1 border-gray-200">
       <form className="flex w-full" onSubmit={preventFormSubmission}>
         <div className="flex w-full items-center">
           <input
             type="text"
-            className="w-full px-4 py-2 border border-gray-200 rounded-full focus:outline-none focus:border-blue-500"
-            placeholder="Type a message..."
+            className="w-full px-4 py-2 border border-gray-200 rounded-l-md focus:outline-none focus:border-orange-600"
+            placeholder="Ask us about enrolment or application ..."
             value={message}
             onChange={handleMessageInput}
             disabled={mostRecentChatIsClient(chatData)}
           />
           <button
             type="submit"
-            className="ml-4"
+            className="bg-gray-800 rounded-r-md focus:ring-offset-2 hover:bg-orange-400 focus:ring-white"
             onClick={handleMessageSubmit}
             disabled={message === "" || mostRecentChatIsClient(chatData)}
           >
-            <PaperAirplaneIcon className="w-6 h-6 text-blue-500" />
+            <PaperAirplaneIcon className="w-12 h-10 pt-2 pb-2 animate-pulse text-white hover:text-gray-800" />
           </button>
         </div>
       </form>
@@ -263,7 +265,7 @@ function ChatInput() {
 
 function Chat() {
   return (
-    <div className="flex flex-col flex-1 h-full">
+    <div className="flex flex-col flex-1 h-96 bg-gray-300">
       <ChatHistory />
       <Login />
       <ChatInput />

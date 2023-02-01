@@ -1,7 +1,5 @@
 import React from "react";
-import { useRef } from "react";
 import { ArrowDownCircleIcon } from "@heroicons/react/24/solid";
-import Document from "@/pages/_document";
 
 import StartChatWithQuestionButton from "@/components/atoms/StartChatWithQuestionButton";
 
@@ -16,7 +14,7 @@ const DATA = {
   courseTitle: "COURSE RESOURCES",
   headLine: "Discover God's Purpose for you in Counselling",
   subHeading:
-    "Talk with our customer experience officer to find the right course for you",
+    "Talk with our customer experience officer now to find the right course for you",
   LearnButton: {
     text: "Study Christian Counselling",
     link: "https://www.ac.edu.au/healthbrochure",
@@ -29,19 +27,22 @@ const DATA = {
 
 //currently video is hidden, remove hidden to play video
 export default function Hero() {
-  const windowWidth = useRef(Document.innerWidth);
-
   return (
     <div className="w-screen h-screen">
       <img
-        className="absolute opacity-30 -z-10 w-screen h-screen lg:opacity-10"
+        className="absolute opacity-30 -z-10 w-screen h-screen lg:hidden"
         src={DATA.ImageBackground.portrait}
+        alt="background"
+      />
+      <img
+        className="absolute opacity-30 -z-10 w-screen h-screen hidden lg:block"
+        src={DATA.ImageBackground.landscape}
         alt="background"
       />
       <div className="grid grid-rows-6 w-screen h-screen">
         <button
           type="button"
-          className="row-span-2 left-10 top-20 h-12 w-3/4 relative inline-flex items-center rounded-md border border-transparent px-4 py-2 shadow-sm hover:bg-white focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 lg:w-1/4"
+          className="row-span-2 left-10 top-40 bg-orange-400 md:top-30 h-12 w-3/4 relative inline-flex items-center rounded-md border border-transparent px-4 py-2 shadow-sm hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 lg:w-1/4"
         >
           <a
             href={DATA.LearnButton.link}
@@ -49,14 +50,14 @@ export default function Hero() {
             target="_blank"
             className="inline-flex h-max w-max space-x-2"
           >
-            <ArrowDownCircleIcon className="h-10 w-10 self-center text-orange-600" />
-            <h3 className="text-md self-center text-left text-black leading-none uppercase ">
+            <ArrowDownCircleIcon className="h-10 w-10 self-center text-white" />
+            <h3 className="text-base font-medium text-white shadow-sm uppercase place-self-center ">
               {DATA.LearnButton.text}
             </h3>
           </a>
         </button>
-        <div>
-          <div className="row-span-4 relative left-10 w-4/5 space-y-4 ">
+        <div className="space-y-6">
+          <div className="row-span-4 relative left-5 sm:left-10 w-4/5 space-y-4 ">
             <h1 className="pt-4 text-5xl tracking-normalleading-none border-orange-400 border-t-4 border-orange-500">
               {DATA.headLine}{" "}
             </h1>

@@ -15,7 +15,7 @@ export default function StudentExperience() {
   return (
     <div
       id="StudentExperience"
-      className="flex flex-wrap w-screen h-screen p-4 space-y-4 lg:space-x-4 lg:space-y-0 bg-gray-200"
+      className="flex flex-wrap p-4 space-y-4 h-screen lg:space-x-4 lg:space-y-0 bg-gray-200"
     >
       <div className="flex flex-col self-start mt-10 w-full lg:w-5/12 lg:ml-10 space-y-8 lg:space-y-20">
         <h1 className="animate-pulse text-3xl tracking-wide border-t-4 border-orange-600 w-3/4">
