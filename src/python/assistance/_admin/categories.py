@@ -13,11 +13,9 @@
 # limitations under the License.
 
 DEMO = "Demo"
-AI_CREATIONS = "AI Creations"
 ADMIN = "Admin"
 
 APPLICATION_CATEGORIES_BY_COLUMN = {
     0: [DEMO],
-    1: [AI_CREATIONS],
-    2: [ADMIN],
+    1: [ADMIN],
 }

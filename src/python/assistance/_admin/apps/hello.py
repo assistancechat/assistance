@@ -17,8 +17,8 @@ import streamlit as st
 from assistance._admin import categories
 
 CATEGORY = categories.DEMO
-TITLE = "A test"
+TITLE = "Hello World!"
 
 
 async def main():
-    st.write("Hello Testing!")
+    pass
