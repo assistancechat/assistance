@@ -104,7 +104,9 @@ def _get_assistance_token_data_with_refresh(assistance_token: str):
     payload = jwt.decode(assistance_token, JWT_SECRET_KEY, algorithms=[ALGORITHM])
 
     assistance_token_data = AssistanceTokenData(
-        **payload, exp=datetime.utcfromtimestamp(payload["exp"])
+        email=payload["email"],
+        name=payload["name"],
+        exp=datetime.utcfromtimestamp(payload["exp"]),
     )
     time_left: timedelta = assistance_token_data["exp"] - datetime.utcnow()
 
