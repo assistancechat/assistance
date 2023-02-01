@@ -69,12 +69,9 @@ function ChatHistory() {
               originator === "client" ? "justify-end" : "justify-start"
             } mb-4`}
           >
-            <div className="flex flex-col items-end">
+            <div className="flex flex-col items-start p-2">
               <div className="flex items-center">
-                <span className="text-xs text-gray-400 mr-2">
-                  {timestampAsString}
-                </span>
-                <span className="text-xs text-gray-400">{name}</span>
+                <span className="text-xs ml-2 leading-relaxed text-gray-400">{name}</span>
               </div>
               <div className="flex flex-col items-end">
                 <div
