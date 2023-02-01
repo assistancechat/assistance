@@ -31,7 +31,8 @@ type OriginatorProfilePictureUrls = Record<MessageOriginator, string | null>;
 // inefficient. Fix this if it becomes an issue.
 export type ChatContextData = {
   open: boolean;
-  idToken: string | null;
+  googleIdToken: string | null;
+  assistanceToken: string | null;
   taskPrompt: string;
   messageHistory: MessageHistory;
   pendingQuestion: string | null;
@@ -41,7 +42,8 @@ export type ChatContextData = {
 
 export const DefaultChatData = {
   open: false,
-  idToken: null,
+  googleIdToken: null,
+  assistanceToken: null,
   taskPrompt: `You are from Assistance.Chat. You are an expert in all things \
 about Alphacrucis (AC) Christian University. You are providing \
 student support to {client_name}.

@@ -16,6 +16,7 @@
 # https://github.com/hwchase17/langchain/blob/ae1b589f60a/langchain/agents/conversational/prompt.py#L1-L36
 
 import asyncio
+import logging
 import re
 import textwrap
 from enum import Enum
@@ -167,6 +168,8 @@ async def run_conversation(
         tool_names=tool_names,
         transcript=transcript,
     )
+
+    logging.info(prompt)
 
     async def _search(query: str):
         return await alphacrucis_search(
