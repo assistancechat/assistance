@@ -14,33 +14,53 @@
 
 import { chat, ChatData as ApiChatData } from "assistance";
 
-import { ChatContextData } from "@/providers/chat";
+import { ChatContextData, MessageOriginator } from "@/providers/chat";
 
-export async function callChatApi(chatContext: ChatContextData) {
-  const agentName = chatContext.originatorNames.agent || "{agent_name}";
-  const taskPrompt = chatContext.taskPrompt;
+export async function callChatApi(
+  chatData: ChatContextData,
+  setChatData: (chatData: ChatContextData) => void
+) {
+  const agentName = chatData.originatorNames.agent || "{agent_name}";
+  const taskPrompt = chatData.taskPrompt;
 
   let transcript = "";
-  for (let item of chatContext.messageHistory) {
-    const name = chatContext.originatorNames[item.originator];
+  for (let item of chatData.messageHistory) {
+    const name = chatData.originatorNames[item.originator];
     const message = item.message;
 
     transcript += `${name}: ${message}\n\n`;
   }
 
-  let data: ApiChatData = {
+  let apiData: ApiChatData = {
     agent_name: agentName,
-    task_prompt: chatContext.taskPrompt,
+    task_prompt: chatData.taskPrompt,
     transcript: transcript,
   };
 
-  if (chatContext.googleIdToken) {
-    data.google_id_token = chatContext.googleIdToken;
+  if (chatData.googleIdToken) {
+    apiData.google_id_token = chatData.googleIdToken;
   }
 
-  if (chatContext.assistanceToken) {
-    data.assistance_token = chatContext.assistanceToken;
+  if (chatData.assistanceToken) {
+    apiData.assistance_token = chatData.assistanceToken;
   }
 
-  return await chat(data);
+  const chatResponse = await chat(apiData);
+
+  const updatedMessageHistory = [
+    ...chatData.messageHistory,
+    {
+      originator: "agent" as MessageOriginator,
+      message: chatResponse.agent_message,
+      timestamp: Date.now(),
+    },
+  ];
+
+  const updatedChatData = {
+    ...chatData,
+    messageHistory: updatedMessageHistory,
+    assistanceToken: chatResponse.assistance_token,
+  };
+
+  setChatData(updatedChatData);
 }

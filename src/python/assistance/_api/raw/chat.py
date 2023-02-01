@@ -71,9 +71,7 @@ async def run_chat(data: ChatData) -> ChatResponse:
     # TODO: Consider having the AI by default check for previous
     # conversations and include a summary of previous conversations
     # within the prompt.
-    return ChatResponse(
-        {"agent_message": agent_message, "assistance_token": assistance_token}
-    )
+    return ChatResponse(agent_message=agent_message, assistance_token=assistance_token)
 
 
 async def _verify_and_get_assistance_token_with_data(

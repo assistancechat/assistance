@@ -183,27 +183,6 @@ function Login() {
     };
 
     setChatData(chatDataUpdatedAfterLogin);
-    const chatResponse = await callChatApi(chatDataUpdatedAfterLogin);
-
-    chatResponse.agent_message;
-    chatResponse.assistance_token;
-
-    const messageHistoryUpdatedAfterResponse = [
-      ...chatDataUpdatedAfterLogin.messageHistory,
-      {
-        originator: "agent" as MessageOriginator,
-        message: chatResponse.agent_message,
-        timestamp: Date.now(),
-      },
-    ];
-
-    const chatDataUpdatedAfterResponse = {
-      ...chatDataUpdatedAfterLogin,
-      messageHistory: messageHistoryUpdatedAfterResponse,
-      assistanceToken: chatResponse.assistance_token,
-    };
-
-    setChatData(chatDataUpdatedAfterResponse);
   };
 
   useEffect(() => {
