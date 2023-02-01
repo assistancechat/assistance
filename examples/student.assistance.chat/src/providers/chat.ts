@@ -22,7 +22,7 @@ export type MessageHistoryItem = {
   timestamp: number;
 };
 
-type MessageHistory = MessageHistoryItem[];
+export type MessageHistory = MessageHistoryItem[];
 
 type OriginatorNames = Record<MessageOriginator, string | null>;
 type OriginatorProfilePictureUrls = Record<MessageOriginator, string | null>;

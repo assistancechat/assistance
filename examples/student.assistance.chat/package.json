@@ -16,7 +16,7 @@
     "@types/node": "18.11.18",
     "@types/react": "18.0.27",
     "@types/react-dom": "18.0.10",
-    "assistance": "^0.4.0",
+    "assistance": "^0.5.1",
     "axios": "^1.2.6",
     "crypto-js": "^4.1.1",
     "emoji-picker-react": "^4.4.7",

@@ -16,7 +16,7 @@ import { useContext, Fragment } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 
-import { ChatContext } from "@/contexts/chat";
+import { ChatContext } from "@/providers/chat";
 
 import Chat from "@/components/Chat";
 

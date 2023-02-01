@@ -21,15 +21,15 @@ import {
   useEffect,
 } from "react";
 import { PaperAirplaneIcon } from "@heroicons/react/24/outline";
-
 import jwt_decode from "jwt-decode";
 import { GoogleLogin, CredentialResponse } from "@react-oauth/google";
 
 import {
   ChatContext,
   MessageHistoryItem,
+  MessageHistory,
   ChatContextData,
-} from "@/contexts/chat";
+} from "@/providers/chat";
 
 import ProfilePicture from "@/components/atoms/ProfilePicture";
 
@@ -141,9 +141,9 @@ function Login() {
 
     chatData.idToken = token;
 
-    let newMessageHistoryItems: MessageHistoryItem[];
+    let messageHistoryToAppend: MessageHistory;
     if (chatData.pendingQuestion === null) {
-      newMessageHistoryItems = [
+      messageHistoryToAppend = [
         {
           originator: "agent",
           message: `Hi {client_name}, it's great to meet you! Thank you for signing in. How can I help you today?`,
@@ -151,7 +151,7 @@ function Login() {
         },
       ];
     } else {
-      newMessageHistoryItems = [
+      messageHistoryToAppend = [
         {
           originator: "agent",
           message: `Hi {client_name}, it's great to meet you! Thank you for signing in.`,
@@ -169,7 +169,7 @@ function Login() {
 
     const updatedMessageHistory = [
       ...chatData.messageHistory,
-      ...newMessageHistoryItems,
+      ...messageHistoryToAppend,
     ];
 
     setChatData({ ...chatData, messageHistory: updatedMessageHistory });

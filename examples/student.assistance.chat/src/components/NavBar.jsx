@@ -4,7 +4,7 @@ import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 import { ChatBubbleOvalLeftEllipsisIcon } from "@heroicons/react/24/solid";
 import { AcademicCapIcon } from "@heroicons/react/24/solid";
 
-import { ChatContext } from "@/contexts/chat";
+import { ChatContext } from "@/providers/chat";
 
 import Logo2 from "@/images/Logo.gif";
 import Image from "next/image";

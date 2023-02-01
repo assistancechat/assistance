@@ -15,7 +15,7 @@
 import { useContext } from "react";
 import { ChatBubbleOvalLeftEllipsisIcon } from "@heroicons/react/24/outline";
 
-import { ChatContext } from "@/contexts/chat";
+import { ChatContext } from "@/providers/chat";
 
 function StartChatWithQuestionButton(props: {
   question: string;

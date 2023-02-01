@@ -14,7 +14,7 @@
 
 import { useContext } from "react";
 
-import { ChatContext, MessageOriginator } from "@/contexts/chat";
+import { ChatContext, MessageOriginator } from "@/providers/chat";
 
 function ProfilePicture(props: { originator: MessageOriginator }) {
   const originator = props.originator;
