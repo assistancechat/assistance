@@ -36,13 +36,13 @@ const reviews = {
     {
       id: 1,
       content: `
-        <p>The evidence based teaching at AC has really transformed the impacet of my ministry
+        <p>The evidence based teaching at AC has really transformed the impact of my ministry
         </p>
       `,
       author: "Bradley M",
       action: "I Enrolled for",
       reason: "Purpose Driven Study",
-      titlelocation: "Senior Member of Churches of Christ, WA.",
+      titlelocation: "- Senior Member of Churches of Christ, WA.",
       course: " Master of Counselling",
       avatarSrc: "https://randomuser.me/api/portraits/men/75.jpg",
     },
@@ -56,7 +56,7 @@ const reviews = {
       action: "I Applied for",
       reason: "Christ Centered Learning",
       titlelocation: "",
-      course: "Bachelor of Applied Social Science",
+      course: "- Bachelor of Applied Social Science",
       avatarSrc: "https://randomuser.me/api/portraits/women/65.jpg",
     },
     {
@@ -65,10 +65,10 @@ const reviews = {
           <p>The evidence based teaching at AC has really transformed the impact of my ministry
           </p>
         `,
-      author: "Anne L",
+      author: "Anne L -",
       action: "I GRADUATED WITH",
       reason: "a meaningful career path",
-      titlelocation: "Founder",
+      titlelocation: "Founder, ",
       course: " Chaplaincy Australia",
       avatarSrc: "https://randomuser.me/api/portraits/women/72.jpg",
     },
@@ -76,15 +76,15 @@ const reviews = {
   ],
 };
 
-export default function Reviews2() {
+export default function Reviews() {
   return (
-    <div className="bg-gray-100">
-      <div className="mx-auto max-w-2xl py-16 px-4 sm:py-24 sm:px-6 lg:grid lg:max-w-7xl lg:grid-cols-12 lg:gap-x-8 lg:py-32 lg:px-8">
+    <div className="bg-gray-800">
+      <div className="mx-auto max-w-2xl py-16 px-4 justify-items-center sm:py-24 sm:px-6 lg:grid lg:max-w-7xl lg:grid-cols-12 lg:gap-x-8 lg:py-32 lg:px-8">
         <div className="lg:col-span-4">
           <div className="bg-orange-400 rounded-lg">
-            <div className="mx-auto max-w-7xl py-10 px-6 border-2 rounded-lg border-gray-400 sm:py-5 lg:px-4">
+            <div className="mx-auto max-w-7xl py-10 px-6 border-2 rounded-lg sm:py-5 lg:px-4">
               <div className="mx-auto max-w-4xl text-center space-y-2">
-                <h2 className="pt-4 text-5xl tracking-normal leading-none border-white text-left border-b-4 border-w-2/3 border-orange-500">
+                <h2 className="pt-4 text-5xl  text-gray-800 tracking-normal leading-none border-white text-left border-b-4 border-w-2/3">
                   Counselling Snapshot
                 </h2>
                 <p className="text-lg text-left font-light text-gray-800">
@@ -93,7 +93,7 @@ export default function Reviews2() {
               </div>
               <dl className="mt-10 text-center space-y-4">
                 <div className="flex border-white border-2 flex-col">
-                  <dt className=" order-2 mt-2 text-lg font-medium leading-6 text-gray-800 ">
+                  <dt className=" order-2 mt-2 text-lg font-light leading-6 text-gray-800 ">
                     Starting Salary
                   </dt>
                   <dd className="order-1 text-5xl font-bold tracking-tight text-white">
@@ -101,7 +101,7 @@ export default function Reviews2() {
                   </dd>
                 </div>
                 <div className="mt-10 border-white border-2 flex flex-col sm:mt-0">
-                  <dt className="order-2 mt-2 text-lg font-medium leading-6 text-gray-800 ">
+                  <dt className="order-2 mt-2 text-lg font-light leading-6 text-gray-800 ">
                     of all Australians will need help from a mental health
                     worker at some point in their life{" "}
                   </dt>
@@ -110,7 +110,7 @@ export default function Reviews2() {
                   </dd>
                 </div>
                 <div className="mt-10 border-white border-2 flex flex-col sm:mt-0">
-                  <dt className="order-2 mt-2 text-lg font-medium leading-6 text-gray-800 ">
+                  <dt className="order-2 mt-2 text-lg font-light leading-6 text-gray-800 ">
                     of all counsellors find their career meaningful and
                     rewarding
                   </dt>
@@ -127,11 +127,11 @@ export default function Reviews2() {
           <h3 className="sr-only">Student Reviews</h3>
 
           <div className="flow-root">
-            <div className="-my-5 divide-y divide-gray-200 space-y-2">
+            <div className="flex flex-wrap items-center divide-gray-200 space-y-2">
               {reviews.featured.map((review) => (
                 <div
                   key={review.id}
-                  className="py-6 hover:bg-orange-200 rounded-md p-2"
+                  className="p-6 bg-gray-300 hover:bg-orange-200 shadow border-gray-400 rounded-md"
                 >
                   <div className="flex items-center">
                     <img
@@ -150,17 +150,17 @@ export default function Reviews2() {
                     </div>
                   </div>
                   <div
-                    className="mt-4 space-y-2 text-base italic text-gray-800 "
+                    className="mt-4 space-y-2 text-sm tracking-wide leading-tight italic text-gray-500 "
                     dangerouslySetInnerHTML={{ __html: review.content }}
                   />
-                  <div className="inline-flex space-x-2 self-end ">
-                    <h4 className="text-xs font-bold text-gray-900">
+                  <div className="inline-flex place-items-start items-start flex-wrap space-x-1  self-end ">
+                    <h4 className="text-xs font-light italic leading-tight text-gray-900">
                       {review.author}
                     </h4>
-                    <h4 className="text-xs italic text-gray-900">
+                    <h4 className="text-xs font-light italic leading-tight text-gray-900">
                       {review.titlelocation}
                     </h4>
-                    <h4 className="text-xs italic font-bold text-gray-900">
+                    <h4 className="text-xs italic font-light leading-tight text-gray-900">
                       {review.course}
                     </h4>
                   </div>

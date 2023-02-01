@@ -32,7 +32,7 @@ export default function MoreInfo() {
       <div className="mx-auto max-w-full lg:grid lg:grid-cols-12 lg:gap-x-8 lg:px-8">
         <div className="px-6 pt-10 pb-24 sm:pb-32 lg:col-span-5 lg:px-0 lg:pb-56 ">
           <div className="mx-auto space-y-12 max-w-2xl lg:mx-0">
-            <h1 className="pt-4 mt-10 text-5xl capitalize tracking-normal leading-none border-orange-400 border-t-4 border-orange-500">
+            <h1 className="pt-4 mt-10 text-5xl capitalize tracking-normal leading-none border-orange-400 border-t-4">
               {DATA.blurb1}
             </h1>
             <h3 className="text-xl w-4/5 tracking-wide leading-tight font-light text-gray-800">
