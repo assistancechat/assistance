@@ -103,18 +103,15 @@ class AssistanceTokenAndData(NamedTuple):
 def _get_assistance_token_data_with_refresh(assistance_token: str):
     payload = jwt.decode(assistance_token, JWT_SECRET_KEY, algorithms=[ALGORITHM])
 
-    assistance_token_data = AssistanceTokenData(**payload, exp=datetime(payload["exp"]))
-
-    logging.info(assistance_token_data)
-
+    assistance_token_data = AssistanceTokenData(
+        **payload, exp=datetime.utcfromtimestamp(payload["exp"])
+    )
     time_left: timedelta = assistance_token_data["exp"] - datetime.utcnow()
 
-    logging.info(time_left)
-
     if time_left > ASSISTANCE_TOKEN_REFRESH:
-        return AssistanceTokenAndData(assistance_token, payload)
+        return AssistanceTokenAndData(assistance_token, assistance_token_data)
 
-    return _create_assistance_token(payload)
+    return _create_assistance_token(assistance_token_data)
 
 
 class GoogleIdTokenData(TypedDict):
