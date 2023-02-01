@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { useState, lazy, Suspense } from "react";
+import { useState, lazy, Suspense, useEffect } from "react";
 
 import Head from "next/head";
 import { Inter } from "@next/font/google";
@@ -31,7 +31,11 @@ import {
   ChatContext,
   ChatContextData,
   DefaultChatData,
+  MessageHistoryItem,
 } from "@/providers/chat";
+
+import { mostRecentChatIsClient } from "@/utilities/flow";
+import { callChatApi } from "@/utilities/call-api";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -42,6 +46,42 @@ export default function Home() {
   // Details on implementation https://stackoverflow.com/a/51573816/3912576
   const [chatData, setChatData] = useState<ChatContextData>(DefaultChatData);
   const value = { chatData, setChatData };
+
+  const appendPendingQuestionIfReady = () => {
+    if (chatData.googleIdToken == null) {
+      return;
+    }
+
+    if (mostRecentChatIsClient(chatData)) {
+      return;
+    }
+
+    if (!chatData.pendingQuestion) {
+      return;
+    }
+
+    const messageHistoryToAppend: MessageHistoryItem = {
+      originator: "client",
+      message: chatData.pendingQuestion,
+      timestamp: Date.now(),
+    };
+
+    const updatedMessageHistory = [
+      ...chatData.messageHistory,
+      messageHistoryToAppend,
+    ];
+
+    const updatedChatData = {
+      ...chatData,
+      messageHistory: updatedMessageHistory,
+      pendingQuestion: null,
+    };
+
+    setChatData(updatedChatData);
+    callChatApi(updatedChatData, setChatData);
+  };
+
+  useEffect(appendPendingQuestionIfReady, [chatData]);
 
   return (
     <>

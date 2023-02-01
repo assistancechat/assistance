@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import asyncio
+import logging
 from datetime import datetime, timedelta
 from typing import NamedTuple, TypedDict
 
@@ -100,11 +101,16 @@ class AssistanceTokenAndData(NamedTuple):
 
 
 def _get_assistance_token_data_with_refresh(assistance_token: str):
-    payload: AssistanceTokenData = jwt.decode(
-        assistance_token, JWT_SECRET_KEY, algorithms=[ALGORITHM]
-    )
+    payload = jwt.decode(assistance_token, JWT_SECRET_KEY, algorithms=[ALGORITHM])
 
-    time_left: timedelta = payload["exp"] - datetime.utcnow()
+    assistance_token_data = AssistanceTokenData(**payload, exp=datetime(payload["exp"]))
+
+    logging.info(assistance_token_data)
+
+    time_left: timedelta = assistance_token_data["exp"] - datetime.utcnow()
+
+    logging.info(time_left)
+
     if time_left > ASSISTANCE_TOKEN_REFRESH:
         return AssistanceTokenAndData(assistance_token, payload)
 

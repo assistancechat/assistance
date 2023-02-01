@@ -28,29 +28,15 @@ import {
   ChatContext,
   MessageHistoryItem,
   MessageHistory,
-  ChatContextData,
-  MessageOriginator,
 } from "@/providers/chat";
 
 import { callChatApi } from "@/utilities/call-api";
+import { mostRecentChatIsClient } from "@/utilities/flow";
 
 import ProfilePicture from "@/components/atoms/ProfilePicture";
 
 const epochToTimestamp = (epoch: number) => {
   return new Date(epoch).toLocaleString();
-};
-
-// Use this in-place of "is-typing" for ellipsis as well as input disabling and
-// submit button disabling.
-const mostRecentChatIsClient = (chatData: ChatContextData) => {
-  const messageHistory = chatData.messageHistory;
-
-  if (messageHistory.length === 0) {
-    return false;
-  }
-
-  const mostRecentChatItem = messageHistory[messageHistory.length - 1];
-  return mostRecentChatItem.originator === "client";
 };
 
 function ChatHistory() {
