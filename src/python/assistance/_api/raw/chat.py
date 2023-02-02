@@ -52,7 +52,10 @@ class ChatResponse(BaseModel):
     assistance_token: str
 
 
-async def run_chat(data: ChatData) -> ChatResponse:
+async def run_chat(data: ChatData, origin_url: str) -> ChatResponse:
+    # TODO: Sort data storage by origin_url
+    logging.info(origin_url)
+
     openai_api_key = data.openai_api_key
     use_client_openai_api_key = openai_api_key is not None
 
