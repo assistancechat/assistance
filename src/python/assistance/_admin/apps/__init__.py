@@ -1,1 +1,1 @@
-from . import hello, talking, chat
+from . import hello, talking, chat, stt
