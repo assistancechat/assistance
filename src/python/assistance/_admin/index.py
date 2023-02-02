@@ -103,7 +103,7 @@ def _get_apps_from_module(module):
 async def main():
     _ctx.open_session()
 
-    getkeys.check_and_set_open_ai_key()
+    getkeys.get_openai_key_via_streamlit_session()
 
     st.session_state.app = get_url_app()
 
