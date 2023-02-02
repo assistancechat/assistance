@@ -19,7 +19,6 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from assistance import _ctx
-from assistance._keys import set_openai_api_key
 
 from .routers import chat
 
@@ -53,7 +52,6 @@ app.include_router(chat.router)
 
 @app.on_event("startup")
 async def startup_event():
-    set_openai_api_key()
     _ctx.open_session()
 
 

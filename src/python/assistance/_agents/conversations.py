@@ -143,6 +143,7 @@ PROMPT = textwrap.dedent(
 
 
 async def run_conversation(
+    openai_api_key: str,
     task_prompt: str,
     agent_name: str,
     client_email: str,
@@ -180,7 +181,10 @@ async def run_conversation(
 
     async def _search(query: str):
         return await alphacrucis_search(
-            record_grouping=RECORD_GROUPING, client_email=client_email, query=query
+            openai_api_key=openai_api_key,
+            record_grouping=RECORD_GROUPING,
+            client_email=client_email,
+            query=query,
         )
 
     async def _email(query: str):
@@ -192,6 +196,7 @@ async def run_conversation(
     }
 
     response = await _run_llm_process_observation_loop(
+        openai_api_key=openai_api_key,
         agent_name=agent_name,
         client_email=client_email,
         prompt=prompt,
