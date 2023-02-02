@@ -67,9 +67,9 @@ jobs:
       - name: Add GitHub Pages config files
         if: github.ref == 'refs/heads/main'
         run: |
-          echo streamlit.assistance.chat > out/CNAME
-          touch out/.nojekyll
-          cp out/index.html out/404.html
+          echo streamlit.assistance.chat > dist/CNAME
+          touch dist/.nojekyll
+          cp dist/index.html dist/404.html
         working-directory: examples/streamlit.assistance.chat
 
       - name: Deploy to gh-pages branch
@@ -77,6 +77,6 @@ jobs:
         uses: JamesIves/github-pages-deploy-action@v4.4.1
         with:
           branch: gh-pages
-          folder: examples/streamlit.assistance.chat/out
-          repository-name: assistancechat/demo.assistance.chat
+          folder: examples/streamlit.assistance.chat/dist
+          repository-name: assistancechat/streamlit.assistance.chat
           token: ${{ secrets.ASSISTANCECHAT_BOT_PAT }}
