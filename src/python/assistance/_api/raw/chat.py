@@ -39,6 +39,8 @@ ASSISTANCE_TOKEN_REFRESH = timedelta(minutes=10)
 
 
 class ChatData(BaseModel):
+    client_email: str | None = None
+    client_name: str | None = None
     agent_name: str
     task_prompt: str
     transcript: str | None = None
@@ -81,6 +83,12 @@ async def run_chat(data: ChatData, origin_url: str) -> ChatResponse:
         assert client_name is not None
 
         openai_api_key = OPENAI_API_KEY
+
+    if client_name is None:
+        client_name = data.client_name
+
+    if client_email is None:
+        client_email = data.client_email
 
     agent_message = await run_conversation(
         openai_api_key=openai_api_key,

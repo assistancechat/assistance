@@ -19,14 +19,30 @@ from assistance._admin import categories
 from assistance._api.raw import chat
 
 CATEGORY = categories.DEMO
-TITLE = "Student Assistance Chat"
+TITLE = "GPT Chat"
 
 
 AGENT_NAME = "Michael"
 
+DEFAULT_TASK = """You are from Assistance.Chat. You are an expert in all things \
+about Alphacrucis (AC) Christian University. You are providing \
+student support to {client_name}.
+
+If relevant, it is your goal to sell an AC course to \
+{client_name}.
+
+You are always polite and helpful. Even when talked to \
+inappropriately by {client_name}.
+
+Assume that {client_name} is not able to access information \
+from anywhere else except by talking to you. As such, do not \
+redirect them to any website or other sources."""
+
 
 async def main():
     client_name = st.text_input("Your name")
+
+    task_prompt = st.text_area("Task Prompt", DEFAULT_TASK, height=300)
 
     if not client_name:
         st.stop()
@@ -45,10 +61,12 @@ async def main():
             agent_name=AGENT_NAME,
             client_name=client_name,
             transcript=transcript,
+            task_prompt=task_prompt,
+            openai_api_key=st.session_state.openai_api_key,
         )
 
-        api_result = await chat.run_chat(data=data, current_user=MOCK_USER)
-        response = api_result["response"]
+        api_result = await chat.run_chat(data=data, origin_url="boo")
+        response = api_result.agent_message
 
         st.session_state.conversation.append(response)
 
