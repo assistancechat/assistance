@@ -3,7 +3,8 @@
 
 
 import whisper
-
+import os
+import tempfile
 import logging
 import logging.handlers
 import threading
@@ -29,7 +30,13 @@ TITLE = "Speech to Text"
 
 
 async def main():
-    model = whisper.load_model("base")
+    temp_dir = tempfile.mkdtemp()
+    save_path = os.path.join(temp_dir, "temp.wav")
+
+    model = None
+
+    if "audio" not in st.session_state:
+        st.session_state.audio = pydub.AudioSegment.empty()
 
     frames_deque_lock = threading.Lock()
     frames_deque: deque = deque([])
@@ -66,11 +73,14 @@ async def main():
     if not webrtc_ctx.state.playing:
         return
 
-    status_indicator.write("Loading...")
+    status_indicator.write("Model loading... (however you can start talking)")
     text_output = st.empty()
-    sound_arrays = []
+    i = 0
 
     while True:
+        if model is None:
+            model = whisper.load_model("large")
+
         if webrtc_ctx.state.playing:
             audio_frames = []
             with frames_deque_lock:
@@ -83,28 +93,33 @@ async def main():
                 status_indicator.write("No frame arrived.")
                 continue
 
-            status_indicator.write("Running. Say something!")
+            i += 1
 
-            sample_rate = None
+            status_indicator.write(
+                "Model is waiting a bit to collect more audio. Say something!"
+            )
+
             for audio_frame in audio_frames:
-                if sample_rate is None:
-                    sample_rate = audio_frame.sample_rate
+                sound = pydub.AudioSegment(
+                    data=audio_frame.to_ndarray().tobytes(),
+                    sample_width=audio_frame.format.bytes,
+                    frame_rate=audio_frame.sample_rate,
+                    channels=len(audio_frame.layout.channels),
+                )
+                st.session_state.audio += sound
 
-                assert audio_frame.sample_rate == sample_rate
+            if i % 50 == 1 and len(st.session_state.audio) > 0:
+                status_indicator.write("Model is processing a batch of audio now.")
 
-                sound_arrays.append(audio_frame.to_ndarray())
+                st.session_state.audio = st.session_state.audio.set_channels(
+                    1
+                ).set_frame_rate(16000)
+                st.session_state.audio.export(save_path, format="wav")
 
-            if len(sound_arrays) > 200:
-                concatenated_sound_arrays = np.concatenate(sound_arrays, axis=None)
-                audio_as_np_float32 = concatenated_sound_arrays.astype(np.float32)
-                max_int16 = 2**15
-                audio_normalised = audio_as_np_float32 / max_int16
+                result = model.transcribe(save_path)
+                predicted_text = result["text"]
 
-                st.audio(audio_normalised, sample_rate=sample_rate * 2)
-
-                text = model.transcribe(audio_normalised)
-                text_output.markdown(f"**Text:** {text}")
-                break
+                text_output.markdown(f"**Text:** {predicted_text}")
         else:
             status_indicator.write("Stopped.")
             break
