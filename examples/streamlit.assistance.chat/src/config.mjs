@@ -1,12 +1,12 @@
 export const SITE = {
-  name: "student.assistance.chat",
+  name: "streamlit.assistance.chat",
 
   title:
-    "student.assistance.chat",
+    "streamlit.assistance.chat",
   description:
-    "student.assistance.chat",
+    "Build Streamlit Apps with AI Assistance",
 
-  origin: "https://student.assistance.chat",
+  origin: "https://streamlit.assistance.chat",
   basePathname: "/",
   trailingSlash: true
 };

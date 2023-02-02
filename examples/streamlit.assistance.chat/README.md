@@ -1,3 +1,3 @@
-# OpenSaMD and RAi website
+# Streamlit Assistance Chat
 
-OpenSaMD and RAi website
+Build streamlit apps with AI assistance
