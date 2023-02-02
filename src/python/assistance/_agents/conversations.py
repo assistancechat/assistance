@@ -207,6 +207,7 @@ async def run_conversation(
 
 
 async def _run_llm_process_observation_loop(
+    openai_api_key: str,
     agent_name: str,
     client_email: str,
     prompt: str,
@@ -220,6 +221,7 @@ async def _run_llm_process_observation_loop(
 
     while True:
         response = await _call_gpt_and_store_as_transcript(
+            openai_api_key=openai_api_key,
             record_grouping=RECORD_GROUPING,
             client_email=client_email,
             model_kwargs=MODEL_KWARGS,
@@ -247,12 +249,15 @@ async def _run_llm_process_observation_loop(
 
 
 async def _call_gpt_and_store_as_transcript(
+    openai_api_key: str,
     record_grouping: str,
     client_email: str,
     model_kwargs: dict,
     prompt: str,
 ):
-    completions = await openai.Completion.acreate(prompt=prompt, **model_kwargs)
+    completions = await openai.Completion.acreate(
+        prompt=prompt, api_key=openai_api_key, **model_kwargs
+    )
     response: str = completions.choices[0].text.strip()
 
     asyncio.create_task(
