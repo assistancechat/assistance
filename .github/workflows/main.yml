@@ -7,8 +7,8 @@ on:
   pull_request:
 
 jobs:
-  web:
-    name: Student Assistance Chat
+  Student:
+    name: Student.Assistance.Chat
     runs-on: ubuntu-latest
 
     steps:
@@ -42,3 +42,41 @@ jobs:
         with:
           branch: gh-pages
           folder: examples/student.assistance.chat/out
+
+  Streamlit:
+    name: Streamlit.Assistant.Chat
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 19
+          cache: "npm"
+          cache-dependency-path: examples/streamlit.assistance.chat/package-lock.json
+
+      - name: Clean install dependencies
+        run: npm ci
+        working-directory: examples/streamlit.assistance.chat
+
+      - name: Build app
+        run: |
+          npm run build
+        working-directory: examples/streamlit.assistance.chat
+
+      - name: Add GitHub Pages config files
+        if: github.ref == 'refs/heads/main'
+        run: |
+          echo streamlit.assistance.chat > out/CNAME
+          touch out/.nojekyll
+          cp out/index.html out/404.html
+        working-directory: examples/streamlit.assistance.chat
+
+      - name: Deploy to gh-pages branch
+        if: github.ref == 'refs/heads/main'
+        uses: JamesIves/github-pages-deploy-action@v4.4.1
+        with:
+          branch: gh-pages
+          folder: examples/streamlit.assistance.chat/out
+          repository-name: assistancechat/demo.assistance.chat
+          token: ${{ secrets.ASSISTANCECHAT_BOT_PAT }}
