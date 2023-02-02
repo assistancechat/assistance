@@ -16,14 +16,12 @@
 import streamlit as st
 
 from assistance._admin import categories
-from assistance._api.login import User
 from assistance._api.raw import chat
 
 CATEGORY = categories.DEMO
 TITLE = "Student Assistance Chat"
 
 
-MOCK_USER = User(username="MockUsername")
 AGENT_NAME = "Michael"
 
 

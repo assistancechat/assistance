@@ -187,6 +187,7 @@
       "pydicom",
       "pylint",
       "pyplot",
+      "pypoetry",
       "pyright",
       "pytest",
       "pyupgrade",
