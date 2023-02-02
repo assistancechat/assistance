@@ -26,12 +26,13 @@ from pydantic import BaseModel
 from assistance._agents.conversations import run_conversation
 from assistance._api.exceptions import CredentialsException
 from assistance._config import get_google_oauth_client_id
-from assistance._keys import get_jwt_key
-from assistance._paths import USERS
+from assistance._keys import get_jwt_key, get_openai_api_key
 
 GOOGLE_OAUTH_CLIENT_ID = get_google_oauth_client_id()
 
 JWT_SECRET_KEY = get_jwt_key()
+OPENAI_API_KEY = get_openai_api_key()
+
 ALGORITHM = "HS256"
 ASSISTANCE_TOKEN_EXPIRES = timedelta(minutes=30)
 ASSISTANCE_TOKEN_REFRESH = timedelta(minutes=10)
@@ -43,6 +44,7 @@ class ChatData(BaseModel):
     transcript: str | None = None
     google_id_token: str | None = None
     assistance_token: str | None = None
+    openai_api_key: str | None = None
 
 
 class ChatResponse(BaseModel):
@@ -50,18 +52,38 @@ class ChatResponse(BaseModel):
     assistance_token: str
 
 
-async def run_chat(data: ChatData) -> ChatResponse:
+async def run_chat(data: ChatData, origin_url: str) -> ChatResponse:
+    # TODO: Sort data storage by origin_url
+    logging.info(origin_url)
+
+    openai_api_key = data.openai_api_key
+    use_client_openai_api_key = openai_api_key is not None
+
     (
         assistance_token,
         assistance_token_data,
     ) = await _verify_and_get_assistance_token_with_data(
-        google_id_token=data.google_id_token, assistance_token=data.assistance_token
+        google_id_token=data.google_id_token,
+        assistance_token=data.assistance_token,
+        use_client_openai_api_key=openai_api_key is not None,
+    )
+
+    assert (
+        assistance_token_data["use_client_openai_api_key"] == use_client_openai_api_key
     )
 
     client_email = assistance_token_data["email"]
     client_name = assistance_token_data["name"]
 
+    if not openai_api_key:
+        assert use_client_openai_api_key is False
+        assert client_email is not None
+        assert client_name is not None
+
+        openai_api_key = OPENAI_API_KEY
+
     agent_message = await run_conversation(
+        openai_api_key=openai_api_key,
         task_prompt=data.task_prompt,
         agent_name=data.agent_name,
         client_email=client_email,
@@ -76,7 +98,9 @@ async def run_chat(data: ChatData) -> ChatResponse:
 
 
 async def _verify_and_get_assistance_token_with_data(
-    google_id_token: str | None, assistance_token: str | None
+    google_id_token: str | None,
+    assistance_token: str | None,
+    use_client_openai_api_key: bool,
 ):
     if assistance_token:
         try:
@@ -86,16 +110,35 @@ async def _verify_and_get_assistance_token_with_data(
         except JWTError as e:
             raise CredentialsException from e
 
-    return await _create_assistance_token_from_google_id(google_id_token)
+    if google_id_token:
+        return await _create_assistance_token_from_google_id(
+            google_id_token, use_client_openai_api_key=use_client_openai_api_key
+        )
+
+    if not use_client_openai_api_key:
+        raise CredentialsException
+
+    return _create_anonymous_client_side_key_token()
+
+
+def _create_anonymous_client_side_key_token():
+    initial_assistance_token_data = {
+        "email": None,
+        "name": None,
+        "use_client_openai_api_key": True,
+    }
+
+    return _create_assistance_token(initial_data=initial_assistance_token_data)
 
 
 class AssistanceTokenData(TypedDict):
-    email: str
-    name: str
+    email: str | None
+    name: str | None
+    use_client_openai_api_key: bool
     exp: datetime
 
 
-class AssistanceTokenAndData(NamedTuple):
+class AssistanceTokenResponses(NamedTuple):
     assistance_token: str
     assistance_token_data: AssistanceTokenData
 
@@ -106,12 +149,13 @@ def _get_assistance_token_data_with_refresh(assistance_token: str):
     assistance_token_data = AssistanceTokenData(
         email=payload["email"],
         name=payload["name"],
+        use_client_openai_api_key=payload["use_client_openai_api_key"],
         exp=datetime.utcfromtimestamp(payload["exp"]),
     )
     time_left: timedelta = assistance_token_data["exp"] - datetime.utcnow()
 
     if time_left > ASSISTANCE_TOKEN_REFRESH:
-        return AssistanceTokenAndData(assistance_token, assistance_token_data)
+        return AssistanceTokenResponses(assistance_token, assistance_token_data)
 
     return _create_assistance_token(assistance_token_data)
 
@@ -121,7 +165,9 @@ class GoogleIdTokenData(TypedDict):
     given_name: str
 
 
-async def _create_assistance_token_from_google_id(google_id_token: str):
+async def _create_assistance_token_from_google_id(
+    google_id_token: str, use_client_openai_api_key: bool
+):
     loop = asyncio.get_event_loop()
 
     def _sync_task() -> GoogleIdTokenData:
@@ -141,6 +187,7 @@ async def _create_assistance_token_from_google_id(google_id_token: str):
     initial_assistance_token_data = {
         "email": client_email,
         "name": client_name,
+        "use_client_openai_api_key": use_client_openai_api_key,
     }
 
     return _create_assistance_token(initial_data=initial_assistance_token_data)
@@ -156,4 +203,4 @@ def _create_assistance_token(initial_data: dict):
         assistance_token_data, JWT_SECRET_KEY, algorithm=ALGORITHM
     )
 
-    return AssistanceTokenAndData(assistance_token, assistance_token_data)
+    return AssistanceTokenResponses(assistance_token, assistance_token_data)

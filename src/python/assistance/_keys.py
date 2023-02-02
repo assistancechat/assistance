@@ -12,14 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
-import openai
-
 from assistance._paths import SECRETS
-
-
-def set_openai_api_key():
-    openai.api_key = get_openai_api_key()
 
 
 def get_openai_api_key():

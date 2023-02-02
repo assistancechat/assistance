@@ -13,7 +13,7 @@
 # limitations under the License.
 
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Request
 
 from assistance._api.raw import chat as _chat
 
@@ -21,5 +21,7 @@ router = APIRouter(prefix="/chat")
 
 
 @router.post("", response_model=_chat.ChatResponse)
-async def chat(data: _chat.ChatData):
-    return await _chat.run_chat(data=data)
+async def chat(data: _chat.ChatData, request: Request):
+    origin_url = dict(request.scope["headers"]).get(b"referer", b"").decode()
+
+    return await _chat.run_chat(data=data, origin_url=origin_url)
