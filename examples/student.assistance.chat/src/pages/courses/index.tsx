@@ -24,7 +24,7 @@ import ChatModal from '@/components/ChatModal'
 import Hero from '@/components/Hero'
 import MoreInfo from '@/components/MoreInfo'
 
-//data
+//data 
 import * as data from '@/components/data/counselling.json'
 
 import {
@@ -100,52 +100,16 @@ export default function Home() {
         <ChatContext.Provider value={value}>
           <Navbar />
           <ChatModal />
-          <Hero
-            key={data.hero.id}
-            portraitPicture={data.hero.portraitPicture}
-            landscapePicture={data.hero.landscapePicture}
-            alt={data.hero.alt}
-            courseTitle={data.hero.courseTitle}
-            headLine={data.hero.headLine}
-            subHeading={data.hero.subHeading}
-            learnButtonText={data.hero.learnButtonText}
-            learnButtonLink={data.hero.learnButtonLink}
-            ChatButtonText={data.hero.ChatButtonText}
-          />
-          <MoreInfo
-            key={data.moreInfo.id}
-            heading={data.moreInfo.heading}
-            subHeading={data.moreInfo.subHeading}
-            learnButtonText={data.moreInfo.learnButtonText}
-            learnButtonLink={data.moreInfo.learnButtonLink}
-            ChatButtonText={data.moreInfo.ChatButtonText}
-            videoLink={data.moreInfo.videoLink}
-            videoTitle={data.moreInfo.videoTitle}
-          />
+          {Hero(data.hero)}
+          {MoreInfo(data.moreInfo)}
           <Suspense fallback={<div>Loading...</div>}>
-            <Reviews
-              key={data.reviews.id}
-              careerSnapshot={data.reviews.careerSnapshot}
-              careerSlogan={data.reviews.careerSlogan}
-              sidePanel={data.reviews.sidePanel}
-              featured={data.reviews.featured}
-            />
+            <Reviews key={data.reviews.id} careerSnapshot={data.reviews.careerSnapshot} careerSlogan={data.reviews.careerSlogan} sidePanel={data.reviews.sidePanel} featured={data.reviews.featured}/>
           </Suspense>
           <Suspense fallback={<div>Loading...</div>}>
-            <StudentExperience
-              key={data.studentExperience.id}
-              videoLink={data.studentExperience.videoLink}
-              videoTitle={data.studentExperience.videoTitle}
-              ChatButtonText={data.studentExperience.ChatButtonText}
-            />
+            <StudentExperience />
           </Suspense>
           <Suspense fallback={<div>Loading...</div>}>
-            <Blog
-              key={data.blog.id}
-              blogsHeading={data.blog.blogsHeading}
-              blogsSubHeading={data.blog.blogsSubHeading}
-              posts={data.blog.posts}
-            />
+            <Blog key={data.blog.id} blogsHeading={data.blog.blogsHeading} blogsSubHeading={data.blog.blogsSubHeading} posts={data.blog.posts}/>
           </Suspense>
           <Suspense fallback={<div>Loading...</div>}>
             <Footer />

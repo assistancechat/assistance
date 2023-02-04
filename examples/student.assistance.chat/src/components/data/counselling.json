@@ -1,5 +1,6 @@
 {
     "hero": {
+        "id": 1,
         "portraitPicture": "https://images.unsplash.com/photo-1604881991405-b273c7a4386a?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=387&q=80",
         "landscapePicture": "https://images.unsplash.com/photo-1626387753307-5a329fa44578?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1331&q=80",
         "alt": "Counselling picture",
@@ -11,6 +12,7 @@
         "ChatButtonText": "How can you help me align counselling with my faith?"
     },
     "moreInfo": {
+        "id":1,
         "heading": "It's time to align your faith with your future",
         "subHeading": "The courses offered to you are designed to provide you with an unique Christian experience. ",
         "learnButtonText": "Counselling courses at a glance",
