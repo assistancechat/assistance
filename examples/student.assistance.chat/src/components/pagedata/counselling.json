@@ -1,0 +1,146 @@
+{
+    "hero": {
+        "portraitPicture": "https://images.unsplash.com/photo-1604881991405-b273c7a4386a?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=387&q=80",
+        "landscapePicture": "https://images.unsplash.com/photo-1626387753307-5a329fa44578?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1331&q=80",
+        "alt": "Counselling picture",
+        "courseTitle": "COURSE RESOURCES",
+        "headLine": "Discover God's Purpose for you in Counselling",
+        "subHeading": "Talk with our customer experience officer now to find the right course for you",
+        "learnButtonText": "Study Christian Counselling",
+        "learnButtonLink": "https://www.ac.edu.au/healthbrochure",
+        "ChatButtonText": "How can you help me align counselling with my faith?"
+    },
+    "moreInfo": {
+        "heading": "It's time to align your faith with your future",
+        "subHeading": "The courses offered to you are designed to provide you with an unique Christian experience. ",
+        "learnButtonText": "Counselling courses at a glance",
+        "learnButtonLink": "https://www.ac.edu.au/healthbrochure",
+        "ChatButtonText": "Do I qualify for FEE-HELP?",
+        "videoLink": "https://www.youtube.com/embed/wds7y_0rix4?",
+        "videoTitle": "Thank you"
+    },
+    "reviews": {
+        "id": 1,
+        "careerSnapshot": "Counselling Degree Snapshot",
+        "careerSlogan": "A Career Worth Pursuing",
+        "sidePanel": [
+            {
+                "id": 1,
+                "headline": "$75,000 ↑",
+                "subheading": "Starting Salary"
+            },
+            {
+                "id": 2,
+                "headline": "↑40% ",
+                "subheading": "Of all Australians will need counselling at some point in their lives"
+            },
+            {
+                "id": 3,
+                "headline": "> 85%",
+                "subheading": "Feel that their career is meaningful and rewarding"
+            }
+        ],
+        "featured": [
+            {
+                "id": 1,
+                "content": "<p>The evidence based teaching at AC has really transformed the impact of my ministry</p>",
+                "author": "Bradley M",
+                "action": "I Enrolled for",
+                "reason": "Purpose Driven Study",
+                "titlelocation": "- Senior Member of Churches of Christ, WA.",
+                "course": "Master of Counselling",
+                "avatarSrc": "https://randomuser.me/api/portraits/men/75.jpg"
+            },
+            {
+                "id": 2,
+                "content": "<p>I was studying the same degree at another university and the lecturer said that our worldview affects everything we do. At that moment, I realised I needed to find a new place to learn</p>",
+                "author": "Abigail C",
+                "action": "I Applied for",
+                "reason": "Christ Centered Learning",
+                "titlelocation": "",
+                "course": "- Bachelor of Applied Social Science",
+                "avatarSrc": "https://randomuser.me/api/portraits/women/65.jpg"
+            },
+            {
+                "id": 3,
+                "content": "<p>The evidence based teaching at AC has really transformed the impact of my ministry</p>",
+                "author": "Anne L -",
+                "action": "I GRADUATED WITH",
+                "reason": "a meaningful career path",
+                "titlelocation": "Founder, ",
+                "course": " Chaplaincy Australia",
+                "avatarSrc": "https://randomuser.me/api/portraits/women/72.jpg"
+            }
+        ]
+    },
+    "studentExperience":{
+        "id":1,
+        "videoLink":"https://www.youtube.com/embed/3_AoWp1tFMA",
+        "videoTitle": "Student Experience",
+        "ChatButtonText": "What is studying at Alphacrucis like?"
+    },
+    "blog": {
+        "id": "1",
+        "blogsHeading": "Read and Inspire",
+        "blogsSubHeading": "Invest wisely in your Talents",
+        "posts": [
+            {
+                "id": 1,
+                "title": "Why a Christian Counselling Degree is Unique and Impactful",
+                "href": "#",
+                "BlogCategory": {
+                    "name": "Video",
+                    "href": "#"
+                },
+                "description": "A Christian Counselling degree is unique in that it combines the best practices of traditional counselling with a biblical perspective. This allows for a holistic approach to helping individuals and families overcome their struggles and find healing. Learn more about the benefits of studying Christian Counselling at Alphacrucis.",
+                "date": "January 1, 2022",
+                "datetime": "2022-01-01T12:00:00",
+                "imageUrl": "https://images.unsplash.com/photo-1592188657297-c6473609e988?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2487&q=80",
+                "readingTime": "5 minute read",
+                "author": {
+                    "name": "Jane Smith",
+                    "href": "#",
+                    "imageUrl": "https://xsgames.co/randomusers/assets/avatars/female/34.jpg"
+                }
+            },
+            {
+                "id": 2,
+                "title": "Career Opportunities with a Christian Counselling Degree",
+                "href": "#",
+                "BlogCategory": {
+                    "name": "Article",
+                    "href": "#"
+                },
+                "description": "A Christian Counselling degree can open up a variety of career paths in the helping professions. From working in a church setting to private practice, the options are endless. Learn more about the different career opportunities available with a Christian Counselling degree from Alphacrucis.",
+                "date": "February 15, 2022",
+                "datetime": "2022-02-15T12:00:00",
+                "imageUrl": "https://images.unsplash.com/photo-1472162314594-eca3c3d90df1?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1738&q=80",
+                "readingTime": "7 minute video",
+                "author": {
+                    "name": "Jesse Doe",
+                    "href": "#",
+                    "imageUrl": "https://xsgames.co/randomusers/assets/avatars/male/31.jpg"
+                }
+            },
+            {
+                "id": 3,
+                "title": "Student Testimonials: Studying Christian Counselling at Alphacrucis",
+                "href": "#",
+                "BlogCategory": {
+                    "name": "Article",
+                    "href": "#"
+                },
+                "description": "Hear from current and former students about their experiences studying Christian Counselling at Alphacrucis. Learn about the impact the program has had on their personal and professional lives, and why they recommend it to others. Discover what makes Alphacrucis a premier institution for Christian Counselling education.",
+                "date": "March 1, 2022",
+                "datetime": "2022-03-01T12:00:00",
+                "imageUrl": "https://images.unsplash.com/photo-1523240795612-9a054b0db644?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1740&q=80",
+                "readingTime": "10 minute read",
+                "author": {
+                    "name": "Alphacrucis Student Services",
+                    "href": "#",
+                    "imageUrl": "https://xsgames.co/randomusers/assets/avatars/female/68.jpg"
+                }
+            }
+        ]
+    }
+}

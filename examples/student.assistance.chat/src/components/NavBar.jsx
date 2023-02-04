@@ -78,7 +78,7 @@ export default function Navbar() {
                     className="-ml-1 mr-2 h-5 w-5 text-orange-600"
                     aria-hidden="true"
                   />
-                  <span className="text-gray-600 text-md">Chat</span>
+                  <span className="text-gray-600 text-md">Enquire</span>
                 </button>
                 <button
                   type="button"
@@ -94,7 +94,7 @@ export default function Navbar() {
                       className="-ml-1 mr-2 h-5 w-5 text-orange-600"
                       aria-hidden="true"
                     />
-                    <span className="text-gray-600 text-md">Enrol</span>
+                    <span className="text-gray-600 text-md">Apply</span>
                   </a>
                 </button>
               </div>
