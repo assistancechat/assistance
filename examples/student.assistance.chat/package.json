@@ -28,7 +28,8 @@
     "react-player": "^2.11.0",
     "react-youtube": "^10.1.0",
     "serve": "^14.2.0",
-    "sharp": "^0.31.3"
+    "sharp": "^0.31.3",
+    "typed.ts": "^2.1.1"
   },
   "devDependencies": {
     "@types/crypto-js": "^4.1.1",
