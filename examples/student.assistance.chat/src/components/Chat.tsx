@@ -269,7 +269,7 @@ function ChatInput() {
           />
           <button
             type="submit"
-            className="bg-orange-400 w-12 justify-center h-full flex rounded-r-lg focus:ring-offset-2 hover:bg-orange-400 focus:ring-white"
+            className="bg-orange-400 w-12 justify-center h-full flex rounded-r-lg focus:ring-offset-2 hover:bg-gray-400 focus:ring-white"
             onClick={handleMessageSubmit}
             disabled={message === "" || mostRecentChatIsClient(chatData)}
           >
