@@ -1,0 +1,147 @@
+{
+    "hero": {
+        "id": "general",
+        "portraitPicture": "https://images.unsplash.com/photo-1604881991405-b273c7a4386a?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=387&q=80",
+        "alt": "Student Recruitment Picture",
+        "courseTitle": "STUDY PROGRAMS",
+        "headLine": "Join the Alphacrucis Community of Learners",
+        "subHeading": "Chat with our student recruitment officer now to find the right course for you",
+        "learnButtonText": "Explore Study Programs",
+        "learnButtonLink": "https://www.ac.edu.au/student-recruitment",
+        "ChatButtonText": "What courses are available at Alphacrucis?"
+    },
+    "moreInfo": {
+        "id": 2,
+        "heading": "Find the right study path with Alphacrucis",
+        "subHeading": "Our courses are designed to help you fulfill your God-given potential and purpose. ",
+        "learnButtonText": "Discover available courses",
+        "learnButtonLink": "https://www.ac.edu.au/courses",
+        "ChatButtonText": "Can I get more information about the admission process?",
+        "videoLink": "https://www.youtube.com/embed/Q0MbM6fhl_8",
+        "videoTitle": "How to Apply to Alphacrucis"
+    },
+    "reviews": {
+        "id": 2,
+        "careerSnapshot": "Alphacrucis Student Experience",
+        "careerSlogan": "Unleash Your Potential",
+        "sidePanel": [
+            {
+                "id": 1,
+                "headline": "98%",
+                "subheading": "Student Satisfaction Rate"
+            },
+            {
+                "id": 2,
+                "headline": "50% ↑",
+                "subheading": "Career Opportunities After Graduation"
+            },
+            {
+                "id": 3,
+                "headline": "> 90%",
+                "subheading": "Would recommend Alphacrucis to a friend"
+            }
+        ],
+        "featured": [
+            {
+                "id": 1,
+                "content": "<p>Alphacrucis gave me the tools and resources to take my ministry to the next level.</p>",
+                "author": "John D",
+                "action": "I Graduated with",
+                "reason": "Purposeful Learning",
+                "titlelocation": "- Senior Pastor, New South Wales",
+                "course": "Master of Theology",
+                "avatarSrc": "https://randomuser.me/api/portraits/men/20.jpg"
+            },
+            {
+                "id": 2,
+                "content": "<p>The professors at Alphacrucis are knowledgeable and passionate about what they teach. Their teachings have greatly impacted my life and my faith.</p>",
+                "author": "Sarah T",
+                "action": "I completed my",
+                "reason": "Christ Centered Education",
+                "titlelocation": "",
+                "course": "Bachelor of Arts",
+                "avatarSrc": "https://randomuser.me/api/portraits/women/30.jpg"
+            },
+            {
+                "id": 3,
+                "content": "<p>The opportunities for hands-on experience and internships at Alphacrucis helped me get the job I wanted after graduation.</p>",
+                "author": "Michael W",
+                "action": "I Studied",
+                "reason": "Practical Experience",
+                "titlelocation": "- Youth Pastor, Victoria",
+                "course": "Bachelor of Ministry",
+                "avatarSrc": "https://randomuser.me/api/portraits/men/45.jpg"
+            }
+        ]
+    },
+    "studentExperience":{
+        "id":1,
+        "videoLink":"https://www.youtube.com/embed/3_AoWp1tFMA",
+        "videoTitle": "Student Experience",
+        "ChatButtonText": "What is studying at Alphacrucis like?"
+        },
+        "blog": {
+            "id": "1",
+            "blogsHeading": "Read and Inspire",
+            "blogsSubHeading": "Invest wisely in your Talents",
+            "posts": [
+                {
+                    "id": 1,
+                    "title": "Why a Christian Counselling Degree is Unique and Impactful",
+                    "href": "#",
+                    "BlogCategory": {
+                        "name": "Video",
+                        "href": "#"
+                    },
+                    "description": "A Christian Counselling degree is unique in that it combines the best practices of traditional counselling with a biblical perspective. This allows for a holistic approach to helping individuals and families overcome their struggles and find healing. Learn more about the benefits of studying Christian Counselling at Alphacrucis.",
+                    "date": "January 1, 2022",
+                    "datetime": "2022-01-01T12:00:00",
+                    "imageUrl": "https://images.unsplash.com/photo-1592188657297-c6473609e988?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2487&q=80",
+                    "readingTime": "5 minute read",
+                    "author": {
+                        "name": "Jane Smith",
+                        "href": "#",
+                        "imageUrl": "https://xsgames.co/randomusers/assets/avatars/female/34.jpg"
+                    }
+                },
+                {
+                    "id": 2,
+                    "title": "Career Opportunities with a Christian Counselling Degree",
+                    "href": "#",
+                    "BlogCategory": {
+                        "name": "Article",
+                        "href": "#"
+                    },
+                    "description": "A Christian Counselling degree can open up a variety of career paths in the helping professions. From working in a church setting to private practice, the options are endless. Learn more about the different career opportunities available with a Christian Counselling degree from Alphacrucis.",
+                    "date": "February 15, 2022",
+                    "datetime": "2022-02-15T12:00:00",
+                    "imageUrl": "https://images.unsplash.com/photo-1472162314594-eca3c3d90df1?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1738&q=80",
+                    "readingTime": "7 minute video",
+                    "author": {
+                        "name": "Jesse Doe",
+                        "href": "#",
+                        "imageUrl": "https://xsgames.co/randomusers/assets/avatars/male/31.jpg"
+                    }
+                },
+                {
+                    "id": 3,
+                    "title": "Student Testimonials: Studying Christian Counselling at Alphacrucis",
+                    "href": "#",
+                    "BlogCategory": {
+                        "name": "Article",
+                        "href": "#"
+                    },
+                    "description": "Hear from current and former students about their experiences studying Christian Counselling at Alphacrucis. Learn about the impact the program has had on their personal and professional lives, and why they recommend it to others. Discover what makes Alphacrucis a premier institution for Christian Counselling education.",
+                    "date": "March 1, 2022",
+                    "datetime": "2022-03-01T12:00:00",
+                    "imageUrl": "https://images.unsplash.com/photo-1523240795612-9a054b0db644?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1740&q=80",
+                    "readingTime": "10 minute read",
+                    "author": {
+                        "name": "Alphacrucis Student Services",
+                        "href": "#",
+                        "imageUrl": "https://xsgames.co/randomusers/assets/avatars/female/68.jpg"
+                    }
+                }
+            ]
+        }
+    }
