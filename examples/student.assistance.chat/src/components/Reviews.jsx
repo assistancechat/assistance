@@ -6,7 +6,7 @@ import CounsellingProfile3 from '../images/counselling-profile-3.png'
 
 export default function Reviews(props) {
   return (
-    <div className='bg-gray-800' key={props.id}>
+    <div className='bg-gray-800' id="Reviews" key={props.id}>
       <div className='mx-auto max-w-2xl py-16 px-4 justify-items-center sm:py-24 sm:px-6 lg:grid lg:max-w-7xl lg:grid-cols-12 lg:gap-x-8 lg:py-32 lg:px-8'>
         <div className='lg:col-span-4'>
           <div className='bg-orange-400 rounded-lg'>

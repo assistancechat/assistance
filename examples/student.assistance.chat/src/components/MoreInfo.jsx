@@ -4,7 +4,7 @@ import StartChatWithQuestionButton from "@/components/atoms/StartChatWithQuestio
 
 export default function MoreInfo(props) {
   return (
-    <div className="relative bg-white">
+    <div id="MoreInfo" className="relative bg-white">
       <div className="mx-auto max-w-full lg:grid lg:grid-cols-12 lg:gap-x-8 lg:px-8">
         <div className="px-6 pt-10 pb-24 sm:pb-32 lg:col-span-5 lg:px-0 lg:pb-56 ">
           <div className="mx-auto space-y-12 max-w-2xl lg:mx-0">
@@ -36,9 +36,9 @@ export default function MoreInfo(props) {
           </div>
         </div>
 
-        <div className="relative lg:col-span-7 xl:inset-0">
+        <div className="relative aspect-video lg:col-span-7 xl:inset-0">
           <iframe
-            className="w-full h-screen p-4 bg-gray-50 object-cover aspect-video lg:p-6"
+            className="w-full h-screen p-4 bg-gray-50 object-cover lg:p-6"
             src={props.videoLink}
             title={props.videoTitle}
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"

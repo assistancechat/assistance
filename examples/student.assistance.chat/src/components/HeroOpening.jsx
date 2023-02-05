@@ -3,7 +3,6 @@ import { ArrowDownCircleIcon } from '@heroicons/react/24/solid'
 import StartChatWithQuestionButton from '@/components/atoms/StartChatWithQuestionButton'
 import Typed from 'typed.js'
 
-//currently video is hidden, remove hidden to play video
 export default function HeroOpening(props) {
 
   var headline = {
@@ -39,7 +38,7 @@ var subHeading = {
     "Talk with our customer experience officer now to find the right course for you",
   ],
   typeSpeed: 20,
-  backDelay: 1200,
+  backDelay: 1150,
   startDelay: 14000,
   loop: true,
   loopCount: 1,
