@@ -1,11 +1,16 @@
 {
     "hero": {
         "id": "general",
-        "portraitPicture": "https://images.unsplash.com/photo-1604881991405-b273c7a4386a?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=387&q=80",
-        "landscapePicture": "https://images.unsplash.com/photo-1626387753307-5a329fa44578?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1331&q=80",
+        "portraitPicture": "https://images.unsplash.com/photo-1600195077077-7c815f540a3d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=989&q=80",
+        "landscapePicture": "https://images.unsplash.com/photo-1580317092843-52bb0adbed4f?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1740&q=80",
         "alt": "Counselling Picture ",
         "courseTitle": "COURSE RESOURCES ",
-        "headLine": "Discover God's Purpose for you in Counselling",
+        "headLine1": "Discover God's Purpose for you in Counselling",
+        "headLine2": "Discover God's Purpose for you in Education",
+        "headLine3": "Discover God's Purpose for you in Ministry",
+        "headLine4": "Discover God's Purpose for you in Leadership",
+        "headLine5": "Discover God's Purpose for you in Business",
+        "headLine6": "Discover God's Purpose for you in Life",
         "subHeading": "Talk with our customer experience officer now to find the right course for you",
         "learnButtonText": "Study Christian Counselling",
         "learnButtonLink": "https://www.ac.edu.au/healthbrochure",
@@ -14,7 +19,7 @@
     "moreInfo": {
         "id":1,
         "heading": "It's time to align your faith with your future",
-        "subHeading": "The courses offered to you are designed to provide you with an unique Christian experience. ",
+        "subHeading": "We will find you the best study pathway to maximise your God gifted talents",
         "learnButtonText": "Counselling courses at a glance",
         "learnButtonLink": "https://www.ac.edu.au/healthbrochure",
         "ChatButtonText": "Do I qualify for FEE-HELP?",

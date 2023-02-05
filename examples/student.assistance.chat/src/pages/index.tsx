@@ -21,7 +21,7 @@ import { GoogleOAuthProvider } from '@react-oauth/google'
 
 import Navbar from '@/components/NavBar'
 import ChatModal from '@/components/ChatModal'
-import Hero from '@/components/Hero'
+import HeroOpening from '@/components/HeroOpening'
 import MoreInfo from '@/components/MoreInfo'
 
 //data
@@ -100,13 +100,18 @@ export default function Home() {
         <ChatContext.Provider value={value}>
           <Navbar />
           <ChatModal />
-          <Hero
+          <HeroOpening 
             key={data.hero.id}
             portraitPicture={data.hero.portraitPicture}
             landscapePicture={data.hero.landscapePicture}
             alt={data.hero.alt}
             courseTitle={data.hero.courseTitle}
-            headLine={data.hero.headLine}
+            headLine1={data.hero.headLine1}
+            headLine2={data.hero.headLine2}
+            headLine3={data.hero.headLine3}
+            headLine4={data.hero.headLine4}
+            headLine5={data.hero.headLine5}
+            headLine6={data.hero.headLine6}
             subHeading={data.hero.subHeading}
             learnButtonText={data.hero.learnButtonText}
             learnButtonLink={data.hero.learnButtonLink}
