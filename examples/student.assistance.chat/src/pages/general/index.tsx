@@ -25,7 +25,7 @@ import Hero from '@/components/Hero'
 import MoreInfo from '@/components/MoreInfo'
 
 //data
-import * as data from '@/components/data/general.json'
+import * as data from '@/components/data/counselling.json'
 
 import {
   ChatContext,

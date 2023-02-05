@@ -10,7 +10,7 @@ export default function ReviewsMediaObject(props) {
           <div className='flex flex-col max-w-xs'>
             <h4 className='text-sm italic self-start leading-none lg:text-md'>{props.title}</h4>
             <h3 className='text-lg font-bold lg:text-xl'>{props.headline}</h3>
-            <p className='text-xs mt-1 max-w-xs lg:max-w-xl lg:text-md lg:w-3/4 lg:w-full '>{props.quote}</p>
+            <p className='text-xs mt-1 max-w-xs lg:max-w-xl lg:text-md lg:w-full '>{props.quote}</p>
           </div>
       </div>
     </div>
