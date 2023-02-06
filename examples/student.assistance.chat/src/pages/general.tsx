@@ -12,91 +12,91 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { useState, lazy, Suspense, useEffect } from 'react'
+import { useState, lazy, Suspense, useEffect } from "react";
 
-import Head from 'next/head'
-import { Inter } from '@next/font/google'
+import Head from "next/head";
+import { Inter } from "@next/font/google";
 
-import { GoogleOAuthProvider } from '@react-oauth/google'
+import { GoogleOAuthProvider } from "@react-oauth/google";
 
-import Navbar from '@/components/NavBar'
-import ChatModal from '@/components/ChatModal'
-import Hero from '@/components/Hero'
-import MoreInfo from '@/components/MoreInfo'
+import Navbar from "@/components/NavBar";
+import ChatModal from "@/components/ChatModal";
+import Hero from "@/components/Hero";
+import MoreInfo from "@/components/MoreInfo";
 
 //data
-import * as data from '@/components/data/counselling.json'
+import data from "@/data/counselling.json";
 
 import {
   ChatContext,
   ChatContextData,
   DefaultChatData,
-  MessageHistoryItem
-} from '@/providers/chat'
+  MessageHistoryItem,
+} from "@/providers/chat";
 
-import { mostRecentChatIsClient } from '@/utilities/flow'
-import { callChatApi } from '@/utilities/call-api'
-import { NoFallbackError } from 'next/dist/server/base-server'
+import { mostRecentChatIsClient } from "@/utilities/flow";
+import { callChatApi } from "@/utilities/call-api";
+import { NoFallbackError } from "next/dist/server/base-server";
 
-const inter = Inter({ subsets: ['latin'] })
+const inter = Inter({ subsets: ["latin"] });
 
 //create a lazy loaded component for the reviews
-const Reviews = lazy(() => import('@/components/Reviews'))
-const StudentExperience = lazy(() => import('@/components/StudentExperience'))
-const Blog = lazy(() => import('@/components/Blog'))
-const Footer = lazy(() => import('@/components/Footer'))
+const Reviews = lazy(() => import("@/components/Reviews"));
+const StudentExperience = lazy(() => import("@/components/StudentExperience"));
+const Blog = lazy(() => import("@/components/Blog"));
+const Footer = lazy(() => import("@/components/Footer"));
 
 export default function Home() {
   // Details on implementation https://stackoverflow.com/a/51573816/3912576
-  const [chatData, setChatData] = useState<ChatContextData>(DefaultChatData)
-  const value = { chatData, setChatData }
+  const [chatData, setChatData] = useState<ChatContextData>(DefaultChatData);
+  const value = { chatData, setChatData };
 
   useEffect(() => {
     const appendPendingQuestionIfReady = async () => {
       if (chatData.googleIdToken == null) {
-        return
+        return;
       }
 
       if (mostRecentChatIsClient(chatData)) {
-        return
+        return;
       }
 
       if (!chatData.pendingQuestion) {
-        return
+        return;
       }
 
       const messageHistoryToAppend: MessageHistoryItem = {
-        originator: 'client',
+        originator: "client",
         message: chatData.pendingQuestion,
-        timestamp: Date.now()
-      }
+        timestamp: Date.now(),
+      };
 
       const updatedMessageHistory = [
         ...chatData.messageHistory,
-        messageHistoryToAppend
-      ]
+        messageHistoryToAppend,
+      ];
 
       const updatedChatData = {
         ...chatData,
         messageHistory: updatedMessageHistory,
-        pendingQuestion: null
-      }
+        pendingQuestion: null,
+      };
 
-      setChatData(updatedChatData)
-      await callChatApi(updatedChatData, setChatData)
-    }
+      setChatData(updatedChatData);
+      await callChatApi(updatedChatData, setChatData);
+    };
 
-    appendPendingQuestionIfReady()
-  }, [chatData])
+    appendPendingQuestionIfReady();
+  }, [chatData]);
 
   return (
     <>
       <Head>
         <title>Global Talent</title>
-        <meta name='viewport' content='width=device-width, initial-scale=1' />
-        <link rel='icon' href='/favicon.ico' />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="icon" href="/favicon.ico" />
       </Head>
-      <GoogleOAuthProvider clientId='332533892028-gmefpu618mrv51k25lhpjtfn09mep8kq.apps.googleusercontent.com'>
+      <GoogleOAuthProvider clientId="332533892028-gmefpu618mrv51k25lhpjtfn09mep8kq.apps.googleusercontent.com">
         <ChatContext.Provider value={value}>
           <Navbar />
           <ChatModal />
@@ -154,5 +154,5 @@ export default function Home() {
       </GoogleOAuthProvider>
       ;
     </>
-  )
+  );
 }

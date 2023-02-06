@@ -21,10 +21,11 @@ import { GoogleOAuthProvider } from "@react-oauth/google";
 
 import Navbar from "@/components/NavBar";
 import ChatModal from "@/components/ChatModal";
-import HeroOpening from "@/components/HeroOpening";
+import Hero from "@/components/Hero";
 import MoreInfo from "@/components/MoreInfo";
 
-import data from "@/data/general.json";
+//data
+import data from "@/data/counselling.json";
 
 import {
   ChatContext,
@@ -35,11 +36,13 @@ import {
 
 import { mostRecentChatIsClient } from "@/utilities/flow";
 import { callChatApi } from "@/utilities/call-api";
+import { NoFallbackError } from "next/dist/server/base-server";
 
 const inter = Inter({ subsets: ["latin"] });
 
 //create a lazy loaded component for the reviews
 const Reviews = lazy(() => import("@/components/Reviews"));
+const StudentExperience = lazy(() => import("@/components/StudentExperience"));
 const Blog = lazy(() => import("@/components/Blog"));
 const Footer = lazy(() => import("@/components/Footer"));
 
@@ -97,33 +100,8 @@ export default function Home() {
         <ChatContext.Provider value={value}>
           <Navbar />
           <ChatModal />
-          <HeroOpening
-            key={data.hero.id}
-            portraitPicture={data.hero.portraitPicture}
-            landscapePicture={data.hero.landscapePicture}
-            alt={data.hero.alt}
-            courseTitle={data.hero.courseTitle}
-            headLine1={data.hero.headLine1}
-            headLine2={data.hero.headLine2}
-            headLine3={data.hero.headLine3}
-            headLine4={data.hero.headLine4}
-            headLine5={data.hero.headLine5}
-            headLine6={data.hero.headLine6}
-            subHeading={data.hero.subHeading}
-            learnButtonText={data.hero.learnButtonText}
-            learnButtonLink={data.hero.learnButtonLink}
-            ChatButtonText={data.hero.ChatButtonText}
-          />
-          <MoreInfo
-            key={data.moreInfo.id}
-            heading={data.moreInfo.heading}
-            subHeading={data.moreInfo.subHeading}
-            learnButtonText={data.moreInfo.learnButtonText}
-            learnButtonLink={data.moreInfo.learnButtonLink}
-            ChatButtonText={data.moreInfo.ChatButtonText}
-            videoLink={data.moreInfo.videoLink}
-            videoTitle={data.moreInfo.videoTitle}
-          />
+          {Hero(data.hero)}
+          {MoreInfo(data.moreInfo)}
           <Suspense fallback={<div>Loading...</div>}>
             <Reviews
               key={data.reviews.id}
@@ -132,6 +110,9 @@ export default function Home() {
               sidePanel={data.reviews.sidePanel}
               featured={data.reviews.featured}
             />
+          </Suspense>
+          <Suspense fallback={<div>Loading...</div>}>
+            <StudentExperience />
           </Suspense>
           <Suspense fallback={<div>Loading...</div>}>
             <Blog
