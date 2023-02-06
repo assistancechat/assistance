@@ -64,13 +64,18 @@ PROMPT = textwrap.dedent(
 
 
 async def summarise_piecewise_with_query(
-    record_grouping: str, username: str, query: str, text_sections: list[str]
+    openai_api_key: str,
+    record_grouping: str,
+    username: str,
+    query: str,
+    text_sections: list[str],
 ):
     if len(text_sections) == 0:
         return "NOT_RELEVANT"
 
     if len(text_sections) == 1:
         return await summarise_with_query(
+            openai_api_key=openai_api_key,
             record_grouping=record_grouping,
             username=username,
             query=query,
@@ -97,6 +102,7 @@ async def summarise_piecewise_with_query(
 
         coroutines.append(
             summarise_with_query(
+                openai_api_key=openai_api_key,
                 record_grouping=record_grouping,
                 username=username,
                 query=query,
@@ -110,6 +116,7 @@ async def summarise_piecewise_with_query(
     combined_summaries = "\n\n".join(cleaned_summaries)
 
     summary = await summarise_with_query(
+        openai_api_key=openai_api_key,
         record_grouping=record_grouping,
         username=username,
         query=query,
@@ -120,6 +127,7 @@ async def summarise_piecewise_with_query(
 
 
 async def summarise_urls_with_query_around_snippets(
+    openai_api_key: str,
     record_grouping: str,
     username: str,
     query: str,
@@ -136,6 +144,7 @@ async def summarise_urls_with_query_around_snippets(
     for page in added_pages:
         coroutines.append(
             summarise_with_query(
+                openai_api_key=openai_api_key,
                 record_grouping=record_grouping,
                 username=username,
                 query=query,
@@ -146,6 +155,7 @@ async def summarise_urls_with_query_around_snippets(
     for url, snippets in snippets_by_url.items():
         coroutines.append(
             summarise_url_with_query_around_snippets(
+                openai_api_key=openai_api_key,
                 record_grouping=record_grouping,
                 username=username,
                 query=query,
@@ -160,6 +170,7 @@ async def summarise_urls_with_query_around_snippets(
     combined_summaries = "\n\n".join(cleaned_summaries)
 
     summary = await summarise_with_query(
+        openai_api_key=openai_api_key,
         record_grouping=record_grouping,
         username=username,
         query=query,
@@ -207,7 +218,12 @@ def _pull_only_relevant(split_page_contents_by_words: str, snippets: str):
 
 
 async def summarise_url_with_query_around_snippets(
-    record_grouping: str, username: str, query: str, url: str, snippets: list[str]
+    openai_api_key: str,
+    record_grouping: str,
+    username: str,
+    query: str,
+    url: str,
+    snippets: list[str],
 ):
     page_contents = await scrape(session=_ctx.session, url=url)
 
@@ -223,6 +239,7 @@ async def summarise_url_with_query_around_snippets(
     logging.info(f"URL: {url}\nTo Summarise: {to_summarise}")
 
     summary = await summarise_with_query(
+        openai_api_key=openai_api_key,
         record_grouping=record_grouping,
         username=username,
         query=query,
@@ -235,11 +252,13 @@ async def summarise_url_with_query_around_snippets(
 
 
 async def summarise_with_query(
-    record_grouping: str, username: str, query: str, text: str
+    openai_api_key: str, record_grouping: str, username: str, query: str, text: str
 ):
     prompt = PROMPT.format(query=query, text=text)
 
-    completions = await openai.Completion.acreate(prompt=prompt, **MODEL_KWARGS)
+    completions = await openai.Completion.acreate(
+        prompt=prompt, api_key=openai_api_key, **MODEL_KWARGS
+    )
     response: str = completions.choices[0].text.strip()
 
     return response

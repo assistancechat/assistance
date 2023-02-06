@@ -28,10 +28,13 @@ API_KEY = get_google_search_api_key()
 SEARCH_RESULTS_TO_USE = 3
 
 
-async def alphacrucis_search(record_grouping: str, client_email: str, query: str):
+async def alphacrucis_search(
+    openai_api_key: str, record_grouping: str, client_email: str, query: str
+):
     query = query + " alphacrucis"
 
     return await _search_with_summary(
+        openai_api_key=openai_api_key,
         record_grouping=record_grouping,
         username=client_email,
         search_engine=SearchEngine.ALPHACRUCIS,
@@ -41,6 +44,7 @@ async def alphacrucis_search(record_grouping: str, client_email: str, query: str
 
 
 async def _search_with_summary(
+    openai_api_key: str,
     record_grouping: str,
     username: str,
     search_engine: SearchEngine,
@@ -81,6 +85,7 @@ async def _search_with_summary(
 
     else:
         summary = await summarise_urls_with_query_around_snippets(
+            openai_api_key=openai_api_key,
             record_grouping=record_grouping,
             username=username,
             query=query,

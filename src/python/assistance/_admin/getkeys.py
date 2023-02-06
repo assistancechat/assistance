@@ -1,24 +1,24 @@
-import openai
 import streamlit as st
 
-from assistance._keys import set_openai_api_key
+from assistance._keys import get_openai_api_key
 
 
-def check_and_set_open_ai_key():
+def get_openai_key_via_streamlit_session():
+    if "openai_api_key" in st.session_state:
+        return st.session_state.openai_api_key
+
     try:
-        set_openai_api_key()
-        return
+        key = get_openai_api_key()
 
     except FileNotFoundError:
-        if "openai_key" not in st.session_state:
-            st.write("OpenAI API key not found.")
+        st.write("OpenAI API key not found.")
 
-            key = st.text_input(
-                "Enter your OpenAI API key (will only be temporarily stored within this server instance):"
-            )
-            if not key:
-                st.stop()
+        key = st.text_input(
+            "Enter your OpenAI API key (will only be temporarily stored within this server instance):"
+        )
+        if not key:
+            st.stop()
 
-            st.session_state.openai_key = key
+    st.session_state.openai_api_key = key
 
-        openai.api_key = st.session_state.openai_key
+    return key

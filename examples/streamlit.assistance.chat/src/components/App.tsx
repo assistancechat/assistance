@@ -20,7 +20,11 @@ export default component$(() => {
           <div class="block md:flex items-center flex-1">
             <div class="relative m-auto w-full max-w-lg">
               <div class="pb-5">
-                <Form items={[{ recordId: "name", formText: "Name" }]} />
+                <Form
+                  items={[
+                    { recordId: "openai-key", formText: "OpenAI API Key" },
+                  ]}
+                />
               </div>
               <GptChat />
             </div>

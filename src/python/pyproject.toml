@@ -14,7 +14,7 @@ readme = "README.md"
 assistance = "assistance.__main__:main"
 
 [tool.poetry.dependencies]
-python = "^3.10"
+python = "~3.10"
 
 # For GPT to use
 numpy = "*"
@@ -40,6 +40,11 @@ authlib = "^1.2.0"
 itsdangerous = "^2.1.2"
 httpx = "^0.23.3"
 google-auth = "^2.16.0"
+mycroft-mimic3-tts = "^0.2.4"
+onnxruntime-gpu = "^1.13.1"
+openai-whisper = "^20230124"
+streamlit-webrtc = "^0.44.2"
+pydub = "^0.25.1"
 
 [tool.poetry.group.dev.dependencies]
 autoflake = "*"

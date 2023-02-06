@@ -12,16 +12,27 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import subprocess
+import streamlit as st
 
-from fastapi import APIRouter, Request
+from assistance._admin import categories
 
-from assistance._api.raw import chat as _chat
+CATEGORY = categories.DEMO
+TITLE = "Talking"
 
-router = APIRouter(prefix="/chat")
 
+async def main():
+    words = st.text_area("Write words")
 
-@router.post("", response_model=_chat.ChatResponse)
-async def chat(data: _chat.ChatData, request: Request):
-    origin_url = dict(request.scope["headers"]).get(b"referer", b"").decode()
+    if not st.button("Play"):
+        st.stop()
 
-    return await _chat.run_chat(data=data, origin_url=origin_url)
+    output = subprocess.check_output(
+        [
+            "/home/simon/.cache/pypoetry/virtualenvs/assistance-zIqiKnAa-py3.10/bin/mimic3",
+            "--cuda",
+            words,
+        ]
+    )
+
+    st.audio(output)
