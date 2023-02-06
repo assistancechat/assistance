@@ -13,9 +13,9 @@
   "content_scripts": [
     {
       "matches": [
-        "https://blank.org/*"
+        "*://mail.google.com/*"
       ],
-      "run_at": "document_end",
+      "run_at": "document_start",
       "js": [
         "./index.global.js"
       ],
