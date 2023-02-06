@@ -1,10 +1,11 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
+import {resolve} from "path";
 
 const fetchVersion = () => {
   return {
     name: 'html-transform',
-    transformIndexHtml(html) {
+    transformIndexHtml(html: string) {
       return html.replace(
         /__APP_VERSION__/,
         `v${process.env.npm_package_version}`
@@ -17,12 +18,17 @@ const fetchVersion = () => {
 export default defineConfig({
   plugins: [react(), fetchVersion()],
   build: {
-    outDir: 'dist',
     emptyOutDir: false,
+    outDir: resolve(__dirname, 'dist'),
+    lib: {
+      formats: ['iife'],
+      entry: resolve(__dirname, './background.ts'),
+      name: 'Cat Facts'
+    },
     rollupOptions: {
-      input: {
-        index: new URL('./index.html', import.meta.url).pathname,
-        background: new URL('./background.html', import.meta.url).pathname,
+      output: {
+        entryFileNames: 'background.global.js',
+        extend: true,
       }
     }
   }
