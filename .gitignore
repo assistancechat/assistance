@@ -233,3 +233,6 @@ dmypy.json
 /dist/
 /.pids
 /.pants.workdir.file_lock*
+
+# MacOS
+.DS_Store
