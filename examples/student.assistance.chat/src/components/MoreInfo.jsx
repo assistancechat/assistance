@@ -18,7 +18,7 @@ export default function MoreInfo(props) {
               question={props.ChatButtonText}
               buttonClassName="inline-flex items-center rounded-md border uppercase border-transparent bg-orange-400 px-4 py-2 text-white shadow-sm hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
               bubbleClassName="-ml-1 mr-3 h-8 w-8"
-              textClassName="self-center leading-none text-white text-md uppercase"
+              textClassName="self-center leading-none text-white text-base uppercase"
             />
             <div className="h-11">
               <button

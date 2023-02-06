@@ -5,7 +5,6 @@ import { ChatBubbleOvalLeftEllipsisIcon } from '@heroicons/react/24/solid'
 import { AcademicCapIcon, EnvelopeIcon } from '@heroicons/react/24/solid'
 
 import { ChatContext } from '@/providers/chat'
-import { EmailForm } from '@/components/EmailForm'
 
 import Logo2 from '@/images/Logo.gif'
 import Image from 'next/image'
@@ -116,7 +115,7 @@ export default function Navbar() {
                   onClick={openDialog}
                   className='text-gray-600 text-md inline-flex items-center px-4 py-2 rounded-md shadow-sm hover:bg-orange-300 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2'
                 >
-                  <ChatBubbleOvalLeftEllipsisIcon
+                  <EnvelopeIcon
                     className='-ml-1 mr-2 h-5 w-5 text-orange-600'
                     aria-hidden='true'
                   />
@@ -238,7 +237,7 @@ export default function Navbar() {
                               htmlFor='email'
                               className='block text-sm font-medium text-orange-300'
                             >
-                              Email
+                          
                             </label>
                             <div className='mt-1'>
                               <input

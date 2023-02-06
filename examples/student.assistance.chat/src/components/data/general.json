@@ -23,7 +23,7 @@
         "learnButtonText": "Counselling courses at a glance",
         "learnButtonLink": "https://www.ac.edu.au/healthbrochure",
         "ChatButtonText": "Do I qualify for FEE-HELP?",
-        "videoLink": "https://www.youtube.com/embed/wds7y_0rix4?",
+        "videoLink": "https://www.youtube.com/embed/XH4dHf5O7u4",
         "videoTitle": "Thank you"
     },
     "reviews": {
@@ -108,7 +108,8 @@
                     "name": "Jane Smith",
                     "href": "#",
                     "imageUrl": "https://xsgames.co/randomusers/assets/avatars/female/34.jpg"
-                }
+                },
+                "content": ""
             },
             {
                 "id": 2,
