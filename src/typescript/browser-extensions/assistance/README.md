@@ -1,0 +1,1 @@
+# Assistance Browser Extension

@@ -46,7 +46,7 @@ function ChatModal() {
           <div className="fixed inset-0 bg-black bg-opacity-25" />
         </Transition.Child>
         <div className="fixed inset-0 overflow-y-auto">
-          <div className="flex min-h-full items-center justify-center p-4 text-center">
+          <div className="flex min-h-full items-center justify-center p-2 text-center">
             <Transition.Child
               as={Fragment}
               enter="ease-out duration-300"
@@ -56,7 +56,7 @@ function ChatModal() {
               leaveFrom="opacity-100 scale-100"
               leaveTo="opacity-0 scale-95"
             >
-              <Dialog.Panel className="w-full rounded max-w-md transform bg-gray-300 overflow-hidden mb-2 rounded-2x p-2 text-left align-middle shadow-xl transition-all">
+              <Dialog.Panel className="w-full rounded max-w-2xl transform bg-gray-800 overflow-visible mb-2 p-2 text-left align-middle shadow-5xl transition-all">
                 <div className="flex justify-end">
                   <button>
                     <XMarkIcon

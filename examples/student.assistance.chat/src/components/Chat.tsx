@@ -258,10 +258,10 @@ function ChatInput() {
   return (
     <div className="flex items-center justify-between p-1 border-gray-200">
       <form className="flex w-full" onSubmit={preventFormSubmission}>
-        <div className="flex w-full bg-gray-800 items-center rounded-lg">
+        <div className="flex w-full bg-gray-400 items-center rounded-lg">
           <input
             type="text"
-            className="w-full px-4 py-2 border border-gray-200 rounded-l-md focus:outline-none focus:border-orange-600"
+            className="w-full px-4 py-2 border border-gray-20000 rounded-l-md focus:outline-none focus:border-orange-600"
             placeholder="Ask us about enrolment or application ..."
             value={message}
             onChange={handleMessageInput}
@@ -269,7 +269,7 @@ function ChatInput() {
           />
           <button
             type="submit"
-            className="bg-gray-800 w-12 justify-center h-full flex rounded-r-lg focus:ring-offset-2 hover:bg-orange-400 focus:ring-white"
+            className="bg-orange-400 w-12 justify-center h-full flex rounded-r-lg focus:ring-offset-2 hover:bg-gray-400 focus:ring-white"
             onClick={handleMessageSubmit}
             disabled={message === "" || mostRecentChatIsClient(chatData)}
           >
@@ -283,7 +283,7 @@ function ChatInput() {
 
 function Chat() {
   return (
-    <div className="flex flex-col flex-1 h-96 bg-gray-300">
+    <div className="flex flex-col flex-1 h-96 bg-gray-800">
       <ChatHistory />
       <Login />
       <ChatInput />
