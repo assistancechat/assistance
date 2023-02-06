@@ -2,6 +2,26 @@
 @tailwind components;
 @tailwind utilities;
 
+h1 {
+    @apply text-3xl;
+}
+
+h2 {
+    @apply text-2xl;
+}
+
+h3 {
+    @apply text-xl;
+}
+
+p {
+    @apply text-base;
+}
+
+button{
+    @apply inline-flex items-center leading-none rounded-md border uppercase border-transparent;
+}
+
 @media (prefers-color-scheme: light) {
     body {
         background-color: white;
@@ -14,3 +34,5 @@
         color: black;
     }
 }
+
+

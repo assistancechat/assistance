@@ -1,7 +1,7 @@
 {
     "hero": {
         "id": "general",
-        "portraitPicture": "https://images.unsplash.com/photo-1600195077077-7c815f540a3d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=989&q=80",
+        "portraitPicture": "https://images.unsplash.com/photo-1600275669439-14e40452d20b?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=774&q=80",
         "landscapePicture": "https://images.unsplash.com/photo-1580317092843-52bb0adbed4f?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1740&q=80",
         "alt": "Counselling Picture ",
         "courseTitle": "COURSE RESOURCES ",
@@ -11,29 +11,29 @@
         "headLine4": "Discover God's Purpose for you in Leadership",
         "headLine5": "Discover God's Purpose for you in Business",
         "headLine6": "Discover God's Purpose for you in Life",
-        "subHeading": "Talk with our customer experience officer now to find the right course for you",
-        "learnButtonText": "Study Christian Counselling",
+        "subHeading": "We'll connect you to the right course and help you find your purpose",
+        "learnButtonText": "Study With Our Partner Alphacrucis University College",
         "learnButtonLink": "https://www.ac.edu.au/healthbrochure",
-        "ChatButtonText": "How can you help me align counselling with my faith?"
+        "ChatButtonText": "How can you help me align my faith and my career?"
     },
     "moreInfo": {
         "id":1,
         "heading": "It's time to align your faith with your future",
         "subHeading": "We will find you the best study pathway to maximise your God gifted talents",
-        "learnButtonText": "Counselling courses at a glance",
-        "learnButtonLink": "https://www.ac.edu.au/healthbrochure",
+        "learnButtonText": "Email us to find out more",
+        "learnButtonLink": "#Enquire",
         "ChatButtonText": "Do I qualify for FEE-HELP?",
-        "videoLink": "https://www.youtube.com/embed/wds7y_0rix4?",
+        "videoLink": "https://www.youtube.com/embed/XH4dHf5O7u4",
         "videoTitle": "Thank you"
     },
     "reviews": {
         "id": 1,
-        "careerSnapshot": "Counselling Degree Snapshot",
-        "careerSlogan": "A Career Worth Pursuing",
+        "careerSnapshot": "Why Our Partners",
+        "careerSlogan": "Make your Faith your Career edge",
         "sidePanel": [
             {
                 "id": 1,
-                "headline": "$75,000 ↑",
+                "headline": "",
                 "subheading": "Starting Salary"
             },
             {
@@ -108,7 +108,8 @@
                     "name": "Jane Smith",
                     "href": "#",
                     "imageUrl": "https://xsgames.co/randomusers/assets/avatars/female/34.jpg"
-                }
+                },
+                "content": ""
             },
             {
                 "id": 2,
@@ -150,4 +151,4 @@
             }
         ]
     }
-}
+} 
