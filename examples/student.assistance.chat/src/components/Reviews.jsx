@@ -57,27 +57,27 @@ export default function Reviews(props) {
                       className='h-12 w-12 rounded-full'
                     />
                     <div className='ml-4'>
-                      <h4 className='text-lg font-light text-gray-900 leading-tight tracking-wide uppercase'>
+                      <h4 className='text-lg font-light text-gray-800 leading-tight tracking-wide uppercase'>
                         {review.action}
                       </h4>
-                      <h3 className='text-2xl font-bold tracking-wide leading-none text-gray-900 capitalize'>
+                      <h3 className='text-2xl font-bold tracking-wide leading-none text-gray-800 capitalize'>
                         {review.reason}
                       </h3>
                       <div className='mt-1 flex items-center'></div>
                     </div>
                   </div>
                   <div
-                    className='mt-4 space-y-2 text-sm tracking-wide leading-tight italic text-gray-500 '
+                    className='mt-2 space-y-2 text-xs tracking-tight leading-none text-gray-600 '
                     dangerouslySetInnerHTML={{ __html: review.content }}
                   />
                   <div className='inline-flex place-items-start items-start flex-wrap space-x-1  self-end '>
-                    <h4 className='text-xs font-light italic leading-tight text-gray-900'>
+                    <h4 className='text-xs font-light italic leading-tight text-gray-800'>
                       {review.author}
                     </h4>
-                    <h4 className='text-xs font-light italic leading-tight text-gray-900'>
+                    <h4 className='text-xs font-light italic leading-tight text-gray-800'>
                       {review.titlelocation}
                     </h4>
-                    <h4 className='text-xs italic font-light leading-tight text-gray-900'>
+                    <h4 className='text-xs italic font-light leading-tight text-gray-800'>
                       {review.course}
                     </h4>
                   </div>

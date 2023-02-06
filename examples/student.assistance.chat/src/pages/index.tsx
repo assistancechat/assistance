@@ -42,7 +42,6 @@ const inter = Inter({ subsets: ['latin'] })
 
 //create a lazy loaded component for the reviews
 const Reviews = lazy(() => import('@/components/Reviews'))
-const StudentExperience = lazy(() => import('@/components/StudentExperience'))
 const Blog = lazy(() => import('@/components/Blog'))
 const Footer = lazy(() => import('@/components/Footer'))
 
@@ -134,14 +133,6 @@ export default function Home() {
               careerSlogan={data.reviews.careerSlogan}
               sidePanel={data.reviews.sidePanel}
               featured={data.reviews.featured}
-            />
-          </Suspense>
-          <Suspense fallback={<div>Loading...</div>}>
-            <StudentExperience
-              key={data.studentExperience.id}
-              videoLink={data.studentExperience.videoLink}
-              videoTitle={data.studentExperience.videoTitle}
-              ChatButtonText={data.studentExperience.ChatButtonText}
             />
           </Suspense>
           <Suspense fallback={<div>Loading...</div>}>

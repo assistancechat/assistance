@@ -51,12 +51,12 @@ export default function Navbar() {
                 </div>
                 <div className='flex flex-shrink-0 items-center'>
                   <Image
-                    className='block h-10 w-auto lg:hidden'
+                    className='block h-14 w-auto lg:hidden'
                     src={Logo2}
                     alt='Global Talent'
                   />
                   <Image
-                    className='hidden h-10 w-auto lg:block'
+                    className='hidden h-12 w-auto lg:block'
                     src={Logo2}
                     alt='Global Talent'
                   />
@@ -83,21 +83,21 @@ export default function Navbar() {
                   </a>
                 </div>
               </div>
-              <div className='flex items-center'>
+              <div className='flex items-center space-x-2'>
                 <button
                   type='button'
                   onClick={openModal}
-                  className='text-gray-600 text-md inline-flex items-center px-4 py-2 rounded-md shadow-sm hover:bg-orange-300 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2'
+                  className='text-gray-600 flex-col text-md inline-flex items-center px-4 py-2 rounded-md shadow-sm hover:bg-orange-300 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2'
                 >
                   <ChatBubbleOvalLeftEllipsisIcon
-                    className='-ml-1 mr-2 h-5 w-5 text-orange-600'
+                    className='h-5 w-5 text-orange-600'
                     aria-hidden='true'
                   />
                   <span className='text-gray-600 text-xs'>Chat</span>
                 </button>
                 <button
                   type='button'
-                  className='text-gray-600 text-md inline-flex items-center px-4 py-2 rounded-md shadow-sm hover:bg-orange-300 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2'
+                  className='text-gray-600 flex-col text-md inline-flex items-center px-4 py-2 rounded-md shadow-sm hover:bg-orange-300 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2'
                   onClick={() =>
                     window.open('https://forms.gle/bJohSSgcd2g61WKSA')
                   }
@@ -105,7 +105,7 @@ export default function Navbar() {
                   rel='noreferrer'
                 >
                   <AcademicCapIcon
-                    className='-ml-1 mr-2 h-5 w-5 text-orange-600'
+                    className='h-5 w-5 text-orange-600'
                     aria-hidden='true'
                   />
                   <span className='text-gray-600 text-xs'>Apply</span>
@@ -113,10 +113,10 @@ export default function Navbar() {
                 <button
                   type='button'
                   onClick={openDialog}
-                  className='text-gray-600 text-md inline-flex items-center px-4 py-2 rounded-md shadow-sm hover:bg-orange-300 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2'
+                  className='text-gray-600 flex-col text-md inline-flex items-center px-4 py-2 rounded-md shadow-sm hover:bg-orange-300 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2'
                 >
                   <EnvelopeIcon
-                    className='-ml-1 mr-2 h-5 w-5 text-orange-600'
+                    className='h-5 w-5 text-orange-600'
                     aria-hidden='true'
                   />
                   <span className='text-gray-600 text-xs' onClick={openDialog}>
