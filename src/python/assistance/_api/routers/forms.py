@@ -12,13 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
+import aiohttp
 from fastapi import APIRouter, Request
 from pydantic import BaseModel
 
+from assistance import _ctx
+from assistance._affiliate import decrypt_affiliate_tag
 from assistance._keys import get_mailgun_api_key
 
-router = APIRouter(prefix="/contact-us")
+router = APIRouter(prefix="/forms")
 
 EMAIL_SUBJECT = "[Contact Us Form] @ {origin_url} | {first_name} {last_name}"
 EMAIL_TEMPLATE = """{first_name} {last_name} has submitted a contact us form on {origin_url}.
@@ -36,7 +38,7 @@ Which has the following content:
 
 LINK_TEMPLATE = "https://career.assistance.chat/?pwd={password}"
 
-API_KEY = get_mailgun_api_key()
+MAILGUN_API_KEY = get_mailgun_api_key()
 DOMAIN = "assistance.chat"
 
 
@@ -50,23 +52,33 @@ class ContactUsData(BaseModel):
     referrer_tag: str | None = None
 
 
-@router.post("")
-async def chat(data: ContactUsData, request: Request):
+@router.post("/contact-us")
+async def contact_us(data: ContactUsData, request: Request):
     origin_url = dict(request.scope["headers"]).get(b"referer", b"").decode()
 
+    _send_email(data, origin_url)
 
-async def send_access_link(email: str):
+
+async def _send_email(data: ContactUsData, origin_url: str):
     url = f"https://api.eu.mailgun.net/v3/{DOMAIN}/messages"
 
-    access_link = get_access_link(email=email)
+    referrer_tag_content = decrypt_affiliate_tag(data.referrer_tag)
 
     data = {
-        "from": "noreply@assistance.chat",
-        "to": email,
-        "subject": EMAIL_SUBJECT,
-        "text": EMAIL_TEMPLATE.format(access_link=access_link),
+        "from": f"noreply@{DOMAIN}",
+        # "to": "applications@globaltalent.work",
+        "to": "applications@assistance.chat",
+        "h:Reply-To": data.email,
+        "subject": EMAIL_SUBJECT.format(
+            origin_url=origin_url, first_name=data.first_name, last_name=data.last_name
+        ),
+        "text": EMAIL_TEMPLATE.format(
+            **data, origin_url=origin_url, referrer_tag_content=referrer_tag_content
+        ),
     }
 
     await _ctx.session.post(
-        url=url, auth=aiohttp.BasicAuth(login="api", password=API_KEY), data=data
+        url=url,
+        auth=aiohttp.BasicAuth(login="api", password=MAILGUN_API_KEY),
+        data=data,
     )
