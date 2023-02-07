@@ -52,7 +52,6 @@ export default function Core(props: { data: typeof dataCore }) {
   const value = { chatData, setChatData };
 
   const router = useRouter();
-
   const tag = router.query.tag;
 
   const removeQueryParam = (param: string) => {

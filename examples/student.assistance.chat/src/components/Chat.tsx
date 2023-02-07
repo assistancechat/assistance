@@ -253,7 +253,6 @@ function ChatInput() {
     setMessage("");
   };
 
-  //trying to prevent the user from submitting form if the input is empty
   const preventFormSubmission = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
   };

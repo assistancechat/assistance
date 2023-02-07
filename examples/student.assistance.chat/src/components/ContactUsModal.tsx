@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { useContext, Fragment, useState, useEffect } from "react";
+import { useContext, Fragment, useState, useEffect, FormEvent } from "react";
 import { Dialog, Transition, Switch } from "@headlessui/react";
 
 import { ChatContext, Details } from "@/providers/chat";
@@ -60,6 +60,11 @@ function ContactUs() {
     setChatData({ ...chatData, openModal: null });
   };
 
+  const preventFormSubmission = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    console.log(chatData.originatorDetails.client);
+  };
+
   return (
     <Transition appear show={chatData.openModal === "enquire"} as={Fragment}>
       <Dialog as="div" className="relative z-10 " onClose={closeModal}>
@@ -98,6 +103,7 @@ function ContactUs() {
                     action="#"
                     method="POST"
                     className="grid grid-cols-1 gap-y-6 sm:grid-cols-2 sm:gap-x-8"
+                    onSubmit={preventFormSubmission}
                   >
                     <div>
                       <label
