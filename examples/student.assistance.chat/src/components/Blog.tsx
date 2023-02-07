@@ -12,32 +12,35 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export default function Blog(props: {
-  id: string;
+type Post = {
+  href: string;
+  title: string;
+  imageUrl: string;
+  description: string;
+  dateTime: string;
+  date: string;
+  readingTime: string;
+  author: {
+    name: string;
+    imageUrl: string;
+    href: string;
+  };
+  blogCategory: { href: string; name: string };
+};
+
+type BlogProps = {
+  key: string;
   blogHeading: string;
   blogSubHeading: string;
-  posts: Array<{
-    href: string;
-    title: string;
-    imageUrl: string;
-    description: string;
-    link: string;
-    dateTime: string;
-    date: string;
-    readingTime: string;
-    author: {
-      name: string;
-      imageUrl: string;
-      href: string;
-    };
-    blogCategory: { href: string; name: string };
-  }>;
-}) {
+  posts: Post[];
+};
+
+export default function Blog(props: BlogProps) {
   return (
     <div
       id="blog"
       className="relative bg-gray-50 px-6 pt-16 pb-20 lg:px-8 lg:pt-24 lg:pb-28"
-      key={props.id}
+      key={props.key}
     >
       <div className="absolute inset-0">
         <div className="h-1/3 bg-white sm:h-2/3" />

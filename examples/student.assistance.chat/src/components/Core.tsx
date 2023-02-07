@@ -139,8 +139,8 @@ export default function Core(props: { data: typeof dataCore }) {
           <Suspense fallback={<div>Loading...</div>}>
             <Blog
               key={props.data.blog.id}
-              blogsHeading={props.data.blog.blogsHeading}
-              blogsSubHeading={props.data.blog.blogsSubHeading}
+              blogHeading={props.data.blog.blogsHeading}
+              blogSubHeading={props.data.blog.blogsSubHeading}
               posts={props.data.blog.posts}
             />
           </Suspense>
