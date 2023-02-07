@@ -35,6 +35,10 @@ def get_jwt_key():
     return _load_secret("jwt-key")
 
 
+def get_fernet_key():
+    return _load_secret("fernet-key").encode()
+
+
 def get_mailgun_api_key():
     return _load_secret("mailgun-api-key")
 
