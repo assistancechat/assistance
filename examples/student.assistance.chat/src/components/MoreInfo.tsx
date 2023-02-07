@@ -12,6 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { useContext } from "react";
+import { ChatContext } from "@/providers/chat";
+
 import { EnvelopeOpenIcon } from "@heroicons/react/24/solid";
 
 import StartChatWithQuestionButton from "@/components/atoms/StartChatWithQuestionButton";
@@ -27,10 +30,16 @@ type MoreInfoProps = {
 };
 
 export default function MoreInfo(props: MoreInfoProps) {
+
+const { chatData, setChatData } = useContext(ChatContext);
+
+function openEnquireModal() {
+  setChatData({ ...chatData, openModal: "enquire" })};
+
   return (
-    <div id="MoreInfo" className="relative h-screen bg-white">
+    <div id="MoreInfo" className="relative h-max bg-white lg:h-screen">
       <div className="mx-auto max-w-full lg:grid lg:grid-cols-12 lg:gap-x-8 lg:px-8">
-        <div className="relative flex lg:col-span-7 xl:inset-0">
+        <div className="relative flex md:col-span-7 xl:inset-0">
           <iframe
             className="w-screen aspect-video mt-10 pl-2 pr-2 bg-orange-50 object-cover lg:p-6 lg:w-full"
             src={props.videoLink}
@@ -39,7 +48,7 @@ export default function MoreInfo(props: MoreInfoProps) {
             allowFullScreen
           />
         </div>
-        <div className="px-6 pt-10 pb-24 sm:pb-32 justify-self-center lg:col-span-5 lg:px-0">
+        <div className="px-6 pt-10 pb-24 sm:pb-32 justify-self-center md:col-span-5 lg:px-0">
           <div className="mx-auto flex flex-col space-y-6 max-w-2xl lg:mx-0">
             <hr className="border-orange-400 border-2" />
             <h1 className="text-5xl capitalize tracking-normal leading-none">
@@ -57,7 +66,7 @@ export default function MoreInfo(props: MoreInfoProps) {
             <div className="h-11">
               <button
                 type="button"
-                onClick={() => window.open(props.learnButtonLink)}
+                onClick={openEnquireModal}
                 className=" bg-gray-800 px-4 py-2 text-sm text-left leading-none text-white shadow-sm hover:bg-orange-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
               >
                 <EnvelopeOpenIcon
