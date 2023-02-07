@@ -30,21 +30,21 @@
         "id": 1,
         "careerSnapshot": "Why Our Partners",
         "careerSlogan": "Make your Faith your Career edge",
-        "sidePanel": [
+        "sidePanels": [
             {
                 "id": 1,
                 "headline": "",
-                "subheading": "Starting Salary"
+                "subHeading": "Starting Salary"
             },
             {
                 "id": 2,
                 "headline": "↑40% ",
-                "subheading": "Of all Australians will need counselling at some point in their lives"
+                "subHeading": "Of all Australians will need counselling at some point in their lives"
             },
             {
                 "id": 3,
                 "headline": "> 85%",
-                "subheading": "Feel that their career is meaningful and rewarding"
+                "subHeading": "Feel that their career is meaningful and rewarding"
             }
         ],
         "featured": [

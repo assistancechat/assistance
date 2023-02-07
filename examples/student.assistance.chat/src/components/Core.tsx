@@ -113,7 +113,7 @@ export default function Core(props: { data: typeof dataCore }) {
             subHeading={props.data.moreInfo.subHeading}
             learnButtonText={props.data.moreInfo.learnButtonText}
             learnButtonLink={props.data.moreInfo.learnButtonLink}
-            ChatButtonText={props.data.moreInfo.ChatButtonText}
+            chatButtonText={props.data.moreInfo.ChatButtonText}
             videoLink={props.data.moreInfo.videoLink}
             videoTitle={props.data.moreInfo.videoTitle}
           />
@@ -122,7 +122,7 @@ export default function Core(props: { data: typeof dataCore }) {
               key={props.data.reviews.id}
               careerSnapshot={props.data.reviews.careerSnapshot}
               careerSlogan={props.data.reviews.careerSlogan}
-              sidePanel={props.data.reviews.sidePanel}
+              sidePanels={props.data.reviews.sidePanels}
               featured={props.data.reviews.featured}
             />
           </Suspense>

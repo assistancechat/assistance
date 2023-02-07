@@ -118,7 +118,7 @@ export default function Home() {
             subHeading={data.moreInfo.subHeading}
             learnButtonText={data.moreInfo.learnButtonText}
             learnButtonLink={data.moreInfo.learnButtonLink}
-            ChatButtonText={data.moreInfo.ChatButtonText}
+            chatButtonText={data.moreInfo.ChatButtonText}
             videoLink={data.moreInfo.videoLink}
             videoTitle={data.moreInfo.videoTitle}
           />
