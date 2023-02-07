@@ -12,6 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { useContext } from "react";
+import { ChatContext } from "@/providers/chat";
+
 import { EnvelopeOpenIcon } from "@heroicons/react/24/solid";
 
 import StartChatWithQuestionButton from "@/components/atoms/StartChatWithQuestionButton";
@@ -27,6 +30,12 @@ type MoreInfoProps = {
 };
 
 export default function MoreInfo(props: MoreInfoProps) {
+
+const { chatData, setChatData } = useContext(ChatContext);
+
+function openEnquireModal() {
+  setChatData({ ...chatData, openModal: "enquire" })};
+
   return (
     <div id="MoreInfo" className="relative h-screen bg-white">
       <div className="mx-auto max-w-full lg:grid lg:grid-cols-12 lg:gap-x-8 lg:px-8">
@@ -57,7 +66,7 @@ export default function MoreInfo(props: MoreInfoProps) {
             <div className="h-11">
               <button
                 type="button"
-                onClick={() => window.open(props.learnButtonLink)}
+                onClick={openEnquireModal}
                 className=" bg-gray-800 px-4 py-2 text-sm text-left leading-none text-white shadow-sm hover:bg-orange-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
               >
                 <EnvelopeOpenIcon

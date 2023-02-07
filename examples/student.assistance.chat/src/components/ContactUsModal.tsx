@@ -17,6 +17,7 @@ import { Dialog, Transition, Switch } from "@headlessui/react";
 
 import { ChatContext, Details } from "@/providers/chat";
 import { updateClientData } from "@/utilities/core";
+import { EnvelopeIcon } from '@heroicons/react/24/solid';
 
 function ContactUs() {
   const { chatData, setChatData } = useContext(ChatContext);
@@ -89,9 +90,9 @@ function ContactUs() {
               <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-gray-800 p-6 text-left align-middle shadow-xl transition-all">
                 <Dialog.Title
                   as="h3"
-                  className="text-3xl font-medium leading-none text-orange-400"
+                  className="text-3xl font-medium inline-flex leading-none text-white space-x-1"
                 >
-                  Contact Us
+                  <EnvelopeIcon className="text-orange-400 w-8 animate-pulse" /><h1>Contact Us</h1>
                 </Dialog.Title>
                 <div className="mt-5">
                   <form
@@ -102,7 +103,7 @@ function ContactUs() {
                     <div>
                       <label
                         htmlFor="first-name"
-                        className="block text-sm font-medium text-orange-300"
+                        className="block text-sm font-medium text-orange-400"
                       >
                         First name
                       </label>
@@ -124,7 +125,7 @@ function ContactUs() {
                     <div>
                       <label
                         htmlFor="last-name"
-                        className="block text-sm font-medium text-orange-300"
+                        className="block text-sm font-medium text-orange-400"
                       >
                         Last name
                       </label>
@@ -146,7 +147,7 @@ function ContactUs() {
                     <div className="sm:col-span-2">
                       <label
                         htmlFor="email"
-                        className="block text-sm font-medium text-orange-300"
+                        className="block text-sm font-medium text-orange-400"
                       >
                         Email
                       </label>
@@ -167,7 +168,7 @@ function ContactUs() {
                     <div className="sm:col-span-2">
                       <label
                         htmlFor="phone-number"
-                        className="block text-sm font-medium text-orange-300"
+                        className="block text-sm font-medium text-orange-400"
                       >
                         Phone Number
                       </label>
@@ -191,7 +192,7 @@ function ContactUs() {
                     <div className="sm:col-span-2">
                       <label
                         htmlFor="message"
-                        className="block text-sm font-medium text-orange-300"
+                        className="block text-sm font-medium text-orange-400"
                       >
                         Message
                       </label>
@@ -236,14 +237,14 @@ function ContactUs() {
                             By selecting this, you agree to the{" "}
                             <a
                               href="#"
-                              className="font-medium text-orange-300 underline"
+                              className="font-medium text-orange-400 underline"
                             >
                               Privacy Policy [TODO]
                             </a>{" "}
                             and{" "}
                             <a
                               href="#"
-                              className="font-medium text-orange-300 underline"
+                              className="font-medium text-orange-400 underline"
                             >
                               Cookie Policy [TODO]
                             </a>

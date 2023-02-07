@@ -51,42 +51,42 @@ export default function Navbar() {
                   />
                 </div>
                 <div className="hidden md:ml-6 md:flex md:space-x-8">
-                  {/* Current: "border-orange-500 text-orange-400", Default: "border-transparent text-gray-500 hover:border-gray-300 hover:text-orange-300" */}
+                  {/* Current: "border-orange-500 text-gray-800", Default: "border-transparent text-gray-500 hover:border-gray-300 hover:text-orange-300" */}
                   <a
                     href="#MoreInfo"
-                    className="inline-flex items-center border-b-2 border-transparent px-1 pt-1 text-sm font-medium text-orange-400 hover:text-orange-700 hover:border-orange-500"
+                    className="inline-flex items-center border-b-2 border-transparent px-1 pt-1 text-sm font-medium text-gray-800 hover:text-orange-400 hover:border-orange-500"
                   >
                     More Info
                   </a>
                   <a
                     href="#Reviews"
-                    className="inline-flex items-center border-b-2 border-transparent px-1 pt-1 text-sm font-medium text-orange-400 hover:text-orange-700 hover:border-orange-500"
+                    className="inline-flex items-center border-b-2 border-transparent px-1 pt-1 text-sm font-medium text-gray-800 hover:text-orange-400 hover:border-orange-500"
                   >
                     Reviews
                   </a>
                   <a
                     href="#StudentExperience"
-                    className="inline-flex items-center border-b-2 border-transparent px-1 pt-1 text-sm font-medium text-orange-400 hover:text-orange-700 hover:border-orange-500"
+                    className="inline-flex items-center border-b-2 border-transparent px-1 pt-1 text-sm font-medium text-gray-800 hover:text-orange-400 hover:border-orange-500"
                   >
                     Student Experience
                   </a>
                 </div>
               </div>
-              <div className="flex items-center space-x-2">
+              <div className="flex items-center">
                 <button
                   type="button"
                   onClick={openChatModal}
-                  className="text-gray-600 flex-col text-md inline-flex items-center px-4 py-2 rounded-md shadow-sm hover:bg-orange-300 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2"
+                  className="text-gray-800 flex-col text-md inline-flex items-center px-4 py-2 rounded-md shadow-sm hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2"
                 >
                   <ChatBubbleOvalLeftEllipsisIcon
                     className="h-5 w-5 text-orange-600"
                     aria-hidden="true"
                   />
-                  <span className="text-gray-600 text-xs">Chat</span>
+                  <span className="text-gray-800 text-xs">Chat</span>
                 </button>
                 <button
                   type="button"
-                  className="text-gray-600 flex-col text-md inline-flex items-center px-4 py-2 rounded-md shadow-sm hover:bg-orange-300 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2"
+                  className="text-gray-800 flex-col text-md inline-flex items-center px-4 py-2 rounded-md shadow-sm hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2"
                   onClick={() =>
                     window.open("https://forms.gle/bJohSSgcd2g61WKSA")
                   }
@@ -95,19 +95,19 @@ export default function Navbar() {
                     className="h-5 w-5 text-orange-600"
                     aria-hidden="true"
                   />
-                  <span className="text-gray-600 text-xs">Apply</span>
+                  <span className="text-gray-800 text-xs">Apply</span>
                 </button>
                 <button
                   type="button"
                   onClick={openEnquireModal}
-                  className="text-gray-600 flex-col text-md inline-flex items-center px-4 py-2 rounded-md shadow-sm hover:bg-orange-300 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2"
+                  className="text-gray-800 flex-col text-md inline-flex items-center px-4 py-2 rounded-md shadow-sm hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2"
                 >
                   <EnvelopeIcon
                     className="h-5 w-5 text-orange-600"
                     aria-hidden="true"
                   />
                   <span
-                    className="text-gray-600 text-xs"
+                    className="text-gray-800 text-xs"
                     onClick={openEnquireModal}
                   >
                     Enquire
@@ -122,7 +122,7 @@ export default function Navbar() {
               <Disclosure.Button
                 as="a"
                 href="#MoreInfo"
-                className="block border-l-4 border-orange-500 bg-orange-50 py-2 pl-3 pr-4 text-base font-medium text-orange-700 sm:pl-5 sm:pr-6"
+                className="block border-l-4 border-orange-500 py-2 pl-3 pr-4 text-base font-medium text-orange-400 sm:pl-5 sm:pr-6"
               >
                 More Info
               </Disclosure.Button>
