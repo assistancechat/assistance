@@ -2,11 +2,10 @@
 # https://github.com/whitphx/streamlit-stt-app/blob/main/app_deepspeech.py
 
 
-import whisper
-import os
-import tempfile
 import logging
 import logging.handlers
+import os
+import tempfile
 import threading
 import time
 from collections import deque
@@ -17,7 +16,7 @@ import av
 import numpy as np
 import pydub
 import streamlit as st
-
+import whisper
 from streamlit_webrtc import WebRtcMode, webrtc_streamer
 
 HERE = Path(__file__).parent
