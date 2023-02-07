@@ -4,9 +4,7 @@ function GoogleEnrolmentForm() {
       src="https://forms.gle/bJohSSgcd2g61WKSA"
       width="640"
       height="800"
-      frameBorder="0"
-      marginheight="0"
-      marginwidth="0"
+      style={{ border: "none", margin: "0" }}
     >
       Loading…
     </iframe>

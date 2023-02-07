@@ -105,17 +105,7 @@ export default function Core(props: { data: typeof dataCore }) {
             portraitPicture={props.data.hero.portraitPicture}
             landscapePicture={props.data.hero.landscapePicture}
             alt={props.data.hero.alt}
-            courseTitle={props.data.hero.courseTitle}
-            headLine1={props.data.hero.headLine1}
-            headLine2={props.data.hero.headLine2}
-            headLine3={props.data.hero.headLine3}
-            headLine4={props.data.hero.headLine4}
-            headLine5={props.data.hero.headLine5}
-            headLine6={props.data.hero.headLine6}
-            subHeading={props.data.hero.subHeading}
-            learnButtonText={props.data.hero.learnButtonText}
-            learnButtonLink={props.data.hero.learnButtonLink}
-            ChatButtonText={props.data.hero.ChatButtonText}
+            chatButtonText={props.data.hero.ChatButtonText}
           />
           <MoreInfo
             key={props.data.moreInfo.id}
@@ -123,24 +113,24 @@ export default function Core(props: { data: typeof dataCore }) {
             subHeading={props.data.moreInfo.subHeading}
             learnButtonText={props.data.moreInfo.learnButtonText}
             learnButtonLink={props.data.moreInfo.learnButtonLink}
-            ChatButtonText={props.data.moreInfo.ChatButtonText}
+            chatButtonText={props.data.moreInfo.ChatButtonText}
             videoLink={props.data.moreInfo.videoLink}
             videoTitle={props.data.moreInfo.videoTitle}
           />
           <Suspense fallback={<div>Loading...</div>}>
             <Reviews
-              key={props.data.reviews.id}
+              id={props.data.reviews.id}
               careerSnapshot={props.data.reviews.careerSnapshot}
               careerSlogan={props.data.reviews.careerSlogan}
-              sidePanel={props.data.reviews.sidePanel}
+              sidePanels={props.data.reviews.sidePanels}
               featured={props.data.reviews.featured}
             />
           </Suspense>
           <Suspense fallback={<div>Loading...</div>}>
             <Blog
-              key={props.data.blog.id}
-              blogsHeading={props.data.blog.blogsHeading}
-              blogsSubHeading={props.data.blog.blogsSubHeading}
+              id={props.data.blog.id}
+              blogHeading={props.data.blog.blogsHeading}
+              blogSubHeading={props.data.blog.blogsSubHeading}
               posts={props.data.blog.posts}
             />
           </Suspense>

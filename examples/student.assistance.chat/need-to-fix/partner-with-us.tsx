@@ -110,7 +110,7 @@ export default function Home() {
             subHeading={data.hero.subHeading}
             learnButtonText={data.hero.learnButtonText}
             learnButtonLink={data.hero.learnButtonLink}
-            ChatButtonText={data.hero.ChatButtonText}
+            chatButtonText={data.hero.ChatButtonText}
           />
           <MoreInfo
             key={data.moreInfo.id}
@@ -118,7 +118,7 @@ export default function Home() {
             subHeading={data.moreInfo.subHeading}
             learnButtonText={data.moreInfo.learnButtonText}
             learnButtonLink={data.moreInfo.learnButtonLink}
-            ChatButtonText={data.moreInfo.ChatButtonText}
+            chatButtonText={data.moreInfo.ChatButtonText}
             videoLink={data.moreInfo.videoLink}
             videoTitle={data.moreInfo.videoTitle}
           />
@@ -136,7 +136,7 @@ export default function Home() {
               key={data.studentExperience.id}
               videoLink={data.studentExperience.videoLink}
               videoTitle={data.studentExperience.videoTitle}
-              ChatButtonText={data.studentExperience.ChatButtonText}
+              chatButtonText={data.studentExperience.ChatButtonText}
             />
           </Suspense>
           <Suspense fallback={<div>Loading...</div>}>
