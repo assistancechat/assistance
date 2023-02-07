@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { ChatContextData } from "@/providers/chat";
+import { ChatContextData, Details } from "@/providers/chat";
 
 // Use this in-place of "is-typing" for ellipsis as well as input disabling and
 // submit button disabling.
@@ -25,4 +25,22 @@ export const mostRecentChatIsClient = (chatData: ChatContextData) => {
 
   const mostRecentChatItem = messageHistory[messageHistory.length - 1];
   return mostRecentChatItem.originator === "client";
+};
+
+export const updateClientData = (
+  chatData: ChatContextData,
+  setChatData: (chatData: ChatContextData) => void,
+  detailsItem: keyof Details,
+  value: string | boolean
+) => {
+  const newClientDetails = {
+    ...chatData.originatorDetails["client"],
+    [detailsItem]: value,
+  };
+  const newOriginatorDetails = {
+    ...chatData.originatorDetails,
+    client: newClientDetails,
+  };
+
+  setChatData({ ...chatData, originatorDetails: newOriginatorDetails });
 };

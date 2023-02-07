@@ -23,7 +23,7 @@ import {
 
 import { PaperAirplaneIcon } from "@heroicons/react/24/solid";
 
-import jwt_decode from "jwt-decode";
+import jwtDecode from "jwt-decode";
 import { GoogleLogin, CredentialResponse } from "@react-oauth/google";
 
 import {
@@ -33,7 +33,7 @@ import {
 } from "@/providers/chat";
 
 import { callChatApi } from "@/utilities/call-api";
-import { mostRecentChatIsClient } from "@/utilities/flow";
+import { mostRecentChatIsClient } from "@/utilities/core";
 
 import ProfilePicture from "@/components/atoms/ProfilePicture";
 
@@ -144,7 +144,7 @@ function Login() {
       return;
     }
 
-    const decoded = jwt_decode(token) as GoogleTokenIdData;
+    const decoded = jwtDecode(token) as GoogleTokenIdData;
 
     console.log(decoded);
 

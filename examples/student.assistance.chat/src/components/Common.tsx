@@ -34,7 +34,7 @@ import {
   MessageHistoryItem,
 } from "@/providers/chat";
 
-import { mostRecentChatIsClient } from "@/utilities/flow";
+import { mostRecentChatIsClient, updateClientData } from "@/utilities/core";
 import { callChatApi } from "@/utilities/call-api";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -49,6 +49,20 @@ const Footer = lazy(() => import("@/components/Footer"));
 export default function Core(props: { data: typeof dataCore }) {
   const [chatData, setChatData] = useState<ChatContextData>(DefaultChatData);
   const value = { chatData, setChatData };
+
+  useEffect(() => {
+    const queryParameters = new URLSearchParams(window.location.search);
+    const tag = queryParameters.get("tag");
+
+    if (tag == null) {
+      return;
+    }
+
+    updateClientData(chatData, setChatData, "referrerTag", tag);
+    console.log(chatData.originatorDetails.client);
+
+    queryParameters.delete("tag");
+  }, []);
 
   useEffect(() => {
     const appendPendingQuestionIfReady = async () => {
