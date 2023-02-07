@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import subprocess
+
 import streamlit as st
 
 from assistance._admin import categories
@@ -47,7 +48,7 @@ async def main():
 
     task_prompt = st.text_area("Task Prompt", DEFAULT_TASK, height=300)
 
-    create_audio = st.checkbox("Create audio of response", True)
+    # create_audio = st.checkbox("Create audio of response", False)
 
     if "conversation" not in st.session_state:
         st.session_state.conversation = []
@@ -81,16 +82,16 @@ async def main():
     with st.form("conversation-form"):
         st.write(transcript)
 
-        if create_audio:
-            output = subprocess.check_output(
-                [
-                    "/home/simon/.cache/pypoetry/virtualenvs/assistance-zIqiKnAa-py3.10/bin/mimic3",
-                    "--cuda",
-                    response,
-                ]
-            )
+        # if create_audio:
+        #     output = subprocess.check_output(
+        #         [
+        #             "/home/simon/.cache/pypoetry/virtualenvs/assistance-zIqiKnAa-py3.10/bin/mimic3",
+        #             "--cuda",
+        #             response,
+        #         ]
+        #     )
 
-            st.audio(output)
+        #     st.audio(output)
 
         st.text_input("Enter your message", key="user_input")
 
