@@ -110,7 +110,7 @@ export default function Home() {
             subHeading={data.hero.subHeading}
             learnButtonText={data.hero.learnButtonText}
             learnButtonLink={data.hero.learnButtonLink}
-            ChatButtonText={data.hero.ChatButtonText}
+            chatButtonText={data.hero.ChatButtonText}
           />
           <MoreInfo
             key={data.moreInfo.id}

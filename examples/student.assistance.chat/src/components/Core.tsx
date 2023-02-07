@@ -115,7 +115,7 @@ export default function Core(props: { data: typeof dataCore }) {
             subHeading={props.data.hero.subHeading}
             learnButtonText={props.data.hero.learnButtonText}
             learnButtonLink={props.data.hero.learnButtonLink}
-            ChatButtonText={props.data.hero.ChatButtonText}
+            chatButtonText={props.data.hero.ChatButtonText}
           />
           <MoreInfo
             key={props.data.moreInfo.id}
@@ -138,7 +138,7 @@ export default function Core(props: { data: typeof dataCore }) {
           </Suspense>
           <Suspense fallback={<div>Loading...</div>}>
             <Blog
-              key={props.data.blog.id}
+              id={props.data.blog.id}
               blogHeading={props.data.blog.blogsHeading}
               blogSubHeading={props.data.blog.blogsSubHeading}
               posts={props.data.blog.posts}

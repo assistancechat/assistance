@@ -29,7 +29,7 @@ type Post = {
 };
 
 type BlogProps = {
-  key: string;
+  id: string;
   blogHeading: string;
   blogSubHeading: string;
   posts: Post[];
@@ -40,7 +40,7 @@ export default function Blog(props: BlogProps) {
     <div
       id="blog"
       className="relative bg-gray-50 px-6 pt-16 pb-20 lg:px-8 lg:pt-24 lg:pb-28"
-      key={props.key}
+      key={props.id}
     >
       <div className="absolute inset-0">
         <div className="h-1/3 bg-white sm:h-2/3" />

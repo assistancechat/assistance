@@ -1,14 +1,35 @@
+// Copyright (C) 2023 Assistance.Chat contributors
+
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+
+//     http://www.apache.org/licenses/LICENSE-2.0
+
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 import React from "react";
 import { ArrowDownCircleIcon } from "@heroicons/react/24/solid";
 
 import StartChatWithQuestionButton from "@/components/atoms/StartChatWithQuestionButton";
 
+type HeroProps = {
+  portraitPicture: string;
+  landscapePicture: string;
+  alt: string;
+  learnButtonLink: string;
+  question: string;
+  learnButtonText: string;
+  headLine: string;
+  subHeading: string;
+  chatButtonText: string;
+};
 
-
-
-
-//currently video is hidden, remove hidden to play video
-export default function Hero(props) {
+export default function Hero(props: HeroProps) {
   return (
     <div className="w-screen h-screen">
       <img
@@ -49,7 +70,7 @@ export default function Hero(props) {
           </div>
 
           <StartChatWithQuestionButton
-            question={props.ChatButtonText}
+            question={props.chatButtonText}
             buttonClassName="row-span-1 relative bg-orange-400 inset-10 inline-flex w-5/6 rounded-md py-1 px-4 shadow-sm hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 lg:w-1/3 lg:justify-self-end lf:mt-10 space-x-4"
             bubbleClassName="-ml-1 animate-pulse self-center text-white h-12 w-12"
             textClassName="text-base font-medium text-white uppercase leading-none text-left place-self-center"
