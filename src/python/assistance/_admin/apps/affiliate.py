@@ -12,16 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import base64
-import json
 
 import streamlit as st
-from cryptography.fernet import Fernet
 
 from assistance._admin import categories
-from assistance._keys import get_fernet_key
-
-FERNET_SECRET_KEY = get_fernet_key()
+from assistance._affiliate import create_affiliate_tag, decrypt_affiliate_tag
 
 CATEGORY = categories.ADMIN
 TITLE = "Affiliate Links"
@@ -35,28 +30,13 @@ async def main():
         "Extra details to encode along with the affiliate link token (optional)"
     )
 
-    affiliate_link_data = {
-        "type": "affiliate",
-        "email": email,
-        "details": details,
-    }
-
     if not st.button("Generate Affiliate Link"):
         st.stop()
 
-    json_string = json.dumps(affiliate_link_data, indent=2)
-    for_encryption = json_string.encode()
-
-    fernet = Fernet(FERNET_SECRET_KEY)
-    encrypted = fernet.encrypt(for_encryption)
-    tag = base64.urlsafe_b64encode(encrypted).decode()
-
+    tag = create_affiliate_tag(email, details)
     st.write(f"https://globaltalent.work/?tag={tag}")
 
-    decoded = base64.urlsafe_b64decode(tag.encode())
-    decrypted = fernet.decrypt(decoded)
-
-    loaded_token_data = json.loads(decrypted)
+    loaded_token_data = decrypt_affiliate_tag(tag)
 
     st.write("## Token contents")
     st.write(loaded_token_data)
