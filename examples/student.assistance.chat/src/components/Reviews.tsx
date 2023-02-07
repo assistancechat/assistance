@@ -13,13 +13,11 @@
 // limitations under the License.
 
 type Panel = {
-  id: number;
   headline: string;
   subHeading: string;
 };
 
 type FeaturedItem = {
-  id: number;
   avatarSrc: string;
   author: string;
   action: string;
@@ -30,7 +28,6 @@ type FeaturedItem = {
 };
 
 type ReviewProps = {
-  id: number;
   careerSnapshot: string;
   careerSlogan: string;
   sidePanels: Panel[];
@@ -39,7 +36,7 @@ type ReviewProps = {
 
 export default function Reviews(props: ReviewProps) {
   return (
-    <div className="bg-gray-800" id="Reviews" key={props.id}>
+    <div className="bg-gray-800" id="Reviews">
       <div className="mx-auto max-w-2xl py-16 px-4 justify-items-center sm:py-24 sm:px-6 lg:grid lg:max-w-7xl lg:grid-cols-12 lg:gap-x-8 lg:py-32 lg:px-8">
         <div className="lg:col-span-4">
           <div className="bg-orange-400 rounded-lg">
@@ -53,20 +50,18 @@ export default function Reviews(props: ReviewProps) {
                 </p>
               </div>
               <dl className="mt-10 text-center space-y-4">
-                {props.sidePanels.map((panel) => (
-                  <>
-                    <div
-                      key={panel.id}
-                      className="flex border-white border-2 flex-col"
-                    >
-                      <dd className="order-1 text-5xl font-bold tracking-tight text-white">
-                        {panel.headline}
-                      </dd>
-                      <dt className=" order-2 mt-2 text-lg font-light leading-6 text-gray-800 ">
-                        {panel.subHeading}
-                      </dt>
-                    </div>
-                  </>
+                {props.sidePanels.map((panel, index) => (
+                  <div
+                    key={index}
+                    className="flex border-white border-2 flex-col"
+                  >
+                    <dd className="order-1 text-5xl font-bold tracking-tight text-white">
+                      {panel.headline}
+                    </dd>
+                    <dt className=" order-2 mt-2 text-lg font-light leading-6 text-gray-800 ">
+                      {panel.subHeading}
+                    </dt>
+                  </div>
                 ))}
               </dl>
             </div>
@@ -78,9 +73,9 @@ export default function Reviews(props: ReviewProps) {
 
           <div className="flow-root">
             <div className="flex flex-wrap items-center divide-gray-200 space-y-2">
-              {props.featured.map((review) => (
+              {props.featured.map((review, index) => (
                 <div
-                  key={review.id}
+                  key={index}
                   className="p-6 bg-gray-300 hover:bg-orange-200 shadow border-gray-400 rounded-md"
                 >
                   <div className="flex items-center">
