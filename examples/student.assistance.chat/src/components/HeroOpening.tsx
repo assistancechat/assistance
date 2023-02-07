@@ -18,7 +18,6 @@ import StartChatWithQuestionButton from "@/components/atoms/StartChatWithQuestio
 import Typed from "typed.js";
 
 type HeroOpeningProps = {
-  headline: string;
   portraitPicture: string;
   landscapePicture: string;
   alt: string;

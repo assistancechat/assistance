@@ -105,16 +105,6 @@ export default function Core(props: { data: typeof dataCore }) {
             portraitPicture={props.data.hero.portraitPicture}
             landscapePicture={props.data.hero.landscapePicture}
             alt={props.data.hero.alt}
-            courseTitle={props.data.hero.courseTitle}
-            headLine1={props.data.hero.headLine1}
-            headLine2={props.data.hero.headLine2}
-            headLine3={props.data.hero.headLine3}
-            headLine4={props.data.hero.headLine4}
-            headLine5={props.data.hero.headLine5}
-            headLine6={props.data.hero.headLine6}
-            subHeading={props.data.hero.subHeading}
-            learnButtonText={props.data.hero.learnButtonText}
-            learnButtonLink={props.data.hero.learnButtonLink}
             chatButtonText={props.data.hero.ChatButtonText}
           />
           <MoreInfo
