@@ -30,11 +30,11 @@ type MoreInfoProps = {
 };
 
 export default function MoreInfo(props: MoreInfoProps) {
+  const { chatData, setChatData } = useContext(ChatContext);
 
-const { chatData, setChatData } = useContext(ChatContext);
-
-function openEnquireModal() {
-  setChatData({ ...chatData, openModal: "enquire" })};
+  function openEnquireModal() {
+    setChatData({ ...chatData, openModal: "enquire" });
+  }
 
   return (
     <div id="MoreInfo" className="relative h-max bg-white lg:h-screen">
