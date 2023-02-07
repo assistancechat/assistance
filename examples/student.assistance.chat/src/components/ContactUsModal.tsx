@@ -12,19 +12,64 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { useContext, Fragment, useState } from "react";
+import { useContext, Fragment, useState, useEffect } from "react";
 import { Dialog, Transition, Switch } from "@headlessui/react";
 
-import { ChatContext } from "@/providers/chat";
+import { ChatContext, Details } from "@/providers/chat";
 
 function ContactUs() {
   const { chatData, setChatData } = useContext(ChatContext);
 
   const [agreed, setAgreed] = useState(false);
+  const [allDataFilledOut, setAllDataFilledOut] = useState(false);
+
+  const onChange = (e: any, detailsItem: keyof Details) => {
+    updateClientData(detailsItem, e.target.value);
+  };
+
+  const updateClientData = (
+    detailsItem: keyof Details,
+    value: string | boolean
+  ) => {
+    const newClientDetails = {
+      ...chatData.originatorDetails["client"],
+      [detailsItem]: value,
+    };
+    const newOriginatorDetails = {
+      ...chatData.originatorDetails,
+      client: newClientDetails,
+    };
+
+    setChatData({ ...chatData, originatorDetails: newOriginatorDetails });
+  };
+
+  useEffect(() => {
+    updateClientData("agreeToTerms", agreed);
+  }, [agreed]);
+
+  useEffect(() => {
+    setAllDataFilledOut(determineIfAllDataFilledOut());
+  }, [chatData]);
 
   function classNames(...classes: string[]) {
     return classes.filter(Boolean).join(" ");
   }
+
+  const determineIfAllDataFilledOut = () => {
+    const clientDetails = chatData.originatorDetails["client"];
+    return (
+      isFilledOut(clientDetails.firstName) &&
+      isFilledOut(clientDetails.lastName) &&
+      isFilledOut(clientDetails.email) &&
+      isFilledOut(clientDetails.phoneNumber) &&
+      isFilledOut(clientDetails.enquiryMessage) &&
+      clientDetails.agreeToTerms === true
+    );
+  };
+
+  const isFilledOut = (value: string | null | undefined) => {
+    return value != null && value !== "";
+  };
 
   const closeModal = () => {
     setChatData({ ...chatData, openModel: null });
@@ -81,6 +126,10 @@ function ContactUs() {
                           type="text"
                           name="first-name"
                           id="first-name"
+                          value={
+                            chatData.originatorDetails["client"]["firstName"]
+                          }
+                          onChange={(e) => onChange(e, "firstName")}
                           autoComplete="given-name"
                           className="block w-full rounded-md border-gray-300 py-3 px-4 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                         />
@@ -98,6 +147,10 @@ function ContactUs() {
                           type="text"
                           name="last-name"
                           id="last-name"
+                          value={
+                            chatData.originatorDetails["client"]["lastName"]
+                          }
+                          onChange={(e) => onChange(e, "lastName")}
                           autoComplete="family-name"
                           className="block w-full rounded-md border-gray-300 py-3 px-4 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                         />
@@ -115,6 +168,8 @@ function ContactUs() {
                           id="email"
                           name="email"
                           type="email"
+                          value={chatData.originatorDetails["client"]["email"]}
+                          onChange={(e) => onChange(e, "email")}
                           autoComplete="email"
                           className="block w-full rounded-md border-gray-300 py-3 px-4 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                         />
@@ -132,6 +187,10 @@ function ContactUs() {
                           type="text"
                           name="phone-number"
                           id="phone-number"
+                          value={
+                            chatData.originatorDetails["client"]["phoneNumber"]
+                          }
+                          onChange={(e) => onChange(e, "phoneNumber")}
                           autoComplete="tel"
                           className="block w-full rounded-md border-gray-300 py-3 px-4  focus:border-indigo-500 focus:ring-indigo-500"
                           placeholder="+61 1234 5678"
@@ -149,9 +208,14 @@ function ContactUs() {
                         <textarea
                           id="message"
                           name="message"
+                          value={
+                            chatData.originatorDetails["client"][
+                              "enquiryMessage"
+                            ]
+                          }
+                          onChange={(e) => onChange(e, "enquiryMessage")}
                           rows={4}
                           className="block w-full rounded-md border-gray-300 py-3 px-4 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                          defaultValue={""}
                         />
                       </div>
                     </div>
@@ -200,7 +264,13 @@ function ContactUs() {
                     <div className="sm:col-span-2">
                       <button
                         type="submit"
-                        className="inline-flex w-full items-center justify-center rounded-md border border-transparent bg-indigo-600 px-6 py-3 text-base font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                        disabled={!allDataFilledOut}
+                        className={classNames(
+                          allDataFilledOut
+                            ? " bg-indigo-600  hover:bg-indigo-700"
+                            : " bg-gray-600",
+                          "inline-flex w-full items-center justify-center rounded-md border border-transparent px-6 py-3 text-base font-medium text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                        )}
                       >
                         Let's talk
                       </button>

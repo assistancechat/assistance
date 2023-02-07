@@ -126,6 +126,7 @@ type GoogleTokenIdData = {
   picture: string;
   given_name: string;
   family_name: string;
+  email: string;
 };
 
 function Login() {
@@ -149,6 +150,7 @@ function Login() {
 
     chatData.originatorDetails["client"].firstName = decoded["given_name"];
     chatData.originatorDetails["client"].lastName = decoded["family_name"];
+    chatData.originatorDetails["client"].email = decoded["email"];
     chatData.originatorDetails["client"].profilePictureUrl = decoded["picture"];
 
     chatData.googleIdToken = token;

@@ -25,13 +25,15 @@ export type MessageHistoryItem = {
 
 export type MessageHistory = MessageHistoryItem[];
 
-type Details = {
+export type Details = {
   firstName?: string;
   lastName?: string;
   email?: string;
   profilePictureUrl?: string;
   phoneNumber?: string;
   agreeToTerms?: boolean;
+  enquiryMessage?: string;
+  referrerToken?: string;
 };
 
 type OriginatorDetails = Record<MessageOriginator, Details>;
