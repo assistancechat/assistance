@@ -65,19 +65,19 @@ export default function Navbar() {
                   {/* Current: "border-orange-500 text-gray-800", Default: "border-transparent text-orange-600 hover:border-gray-300 hover:text-gray-800" */}
                   <a
                     href='#MoreInfo'
-                    className='inline-flex items-center border-b-2 border-transparent px-1 pt-1 text-sm font-medium text-gray-800 hover:text-orange-700 hover:border-orange-500'
+                    className='inline-flex items-center border-b-2 border-transparent px-1 pt-1 text-sm font-medium text-gray-800 hover:text-orange-600 hover:border-orange-500'
                   >
                     More Info
                   </a>
                   <a
                     href='#Reviews'
-                    className='inline-flex items-center border-b-2 border-transparent px-1 pt-1 text-sm font-medium text-gray-800 hover:text-orange-700 hover:border-orange-500'
+                    className='inline-flex items-center border-b-2 border-transparent px-1 pt-1 text-sm font-medium text-gray-800 hover:text-orange-600 hover:border-orange-500'
                   >
                     Reviews
                   </a>
                   <a
                     href='#StudentExperience'
-                    className='inline-flex items-center border-b-2 border-transparent px-1 pt-1 text-sm font-medium text-gray-800 hover:text-orange-700 hover:border-orange-500'
+                    className='inline-flex items-center border-b-2 border-transparent px-1 pt-1 text-sm font-medium text-gray-800 hover:text-orange-600 hover:border-orange-500'
                   >
                     Student Experience
                   </a>
@@ -132,7 +132,7 @@ export default function Navbar() {
               <Disclosure.Button
                 as='a'
                 href='#MoreInfo'
-                className='block border-l-4 border-orange-500 bg-orange-50 py-2 pl-3 pr-4 text-base font-medium text-orange-700 sm:pl-5 sm:pr-6'
+                className='block border-l-4 border-orange-500 bg-orange-50 py-2 pl-3 pr-4 text-base font-medium text-orange-600 sm:pl-5 sm:pr-6'
               >
                 More Info
               </Disclosure.Button>
@@ -188,9 +188,9 @@ export default function Navbar() {
                     <Dialog.Panel className='w-full max-w-md transform overflow-hidden rounded-2xl bg-gray-800 p-6 text-left align-middle shadow-xl transition-all'>
                       <Dialog.Title
                         as='h3'
-                        className='text-3xl font-medium leading-none text-gray-800'
+                        className='flex items-center space-x-2 text-3xl font-medium leading-none text-white'
                       >
-                        Contact Us
+                        <EnvelopeIcon className="w-8 animate-pulse text-orange-400"/> <h1>Contact Us </h1> 
                       </Dialog.Title>
                       <div className='mt-5'>
                         <form
@@ -201,7 +201,7 @@ export default function Navbar() {
                           <div>
                             <label
                               htmlFor='first-name'
-                              className='block text-sm font-medium text-orange-300'
+                              className='block text-sm font-medium text-orange-400'
                             >
                               First name
                             </label>
@@ -218,7 +218,7 @@ export default function Navbar() {
                           <div>
                             <label
                               htmlFor='last-name'
-                              className='block text-sm font-medium text-orange-300'
+                              className='block text-sm font-medium text-orange-400'
                             >
                               Last name
                             </label>
@@ -235,9 +235,9 @@ export default function Navbar() {
                           <div className='sm:col-span-2'>
                             <label
                               htmlFor='email'
-                              className='block text-sm font-medium text-orange-300'
+                              className='block text-sm font-medium text-orange-400'
                             >
-                          
+                              Email
                             </label>
                             <div className='mt-1'>
                               <input
@@ -252,7 +252,7 @@ export default function Navbar() {
                           <div className='sm:col-span-2'>
                             <label
                               htmlFor='phone-number'
-                              className='block text-sm font-medium text-orange-300'
+                              className='block text-sm font-medium text-orange-400'
                             >
                               Phone Number
                             </label>
@@ -271,7 +271,7 @@ export default function Navbar() {
                           <div className='sm:col-span-2'>
                             <label
                               htmlFor='message'
-                              className='block text-sm font-medium text-orange-300'
+                              className='block text-sm font-medium text-orange-400'
                             >
                               Message
                             </label>
@@ -287,49 +287,7 @@ export default function Navbar() {
                           </div>
                           <div className='sm:col-span-2'>
                             <div className='flex items-start'>
-                              <div className='flex-shrink-0'>
-                                <Switch
-                                  checked={agreed}
-                                  onChange={setAgreed}
-                                  className={classNames(
-                                    agreed ? 'bg-indigo-600' : 'bg-gray-200',
-                                    'relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2'
-                                  )}
-                                >
-                                  <span className='sr-only'>
-                                    Agree to policies
-                                  </span>
-                                  <span
-                                    aria-hidden='true'
-                                    className={classNames(
-                                      agreed
-                                        ? 'translate-x-5'
-                                        : 'translate-x-0',
-                                      'inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out'
-                                    )}
-                                  />
-                                </Switch>
                               </div>
-                              <div className='ml-3'>
-                                <p className='text-base text-orange-600'>
-                                  By selecting this, you agree to the{' '}
-                                  <a
-                                    href='#'
-                                    className='font-medium text-orange-300 underline'
-                                  >
-                                    Privacy Policy
-                                  </a>{' '}
-                                  and{' '}
-                                  <a
-                                    href='#'
-                                    className='font-medium text-orange-300 underline'
-                                  >
-                                    Cookie Policy
-                                  </a>
-                                  .
-                                </p>
-                              </div>
-                            </div>
                           </div>
                           <div className='sm:col-span-2'>
                             <button

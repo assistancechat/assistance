@@ -3,12 +3,12 @@ const navigation = {
       { name: 'About', href: '#' },
       { name: 'Blog', href: '#' },
       { name: 'Jobs', href: '#' },
-      { name: 'Partners', href: '#' },
+      { name: 'Privacy', href: '#' },
     ],
     social: [
       {
         name: 'Facebook',
-        href: '#',
+        href: 'https://www.facebook.com/globaltalentrecruitment',
         icon: (props) => (
           <svg fill="currentColor" viewBox="0 0 24 24" {...props}>
             <path
@@ -72,7 +72,7 @@ const navigation = {
           </nav>
           <div className="mt-10 flex justify-center space-x-10">
             {navigation.social.map((item) => (
-              <a key={item.name} href={item.href} className="text-gray-400 hover:text-gray-500">
+              <a key={item.name} onClick={()=>window.open(item.href)} className="text-gray-400 hover:text-gray-500">
                 <span className="sr-only">{item.name}</span>
                 <item.icon className="h-6 w-6 text-orange-400" aria-hidden="true" />
               </a>
