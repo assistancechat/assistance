@@ -17,18 +17,19 @@
         "ChatButtonText": "How can you help me align my faith and my career?"
     },
     "moreInfo": {
-        "id":1,
+        "id": 1,
         "heading": "It's time to align your faith with your future",
         "subHeading": "We will find you the best study pathway to maximise your God gifted talents",
         "learnButtonText": "Email us to find out more",
         "learnButtonLink": "#Enquire",
         "ChatButtonText": "Do I qualify for FEE-HELP?",
-        "videoLink": "https://www.youtube.com/embed/XH4dHf5O7u4",
+        "videoLink": "https://www.youtube.com/embed/Ezoi_6FN2xw",
         "videoTitle": "Thank you"
     },
     "reviews": {
         "id": 1,
         "careerSnapshot": "Why Our Partners",
+<<<<<<< HEAD
         "careerSlogan": "Make your Faith your Career edge",
         "sidePanels": [
             {
@@ -45,44 +46,80 @@
                 "id": 3,
                 "headline": "> 85%",
                 "subHeading": "Feel that their career is meaningful and rewarding"
+=======
+        "careerSlogan": "make your faith your career advantage",
+        "sidePanel": [
+            {
+                "id": 1,
+                "headline": "↑95%",
+                "subheading": "graduate satisfaction rate"
+            },
+            {
+                "id": 2,
+                "headline": "100% ",
+                "subheading": "flexible online and on-campus study options"
+            },
+            {
+                "id": 3,
+                "headline": "100%",
+                "subheading": "equipped to serve and lead in church and community"
+>>>>>>> origin/230207ken3
             }
         ],
         "featured": [
             {
                 "id": 1,
-                "content": "<p>The evidence based teaching at AC has really transformed the impact of my ministry</p>",
-                "author": "Bradley M",
+                "content": "By combining Theology and Business, it has really opened up more opportunities for me, whether it's going into the corporate world or working within a church context. My faith has grown through study - getting into the historical texts has meant that I see the Bible and God, in a whole new way. On top of that, I'm going to graduate with a business degree that will open up more options – I am very excited about my future.",
+                "author": "Sam M",
                 "action": "I Enrolled for",
                 "reason": "Purpose Driven Study",
+<<<<<<< HEAD
                 "titleLocation": "- Senior Member of Churches of Christ, WA.",
                 "course": "Master of Counselling",
                 "avatarSrc": "https://randomuser.me/api/portraits/men/75.jpg"
+=======
+                "titlelocation": "- Bachelor of Theology & Bachelor of Business",
+                "course": "",
+                "avatarSrc": "https://d3nr8uzk0yq0qe.cloudfront.net/media/images/sam-moore-208-208px.width-400.png"
+>>>>>>> origin/230207ken3
             },
             {
                 "id": 2,
-                "content": "<p>I was studying the same degree at another university and the lecturer said that our worldview affects everything we do. At that moment, I realised I needed to find a new place to learn</p>",
-                "author": "Abigail C",
+                "content": "I’m doing my placement with William Clarke College in Kellyville and it’s just been an awesome experience. Just being put into a school that shares your values and allows you to share those with the students is such a great freedom. Knowing that you’re supported by your mentor teacher is also really helpful.",
+                "author": "Michael R",
                 "action": "I Applied for",
                 "reason": "Christ Centered Learning",
+<<<<<<< HEAD
                 "titleLocation": "",
                 "course": "- Bachelor of Applied Social Science",
                 "avatarSrc": "https://randomuser.me/api/portraits/women/65.jpg"
+=======
+                "titlelocation": "",
+                "course": "- Bachelor of Education (Primary)",
+                "avatarSrc": "https://d3nr8uzk0yq0qe.cloudfront.net/media/images/michael-circle.width-400.png"
+>>>>>>> origin/230207ken3
             },
             {
                 "id": 3,
-                "content": "<p>The evidence based teaching at AC has really transformed the impact of my ministry</p>",
-                "author": "Anne L -",
+                "content": "Ruth to move to Thailand three years ago. She felt called to the Thai-Myanmar border to work with displaced people affected by the long-running civil war. Through AC's student-led missions initiative, Sounds of Silence, Ruth developed an interest in anti-trafficking movements. Ruth now transforms communities where people are at risk of human trafficking. She builds partnerships with organisations in the area, teaches English and vocational skills, and assists with natural farming sustainability projects.",
+                "author": "Ruth L",
                 "action": "I GRADUATED WITH",
                 "reason": "a meaningful career path",
+<<<<<<< HEAD
                 "titleLocation": "Founder, ",
                 "course": " Chaplaincy Australia",
                 "avatarSrc": "https://randomuser.me/api/portraits/women/72.jpg"
+=======
+                "titlelocation": "- Director of Training for Global Alms Incorporated",
+                "course": " - Bachelor of Ministry Graduate",
+                "avatarSrc": "https://d3nr8uzk0yq0qe.cloudfront.net/media/images/ruth_lesmana.width-400.png"
+>>>>>>> origin/230207ken3
             }
         ]
     },
-    "studentExperience":{
-        "id":1,
-        "videoLink":"https://www.youtube.com/embed/3_AoWp1tFMA",
+    "studentExperience": {
+        "id": 1,
+        "videoLink": "https://www.youtube.com/embed/3_AoWp1tFMA",
         "videoTitle": "Student Experience",
         "ChatButtonText": "What is studying at Alphacrucis like?"
     },
@@ -93,8 +130,9 @@
         "posts": [
             {
                 "id": 1,
-                "title": "Why a Christian Counselling Degree is Unique and Impactful",
+                "title": "The Advantages of a Christian Education: A Comprehensive Overview",
                 "href": "#",
+<<<<<<< HEAD
                 "blogCategory": {
                     "name": "Video",
                     "href": "#"
@@ -104,50 +142,82 @@
                 "dateTime": "2022-01-01T12:00:00",
                 "imageUrl": "https://images.unsplash.com/photo-1592188657297-c6473609e988?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2487&q=80",
                 "readingTime": "5 minute read",
+=======
+                "BlogCategory": {
+                    "name": "Report",
+                    "href": "#"
+                },
+                "description": "A Christian education offers unique benefits that can impact a student's life both academically and spiritually. This report provides a comprehensive overview of the advantages of studying at a Christian university, including a focus on values, character development, and a sense of community.",
+                "date": "May 1, 2022",
+                "datetime": "2022-05-01T12:00:00",
+                "imageUrl": "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2071&q=80",
+                "readingTime": "10 minute read",
+>>>>>>> origin/230207ken3
                 "author": {
-                    "name": "Jane Smith",
+                    "name": "Emily Davis",
                     "href": "#",
-                    "imageUrl": "https://xsgames.co/randomusers/assets/avatars/female/34.jpg"
+                    "imageUrl": "https://xsgames.co/randomusers/assets/avatars/female/12.jpg"
                 },
                 "content": ""
             },
             {
                 "id": 2,
-                "title": "Career Opportunities with a Christian Counselling Degree",
+                "title": "The Importance of Integration of Faith in the Workplace",
                 "href": "#",
                 "blogCategory": {
                     "name": "Article",
                     "href": "#"
                 },
+<<<<<<< HEAD
                 "description": "A Christian Counselling degree can open up a variety of career paths in the helping professions. From working in a church setting to private practice, the options are endless. Learn more about the different career opportunities available with a Christian Counselling degree from Alphacrucis.",
                 "date": "February 15, 2022",
                 "dateTime": "2022-02-15T12:00:00",
                 "imageUrl": "https://images.unsplash.com/photo-1472162314594-eca3c3d90df1?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1738&q=80",
                 "readingTime": "7 minute video",
+=======
+                "description": "Integrating faith into the workplace can bring a sense of purpose and fulfillment to one's career. It can also positively impact relationships with coworkers and the overall work environment. Discover how aligning one's faith with their work can lead to a more meaningful career.",
+                "date": "February 1, 2022",
+                "datetime": "2022-02-01T12:00:00",
+                "imageUrl": "https://images.unsplash.com/photo-1485115905815-74a5c9fda2f5?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1018&q=80",
+                "readingTime": "7 minute read",
+>>>>>>> origin/230207ken3
                 "author": {
-                    "name": "Jesse Doe",
+                    "name": "Jennifer Smith",
                     "href": "#",
-                    "imageUrl": "https://xsgames.co/randomusers/assets/avatars/male/31.jpg"
-                }
+                    "imageUrl": "https://xsgames.co/randomusers/assets/avatars/female/23.jpg"
+                },
+                "content": ""
             },
             {
                 "id": 3,
-                "title": "Student Testimonials: Studying Christian Counselling at Alphacrucis",
+                "title": "Balancing Your Faith and Your Career: A Guide",
                 "href": "#",
+<<<<<<< HEAD
                 "blogCategory": {
                     "name": "Article",
+=======
+                "BlogCategory": {
+                    "name": "E-book",
+>>>>>>> origin/230207ken3
                     "href": "#"
                 },
-                "description": "Hear from current and former students about their experiences studying Christian Counselling at Alphacrucis. Learn about the impact the program has had on their personal and professional lives, and why they recommend it to others. Discover what makes Alphacrucis a premier institution for Christian Counselling education.",
+                "description": "Balancing your faith and career can be challenging, but it is possible. This guide provides practical tips and biblical insights to help you navigate this balance. Learn how to integrate your faith into your work, maintain a positive attitude, and find purpose and meaning in your career.",
                 "date": "March 1, 2022",
+<<<<<<< HEAD
                 "dateTime": "2022-03-01T12:00:00",
                 "imageUrl": "https://images.unsplash.com/photo-1523240795612-9a054b0db644?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1740&q=80",
                 "readingTime": "10 minute read",
+=======
+                "datetime": "2022-03-01T12:00:00",
+                "imageUrl": "https://images.unsplash.com/photo-1536623975707-c4b3b2af565d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2070&q=80",
+                "readingTime": "15 minute read",
+>>>>>>> origin/230207ken3
                 "author": {
-                    "name": "Alphacrucis Student Services",
+                    "name": "Michael Johnson",
                     "href": "#",
-                    "imageUrl": "https://xsgames.co/randomusers/assets/avatars/female/68.jpg"
-                }
+                    "imageUrl": "https://xsgames.co/randomusers/assets/avatars/male/56.jpg"
+                },
+                "content": ""
             }
         ]
     }

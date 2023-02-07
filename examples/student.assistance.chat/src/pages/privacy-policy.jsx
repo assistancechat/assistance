@@ -3,7 +3,7 @@ import React from 'react'
 export default function Privacy() {
   return (
     <>
-      <div className="bg-gray-400 p-4">
+      <div id="privacy" className="bg-gray-400 p-4">
         <h1>Privacy Policy</h1>
         <p>Last updated: February 06, 2023</p>
         <p>
