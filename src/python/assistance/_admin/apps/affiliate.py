@@ -21,8 +21,6 @@ from cryptography.fernet import Fernet
 from assistance._admin import categories
 from assistance._keys import get_fernet_key
 
-ALGORITHM = "HS256"
-
 FERNET_SECRET_KEY = get_fernet_key()
 
 CATEGORY = categories.ADMIN
@@ -50,8 +48,8 @@ async def main():
     for_encryption = json_string.encode()
 
     fernet = Fernet(FERNET_SECRET_KEY)
-    token = fernet.encrypt(for_encryption)
-    tag = base64.urlsafe_b64encode(token).decode()
+    encrypted = fernet.encrypt(for_encryption)
+    tag = base64.urlsafe_b64encode(encrypted).decode()
 
     st.write(f"https://globaltalent.work/?tag={tag}")
 
