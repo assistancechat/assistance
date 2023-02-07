@@ -13,9 +13,14 @@
 # limitations under the License.
 
 import streamlit as st
+from jose import jwt
 
 from assistance._admin import categories
 from assistance._keys import get_jwt_key
+
+ALGORITHM = "HS256"
+
+JWT_SECRET_KEY = get_jwt_key()
 
 CATEGORY = categories.ADMIN
 TITLE = "Affiliate Links"
@@ -23,10 +28,10 @@ TITLE = "Affiliate Links"
 
 async def main():
     email = st.text_input(
-        "Email address of the affiliate who is bein associated with this link"
+        "Email address of the affiliate who is being associated with this link"
     )
     details = st.text_area(
-        "Details to encode within the affiliate link token (optional)"
+        "Extra details to encode along with the affiliate link token (optional)"
     )
 
     affiliate_link_data = {
@@ -34,3 +39,15 @@ async def main():
         "email": email,
         "details": details,
     }
+
+    if not st.button("Generate Affiliate Link"):
+        st.stop()
+
+    tag = _create_affiliate_tag(affiliate_link_data)
+    st.write(f"https://globaltalent.work/?tag={tag}")
+
+
+def _create_affiliate_tag(data: dict):
+    affiliate_tag = jwt.encode(data, JWT_SECRET_KEY, algorithm=ALGORITHM)
+
+    return affiliate_tag
