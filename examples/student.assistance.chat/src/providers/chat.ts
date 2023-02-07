@@ -16,7 +16,6 @@ import { createContext } from "react";
 
 export type MessageOriginator = "client" | "agent";
 export type OpenModel = null | "chat" | "enquire";
-export type NameType = "firstName" | "lastName";
 
 export type MessageHistoryItem = {
   originator: MessageOriginator;
@@ -26,9 +25,16 @@ export type MessageHistoryItem = {
 
 export type MessageHistory = MessageHistoryItem[];
 
-type Name = Record<NameType, string | null>;
-type OriginatorNames = Record<MessageOriginator, Name>;
-type OriginatorProfilePictureUrls = Record<MessageOriginator, string | null>;
+type Details = {
+  firstName?: string;
+  lastName?: string;
+  email?: string;
+  profilePictureUrl?: string;
+  phoneNumber?: string;
+  agreeToTerms?: boolean;
+};
+
+type OriginatorDetails = Record<MessageOriginator, Details>;
 
 // TODO: Having all of this data within the one context is potentially
 // inefficient. Fix this if it becomes an issue.
@@ -39,8 +45,7 @@ export type ChatContextData = {
   taskPrompt: string;
   messageHistory: MessageHistory;
   pendingQuestion: string | null;
-  originatorNames: OriginatorNames;
-  originatorProfilePictureUrls: OriginatorProfilePictureUrls;
+  originatorDetails: OriginatorDetails;
 };
 
 export const DefaultChatData = {
@@ -69,13 +74,12 @@ Keep in mind the below points in everything you say:
     },
   ],
   pendingQuestion: null,
-  originatorNames: {
-    client: { firstName: null, lastName: null },
-    agent: { firstName: "Michael", lastName: null },
-  },
-  originatorProfilePictureUrls: {
-    client: null,
-    agent: "https://www.w3schools.com/howto/img_avatar.png",
+  originatorDetails: {
+    client: {},
+    agent: {
+      firstName: "Michael",
+      profilePictureUrl: "https://www.w3schools.com/howto/img_avatar.png",
+    },
   },
 };
 

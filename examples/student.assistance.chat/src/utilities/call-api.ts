@@ -20,11 +20,12 @@ export async function callChatApi(
   chatData: ChatContextData,
   setChatData: (chatData: ChatContextData) => void
 ) {
-  const agentName = chatData.originatorNames.agent.firstName || "{agent_name}";
+  const agentName =
+    chatData.originatorDetails.agent.firstName || "{agent_name}";
 
   let transcript = "";
   for (let item of chatData.messageHistory) {
-    const name = chatData.originatorNames[item.originator].firstName;
+    const name = chatData.originatorDetails[item.originator].firstName;
     const message = item.message;
 
     transcript += `${name}: ${message}\n\n`;
