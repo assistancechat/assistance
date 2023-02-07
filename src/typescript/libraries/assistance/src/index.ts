@@ -12,13 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { ChatData, DefaultService } from "./client";
+import { ChatData, ContactUsData, DefaultService } from "./client";
 
-export type { ChatData } from "./client";
-export type { ChatResponse } from "./client";
-export type { HTTPValidationError } from "./client";
-export type { ValidationError } from "./client";
+export type {
+  ChatData,
+  ChatResponse,
+  ContactUsData,
+  HTTPValidationError,
+  ValidationError,
+} from "./client";
 
 export function chat(data: ChatData) {
   return DefaultService.chatChatPost(data);
+}
+
+export function contactUs(data: ContactUsData) {
+  return DefaultService.contactUsFormsContactUsPost(data);
 }
