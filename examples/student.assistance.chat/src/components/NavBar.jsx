@@ -40,7 +40,7 @@ export default function Navbar() {
               <div className='flex'>
                 <div className='-ml-2 mr-2 flex items-center md:hidden'>
                   {/* Mobile menu button */}
-                  <Disclosure.Button className='inline-flex items-center justify-center  p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-orange-500'>
+                  <Disclosure.Button className='inline-flex items-center justify-center  p-2 text-gray-400 hover:bg-gray-100 hover:text-orange-600 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-orange-500'>
                     <span className='sr-only'>Open main menu</span>
                     {open ? (
                       <XMarkIcon className='block h-6 w-6' aria-hidden='true' />
@@ -62,22 +62,22 @@ export default function Navbar() {
                   />
                 </div>
                 <div className='hidden md:ml-6 md:flex md:space-x-8'>
-                  {/* Current: "border-orange-500 text-orange-400", Default: "border-transparent text-gray-500 hover:border-gray-300 hover:text-orange-300" */}
+                  {/* Current: "border-orange-500 text-gray-800", Default: "border-transparent text-orange-600 hover:border-gray-300 hover:text-gray-800" */}
                   <a
                     href='#MoreInfo'
-                    className='inline-flex items-center border-b-2 border-transparent px-1 pt-1 text-sm font-medium text-orange-400 hover:text-orange-700 hover:border-orange-500'
+                    className='inline-flex items-center border-b-2 border-transparent px-1 pt-1 text-sm font-medium text-gray-800 hover:text-orange-700 hover:border-orange-500'
                   >
                     More Info
                   </a>
                   <a
                     href='#Reviews'
-                    className='inline-flex items-center border-b-2 border-transparent px-1 pt-1 text-sm font-medium text-orange-400 hover:text-orange-700 hover:border-orange-500'
+                    className='inline-flex items-center border-b-2 border-transparent px-1 pt-1 text-sm font-medium text-gray-800 hover:text-orange-700 hover:border-orange-500'
                   >
                     Reviews
                   </a>
                   <a
                     href='#StudentExperience'
-                    className='inline-flex items-center border-b-2 border-transparent px-1 pt-1 text-sm font-medium text-orange-400 hover:text-orange-700 hover:border-orange-500'
+                    className='inline-flex items-center border-b-2 border-transparent px-1 pt-1 text-sm font-medium text-gray-800 hover:text-orange-700 hover:border-orange-500'
                   >
                     Student Experience
                   </a>
@@ -87,17 +87,17 @@ export default function Navbar() {
                 <button
                   type='button'
                   onClick={openModal}
-                  className='text-gray-600 flex-col text-md inline-flex items-center px-4 py-2 rounded-md shadow-sm hover:bg-orange-300 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2'
+                  className='text-gray-600 flex-col text-md inline-flex items-center px-4 py-2 rounded-md shadow-sm hover:bg-gray-800 hover:text-orange-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2'
                 >
                   <ChatBubbleOvalLeftEllipsisIcon
                     className='h-5 w-5 text-orange-600'
                     aria-hidden='true'
                   />
-                  <span className='text-gray-600 text-xs'>Chat</span>
+                  <span className='text-gray-600 text-xs hover:text-orange-400'>Chat</span>
                 </button>
                 <button
                   type='button'
-                  className='text-gray-600 flex-col text-md inline-flex items-center px-4 py-2 rounded-md shadow-sm hover:bg-orange-300 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2'
+                  className='text-gray-600 flex-col text-md inline-flex items-center px-4 py-2 rounded-md shadow-sm hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2'
                   onClick={() =>
                     window.open('https://forms.gle/bJohSSgcd2g61WKSA')
                   }
@@ -108,18 +108,18 @@ export default function Navbar() {
                     className='h-5 w-5 text-orange-600'
                     aria-hidden='true'
                   />
-                  <span className='text-gray-600 text-xs'>Apply</span>
+                  <span className='text-gray-600 text-xs hover:text-orange-400'>Apply</span>
                 </button>
                 <button
                   type='button'
                   onClick={openDialog}
-                  className='text-gray-600 flex-col text-md inline-flex items-center px-4 py-2 rounded-md shadow-sm hover:bg-orange-300 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2'
+                  className='text-gray-600 flex-col text-md inline-flex items-center px-4 py-2 rounded-md shadow-sm hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2'
                 >
                   <EnvelopeIcon
                     className='h-5 w-5 text-orange-600'
                     aria-hidden='true'
                   />
-                  <span className='text-gray-600 text-xs' onClick={openDialog}>
+                  <span className='text-gray-600 text-xs hover:text-orange-400' onClick={openDialog}>
                     Enquire
                   </span>
                 </button>
@@ -139,21 +139,21 @@ export default function Navbar() {
               <Disclosure.Button
                 as='a'
                 href='#Reviews'
-                className='block border-l-4 border-transparent py-2 pl-3 pr-4 text-base font-medium text-gray-500 hover:border-gray-300 hover:bg-gray-50 hover:text-orange-300 sm:pl-5 sm:pr-6'
+                className='block border-l-4 border-transparent py-2 pl-3 pr-4 text-base font-medium text-orange-600 hover:border-gray-300 hover:bg-gray-50 hover:text-gray-800 sm:pl-5 sm:pr-6'
               >
                 Reviews
               </Disclosure.Button>
               <Disclosure.Button
                 as='a'
                 href='#StudentExperience'
-                className='block border-l-4 border-transparent py-2 pl-3 pr-4 text-base font-medium text-gray-500 hover:border-gray-300 hover:bg-gray-50 hover:text-orange-300 sm:pl-5 sm:pr-6'
+                className='block border-l-4 border-transparent py-2 pl-3 pr-4 text-base font-medium text-orange-600 hover:border-gray-300 hover:bg-gray-50 hover:text-gray-800 sm:pl-5 sm:pr-6'
               >
                 Student Experience
               </Disclosure.Button>
               <Disclosure.Button
                 as='a'
                 href='#blog'
-                className='block border-l-4 border-transparent py-2 pl-3 pr-4 text-base font-medium text-gray-500 hover:border-gray-300 hover:bg-gray-50 hover:text-orange-300 sm:pl-5 sm:pr-6'
+                className='block border-l-4 border-transparent py-2 pl-3 pr-4 text-base font-medium text-orange-600 hover:border-gray-300 hover:bg-gray-50 hover:text-gray-800 sm:pl-5 sm:pr-6'
               >
                 Blogs
               </Disclosure.Button>
@@ -188,7 +188,7 @@ export default function Navbar() {
                     <Dialog.Panel className='w-full max-w-md transform overflow-hidden rounded-2xl bg-gray-800 p-6 text-left align-middle shadow-xl transition-all'>
                       <Dialog.Title
                         as='h3'
-                        className='text-3xl font-medium leading-none text-orange-400'
+                        className='text-3xl font-medium leading-none text-gray-800'
                       >
                         Contact Us
                       </Dialog.Title>
@@ -311,7 +311,7 @@ export default function Navbar() {
                                 </Switch>
                               </div>
                               <div className='ml-3'>
-                                <p className='text-base text-gray-500'>
+                                <p className='text-base text-orange-600'>
                                   By selecting this, you agree to the{' '}
                                   <a
                                     href='#'

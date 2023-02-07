@@ -83,7 +83,7 @@ useEffect(() => {
 
           <StartChatWithQuestionButton
             question={props.ChatButtonText}
-            buttonClassName='row-span-1 inset-10 relative bg-orange-400 inline-flex w-9/12 rounded-md py-1 px-4 shadow-sm hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 lg:w-1/3 lg:justify-self-end space-x-4'
+            buttonClassName='row-span-1 inset-10 relative bg-gray-800 inline-flex w-9/12 rounded-md py-1 px-4 shadow-sm hover:bg-orange-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 lg:w-1/3 lg:justify-self-end space-x-4'
             bubbleClassName='-ml-1 self-center text-white h-12 w-12'
             textClassName='text-sm font-medium text-white uppercase leading-none text-left place-self-center'
           />
