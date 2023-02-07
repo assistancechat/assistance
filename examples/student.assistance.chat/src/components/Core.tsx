@@ -119,7 +119,7 @@ export default function Core(props: { data: typeof dataCore }) {
           />
           <Suspense fallback={<div>Loading...</div>}>
             <Reviews
-              key={props.data.reviews.id}
+              id={props.data.reviews.id}
               careerSnapshot={props.data.reviews.careerSnapshot}
               careerSlogan={props.data.reviews.careerSlogan}
               sidePanels={props.data.reviews.sidePanels}
