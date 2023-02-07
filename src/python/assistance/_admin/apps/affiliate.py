@@ -12,15 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import base64
+import json
+
 import streamlit as st
-from jose import jwt
+from cryptography.fernet import Fernet
 
 from assistance._admin import categories
-from assistance._keys import get_jwt_key
+from assistance._keys import get_fernet_key
 
 ALGORITHM = "HS256"
 
-JWT_SECRET_KEY = get_jwt_key()
+FERNET_SECRET_KEY = get_fernet_key()
 
 CATEGORY = categories.ADMIN
 TITLE = "Affiliate Links"
@@ -43,16 +46,19 @@ async def main():
     if not st.button("Generate Affiliate Link"):
         st.stop()
 
-    tag = _create_affiliate_tag(affiliate_link_data)
+    json_string = json.dumps(affiliate_link_data, indent=2)
+    for_encryption = json_string.encode()
+
+    fernet = Fernet(FERNET_SECRET_KEY)
+    token = fernet.encrypt(for_encryption)
+    tag = base64.urlsafe_b64encode(token).decode()
+
     st.write(f"https://globaltalent.work/?tag={tag}")
 
-    payload = jwt.decode(tag, JWT_SECRET_KEY, algorithms=[ALGORITHM])
+    decoded = base64.urlsafe_b64decode(tag.encode())
+    decrypted = fernet.decrypt(decoded)
+
+    loaded_token_data = json.loads(decrypted)
 
     st.write("## Token contents")
-    st.write(payload)
-
-
-def _create_affiliate_tag(data: dict):
-    affiliate_tag = jwt.encode(data, JWT_SECRET_KEY, algorithm=ALGORITHM)
-
-    return affiliate_tag
+    st.write(loaded_token_data)
