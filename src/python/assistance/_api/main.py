@@ -20,7 +20,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from assistance import _ctx
 
-from .routers import chat
+from .routers import chat, forms
 
 logging.basicConfig(
     level=logging.INFO,
@@ -48,6 +48,7 @@ app.add_middleware(
 )
 
 app.include_router(chat.router)
+app.include_router(forms.router)
 
 
 @app.on_event("startup")

@@ -42,6 +42,42 @@
           }
         }
       }
+    },
+    "/forms/contact-us": {
+      "post": {
+        "summary": "Contact Us",
+        "operationId": "contact_us_forms_contact_us_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ContactUsData"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -54,6 +90,14 @@
         ],
         "type": "object",
         "properties": {
+          "client_email": {
+            "title": "Client Email",
+            "type": "string"
+          },
+          "client_name": {
+            "title": "Client Name",
+            "type": "string"
+          },
           "agent_name": {
             "title": "Agent Name",
             "type": "string"
@@ -73,6 +117,10 @@
           "assistance_token": {
             "title": "Assistance Token",
             "type": "string"
+          },
+          "openai_api_key": {
+            "title": "Openai Api Key",
+            "type": "string"
           }
         }
       },
@@ -90,6 +138,48 @@
           },
           "assistance_token": {
             "title": "Assistance Token",
+            "type": "string"
+          }
+        }
+      },
+      "ContactUsData": {
+        "title": "ContactUsData",
+        "required": [
+          "first_name",
+          "last_name",
+          "email",
+          "phone_number",
+          "message",
+          "agree_to_terms"
+        ],
+        "type": "object",
+        "properties": {
+          "first_name": {
+            "title": "First Name",
+            "type": "string"
+          },
+          "last_name": {
+            "title": "Last Name",
+            "type": "string"
+          },
+          "email": {
+            "title": "Email",
+            "type": "string"
+          },
+          "phone_number": {
+            "title": "Phone Number",
+            "type": "string"
+          },
+          "message": {
+            "title": "Message",
+            "type": "string"
+          },
+          "agree_to_terms": {
+            "title": "Agree To Terms",
+            "type": "boolean"
+          },
+          "referrer_tag": {
+            "title": "Referrer Tag",
             "type": "string"
           }
         }
