@@ -103,12 +103,7 @@ export default function Home() {
             landscapePicture={data.hero.landscapePicture}
             alt={data.hero.alt}
             courseTitle={data.hero.courseTitle}
-            headLine1={data.hero.headLine1}
-            headLine2={data.hero.headLine2}
-            headLine3={data.hero.headLine3}
-            headLine4={data.hero.headLine4}
-            headLine5={data.hero.headLine5}
-            headLine6={data.hero.headLine6}
+            headLine={data.hero.headLine}
             subHeading={data.hero.subHeading}
             learnButtonText={data.hero.learnButtonText}
             learnButtonLink={data.hero.learnButtonLink}

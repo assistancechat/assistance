@@ -5,7 +5,7 @@ import Typed from 'typed.js'
 
 export default function HeroOpening(props) {
 
-  var headline = {
+  const headline = {
     strings: [
       "Discover God's Purpose for you in <u>Ministry</u>",
       "Discover God's Purpose for you in <u>Counselling </u>",
