@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// TODO: Make this use the "Core" component.
+
 import { useState, lazy, Suspense, useEffect } from "react";
 
 import Head from "next/head";

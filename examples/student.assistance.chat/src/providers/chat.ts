@@ -15,6 +15,7 @@
 import { createContext } from "react";
 
 export type MessageOriginator = "client" | "agent";
+export type OpenModel = null | "chat" | "enquire";
 
 export type MessageHistoryItem = {
   originator: MessageOriginator;
@@ -24,24 +25,33 @@ export type MessageHistoryItem = {
 
 export type MessageHistory = MessageHistoryItem[];
 
-type OriginatorNames = Record<MessageOriginator, string | null>;
-type OriginatorProfilePictureUrls = Record<MessageOriginator, string | null>;
+export type Details = {
+  firstName?: string;
+  lastName?: string;
+  email?: string;
+  profilePictureUrl?: string;
+  phoneNumber?: string;
+  agreeToTerms?: boolean;
+  enquiryMessage?: string;
+  referrerToken?: string;
+};
+
+type OriginatorDetails = Record<MessageOriginator, Details>;
 
 // TODO: Having all of this data within the one context is potentially
 // inefficient. Fix this if it becomes an issue.
 export type ChatContextData = {
-  open: boolean;
+  openModel: OpenModel;
   googleIdToken: string | null;
   assistanceToken: string | null;
   taskPrompt: string;
   messageHistory: MessageHistory;
   pendingQuestion: string | null;
-  originatorNames: OriginatorNames;
-  originatorProfilePictureUrls: OriginatorProfilePictureUrls;
+  originatorDetails: OriginatorDetails;
 };
 
 export const DefaultChatData = {
-  open: false,
+  openModel: null,
   googleIdToken: null,
   assistanceToken: null,
   taskPrompt: `You work for Global Talent. You are trying to sell Alphacrucis Courses. \
@@ -66,13 +76,12 @@ Keep in mind the below points in everything you say:
     },
   ],
   pendingQuestion: null,
-  originatorNames: {
-    client: null,
-    agent: "Michael",
-  },
-  originatorProfilePictureUrls: {
-    client: null,
-    agent: "https://www.w3schools.com/howto/img_avatar.png",
+  originatorDetails: {
+    client: {},
+    agent: {
+      firstName: "Michael",
+      profilePictureUrl: "https://www.w3schools.com/howto/img_avatar.png",
+    },
   },
 };
 

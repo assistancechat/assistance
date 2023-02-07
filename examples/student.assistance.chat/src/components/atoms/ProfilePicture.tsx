@@ -20,13 +20,14 @@ function ProfilePicture(props: { originator: MessageOriginator }) {
   const originator = props.originator;
 
   const { chatData } = useContext(ChatContext);
-  const profilePictureUrl = chatData.originatorProfilePictureUrls[originator];
+  const profilePictureUrl =
+    chatData.originatorDetails[originator].profilePictureUrl;
 
   if (profilePictureUrl === null) {
     return <></>;
   }
 
-  const name = chatData.originatorNames[originator];
+  const name = chatData.originatorDetails[originator].firstName;
 
   if (name === null) {
     return (
