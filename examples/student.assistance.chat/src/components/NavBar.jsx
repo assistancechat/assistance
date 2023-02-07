@@ -245,6 +245,7 @@ export default function Navbar() {
                                 name='email'
                                 type='email'
                                 autoComplete='email'
+                                required='true'
                                 className='block w-full rounded-md border-gray-300 py-3 px-4 shadow-sm focus:border-indigo-500 focus:ring-indigo-500'
                               />
                             </div>
