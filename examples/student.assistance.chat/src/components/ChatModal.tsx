@@ -24,11 +24,11 @@ function ChatModal() {
   const { chatData, setChatData } = useContext(ChatContext);
 
   const closeModal = () => {
-    setChatData({ ...chatData, open: false });
+    setChatData({ ...chatData, openModel: null });
   };
 
   return (
-    <Transition appear show={chatData.open} as={Fragment}>
+    <Transition appear show={chatData.openModel === "chat"} as={Fragment}>
       <Dialog
         as="div"
         className="fixed inset-0 z-10 overflow-y-auto"

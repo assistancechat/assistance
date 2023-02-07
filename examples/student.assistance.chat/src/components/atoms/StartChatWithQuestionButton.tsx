@@ -26,7 +26,11 @@ function StartChatWithQuestionButton(props: {
   const { chatData, setChatData } = useContext(ChatContext);
 
   const startChatWithQuestion = () => {
-    setChatData({ ...chatData, open: true, pendingQuestion: props.question });
+    setChatData({
+      ...chatData,
+      openModel: true,
+      pendingQuestion: props.question,
+    });
   };
 
   return (

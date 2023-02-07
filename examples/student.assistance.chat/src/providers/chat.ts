@@ -15,6 +15,7 @@
 import { createContext } from "react";
 
 export type MessageOriginator = "client" | "agent";
+export type OpenModel = null | "chat" | "enquire";
 
 export type MessageHistoryItem = {
   originator: MessageOriginator;
@@ -30,7 +31,7 @@ type OriginatorProfilePictureUrls = Record<MessageOriginator, string | null>;
 // TODO: Having all of this data within the one context is potentially
 // inefficient. Fix this if it becomes an issue.
 export type ChatContextData = {
-  open: boolean;
+  openModel: OpenModel;
   googleIdToken: string | null;
   assistanceToken: string | null;
   taskPrompt: string;
@@ -41,7 +42,7 @@ export type ChatContextData = {
 };
 
 export const DefaultChatData = {
-  open: false,
+  openModel: null,
   googleIdToken: null,
   assistanceToken: null,
   taskPrompt: `You work for Global Talent. You are trying to sell Alphacrucis Courses. \
