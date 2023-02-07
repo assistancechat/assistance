@@ -1,1 +1,1 @@
-from . import hello, talking, chat, stt
+from . import affiliate, hello
