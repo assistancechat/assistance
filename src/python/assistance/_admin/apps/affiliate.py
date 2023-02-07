@@ -50,8 +50,8 @@ async def main():
     for_encryption = json_string.encode()
 
     fernet = Fernet(FERNET_SECRET_KEY)
-    token = fernet.encrypt(for_encryption)
-    tag = base64.urlsafe_b64encode(token).decode()
+    encrypted = fernet.encrypt(for_encryption)
+    tag = base64.urlsafe_b64encode(encrypted).decode()
 
     st.write(f"https://globaltalent.work/?tag={tag}")
 
