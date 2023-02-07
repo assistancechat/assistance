@@ -26,7 +26,7 @@ function ProfilePicture(props: { originator: MessageOriginator }) {
     return <></>;
   }
 
-  const name = chatData.originatorNames[originator];
+  const name = chatData.originatorNames[originator].firstName;
 
   if (name === null) {
     return (

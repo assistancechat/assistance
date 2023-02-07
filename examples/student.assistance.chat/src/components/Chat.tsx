@@ -60,7 +60,7 @@ function ChatHistory() {
     return chatData.messageHistory.map(
       ({ message, originator, timestamp }, index) => {
         const timestampAsString = epochToTimestamp(timestamp);
-        const name = chatData.originatorNames[originator];
+        const name = chatData.originatorNames[originator].firstName;
 
         return (
           <div
@@ -71,7 +71,9 @@ function ChatHistory() {
           >
             <div className="flex flex-col items-start p-2">
               <div className="flex items-center">
-                <span className="text-xs ml-2 leading-relaxed text-gray-400">{name}</span>
+                <span className="text-xs ml-2 leading-relaxed text-gray-400">
+                  {name}
+                </span>
               </div>
               <div className="flex flex-col items-end">
                 <div
@@ -84,14 +86,14 @@ function ChatHistory() {
                   {message
                     .replaceAll(
                       "{agent_name}",
-                      chatData.originatorNames["agent"]
-                        ? chatData.originatorNames["agent"]
+                      chatData.originatorNames["agent"].firstName
+                        ? chatData.originatorNames["agent"].firstName
                         : "agent"
                     )
                     .replaceAll(
                       "{client_name}",
-                      chatData.originatorNames["client"]
-                        ? chatData.originatorNames["client"]
+                      chatData.originatorNames["client"].firstName
+                        ? chatData.originatorNames["client"].firstName
                         : "client"
                     )}
                 </div>
@@ -147,7 +149,7 @@ function Login() {
     const profilePictureUrl = decoded["picture"];
     const clientName = decoded["given_name"];
 
-    chatData.originatorNames["client"] = clientName;
+    chatData.originatorNames["client"].firstName = clientName;
     chatData.originatorProfilePictureUrls["client"] = profilePictureUrl;
 
     chatData.googleIdToken = token;

@@ -21,7 +21,7 @@ import { GoogleOAuthProvider } from "@react-oauth/google";
 
 import Navbar from "@/components/NavBar";
 import ChatModal from "@/components/ChatModal";
-import ContactUs from "@/components/ContactUs";
+import ContactUsModal from "@/components/ContactUsModal";
 import HeroOpening from "@/components/HeroOpening";
 import MoreInfo from "@/components/MoreInfo";
 
@@ -99,7 +99,7 @@ export default function Core(props: { data: typeof dataCore }) {
         <ChatContext.Provider value={value}>
           <Navbar />
           <ChatModal />
-          <ContactUs />
+          <ContactUsModal />
           <HeroOpening
             key={props.data.hero.id}
             portraitPicture={props.data.hero.portraitPicture}

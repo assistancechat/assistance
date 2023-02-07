@@ -16,6 +16,7 @@ import { createContext } from "react";
 
 export type MessageOriginator = "client" | "agent";
 export type OpenModel = null | "chat" | "enquire";
+export type NameType = "firstName" | "lastName";
 
 export type MessageHistoryItem = {
   originator: MessageOriginator;
@@ -25,7 +26,8 @@ export type MessageHistoryItem = {
 
 export type MessageHistory = MessageHistoryItem[];
 
-type OriginatorNames = Record<MessageOriginator, string | null>;
+type Name = Record<NameType, string | null>;
+type OriginatorNames = Record<MessageOriginator, Name>;
 type OriginatorProfilePictureUrls = Record<MessageOriginator, string | null>;
 
 // TODO: Having all of this data within the one context is potentially
@@ -68,8 +70,8 @@ Keep in mind the below points in everything you say:
   ],
   pendingQuestion: null,
   originatorNames: {
-    client: null,
-    agent: "Michael",
+    client: { firstName: null, lastName: null },
+    agent: { firstName: "Michael", lastName: null },
   },
   originatorProfilePictureUrls: {
     client: null,

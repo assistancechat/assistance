@@ -107,7 +107,9 @@ function ContactUs() {
                       <label
                         htmlFor="email"
                         className="block text-sm font-medium text-orange-300"
-                      ></label>
+                      >
+                        Email
+                      </label>
                       <div className="mt-1">
                         <input
                           id="email"
