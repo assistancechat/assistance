@@ -17,7 +17,8 @@ import { Dialog, Transition, Switch } from "@headlessui/react";
 
 import { ChatContext, Details } from "@/providers/chat";
 import { updateClientData } from "@/utilities/core";
-import { EnvelopeIcon } from '@heroicons/react/24/solid';
+import { EnvelopeIcon } from "@heroicons/react/24/solid";
+import { callContactUsApi } from "@/utilities/call-contact-us-api";
 
 function ContactUs() {
   const { chatData, setChatData } = useContext(ChatContext);
@@ -61,9 +62,9 @@ function ContactUs() {
     setChatData({ ...chatData, openModal: null });
   };
 
-  const preventFormSubmission = (event: FormEvent<HTMLFormElement>) => {
+  const formSubmission = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    console.log(chatData.originatorDetails.client);
+    await callContactUsApi(chatData);
   };
 
   return (
@@ -97,14 +98,15 @@ function ContactUs() {
                   as="h3"
                   className="text-3xl font-medium inline-flex leading-none text-white space-x-1"
                 >
-                  <EnvelopeIcon className="text-orange-400 w-8 animate-pulse" /><h1>Contact Us</h1>
+                  <EnvelopeIcon className="text-orange-400 w-8 animate-pulse" />
+                  <h1>Contact Us</h1>
                 </Dialog.Title>
                 <div className="mt-5">
                   <form
                     action="#"
                     method="POST"
                     className="grid grid-cols-1 gap-y-6 sm:grid-cols-2 sm:gap-x-8"
-                    onSubmit={preventFormSubmission}
+                    onSubmit={formSubmission}
                   >
                     <div>
                       <label
