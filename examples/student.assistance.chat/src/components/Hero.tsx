@@ -4,8 +4,8 @@ import { ArrowDownCircleIcon } from "@heroicons/react/24/solid";
 import StartChatWithQuestionButton from "@/components/atoms/StartChatWithQuestionButton";
 
 
-  
-  
+
+
 
 //currently video is hidden, remove hidden to play video
 export default function Hero(props) {

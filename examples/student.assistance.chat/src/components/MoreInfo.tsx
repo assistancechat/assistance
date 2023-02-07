@@ -3,7 +3,7 @@ import { EnvelopeOpenIcon } from "@heroicons/react/24/solid";
 import StartChatWithQuestionButton from "@/components/atoms/StartChatWithQuestionButton";
 
 export default function MoreInfo(props) {
-  
+
 
 
   return (
