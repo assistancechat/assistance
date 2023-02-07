@@ -16,6 +16,7 @@ import { useState, lazy, Suspense, useEffect } from "react";
 
 import Head from "next/head";
 import { Inter } from "@next/font/google";
+import { useRouter } from "next/router";
 
 import { GoogleOAuthProvider } from "@react-oauth/google";
 
@@ -50,19 +51,25 @@ export default function Core(props: { data: typeof dataCore }) {
   const [chatData, setChatData] = useState<ChatContextData>(DefaultChatData);
   const value = { chatData, setChatData };
 
+  const router = useRouter();
+  const tag = router.query.tag;
+
+  const removeQueryParam = (param: string) => {
+    const { pathname, query } = router;
+    const params = new URLSearchParams(query as any);
+    params.delete(param);
+    router.replace({ pathname, query: params.toString() }, undefined, {
+      shallow: true,
+    });
+  };
+
   useEffect(() => {
-    const queryParameters = new URLSearchParams(window.location.search);
-    const tag = queryParameters.get("tag");
-
-    if (tag == null) {
-      return;
+    if (tag != null) {
+      updateClientData(chatData, setChatData, "referrerTag", tag);
+      removeQueryParam("tag");
+      console.log("tag:", tag);
     }
-
-    updateClientData(chatData, setChatData, "referrerTag", tag);
-    console.log(chatData.originatorDetails.client);
-
-    queryParameters.delete("tag");
-  }, []);
+  }, [tag]);
 
   useEffect(() => {
     const appendPendingQuestionIfReady = async () => {
