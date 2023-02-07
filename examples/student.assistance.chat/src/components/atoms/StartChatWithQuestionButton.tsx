@@ -28,7 +28,7 @@ function StartChatWithQuestionButton(props: {
   const startChatWithQuestion = () => {
     setChatData({
       ...chatData,
-      openModel: "chat",
+      openModal: "chat",
       pendingQuestion: props.question,
     });
   };

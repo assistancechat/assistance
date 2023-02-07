@@ -13,11 +13,11 @@ export default function Navbar() {
   const { chatData, setChatData } = useContext(ChatContext);
 
   function openChatModal() {
-    setChatData({ ...chatData, openModel: "chat" });
+    setChatData({ ...chatData, openModal: "chat" });
   }
 
   function openEnquireModal() {
-    setChatData({ ...chatData, openModel: "enquire" });
+    setChatData({ ...chatData, openModal: "enquire" });
   }
 
   return (

@@ -41,7 +41,7 @@ type OriginatorDetails = Record<MessageOriginator, Details>;
 // TODO: Having all of this data within the one context is potentially
 // inefficient. Fix this if it becomes an issue.
 export type ChatContextData = {
-  openModel: OpenModel;
+  openModal: OpenModel;
   googleIdToken: string | null;
   assistanceToken: string | null;
   taskPrompt: string;
@@ -51,7 +51,7 @@ export type ChatContextData = {
 };
 
 export const DefaultChatData = {
-  openModel: null,
+  openModal: null,
   googleIdToken: null,
   assistanceToken: null,
   taskPrompt: `You work for Global Talent. You are trying to sell Alphacrucis Courses. \
