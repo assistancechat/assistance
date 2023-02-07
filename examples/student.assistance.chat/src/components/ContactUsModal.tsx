@@ -127,7 +127,8 @@ function ContactUs() {
                           name="first-name"
                           id="first-name"
                           value={
-                            chatData.originatorDetails["client"]["firstName"]
+                            chatData.originatorDetails["client"]["firstName"] ||
+                            ""
                           }
                           onChange={(e) => onChange(e, "firstName")}
                           autoComplete="given-name"
@@ -148,7 +149,8 @@ function ContactUs() {
                           name="last-name"
                           id="last-name"
                           value={
-                            chatData.originatorDetails["client"]["lastName"]
+                            chatData.originatorDetails["client"]["lastName"] ||
+                            ""
                           }
                           onChange={(e) => onChange(e, "lastName")}
                           autoComplete="family-name"
@@ -168,7 +170,9 @@ function ContactUs() {
                           id="email"
                           name="email"
                           type="email"
-                          value={chatData.originatorDetails["client"]["email"]}
+                          value={
+                            chatData.originatorDetails["client"]["email"] || ""
+                          }
                           onChange={(e) => onChange(e, "email")}
                           autoComplete="email"
                           className="block w-full rounded-md border-gray-300 py-3 px-4 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
@@ -188,7 +192,9 @@ function ContactUs() {
                           name="phone-number"
                           id="phone-number"
                           value={
-                            chatData.originatorDetails["client"]["phoneNumber"]
+                            chatData.originatorDetails["client"][
+                              "phoneNumber"
+                            ] || ""
                           }
                           onChange={(e) => onChange(e, "phoneNumber")}
                           autoComplete="tel"
@@ -211,7 +217,7 @@ function ContactUs() {
                           value={
                             chatData.originatorDetails["client"][
                               "enquiryMessage"
-                            ]
+                            ] || ""
                           }
                           onChange={(e) => onChange(e, "enquiryMessage")}
                           rows={4}
