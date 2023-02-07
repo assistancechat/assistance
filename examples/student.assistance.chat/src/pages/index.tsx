@@ -12,14 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import Core from "@/components/Core";
+import Common from "@/components/Common";
 
 import data from "@/data/general.json";
 
 export default function Home() {
   return (
     <>
-      <Core data={data} />
+      <Common data={data} />
     </>
   );
 }

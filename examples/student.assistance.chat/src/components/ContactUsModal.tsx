@@ -16,6 +16,7 @@ import { useContext, Fragment, useState, useEffect } from "react";
 import { Dialog, Transition, Switch } from "@headlessui/react";
 
 import { ChatContext, Details } from "@/providers/chat";
+import { updateClientData } from "@/utilities/core";
 
 function ContactUs() {
   const { chatData, setChatData } = useContext(ChatContext);
@@ -24,27 +25,11 @@ function ContactUs() {
   const [allDataFilledOut, setAllDataFilledOut] = useState(false);
 
   const onChange = (e: any, detailsItem: keyof Details) => {
-    updateClientData(detailsItem, e.target.value);
-  };
-
-  const updateClientData = (
-    detailsItem: keyof Details,
-    value: string | boolean
-  ) => {
-    const newClientDetails = {
-      ...chatData.originatorDetails["client"],
-      [detailsItem]: value,
-    };
-    const newOriginatorDetails = {
-      ...chatData.originatorDetails,
-      client: newClientDetails,
-    };
-
-    setChatData({ ...chatData, originatorDetails: newOriginatorDetails });
+    updateClientData(chatData, setChatData, detailsItem, e.target.value);
   };
 
   useEffect(() => {
-    updateClientData("agreeToTerms", agreed);
+    updateClientData(chatData, setChatData, "agreeToTerms", agreed);
   }, [agreed]);
 
   useEffect(() => {
@@ -253,14 +238,14 @@ function ContactUs() {
                               href="#"
                               className="font-medium text-orange-300 underline"
                             >
-                              Privacy Policy
+                              Privacy Policy [TODO]
                             </a>{" "}
                             and{" "}
                             <a
                               href="#"
                               className="font-medium text-orange-300 underline"
                             >
-                              Cookie Policy
+                              Cookie Policy [TODO]
                             </a>
                             .
                           </p>
