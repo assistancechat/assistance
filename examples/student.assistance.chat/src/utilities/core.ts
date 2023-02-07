@@ -31,7 +31,7 @@ export const updateClientData = (
   chatData: ChatContextData,
   setChatData: (chatData: ChatContextData) => void,
   detailsItem: keyof Details,
-  value: string | boolean | string[]
+  value: string | boolean
 ) => {
   const newClientDetails = {
     ...chatData.originatorDetails["client"],
