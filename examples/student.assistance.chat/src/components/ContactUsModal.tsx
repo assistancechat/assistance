@@ -72,11 +72,11 @@ function ContactUs() {
   };
 
   const closeModal = () => {
-    setChatData({ ...chatData, openModel: null });
+    setChatData({ ...chatData, openModal: null });
   };
 
   return (
-    <Transition appear show={chatData.openModel === "enquire"} as={Fragment}>
+    <Transition appear show={chatData.openModal === "enquire"} as={Fragment}>
       <Dialog as="div" className="relative z-10 " onClose={closeModal}>
         <Transition.Child
           as={Fragment}
