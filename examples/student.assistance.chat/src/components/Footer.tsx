@@ -19,12 +19,12 @@ const navigation = {
     { name: "About", href: "#" },
     { name: "Blog", href: "#" },
     { name: "Jobs", href: "#" },
-    { name: "Partners", href: "#" },
+    { name: "Privacy", href: "#" },
   ],
   social: [
     {
       name: "Facebook",
-      href: "#",
+      href: "https://www.facebook.com/globaltalentrecruitment",
       icon: (props: SVGProps<any>) => (
         <svg fill="currentColor" viewBox="0 0 24 24" {...props}>
           <path
@@ -96,7 +96,7 @@ export default function Footer() {
           {navigation.social.map((item) => (
             <a
               key={item.name}
-              href={item.href}
+              onClick={() => window.open(item.href)}
               className="text-gray-400 hover:text-gray-500"
             >
               <span className="sr-only">{item.name}</span>

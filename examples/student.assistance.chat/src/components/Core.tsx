@@ -105,7 +105,7 @@ export default function Core(props: { data: typeof dataCore }) {
             portraitPicture={props.data.hero.portraitPicture}
             landscapePicture={props.data.hero.landscapePicture}
             alt={props.data.hero.alt}
-            chatButtonText={props.data.hero.ChatButtonText}
+            chatButtonText={props.data.hero.chatButtonText}
           />
           <MoreInfo
             key={props.data.moreInfo.id}
@@ -113,7 +113,7 @@ export default function Core(props: { data: typeof dataCore }) {
             subHeading={props.data.moreInfo.subHeading}
             learnButtonText={props.data.moreInfo.learnButtonText}
             learnButtonLink={props.data.moreInfo.learnButtonLink}
-            chatButtonText={props.data.moreInfo.ChatButtonText}
+            chatButtonText={props.data.moreInfo.chatButtonText}
             videoLink={props.data.moreInfo.videoLink}
             videoTitle={props.data.moreInfo.videoTitle}
           />
