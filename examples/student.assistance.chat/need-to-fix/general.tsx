@@ -138,7 +138,7 @@ export default function Home() {
               key={data.studentExperience.id}
               videoLink={data.studentExperience.videoLink}
               videoTitle={data.studentExperience.videoTitle}
-              ChatButtonText={data.studentExperience.ChatButtonText}
+              chatButtonText={data.studentExperience.ChatButtonText}
             />
           </Suspense>
           <Suspense fallback={<div>Loading...</div>}>
