@@ -48,7 +48,7 @@ async def main():
 
     payload = jwt.decode(tag, JWT_SECRET_KEY, algorithms=[ALGORITHM])
 
-    st.write("## Affiliate token contents")
+    st.write("## Token contents")
     st.write(payload)
 
 
