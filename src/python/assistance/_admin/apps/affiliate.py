@@ -46,6 +46,11 @@ async def main():
     tag = _create_affiliate_tag(affiliate_link_data)
     st.write(f"https://globaltalent.work/?tag={tag}")
 
+    payload = jwt.decode(tag, JWT_SECRET_KEY, algorithms=[ALGORITHM])
+
+    st.write("## Affiliate token contents")
+    st.write(payload)
+
 
 def _create_affiliate_tag(data: dict):
     affiliate_tag = jwt.encode(data, JWT_SECRET_KEY, algorithm=ALGORITHM)
