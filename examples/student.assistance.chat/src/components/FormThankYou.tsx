@@ -1,11 +1,12 @@
-import { Fragment, useState } from 'react'
-import { Transition } from '@headlessui/react'
-import { CheckCircleIcon } from '@heroicons/react/24/outline'
-import { XMarkIcon } from '@heroicons/react/20/solid'
+import { Fragment } from "react";
+import { Transition } from "@headlessui/react";
+import { CheckCircleIcon } from "@heroicons/react/24/outline";
+import { XMarkIcon } from "@heroicons/react/20/solid";
 
-export default function FormThankyou() {
-  const [show, setShow] = useState(true)
-
+export function FormThankYou(props: {
+  show: boolean;
+  setShow: (show: boolean) => {};
+}) {
   return (
     <>
       {/* Global notification live region, render this permanently at the end of the document */}
@@ -16,7 +17,7 @@ export default function FormThankyou() {
         <div className="flex w-full flex-col items-center space-y-4 sm:items-end">
           {/* Notification panel, dynamically insert this into the live region when it needs to be displayed */}
           <Transition
-            show={show}
+            show={props.show}
             as={Fragment}
             enter="transform ease-out duration-300 transition"
             enterFrom="translate-y-2 opacity-0 sm:translate-y-0 sm:translate-x-2"
@@ -29,18 +30,25 @@ export default function FormThankyou() {
               <div className="p-4">
                 <div className="flex items-start">
                   <div className="flex-shrink-0">
-                    <CheckCircleIcon className="h-6 w-6 text-green-400" aria-hidden="true" />
+                    <CheckCircleIcon
+                      className="h-6 w-6 text-green-400"
+                      aria-hidden="true"
+                    />
                   </div>
                   <div className="ml-3 w-0 flex-1 pt-0.5">
-                    <p className="text-sm font-medium text-gray-900">Successfully sent!</p>
-                    <p className="mt-1 text-sm text-gray-500">We'll get back to you shortly</p>
+                    <p className="text-sm font-medium text-gray-900">
+                      Successfully sent!
+                    </p>
+                    <p className="mt-1 text-sm text-gray-500">
+                      We'll get back to you shortly
+                    </p>
                   </div>
                   <div className="ml-4 flex flex-shrink-0">
                     <button
                       type="button"
                       className="inline-flex rounded-md bg-white text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
                       onClick={() => {
-                        setShow(false)
+                        props.setShow(false);
                       }}
                     >
                       <span className="sr-only">Close</span>
@@ -54,5 +62,5 @@ export default function FormThankyou() {
         </div>
       </div>
     </>
-  )
+  );
 }

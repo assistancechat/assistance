@@ -19,12 +19,14 @@ import { ChatContext, ChatContextData, Details } from "@/providers/chat";
 import { updateClientData } from "@/utilities/core";
 import { EnvelopeIcon } from "@heroicons/react/24/solid";
 import { callContactUsApi } from "@/utilities/call-contact-us-api";
+import { FormThankYou } from "@/components/FormThankYou";
 
 function ContactUs() {
   const { chatData, setChatData } = useContext(ChatContext);
 
   const [agreed, setAgreed] = useState(false);
   const [allDataFilledOut, setAllDataFilledOut] = useState(false);
+  const [showThankYou, setShowThankYou] = useState(false);
 
   const onChange = (e: any, detailsItem: keyof Details) => {
     updateClientData(chatData, setChatData, detailsItem, e.target.value);
@@ -74,233 +76,240 @@ function ContactUs() {
     );
     closeModal(newChatData);
 
-    // TODO: Add in a success message
-    // Something like this?
-    // https://tailwindui.com/components/application-ui/overlays/notifications
+    setShowThankYou(true);
   };
 
   return (
-    <Transition appear show={chatData.openModal === "enquire"} as={Fragment}>
-      <Dialog
-        as="div"
-        className="relative z-10 "
-        onClose={() => {
-          closeModal(chatData);
-        }}
-      >
-        <Transition.Child
-          as={Fragment}
-          enter="ease-out duration-300"
-          enterFrom="opacity-0"
-          enterTo="opacity-100"
-          leave="ease-in duration-200"
-          leaveFrom="opacity-100"
-          leaveTo="opacity-0"
+    <>
+      <Transition appear show={chatData.openModal === "enquire"} as={Fragment}>
+        <Dialog
+          as="div"
+          className="relative z-10 "
+          onClose={() => {
+            closeModal(chatData);
+          }}
         >
-          <div className="fixed inset-0 bg-black bg-opacity-25" />
-        </Transition.Child>
+          <Transition.Child
+            as={Fragment}
+            enter="ease-out duration-300"
+            enterFrom="opacity-0"
+            enterTo="opacity-100"
+            leave="ease-in duration-200"
+            leaveFrom="opacity-100"
+            leaveTo="opacity-0"
+          >
+            <div className="fixed inset-0 bg-black bg-opacity-25" />
+          </Transition.Child>
 
-        <div className="fixed inset-0 overflow-y-auto">
-          <div className="flex min-h-full items-center justify-center p-4 text-center">
-            <Transition.Child
-              as={Fragment}
-              enter="ease-out duration-300"
-              enterFrom="opacity-0 scale-95"
-              enterTo="opacity-100 scale-100"
-              leave="ease-in duration-200"
-              leaveFrom="opacity-100 scale-100"
-              leaveTo="opacity-0 scale-95"
-            >
-              <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-gray-800 p-6 text-left align-middle shadow-xl transition-all">
-                <Dialog.Title
-                  as="h3"
-                  className="text-3xl font-medium inline-flex leading-none text-white space-x-1"
-                >
-                  <EnvelopeIcon className="text-orange-400 w-8 animate-pulse" />
-                  <h1>Contact Us</h1>
-                </Dialog.Title>
-                <div className="mt-5">
-                  <form
-                    action="#"
-                    method="POST"
-                    className="grid grid-cols-1 gap-y-6 sm:grid-cols-2 sm:gap-x-8"
-                    onSubmit={formSubmission}
+          <div className="fixed inset-0 overflow-y-auto">
+            <div className="flex min-h-full items-center justify-center p-4 text-center">
+              <Transition.Child
+                as={Fragment}
+                enter="ease-out duration-300"
+                enterFrom="opacity-0 scale-95"
+                enterTo="opacity-100 scale-100"
+                leave="ease-in duration-200"
+                leaveFrom="opacity-100 scale-100"
+                leaveTo="opacity-0 scale-95"
+              >
+                <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-gray-800 p-6 text-left align-middle shadow-xl transition-all">
+                  <Dialog.Title
+                    as="h3"
+                    className="text-3xl font-medium inline-flex leading-none text-white space-x-1"
                   >
-                    <div>
-                      <label
-                        htmlFor="first-name"
-                        className="block text-sm font-medium text-orange-400"
-                      >
-                        First name
-                      </label>
-                      <div className="mt-1">
-                        <input
-                          type="text"
-                          name="first-name"
-                          id="first-name"
-                          value={
-                            chatData.originatorDetails["client"]["firstName"] ||
-                            ""
-                          }
-                          onChange={(e) => onChange(e, "firstName")}
-                          autoComplete="given-name"
-                          className="block w-full rounded-md border-gray-300 py-3 px-4 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                        />
+                    <EnvelopeIcon className="text-orange-400 w-8 animate-pulse" />
+                    <h1>Contact Us</h1>
+                  </Dialog.Title>
+                  <div className="mt-5">
+                    <form
+                      action="#"
+                      method="POST"
+                      className="grid grid-cols-1 gap-y-6 sm:grid-cols-2 sm:gap-x-8"
+                      onSubmit={formSubmission}
+                    >
+                      <div>
+                        <label
+                          htmlFor="first-name"
+                          className="block text-sm font-medium text-orange-400"
+                        >
+                          First name
+                        </label>
+                        <div className="mt-1">
+                          <input
+                            type="text"
+                            name="first-name"
+                            id="first-name"
+                            value={
+                              chatData.originatorDetails["client"][
+                                "firstName"
+                              ] || ""
+                            }
+                            onChange={(e) => onChange(e, "firstName")}
+                            autoComplete="given-name"
+                            className="block w-full rounded-md border-gray-300 py-3 px-4 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                          />
+                        </div>
                       </div>
-                    </div>
-                    <div>
-                      <label
-                        htmlFor="last-name"
-                        className="block text-sm font-medium text-orange-400"
-                      >
-                        Last name
-                      </label>
-                      <div className="mt-1">
-                        <input
-                          type="text"
-                          name="last-name"
-                          id="last-name"
-                          value={
-                            chatData.originatorDetails["client"]["lastName"] ||
-                            ""
-                          }
-                          onChange={(e) => onChange(e, "lastName")}
-                          autoComplete="family-name"
-                          className="block w-full rounded-md border-gray-300 py-3 px-4 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                        />
+                      <div>
+                        <label
+                          htmlFor="last-name"
+                          className="block text-sm font-medium text-orange-400"
+                        >
+                          Last name
+                        </label>
+                        <div className="mt-1">
+                          <input
+                            type="text"
+                            name="last-name"
+                            id="last-name"
+                            value={
+                              chatData.originatorDetails["client"][
+                                "lastName"
+                              ] || ""
+                            }
+                            onChange={(e) => onChange(e, "lastName")}
+                            autoComplete="family-name"
+                            className="block w-full rounded-md border-gray-300 py-3 px-4 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                          />
+                        </div>
                       </div>
-                    </div>
-                    <div className="sm:col-span-2">
-                      <label
-                        htmlFor="email"
-                        className="block text-sm font-medium text-orange-400"
-                      >
-                        Email
-                      </label>
-                      <div className="mt-1">
-                        <input
-                          id="email"
-                          name="email"
-                          type="email"
-                          value={
-                            chatData.originatorDetails["client"]["email"] || ""
-                          }
-                          onChange={(e) => onChange(e, "email")}
-                          autoComplete="email"
-                          className="block w-full rounded-md border-gray-300 py-3 px-4 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                        />
+                      <div className="sm:col-span-2">
+                        <label
+                          htmlFor="email"
+                          className="block text-sm font-medium text-orange-400"
+                        >
+                          Email
+                        </label>
+                        <div className="mt-1">
+                          <input
+                            id="email"
+                            name="email"
+                            type="email"
+                            value={
+                              chatData.originatorDetails["client"]["email"] ||
+                              ""
+                            }
+                            onChange={(e) => onChange(e, "email")}
+                            autoComplete="email"
+                            className="block w-full rounded-md border-gray-300 py-3 px-4 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                          />
+                        </div>
                       </div>
-                    </div>
-                    <div className="sm:col-span-2">
-                      <label
-                        htmlFor="phone-number"
-                        className="block text-sm font-medium text-orange-400"
-                      >
-                        Phone Number
-                      </label>
-                      <div className="relative mt-1 rounded-md shadow-sm">
-                        <input
-                          type="text"
-                          name="phone-number"
-                          id="phone-number"
-                          value={
-                            chatData.originatorDetails["client"][
-                              "phoneNumber"
-                            ] || ""
-                          }
-                          onChange={(e) => onChange(e, "phoneNumber")}
-                          autoComplete="tel"
-                          className="block w-full rounded-md border-gray-300 py-3 px-4  focus:border-indigo-500 focus:ring-indigo-500"
-                          placeholder="+61 1234 5678"
-                        />
+                      <div className="sm:col-span-2">
+                        <label
+                          htmlFor="phone-number"
+                          className="block text-sm font-medium text-orange-400"
+                        >
+                          Phone Number
+                        </label>
+                        <div className="relative mt-1 rounded-md shadow-sm">
+                          <input
+                            type="text"
+                            name="phone-number"
+                            id="phone-number"
+                            value={
+                              chatData.originatorDetails["client"][
+                                "phoneNumber"
+                              ] || ""
+                            }
+                            onChange={(e) => onChange(e, "phoneNumber")}
+                            autoComplete="tel"
+                            className="block w-full rounded-md border-gray-300 py-3 px-4  focus:border-indigo-500 focus:ring-indigo-500"
+                            placeholder="+61 1234 5678"
+                          />
+                        </div>
                       </div>
-                    </div>
-                    <div className="sm:col-span-2">
-                      <label
-                        htmlFor="message"
-                        className="block text-sm font-medium text-orange-400"
-                      >
-                        Message
-                      </label>
-                      <div className="mt-1">
-                        <textarea
-                          id="message"
-                          name="message"
-                          value={
-                            chatData.originatorDetails["client"][
-                              "enquiryMessage"
-                            ] || ""
-                          }
-                          onChange={(e) => onChange(e, "enquiryMessage")}
-                          rows={4}
-                          className="block w-full rounded-md border-gray-300 py-3 px-4 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                        />
+                      <div className="sm:col-span-2">
+                        <label
+                          htmlFor="message"
+                          className="block text-sm font-medium text-orange-400"
+                        >
+                          Message
+                        </label>
+                        <div className="mt-1">
+                          <textarea
+                            id="message"
+                            name="message"
+                            value={
+                              chatData.originatorDetails["client"][
+                                "enquiryMessage"
+                              ] || ""
+                            }
+                            onChange={(e) => onChange(e, "enquiryMessage")}
+                            rows={4}
+                            className="block w-full rounded-md border-gray-300 py-3 px-4 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                          />
+                        </div>
                       </div>
-                    </div>
-                    <div className="sm:col-span-2">
-                      <div className="flex items-start">
-                        <div className="flex-shrink-0">
-                          <Switch
-                            checked={agreed}
-                            onChange={setAgreed}
-                            className={classNames(
-                              agreed ? "bg-indigo-600" : "bg-gray-200",
-                              "relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-                            )}
-                          >
-                            <span className="sr-only">Agree to policies</span>
-                            <span
-                              aria-hidden="true"
+                      <div className="sm:col-span-2">
+                        <div className="flex items-start">
+                          <div className="flex-shrink-0">
+                            <Switch
+                              checked={agreed}
+                              onChange={setAgreed}
                               className={classNames(
-                                agreed ? "translate-x-5" : "translate-x-0",
-                                "inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"
+                                agreed ? "bg-indigo-600" : "bg-gray-200",
+                                "relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
                               )}
-                            />
-                          </Switch>
-                        </div>
-                        <div className="ml-3">
-                          <p className="text-base text-gray-500">
-                            By selecting this, you agree to the{" "}
-                            <a
-                              href="#"
-                              className="font-medium text-orange-400 underline"
                             >
-                              Privacy Policy [TODO]
-                            </a>{" "}
-                            and{" "}
-                            <a
-                              href="#"
-                              className="font-medium text-orange-400 underline"
-                            >
-                              Cookie Policy [TODO]
-                            </a>
-                            .
-                          </p>
+                              <span className="sr-only">Agree to policies</span>
+                              <span
+                                aria-hidden="true"
+                                className={classNames(
+                                  agreed ? "translate-x-5" : "translate-x-0",
+                                  "inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"
+                                )}
+                              />
+                            </Switch>
+                          </div>
+                          <div className="ml-3">
+                            <p className="text-base text-gray-500">
+                              By selecting this, you agree to the{" "}
+                              <a
+                                href="#"
+                                className="font-medium text-orange-400 underline"
+                              >
+                                Privacy Policy [TODO]
+                              </a>{" "}
+                              and{" "}
+                              <a
+                                href="#"
+                                className="font-medium text-orange-400 underline"
+                              >
+                                Cookie Policy [TODO]
+                              </a>
+                              .
+                            </p>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                    <div className="sm:col-span-2">
-                      <button
-                        type="submit"
-                        disabled={!allDataFilledOut}
-                        className={classNames(
-                          allDataFilledOut
-                            ? " bg-indigo-600  hover:bg-indigo-700"
-                            : " bg-gray-600",
-                          "inline-flex w-full items-center justify-center rounded-md border border-transparent px-6 py-3 text-base font-medium text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-                        )}
-                      >
-                        Let's talk
-                      </button>
-                    </div>
-                  </form>
-                </div>
-              </Dialog.Panel>
-            </Transition.Child>
+                      <div className="sm:col-span-2">
+                        <button
+                          type="submit"
+                          disabled={!allDataFilledOut}
+                          className={classNames(
+                            allDataFilledOut
+                              ? " bg-indigo-600  hover:bg-indigo-700"
+                              : " bg-gray-600",
+                            "inline-flex w-full items-center justify-center rounded-md border border-transparent px-6 py-3 text-base font-medium text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                          )}
+                        >
+                          Let's talk
+                        </button>
+                      </div>
+                    </form>
+                  </div>
+                </Dialog.Panel>
+              </Transition.Child>
+            </div>
           </div>
-        </div>
-      </Dialog>
-    </Transition>
+        </Dialog>
+      </Transition>
+      <FormThankYou
+        show={showThankYou}
+        setShow={setShowThankYou as (show: boolean) => {}}
+      />
+    </>
   );
 }
 
