@@ -8,6 +8,7 @@ export type { OpenAPIConfig } from './core/OpenAPI';
 
 export type { ChatData } from './models/ChatData';
 export type { ChatResponse } from './models/ChatResponse';
+export type { ContactUsData } from './models/ContactUsData';
 export type { HTTPValidationError } from './models/HTTPValidationError';
 export type { ValidationError } from './models/ValidationError';
 

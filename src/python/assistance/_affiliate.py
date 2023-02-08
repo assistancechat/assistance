@@ -14,13 +14,20 @@
 
 
 import base64
+import functools
 import json
 
 from cryptography.fernet import Fernet
 
 from assistance._keys import get_fernet_key
 
-FERNET_SECRET_KEY = get_fernet_key()
+
+@functools.cache
+def get_fernet():
+    key = get_fernet_key()
+    fernet = Fernet(key)
+
+    return fernet
 
 
 def create_affiliate_tag(email: str, details: str):
@@ -33,7 +40,7 @@ def create_affiliate_tag(email: str, details: str):
     json_string = json.dumps(affiliate_tag_data, indent=2)
     for_encryption = json_string.encode()
 
-    fernet = Fernet(FERNET_SECRET_KEY)
+    fernet = get_fernet()
     encrypted = fernet.encrypt(for_encryption)
     tag = base64.urlsafe_b64encode(encrypted).decode()
 
@@ -43,7 +50,7 @@ def create_affiliate_tag(email: str, details: str):
 def decrypt_affiliate_tag(tag: str):
     decoded = base64.urlsafe_b64decode(tag.encode())
 
-    fernet = Fernet(FERNET_SECRET_KEY)
+    fernet = get_fernet()
     decrypted = fernet.decrypt(decoded)
 
     loaded_token_data = json.loads(decrypted)
