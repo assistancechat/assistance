@@ -44,6 +44,7 @@ const inter = Inter({ subsets: ["latin"] });
 const Reviews = lazy(() => import("@/components/Reviews"));
 const Blog = lazy(() => import("@/components/Blog"));
 const Footer = lazy(() => import("@/components/Footer"));
+const AboutUs = lazy(() => import("@/components/AboutUs"));
 
 // TODO: Make this type declaration more flexible so that it works for all of
 // the page types.
@@ -129,6 +130,7 @@ export default function Core(props: { data: typeof dataCore }) {
             alt={props.data.hero.alt}
             chatButtonText={props.data.hero.chatButtonText}
           />
+          
           <MoreInfo
             key={props.data.moreInfo.id}
             heading={props.data.moreInfo.heading}
@@ -139,6 +141,9 @@ export default function Core(props: { data: typeof dataCore }) {
             videoLink={props.data.moreInfo.videoLink}
             videoTitle={props.data.moreInfo.videoTitle}
           />
+          <Suspense fallback={<div>Loading...</div>}>
+          <AboutUs />
+          </Suspense>
           <Suspense fallback={<div>Loading...</div>}>
             <Reviews
               careerSnapshot={props.data.reviews.careerSnapshot}
@@ -155,9 +160,11 @@ export default function Core(props: { data: typeof dataCore }) {
               posts={props.data.blog.posts}
             />
           </Suspense>
+          
           <Suspense fallback={<div>Loading...</div>}>
             <Footer />
           </Suspense>
+
         </ChatContext.Provider>
       </GoogleOAuthProvider>
       ;
