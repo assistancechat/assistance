@@ -59,6 +59,10 @@ const addBrainButton = () => {
   button.appendChild(anchor);
 
   googleBanner?.prepend(button);
+
+  button.onclick = () => {
+    window.gmail.tools.add_modal_window("Email AI Assistance", "boo", () => {});
+  };
 };
 
 export {};
