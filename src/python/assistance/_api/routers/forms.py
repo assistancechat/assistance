@@ -107,6 +107,7 @@ async def _send_email(data: ContactUsData, origin_url: str):
             email_subject=mailgun_data["subject"],
             email_content=mailgun_data["text"],
             form_data=data.dict(),
+            mailgun_data=mailgun_data,
         )
     )
 
