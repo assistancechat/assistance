@@ -1,10 +1,10 @@
-"use strict";
-
 // import brain from "img/brain.svg";
 
-declare interface Window {
-  _gmailjs: Gmail;
-  gmail: Gmail;
+declare global {
+  interface Window {
+    _gmailjs: Gmail;
+    gmail: Gmail;
+  }
 }
 
 const loaderId = setInterval(() => {
@@ -41,3 +41,5 @@ const addIcon = () => {
   const icon = document.createElementNS("http://www.w3.org/2000/svg", "svg");
   // console.log(brain);
 };
+
+export {};

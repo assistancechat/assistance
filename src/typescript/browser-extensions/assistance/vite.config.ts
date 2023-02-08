@@ -6,7 +6,7 @@ export default defineConfig({
     "process.env": {},
   },
   build: {
-    emptyOutDir: false,
+    emptyOutDir: true,
     outDir: resolve(__dirname, "dist"),
     lib: {
       entry: resolve(__dirname, "./src/main.ts"),

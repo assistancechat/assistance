@@ -4,10 +4,10 @@
   "description": "",
   "main": "",
   "scripts": {
-    "build": "run-s build.*",
-    "build.loader": "vite build --config vite.loader.config.ts",
-    "build.injector": "vite build --config vite.injector.config.ts",
-    "build.main": "vite build --config vite.main.config.ts"
+    "build": "run-s build.main build.loader",
+    "build.main": "vite build",
+    "build.loader": "esbuild loader/gmail-js-loader.js --outdir=dist/ --bundle --sourcemap --target=es6"
+
   },
   "author": "Simon Biggs",
   "license": "Apache-2.0",
@@ -16,10 +16,11 @@
     "jquery": "^3.6.1"
   },
   "devDependencies": {
+    "@types/jquery": "^3.5.16",
     "@types/node": "^18.13.0",
     "esbuild": "^0.16.0",
+    "npm-run-all": "^4.1.5",
     "typescript": "^4.9.5",
-    "vite": "^4.1.0",
-    "npm-run-all": "^4.1.5"
+    "vite": "^4.1.0"
   }
 }

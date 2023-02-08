@@ -11,7 +11,7 @@
         {
             "matches": [ "*://mail.google.com/*" ],
             "js": [
-                "dist/extension-injector.js"
+                "loader/extension-injector.js"
             ],
             "run_at": "document_start"
         }
@@ -19,8 +19,9 @@
 
     "web_accessible_resources": [{
         "resources": [
+            "dist/main.js",
             "dist/gmail-js-loader.js",
-            "dist/main.js"
+            "dist/gmail-js-loader.js.map"
         ],
         "matches": ["<all_urls>"]
     }],
