@@ -24,7 +24,7 @@ function startExtension(gmail: Gmail) {
     const userEmail = gmail.get.user_email();
     console.log("Hello, " + userEmail + ". This is your extension talking!");
 
-    addBrainButton();
+    addBrainButton(gmail);
 
     gmail.observe.on("view_email", (domEmail) => {
       console.log("Looking at email:", domEmail);
@@ -38,10 +38,7 @@ function startExtension(gmail: Gmail) {
   });
 }
 
-const addBrainButton = () => {
-  // TODO: This needs to be more robust to changes in Gmail's compilation
-  // Could search for header, then search for links that look like buttons
-  // within the header.
+const addBrainButton = (gmail: Gmail) => {
   const googleBanner = document.querySelector(".gb_ve.gb_te");
 
   const button = document.createElement("div");
@@ -61,7 +58,13 @@ const addBrainButton = () => {
   googleBanner?.prepend(button);
 
   button.onclick = () => {
-    window.gmail.tools.add_modal_window("Email AI Assistance", "boo", () => {});
+    gmail.tools.add_modal_window(
+      "Email Assistance Chat",
+      "This modal currently does nothing.",
+      () => {
+        gmail.tools.remove_modal_window();
+      }
+    );
   };
 };
 
