@@ -1,0 +1,12 @@
+{
+  "configurations": [
+  {
+    "type": "firefox",
+    "request": "launch",
+    "reAttach": true,
+    "name": "Launch add-on",
+    "addonPath": "${workspaceFolder}/src/typescript/browser-extensions/assistance/dist",
+    "reloadOnChange": "${workspaceFolder}/src/typescript/browser-extensions/assistance/dist/**/*.js"
+  }
+  ]
+}
