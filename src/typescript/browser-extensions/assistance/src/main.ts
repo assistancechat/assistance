@@ -39,11 +39,13 @@ function startExtension(gmail: Gmail) {
 }
 
 const addIcon = () => {
-  const googleBanner = document.getElementById("gb");
+  const googleBanner = document.querySelector(".gb_ve.gb_te");
+
   const brainWrapper = document.createElement("img");
   brainWrapper.src = brain;
+  brainWrapper.width = 24;
 
-  googleBanner?.appendChild(brainWrapper);
+  googleBanner?.prepend(brainWrapper);
 };
 
 export {};
