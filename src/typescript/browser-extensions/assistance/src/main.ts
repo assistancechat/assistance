@@ -1,4 +1,4 @@
-// import brain from "img/brain.svg";
+import brain from "./img/brain.svg";
 
 declare global {
   interface Window {
@@ -39,7 +39,7 @@ function startExtension(gmail: Gmail) {
 const addIcon = () => {
   const googleBanner = document.getElementById("gb");
   const icon = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-  // console.log(brain);
+  console.log(brain);
 };
 
 export {};

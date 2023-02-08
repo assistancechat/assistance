@@ -2,9 +2,6 @@ import { resolve } from "path";
 import { defineConfig } from "vite";
 
 export default defineConfig({
-  define: {
-    "process.env": {},
-  },
   build: {
     emptyOutDir: true,
     outDir: resolve(__dirname, "dist"),
