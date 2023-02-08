@@ -58,14 +58,43 @@ const addBrainButton = (gmail: Gmail) => {
   googleBanner?.prepend(button);
 
   button.onclick = () => {
-    gmail.tools.add_modal_window(
-      "Email Assistance Chat",
-      "This modal currently does nothing.",
-      () => {
-        gmail.tools.remove_modal_window();
-      }
-    );
+    const overview = getOverviews(gmail);
+    let innerHtml = "<form>";
+    overview.fromAddresses.forEach((address) => {
+      innerHtml += `<input type="checkbox" id="${address}" name="${address}" value="${address}">`;
+      innerHtml += `<label for="${address}">${address}</label><br>`;
+    });
+    innerHtml += "</form>";
+
+    // innerHtml += "<h3>Subjects:</h3><ul>";
+    // overview.subject.forEach((subject) => {
+    //   innerHtml += `<li>${subject}</li>`;
+    // });
+    // innerHtml += "</ul>";
+
+    gmail.tools.add_modal_window("Email Assistance Chat", innerHtml, () => {
+      getOverviews(gmail);
+      gmail.tools.remove_modal_window();
+    });
   };
+};
+
+const getOverviews = (gmail: Gmail) => {
+  // @ts-ignore
+  const threads = gmail.cache.threadCache as Record<string, GmailNewThreadData>;
+  const overview = {
+    fromAddresses: new Set<string>(),
+    subject: new Set<string>(),
+  };
+
+  Object.entries(threads).forEach(([threadId, threadData]) => {
+    threadData.emails.forEach((email) => {
+      overview.fromAddresses.add(email.from.address);
+      overview.subject.add(email.subject);
+    });
+  });
+
+  return overview;
 };
 
 export {};
