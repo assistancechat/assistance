@@ -32,7 +32,7 @@ import {
   MessageHistory,
 } from "@/providers/chat";
 
-import { callChatApi } from "@/utilities/call-api";
+import { callChatApi } from "@/utilities/call-chat-api";
 import { mostRecentChatIsClient } from "@/utilities/core";
 
 import ProfilePicture from "@/components/atoms/ProfilePicture";

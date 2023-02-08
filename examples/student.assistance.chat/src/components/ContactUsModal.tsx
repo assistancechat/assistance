@@ -15,9 +15,10 @@
 import { useContext, Fragment, useState, useEffect, FormEvent } from "react";
 import { Dialog, Transition, Switch } from "@headlessui/react";
 
-import { ChatContext, Details } from "@/providers/chat";
+import { ChatContext, ChatContextData, Details } from "@/providers/chat";
 import { updateClientData } from "@/utilities/core";
-import { EnvelopeIcon } from '@heroicons/react/24/solid';
+import { EnvelopeIcon } from "@heroicons/react/24/solid";
+import { callContactUsApi } from "@/utilities/call-contact-us-api";
 
 function ContactUs() {
   const { chatData, setChatData } = useContext(ChatContext);
@@ -57,18 +58,36 @@ function ContactUs() {
     return value != null && value !== "";
   };
 
-  const closeModal = () => {
+  const closeModal = (chatData: ChatContextData) => {
     setChatData({ ...chatData, openModal: null });
   };
 
-  const preventFormSubmission = (event: FormEvent<HTMLFormElement>) => {
+  const formSubmission = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    console.log(chatData.originatorDetails.client);
+    await callContactUsApi(chatData);
+
+    const newChatData = updateClientData(
+      chatData,
+      setChatData,
+      "enquiryMessage",
+      ""
+    );
+    closeModal(newChatData);
+
+    // TODO: Add in a success message
+    // Something like this?
+    // https://tailwindui.com/components/application-ui/overlays/notifications
   };
 
   return (
     <Transition appear show={chatData.openModal === "enquire"} as={Fragment}>
-      <Dialog as="div" className="relative z-10 " onClose={closeModal}>
+      <Dialog
+        as="div"
+        className="relative z-10 "
+        onClose={() => {
+          closeModal(chatData);
+        }}
+      >
         <Transition.Child
           as={Fragment}
           enter="ease-out duration-300"
@@ -97,14 +116,15 @@ function ContactUs() {
                   as="h3"
                   className="text-3xl font-medium inline-flex leading-none text-white space-x-1"
                 >
-                  <EnvelopeIcon className="text-orange-400 w-8 animate-pulse" /><h1>Contact Us</h1>
+                  <EnvelopeIcon className="text-orange-400 w-8 animate-pulse" />
+                  <h1>Contact Us</h1>
                 </Dialog.Title>
                 <div className="mt-5">
                   <form
                     action="#"
                     method="POST"
                     className="grid grid-cols-1 gap-y-6 sm:grid-cols-2 sm:gap-x-8"
-                    onSubmit={preventFormSubmission}
+                    onSubmit={formSubmission}
                   >
                     <div>
                       <label

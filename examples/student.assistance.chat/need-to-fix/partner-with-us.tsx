@@ -36,7 +36,7 @@ import {
 } from "@/providers/chat";
 
 import { mostRecentChatIsClient } from "@/utilities/flow";
-import { callChatApi } from "@/utilities/call-api";
+import { callChatApi } from "@/utilities/call-chat-api";
 
 const inter = Inter({ subsets: ["latin"] });
 

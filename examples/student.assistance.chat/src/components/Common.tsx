@@ -36,7 +36,7 @@ import {
 } from "@/providers/chat";
 
 import { mostRecentChatIsClient, updateClientData } from "@/utilities/core";
-import { callChatApi } from "@/utilities/call-api";
+import { callChatApi } from "@/utilities/call-chat-api";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -65,7 +65,8 @@ export default function Core(props: { data: typeof dataCore }) {
 
   useEffect(() => {
     if (tag != null) {
-      updateClientData(chatData, setChatData, "referrerTag", tag);
+      // TODO: Consider handling the case where tag might be string[].
+      updateClientData(chatData, setChatData, "referrerTag", tag as string);
       removeQueryParam("tag");
       console.log("tag:", tag);
     }

@@ -33,7 +33,7 @@ export type Details = {
   phoneNumber?: string;
   agreeToTerms?: boolean;
   enquiryMessage?: string;
-  referrerTag?: string | string[];
+  referrerTag?: string;
 };
 
 type OriginatorDetails = Record<MessageOriginator, Details>;
