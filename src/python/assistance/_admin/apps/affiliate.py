@@ -30,11 +30,13 @@ async def main():
         "Extra details to encode along with the affiliate link token (optional)"
     )
 
+    domain = st.text_input("Domain to create the link for", "globaltalent.work")
+
     if not st.button("Generate Affiliate Link"):
         st.stop()
 
     tag = create_affiliate_tag(email, details)
-    st.write(f"https://globaltalent.work/?tag={tag}")
+    st.write(f"https://{domain}/?tag={tag}")
 
     loaded_token_data = decrypt_affiliate_tag(tag)
 
