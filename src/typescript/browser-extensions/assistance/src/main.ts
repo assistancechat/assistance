@@ -24,6 +24,8 @@ function startExtension(gmail: Gmail) {
     const userEmail = gmail.get.user_email();
     console.log("Hello, " + userEmail + ". This is your extension talking!");
 
+    addIcon();
+
     gmail.observe.on("view_email", (domEmail) => {
       console.log("Looking at email:", domEmail);
       const emailData = gmail.new.get.email_data(domEmail);
@@ -38,8 +40,10 @@ function startExtension(gmail: Gmail) {
 
 const addIcon = () => {
   const googleBanner = document.getElementById("gb");
-  const icon = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-  console.log(brain);
+  const brainWrapper = document.createElement("img");
+  brainWrapper.src = brain;
+
+  googleBanner?.appendChild(brainWrapper);
 };
 
 export {};
