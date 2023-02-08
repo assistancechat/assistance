@@ -33,7 +33,7 @@ export default function HeroOpening(props: HeroOpeningProps) {
       "Discover God's Purpose for you in <u>Business</u>",
       "Discover God's Purpose for your <u>Life</u>",
     ],
-    typeSpeed: 10,
+    typeSpeed: 5,
     backSpeed: 25,
     backDelay: 1200,
     loop: true,
@@ -45,10 +45,13 @@ export default function HeroOpening(props: HeroOpeningProps) {
   const subHeadingConfig = {
     strings: [
       "We will help you find the right course and connect you to your purpose",
+      "Don't wait and waste your talent", 
+      "ASK US TODAY."
     ],
-    typeSpeed: 20,
+    typeSpeed: 15,
+    backSpeed: 10,
     backDelay: 1350,
-    startDelay: 9200,
+    startDelay: 7000,
     loop: true,
     loopCount: 1,
     showCursor: false,
