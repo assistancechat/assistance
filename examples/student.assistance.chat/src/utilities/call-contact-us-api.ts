@@ -44,5 +44,6 @@ export async function callContactUsApi(chatData: ChatContextData) {
   }
 
   const response = await contactUs(contactUsData);
-  console.log(response);
+
+  return response;
 }

@@ -42,5 +42,8 @@ export const updateClientData = (
     client: newClientDetails,
   };
 
-  setChatData({ ...chatData, originatorDetails: newOriginatorDetails });
+  const newChatData = { ...chatData, originatorDetails: newOriginatorDetails };
+
+  setChatData(newChatData);
+  return newChatData;
 };

@@ -15,7 +15,7 @@
 import { useContext, Fragment, useState, useEffect, FormEvent } from "react";
 import { Dialog, Transition, Switch } from "@headlessui/react";
 
-import { ChatContext, Details } from "@/providers/chat";
+import { ChatContext, ChatContextData, Details } from "@/providers/chat";
 import { updateClientData } from "@/utilities/core";
 import { EnvelopeIcon } from "@heroicons/react/24/solid";
 import { callContactUsApi } from "@/utilities/call-contact-us-api";
@@ -58,18 +58,36 @@ function ContactUs() {
     return value != null && value !== "";
   };
 
-  const closeModal = () => {
+  const closeModal = (chatData: ChatContextData) => {
     setChatData({ ...chatData, openModal: null });
   };
 
   const formSubmission = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     await callContactUsApi(chatData);
+
+    const newChatData = updateClientData(
+      chatData,
+      setChatData,
+      "enquiryMessage",
+      ""
+    );
+    closeModal(newChatData);
+
+    // TODO: Add in a success message
+    // Something like this?
+    // https://tailwindui.com/components/application-ui/overlays/notifications
   };
 
   return (
     <Transition appear show={chatData.openModal === "enquire"} as={Fragment}>
-      <Dialog as="div" className="relative z-10 " onClose={closeModal}>
+      <Dialog
+        as="div"
+        className="relative z-10 "
+        onClose={() => {
+          closeModal(chatData);
+        }}
+      >
         <Transition.Child
           as={Fragment}
           enter="ease-out duration-300"
