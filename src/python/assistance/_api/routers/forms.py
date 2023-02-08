@@ -12,7 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import asyncio
 import json
+from urllib.parse import urlparse
 
 import aiohttp
 from fastapi import APIRouter, Request
@@ -21,6 +23,7 @@ from pydantic import BaseModel
 from assistance import _ctx
 from assistance._affiliate import decrypt_affiliate_tag
 from assistance._keys import get_mailgun_api_key
+from assistance._store.emails import store_contact_us_request
 
 router = APIRouter(prefix="/forms")
 
@@ -81,7 +84,7 @@ async def _send_email(data: ContactUsData, origin_url: str):
             referrer_tag_content=json.dumps(referrer_tag_content, indent=2),
         )
 
-    data = {
+    mailgun_data = {
         "from": f"noreply@{DOMAIN}",
         # "to": "applications@globaltalent.work",
         "to": "applications@assistance.chat",
@@ -96,8 +99,19 @@ async def _send_email(data: ContactUsData, origin_url: str):
         ),
     }
 
+    record_grouping = urlparse(origin_url).netloc
+    asyncio.create_task(
+        store_contact_us_request(
+            record_grouping=record_grouping,
+            email_address=data.email,
+            email_subject=mailgun_data["subject"],
+            email_content=mailgun_data["text"],
+            form_data=data.dict(),
+        )
+    )
+
     await _ctx.session.post(
         url=url,
         auth=aiohttp.BasicAuth(login="api", password=MAILGUN_API_KEY),
-        data=data,
+        data=mailgun_data,
     )
