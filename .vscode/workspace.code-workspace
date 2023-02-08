@@ -285,7 +285,9 @@
       "tyriar.sort-lines",
       "bradlc.vscode-tailwindcss",
       "firefox-devtools.vscode-firefox-debug",
-      "ms-edgedevtools.vscode-edge-devtools"
+      "ms-edgedevtools.vscode-edge-devtools",
+      "aaravb.chrome-extension-developer-tools",
+      "codemooseus.vscode-devtools-for-chrome"
     ]
   }
 }
