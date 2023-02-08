@@ -25,6 +25,7 @@ import ChatModal from "@/components/ChatModal";
 import ContactUsModal from "@/components/ContactUsModal";
 import HeroOpening from "@/components/HeroOpening";
 import MoreInfo from "@/components/MoreInfo";
+import TikTokAnalytics from "./TikTokAnalytics";
 
 import dataCore from "@/data/general.json";
 
@@ -117,6 +118,7 @@ export default function Core(props: { data: typeof dataCore }) {
         <title>Global Talent</title>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
+        <TikTokAnalytics />
       </Head>
       <GoogleOAuthProvider clientId="332533892028-gmefpu618mrv51k25lhpjtfn09mep8kq.apps.googleusercontent.com">
         <ChatContext.Provider value={value}>
@@ -171,3 +173,5 @@ export default function Core(props: { data: typeof dataCore }) {
     </>
   );
 }
+
+

@@ -55,15 +55,8 @@ function openEnquireModal() {
           <h1 className="text-4xl font-bold tracking-tight text-orange-400 md:text-5xl lg:text-6xl">
             About Us
           </h1>
-          <p className='mt-6 max-w-3xl text-xl text-gray-300'>
-            Our team will help you find the right career in Australia. Our
-            Christian values guide us and we are committed to finding meaningful
-            and fufilling work for you.
-          </p>
-          <p className='mt-6 max-w-3xl text-xl text-gray-300'>
-            If you are willing to begin your journey. We would love to support
-            you and help you invest your talent wisely.
-          </p>
+          <p className='mt-6 max-w-5xl text-xl text-gray-300'>
+          Our team is dedicated to finding the right career for you in Australia. We specialize in placing people into meaningful, purpose-driven careers.  We can't wait to see what God has planned for you next.          </p>
         </div>
       </div>
 
