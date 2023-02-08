@@ -13,6 +13,9 @@
             "js": [
                 "loader/extension-injector.js"
             ],
+            "css": [
+                "src/style.css"
+              ],
             "run_at": "document_start"
         }
     ],
