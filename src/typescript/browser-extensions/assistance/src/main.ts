@@ -1,5 +1,7 @@
 "use strict";
 
+// import brain from "img/brain.svg";
+
 declare interface Window {
   _gmailjs: Gmail;
   gmail: Gmail;
@@ -33,3 +35,9 @@ function startExtension(gmail: Gmail) {
     });
   });
 }
+
+const addIcon = () => {
+  const googleBanner = document.getElementById("gb");
+  const icon = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  // console.log(brain);
+};
