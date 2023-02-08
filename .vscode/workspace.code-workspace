@@ -267,7 +267,25 @@
   "extensions": {
     "recommendations": [
       "executablebookproject.myst-highlight",
-      "jasonnutter.vscode-codeowners"
+      "jasonnutter.vscode-codeowners",
+      "esbenp.prettier-vscode",
+      "ms-python.vscode-pylance",
+      "bungcip.better-toml",
+      "streetsidesoftware.code-spell-checker",
+      "github.vscode-codeql",
+      "github.vscode-pull-request-github",
+      "nhoizey.gremlins",
+      "visualstudioexptteam.vscodeintellicode",
+      "ms-python.isort",
+      "ms-vsliveshare.vsliveshare",
+      "ms-python.python",
+      "ms-vscode-remote.remote-ssh",
+      "ms-vscode-remote.remote-ssh-edit",
+      "stkb.rewrap",
+      "tyriar.sort-lines",
+      "bradlc.vscode-tailwindcss",
+      "firefox-devtools.vscode-firefox-debug",
+      "ms-edgedevtools.vscode-edge-devtools"
     ]
   }
 }
