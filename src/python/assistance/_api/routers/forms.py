@@ -86,8 +86,8 @@ async def _send_email(data: ContactUsData, origin_url: str):
 
     mailgun_data = {
         "from": f"noreply@{DOMAIN}",
-        # "to": "applications@globaltalent.work",
-        "to": "applications@assistance.chat",
+        "to": "applications@globaltalent.work",
+        # "to": "applications@assistance.chat",
         "h:Reply-To": data.email,
         "subject": EMAIL_SUBJECT.format(
             origin_url=origin_url, first_name=data.first_name, last_name=data.last_name

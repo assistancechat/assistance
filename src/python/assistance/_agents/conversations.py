@@ -28,8 +28,6 @@ from thefuzz import process as fuzz_process
 from assistance._store.transcript import store_prompt_transcript
 from assistance._tools.search import alphacrucis_search
 
-RECORD_GROUPING = "student.assistance.chat"
-
 MODEL_KWARGS = {
     "engine": "text-davinci-003",
     "max_tokens": 256,
@@ -143,6 +141,7 @@ PROMPT = textwrap.dedent(
 
 
 async def run_conversation(
+    record_grouping: str,
     openai_api_key: str,
     task_prompt: str,
     agent_name: str,
@@ -182,7 +181,7 @@ async def run_conversation(
     async def _search(query: str):
         return await alphacrucis_search(
             openai_api_key=openai_api_key,
-            record_grouping=RECORD_GROUPING,
+            record_grouping=record_grouping,
             client_email=client_email,
             query=query,
         )
@@ -196,6 +195,7 @@ async def run_conversation(
     }
 
     response = await _run_llm_process_observation_loop(
+        record_grouping=record_grouping,
         openai_api_key=openai_api_key,
         agent_name=agent_name,
         client_email=client_email,
@@ -207,6 +207,7 @@ async def run_conversation(
 
 
 async def _run_llm_process_observation_loop(
+    record_grouping: str,
     openai_api_key: str,
     agent_name: str,
     client_email: str,
@@ -222,7 +223,7 @@ async def _run_llm_process_observation_loop(
     while True:
         response = await _call_gpt_and_store_as_transcript(
             openai_api_key=openai_api_key,
-            record_grouping=RECORD_GROUPING,
+            record_grouping=record_grouping,
             client_email=client_email,
             model_kwargs=MODEL_KWARGS,
             prompt=prompt,
