@@ -69,7 +69,6 @@ export default function Common() {
           <ContactUsModal />
         </ChatContext.Provider>
       </GoogleOAuthProvider>
-      ;
     </>
   );
 }
