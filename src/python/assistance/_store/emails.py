@@ -15,6 +15,8 @@
 import asyncio
 import json
 
+from aiohttp import ClientResponse
+
 from assistance._paths import RECORDS
 
 from .utilities import (
@@ -30,18 +32,20 @@ async def store_contact_us_request(
     email_content: str,
     form_data: dict,
     mailgun_data: dict,
-    mailgun_response: dict,
+    mailgun_response: ClientResponse,
 ):
     record_directory = create_record_directory_with_epoch(
         RECORDS, [record_grouping, email_address, "emails"]
     )
+
+    mailgun_response_data = await mailgun_response.json()
 
     data_to_save = {
         "email_subject.txt": email_subject,
         "email_content.txt": email_content,
         "form_data.json": json.dumps(form_data, indent=2),
         "mailgun_data.json": json.dumps(mailgun_data, indent=2),
-        "mailgun_response.json": json.dumps(mailgun_response, indent=2),
+        "mailgun_response_data.json": json.dumps(mailgun_response_data, indent=2),
     }
 
     asyncio.create_task(
