@@ -21,7 +21,6 @@ export async function callContactUsApi(chatData: ChatContextData) {
 
   if (
     !clientData.email ||
-    !clientData.phoneNumber ||
     !clientData.firstName ||
     !clientData.lastName ||
     !clientData.enquiryMessage
@@ -33,7 +32,7 @@ export async function callContactUsApi(chatData: ChatContextData) {
     first_name: clientData.firstName,
     last_name: clientData.lastName,
     email: clientData.email,
-    phone_number: clientData.phoneNumber,
+    phone_number: "{was_not_asked_for}",
     message: clientData.enquiryMessage,
     agree_to_terms: false,
   };

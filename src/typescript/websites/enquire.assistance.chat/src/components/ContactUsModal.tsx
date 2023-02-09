@@ -193,34 +193,10 @@ function ContactUs() {
                       </div>
                       <div className="sm:col-span-2">
                         <label
-                          htmlFor="phone-number"
-                          className="block text-sm font-medium text-orange-400"
-                        >
-                          Phone Number
-                        </label>
-                        <div className="relative mt-1 rounded-md shadow-sm">
-                          <input
-                            type="text"
-                            name="phone-number"
-                            id="phone-number"
-                            value={
-                              chatData.originatorDetails["client"][
-                                "phoneNumber"
-                              ] || ""
-                            }
-                            onChange={(e) => onChange(e, "phoneNumber")}
-                            autoComplete="tel"
-                            className="block w-full rounded-md border-gray-300 py-3 px-4  focus:border-indigo-500 focus:ring-indigo-500"
-                            placeholder="+61 1234 5678"
-                          />
-                        </div>
-                      </div>
-                      <div className="sm:col-span-2">
-                        <label
                           htmlFor="message"
                           className="block text-sm font-medium text-orange-400"
                         >
-                          Message
+                          What would you like to study?
                         </label>
                         <div className="mt-1">
                           <textarea
