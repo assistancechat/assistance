@@ -99,6 +99,12 @@ async def _send_email(data: ContactUsData, origin_url: str):
         ),
     }
 
+    mailgun_response = await _ctx.session.post(
+        url=url,
+        auth=aiohttp.BasicAuth(login="api", password=MAILGUN_API_KEY),
+        data=mailgun_data,
+    )
+
     record_grouping = urlparse(origin_url).netloc
     asyncio.create_task(
         store_contact_us_request(
@@ -108,11 +114,6 @@ async def _send_email(data: ContactUsData, origin_url: str):
             email_content=mailgun_data["text"],
             form_data=data.dict(),
             mailgun_data=mailgun_data,
+            mailgun_response=mailgun_response,
         )
-    )
-
-    await _ctx.session.post(
-        url=url,
-        auth=aiohttp.BasicAuth(login="api", password=MAILGUN_API_KEY),
-        data=mailgun_data,
     )
