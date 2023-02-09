@@ -30,6 +30,7 @@ async def store_contact_us_request(
     email_content: str,
     form_data: dict,
     mailgun_data: dict,
+    mailgun_response: dict,
 ):
     record_directory = create_record_directory_with_epoch(
         RECORDS, [record_grouping, email_address, "emails"]
@@ -40,6 +41,7 @@ async def store_contact_us_request(
         "email_content.txt": email_content,
         "form_data.json": json.dumps(form_data, indent=2),
         "mailgun_data.json": json.dumps(mailgun_data, indent=2),
+        "mailgun_response.json": json.dumps(mailgun_response, indent=2),
     }
 
     asyncio.create_task(
