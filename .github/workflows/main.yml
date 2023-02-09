@@ -105,9 +105,9 @@ jobs:
       - name: Add GitHub Pages config files
         if: github.ref == 'refs/heads/main'
         run: |
-          echo enquire.assistance.chat > dist/CNAME
-          touch dist/.nojekyll
-          cp dist/index.html dist/404.html
+          echo enquire.assistance.chat > out/CNAME
+          touch out/.nojekyll
+          cp out/index.html out/404.html
         working-directory: src/typescript/websites/enquire.assistance.chat
 
       - name: Deploy to gh-pages branch
@@ -115,7 +115,7 @@ jobs:
         uses: JamesIves/github-pages-deploy-action@v4.4.1
         with:
           branch: gh-pages
-          folder: src/typescript/websites/enquire.assistance.chat/dist
+          folder: src/typescript/websites/enquire.assistance.chat/out
           repository-name: assistancechat/enquire.assistance.chat
           token: ${{ secrets.ASSISTANCECHAT_BOT_PAT }}
 
