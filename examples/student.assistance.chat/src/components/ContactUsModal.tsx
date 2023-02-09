@@ -269,14 +269,14 @@ function ContactUs() {
                                 href="#"
                                 className="font-medium text-orange-400 underline"
                               >
-                                Privacy Policy [TODO]
+                                Privacy Policy
                               </a>{" "}
                               and{" "}
                               <a
                                 href="#"
                                 className="font-medium text-orange-400 underline"
                               >
-                                Cookie Policy [TODO]
+                                Cookie Policy
                               </a>
                               .
                             </p>

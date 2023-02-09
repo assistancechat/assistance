@@ -16,6 +16,7 @@ import asyncio
 import logging
 from datetime import datetime, timedelta
 from typing import NamedTuple, TypedDict
+from urllib.parse import urlparse
 
 from google.auth import exceptions
 from google.auth.transport import requests
@@ -90,7 +91,10 @@ async def run_chat(data: ChatData, origin_url: str) -> ChatResponse:
     if client_email is None:
         client_email = data.client_email
 
+    record_grouping = urlparse(origin_url).netloc
+
     agent_message = await run_conversation(
+        record_grouping=record_grouping,
         openai_api_key=openai_api_key,
         task_prompt=data.task_prompt,
         agent_name=data.agent_name,
