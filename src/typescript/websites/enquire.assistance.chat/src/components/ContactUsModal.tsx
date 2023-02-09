@@ -45,7 +45,6 @@ function ContactUs() {
       isFilledOut(clientDetails.firstName) &&
       isFilledOut(clientDetails.lastName) &&
       isFilledOut(clientDetails.email) &&
-      isFilledOut(clientDetails.phoneNumber) &&
       isFilledOut(clientDetails.enquiryMessage)
     );
   };
