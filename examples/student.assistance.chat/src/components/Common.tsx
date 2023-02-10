@@ -111,7 +111,7 @@ export default function Core(props: { data: typeof dataCore }) {
 
     appendPendingQuestionIfReady();
   }, [chatData]);
-
+  
   return (
     <>
       <Head>
