@@ -27,8 +27,6 @@ import HeroOpening from "@/components/HeroOpening";
 import MoreInfo from "@/components/MoreInfo";
 import TikTokAnalytics from "./TikTokAnalytics";
 
-import dataCore from "@/data/general.json";
-
 import {
   ChatContext,
   ChatContextData,
@@ -49,7 +47,8 @@ const AboutUs = lazy(() => import("@/components/AboutUs"));
 
 // TODO: Make this type declaration more flexible so that it works for all of
 // the page types.
-export default function Core(props: { data: typeof dataCore }) {
+export default function Core(props: { data: any }) {
+  
   const [chatData, setChatData] = useState<ChatContextData>(DefaultChatData);
   const value = { chatData, setChatData };
 
@@ -144,15 +143,15 @@ export default function Core(props: { data: typeof dataCore }) {
             videoTitle={props.data.moreInfo.videoTitle}
           />
           <Suspense fallback={<div>Loading...</div>}>
-          <AboutUs />
-          </Suspense>
-          <Suspense fallback={<div>Loading...</div>}>
             <Reviews
               careerSnapshot={props.data.reviews.careerSnapshot}
               careerSlogan={props.data.reviews.careerSlogan}
               sidePanels={props.data.reviews.sidePanels}
               featured={props.data.reviews.featured}
             />
+          </Suspense>
+          <Suspense fallback={<div>Loading...</div>}>
+          <AboutUs />
           </Suspense>
           <Suspense fallback={<div>Loading...</div>}>
             <Blog
@@ -162,7 +161,6 @@ export default function Core(props: { data: typeof dataCore }) {
               posts={props.data.blog.posts}
             />
           </Suspense>
-          
           <Suspense fallback={<div>Loading...</div>}>
             <Footer />
           </Suspense>
