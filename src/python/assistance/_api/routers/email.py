@@ -23,6 +23,7 @@ from assistance import _ctx
 from assistance._config import ROOT_DOMAIN
 
 from assistance._agents.email.create import react_to_create_domain
+from assistance._agents.email.custom import react_to_custom_agent_request
 from assistance._mailgun import send_email
 from fastapi import APIRouter, Request
 
@@ -83,6 +84,13 @@ async def _react_to_email(email: Email):
             body_plain=email["body-plain"],
         )
         return
+
+    await react_to_custom_agent_request(
+        from_string=email["from"],
+        subject=email["subject"],
+        body_plain=email["body-plain"],
+        agent_name=email["recipient"].split("@")[0],
+    )
 
 
 VERIFICATION_TOKEN_BASE = "https://mail.google.com/mail/vf-"

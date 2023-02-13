@@ -16,14 +16,11 @@
 # https://github.com/hwchase17/langchain/blob/ae1b589f60a/langchain/agents/conversational/prompt.py#L1-L36
 
 import json
-import asyncio
 import logging
 import re
 import aiofiles
 import textwrap
-from typing import Callable, Coroutine
 
-from thefuzz import process as fuzz_process
 
 import openai
 
