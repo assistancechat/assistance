@@ -12,9 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Prompt inspired by the work provided under an MIT license over at:
-# https://github.com/hwchase17/langchain/blob/ae1b589f60a/langchain/agents/conversational/prompt.py#L1-L36
-
 import json
 import logging
 import re
@@ -28,6 +25,10 @@ from assistance._paths import PROMPTS as PROMPTS_PATH
 from assistance._config import ROOT_DOMAIN
 from assistance._keys import get_openai_api_key
 from assistance._mailgun import send_email
+
+from .reply import create_reply
+from .default import DEFAULT_TASKS
+
 
 OPEN_AI_API_KEY = get_openai_api_key()
 
@@ -120,6 +121,14 @@ PROMPT = textwrap.dedent(
         Only provide this information once the agent has been
         successfully created.
 
+        The email chain thus far, most recent email first
+        -------------------------------------------------
+
+        Subject: {subject}
+
+        Email body:
+        {body_plain}
+
         Response format
         ---------------
 
@@ -138,14 +147,6 @@ PROMPT = textwrap.dedent(
         {RESPONSE_SECTION}
 
         [Response to user goes here]
-
-        The email chain thus far, most recent email first
-        -------------------------------------------------
-
-        Subject: {subject}
-
-        Email body:
-        {body_plain}
 
         Response
         --------
@@ -187,24 +188,29 @@ async def react_to_create_domain(from_string: str, subject: str, body_plain: str
     tool_response: str | None = None
 
     try:
-        agent_name: str = json_data["agent_name"]
-        agent_name = agent_name.lower().replace(" ", "-")
-
-        agent_email = f"{agent_name}@{ROOT_DOMAIN}".lower()
-        match = re.search(
-            r"^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$",
-            agent_email,
-        )
-        if match is None:
-            raise ValueError(
-                f"Invalid agent_name: {agent_name}. The created email "
-                f"address of {agent_email} is not a valid address."
-            )
-
-        json_data["agent_name"] = agent_name
-
         if json_data["ready_to_create_agent"]:
-            logging.info("Creating email agent")
+            agent_name: str = json_data["agent_name"]
+            agent_name = agent_name.lower().replace(" ", "-")
+
+            agent_email = f"{agent_name}@{ROOT_DOMAIN}".lower()
+            match = re.search(
+                r"^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$",
+                agent_email,
+            )
+            if match is None:
+                raise ValueError(
+                    f"Invalid agent_name: {agent_name}. The created email "
+                    f"address of {agent_email} is not a valid address."
+                )
+
+            json_data["agent_name"] = agent_name
+
+            if agent_name in DEFAULT_TASKS.keys():
+                raise ValueError(
+                    "Cannot create an agent with a reserved name. "
+                    f"{agent_name} is a reserved name."
+                )
+
             tool_response = await _create_email_agent(
                 user_email_address, agent_name, json_data["prompt"]
             )
@@ -234,14 +240,18 @@ async def react_to_create_domain(from_string: str, subject: str, body_plain: str
     )
     response: str = completions.choices[0].text.strip()
 
-    if not subject.startswith("Re:"):
-        subject = f"Re: {subject}"
+    subject, total_reply = create_reply(
+        subject=subject,
+        body_plain=body_plain,
+        response=response,
+        from_string=from_string,
+    )
 
     mailgun_data = {
         "from": f"create@{ROOT_DOMAIN}",
         "to": user_email_address,
         "subject": subject,
-        "text": response,
+        "text": total_reply,
     }
 
     await send_email(mailgun_data)

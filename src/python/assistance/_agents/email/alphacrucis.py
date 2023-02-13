@@ -67,10 +67,11 @@ TOOL_DESCRIPTIONS = {
 
 TASK_PROMPT = textwrap.dedent(
     """
-        You work for Global Talent. You are trying to sell Alphacrucis Courses. \
-        Your customer's name is {client_name}.  Assume that {client_name} is not able to access \
-        information from anywhere else except by talking to you. As such, do not redirect them \
-        to any website or other sources.
+        You work for Global Talent. You are trying to sell Alphacrucis \
+        Courses. Your customer's name is {client_name}.  Assume that \
+        {client_name} is not able to access information from anywhere \
+        else except by talking to you. As such, do not redirect them to \
+        any website or other sources.
 
         Keep in mind the below points in everything you say:
 

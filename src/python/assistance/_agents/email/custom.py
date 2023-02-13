@@ -16,16 +16,15 @@
 # https://github.com/hwchase17/langchain/blob/ae1b589f60a/langchain/agents/conversational/prompt.py#L1-L36
 
 import logging
-import re
-import aiofiles
 import textwrap
 
 import openai
 
-from assistance._paths import PROMPTS as PROMPTS_PATH
 from assistance._config import ROOT_DOMAIN
 from assistance._keys import get_openai_api_key
 from assistance._mailgun import send_email
+
+from .reply import create_reply
 
 OPEN_AI_API_KEY = get_openai_api_key()
 
@@ -46,6 +45,12 @@ PROMPT = textwrap.dedent(
         You are sending and receiving multiple emails from
         "{from_string}". Your email address is {agent_name}@{ROOT_DOMAIN}.
 
+        Keep in mind the below points in everything you say:
+
+        - Personalise with the user's name
+        - Ask open-ended questions to understand the user's needs
+        - Show genuine empathy and interest in user's situation
+
         Task
         ----
 
@@ -54,6 +59,9 @@ PROMPT = textwrap.dedent(
         The email chain thus far, most recent email first
         -------------------------------------------------
 
+        Subject: {subject}
+
+        Email body:
         {body_plain}
 
         Next email to send to {from_string}
@@ -75,6 +83,7 @@ async def react_to_custom_agent_request(
         from_string=from_string,
         prompt_task=prompt_task,
         agent_name=agent_name,
+        subject=subject,
         ROOT_DOMAIN=ROOT_DOMAIN,
     )
     logging.info(prompt)
@@ -86,14 +95,18 @@ async def react_to_custom_agent_request(
 
     logging.info(response)
 
-    if not subject.startswith("Re:"):
-        subject = f"Re: {subject}"
+    subject, total_reply = create_reply(
+        subject=subject,
+        body_plain=body_plain,
+        response=response,
+        from_string=from_string,
+    )
 
     mailgun_data = {
         "from": f"{agent_name}@{ROOT_DOMAIN}",
         "to": user_email_address,
         "subject": subject,
-        "text": response,
+        "text": total_reply,
     }
 
     await send_email(mailgun_data)

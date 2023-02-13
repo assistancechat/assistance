@@ -26,6 +26,7 @@ from assistance._paths import PROMPTS as PROMPTS_PATH
 
 from assistance._agents.email.create import react_to_create_domain
 from assistance._agents.email.custom import react_to_custom_agent_request
+from assistance._agents.email.default import DEFAULT_TASKS
 from assistance._mailgun import send_email
 from fastapi import APIRouter, Request
 
@@ -92,6 +93,8 @@ async def _react_to_email(email: Email):
 
         return
 
+    agent_name = email["recipient"].split("@")[0].lower()
+
     if email["recipient"] == f"create@{ROOT_DOMAIN}":
         await react_to_create_domain(
             from_string=from_string,
@@ -101,10 +104,20 @@ async def _react_to_email(email: Email):
 
         return
 
-    agent_name = email["recipient"].split("@")[0].lower()
-
     match = re.search(r"[\w.+-]+@[\w-]+\.[\w.-]+", from_string)
     user_email_address = match.group(0)
+
+    if agent_name in DEFAULT_TASKS:
+        await react_to_custom_agent_request(
+            from_string=from_string,
+            subject=subject,
+            user_email_address=user_email_address,
+            body_plain=body_plain,
+            agent_name=agent_name,
+            prompt_task=DEFAULT_TASKS[agent_name],
+        )
+
+        return
 
     path_to_new_prompt = PROMPTS_PATH / user_email_address / agent_name
 
@@ -117,7 +130,7 @@ async def _react_to_email(email: Email):
         return
 
     await react_to_custom_agent_request(
-        from_string=email["from"],
+        from_string=from_string,
         subject=subject,
         user_email_address=user_email_address,
         body_plain=body_plain,
