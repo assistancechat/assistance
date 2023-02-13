@@ -16,12 +16,34 @@ import textwrap
 from assistance._config import ROOT_DOMAIN
 
 DEFAULT_TASKS = {
-    "create": ("Used to create ", None),
-    "hi": textwrap.dedent(
-        f"""
+    "create": (
+        "Used to create new agents. "
+        "When emailing need to provide an agent name and a prompt.",
+        None,
+    )
+}
+
+_task_overviews = ""
+for agent, (overview, _prompt) in DEFAULT_TASKS.items():
+    _task_overviews += f"- {agent}@{ROOT_DOMAIN}: {overview}\n"
+
+
+HI_TASK = (
+    (
+        "Used to onboard new users",
+        textwrap.dedent(
+            """
             You are the user's first port of call to using {ROOT_DOMAIN}.
             You are to have a welcoming discussion with them and provide
             them with an overview of what can be done.
+
+            Overview of the AI agent emails and what they can do:
+            {task_overviews}
         """
-    ).strip(),
-}
+        )
+        .format(task_overviews=_task_overviews, ROOT_DOMAIN=ROOT_DOMAIN)
+        .strip(),
+    ),
+)
+
+DEFAULT_TASKS["hi"] = HI_TASK

@@ -45,23 +45,16 @@ PROMPT = textwrap.dedent(
         You are sending and receiving multiple emails from
         "{from_string}". Your email address is {agent_name}@{ROOT_DOMAIN}.
 
-        Keep in mind the below points in everything you say:
-
-        - Personalise with the user's name
-        - Ask open-ended questions to understand the user's needs
-        - Show genuine empathy and interest in user's situation
-
         Task
         ----
 
         {prompt_task}
 
+        The subject of the email is: {subject}
+
         The email chain thus far, most recent email first
         -------------------------------------------------
 
-        Subject: {subject}
-
-        Email body:
         {body_plain}
 
         Next email to send to {from_string}

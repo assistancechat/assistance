@@ -114,7 +114,7 @@ async def _react_to_email(email: Email):
             user_email_address=user_email_address,
             body_plain=body_plain,
             agent_name=agent_name,
-            prompt_task=DEFAULT_TASKS[agent_name],
+            prompt_task=DEFAULT_TASKS[agent_name][1],
         )
 
         return

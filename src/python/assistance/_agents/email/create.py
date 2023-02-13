@@ -121,12 +121,11 @@ PROMPT = textwrap.dedent(
         Only provide this information once the agent has been
         successfully created.
 
+        The subject of the email is: {subject}
+
         The email chain thus far, most recent email first
         -------------------------------------------------
 
-        Subject: {subject}
-
-        Email body:
         {body_plain}
 
         Response format
