@@ -19,6 +19,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from assistance import _ctx
+from assistance._config import ROOT_DOMAIN
 
 
 from .routers import chat, forms, email
@@ -34,8 +35,8 @@ app = FastAPI()
 
 
 origins = [
-    "https://enquire.assistance.chat",
-    "https://student.assistance.chat",
+    f"https://enquire.{ROOT_DOMAIN}",
+    f"https://student.{ROOT_DOMAIN}",
     "https://globaltalent.work",
     "http://localhost:3000",
     "http://127.0.0.1:3000",

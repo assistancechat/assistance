@@ -20,15 +20,15 @@ from assistance._paths import USERS
 
 from . import _ctx
 from ._keys import get_mailgun_api_key
+from ._config import ROOT_DOMAIN
 
-EMAIL_SUBJECT = "Your career.assistance.chat access link"
+EMAIL_SUBJECT = f"Your career.{ROOT_DOMAIN} access link"
 EMAIL_TEMPLATE = (
     "Your personal access link, which is tied to your email is {access_link}"
 )
-LINK_TEMPLATE = "https://career.assistance.chat/?pwd={password}"
+LINK_TEMPLATE = "https://career.{domain}/?pwd={password}"
 
 API_KEY = get_mailgun_api_key()
-DOMAIN = "assistance.chat"
 
 
 def get_access_link(email: str):
@@ -44,16 +44,16 @@ def get_access_link(email: str):
         with open(USERS / email, "w", encoding="utf8") as f:
             f.write(password)
 
-    return LINK_TEMPLATE.format(password=password)
+    return LINK_TEMPLATE.format(password=password, domain=ROOT_DOMAIN)
 
 
 async def send_access_link(email: str):
-    url = f"https://api.eu.mailgun.net/v3/{DOMAIN}/messages"
+    url = f"https://api.eu.mailgun.net/v3/{ROOT_DOMAIN}/messages"
 
     access_link = get_access_link(email=email)
 
     data = {
-        "from": "noreply@assistance.chat",
+        "from": f"noreply@{ROOT_DOMAIN}",
         "to": email,
         "subject": EMAIL_SUBJECT,
         "text": EMAIL_TEMPLATE.format(access_link=access_link),

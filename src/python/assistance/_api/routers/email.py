@@ -20,6 +20,7 @@ import json
 import logging
 
 from assistance import _ctx
+from assistance._config import ROOT_DOMAIN
 
 from fastapi import APIRouter, Request
 
@@ -27,7 +28,6 @@ from fastapi import APIRouter, Request
 from assistance._keys import get_mailgun_api_key
 
 MAILGUN_API_KEY = get_mailgun_api_key()
-DOMAIN = "assistance.chat"
 
 router = APIRouter(prefix="/email")
 
@@ -72,6 +72,15 @@ async def email(request: Request):
 async def _react_to_email(email: Email):
     if email["sender"] == "forwarding-noreply@google.com":
         await _respond_to_gmail_forward_request(email)
+        return
+
+    if email["recipient"] == f"create@{ROOT_DOMAIN}":
+        await _respond_to_create_email(email)
+        return
+
+
+async def _respond_to_create_email(email: Email):
+    pass
 
 
 VERIFICATION_TOKEN_BASE = "https://mail.google.com/mail/vf-"
@@ -121,7 +130,7 @@ async def _post_gmail_forwarding_verification(verification_token):
 
 
 async def _send_email(mailgun_data):
-    url = f"https://api.eu.mailgun.net/v3/{DOMAIN}/messages"
+    url = f"https://api.eu.mailgun.net/v3/{ROOT_DOMAIN}/messages"
 
     mailgun_response = await _ctx.session.post(
         url=url,

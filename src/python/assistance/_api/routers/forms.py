@@ -21,6 +21,7 @@ from fastapi import APIRouter, Request
 from pydantic import BaseModel
 
 from assistance import _ctx
+from assistance._config import ROOT_DOMAIN
 from assistance._affiliate import decrypt_affiliate_tag
 from assistance._keys import get_mailgun_api_key
 from assistance._store.emails import store_contact_us_request
@@ -48,10 +49,8 @@ REFERRER_TEMPLATE = """Their referrer tag is: {referrer_tag}
 Which has the following content:
 {referrer_tag_content}"""
 
-LINK_TEMPLATE = "https://career.assistance.chat/?pwd={password}"
 
 MAILGUN_API_KEY = get_mailgun_api_key()
-DOMAIN = "assistance.chat"
 
 
 class ContactUsData(BaseModel):
@@ -72,7 +71,7 @@ async def contact_us(data: ContactUsData, request: Request):
 
 
 async def _send_email(data: ContactUsData, origin_url: str):
-    url = f"https://api.eu.mailgun.net/v3/{DOMAIN}/messages"
+    url = f"https://api.eu.mailgun.net/v3/{ROOT_DOMAIN}/messages"
 
     if data.referrer_tag is None:
         referrer_details = "No referrer tag was provided."
@@ -85,9 +84,8 @@ async def _send_email(data: ContactUsData, origin_url: str):
         )
 
     mailgun_data = {
-        "from": f"noreply@{DOMAIN}",
+        "from": f"noreply@{ROOT_DOMAIN}",
         "to": "applications@globaltalent.work",
-        # "to": "applications@assistance.chat",
         "h:Reply-To": data.email,
         "subject": EMAIL_SUBJECT.format(
             origin_url=origin_url, first_name=data.first_name, last_name=data.last_name

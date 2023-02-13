@@ -15,6 +15,8 @@
 
 from assistance._paths import CONFIG
 
+ROOT_DOMAIN = "assistance.chat"
+
 
 def get_google_oauth_client_id():
     return _load_config_item("google-oauth-client-id")
