@@ -178,6 +178,8 @@ async def react_to_create_domain(from_string: str, subject: str, body_plain: str
                 f"address of {agent_email} is not a valid address."
             )
 
+        json_data["agent_name"] = agent_name
+
         if json_data["ready_to_create_agent"]:
             logging.info("Creating email agent")
             tool_response = await _create_email_agent(
@@ -193,7 +195,7 @@ async def react_to_create_domain(from_string: str, subject: str, body_plain: str
 
     prompt += (
         "\n\n"
-        + response
+        + json.dumps(json_data, indent=2)
         + "\n\n"
         + TOOL_RESULT_SECTION
         + "\n\n"
