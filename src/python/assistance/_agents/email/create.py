@@ -35,11 +35,15 @@ from assistance._mailgun import send_email
 OPEN_AI_API_KEY = get_openai_api_key()
 
 
+JSON_SECTION = "1. JSON details:"
+TOOL_RESULT_SECTION = "2. Tool result:"
+RESPONSE_SECTION = "3. Next email to send to user:"
+
 MODEL_KWARGS = {
     "engine": "text-davinci-003",
     "max_tokens": 256,
     "best_of": 1,
-    "stop": "Observation:",
+    "stop": TOOL_RESULT_SECTION,
     "temperature": 0.7,
     "top_p": 1,
     "frequency_penalty": 0.1,
@@ -49,45 +53,78 @@ MODEL_KWARGS = {
 
 PROMPT = textwrap.dedent(
     """
-        A user is emailing you with the aim to create an automated
-        emailing agent. To create an emailing agent there needs to be
-        a prompt as well as the email agent_name of the agent. They may
-        provide the prompt to you, or with your help and their feedback
-        you may create a prompt for them.
+        You are sending and receiving multiple emails from
+        "{from_string}". They are asking you to create an automated
+        emailing agent for them. This automated agent will be a large
+        language model that will not have access to the internet or
+        any tooling.
 
-        Once the user has provided an agent_name the email agent will be
-        created to respond to the user automatically when they email
-        [agent_name]@{domain}. agent_name must be able to be prepended
-        to @{domain} in order to create a valid email address.
+        To create an emailing agent there needs to be a prompt as well
+        as an agent_name of the agent to be created. They may provide
+        the prompt to you, or with your help and their feedback you may
+        create a prompt for them.
 
-        Within your response you are required to provide two sections of
-        information. The first is the JSON details that will be used to
-        create the agent. Within this first section you also declare
-        whether or not the agent is ready to be created. The second is
-        the response that will be sent to the user either to confirm
-        that the agent or to inform them that the agent could not be
-        created and provide the user with the reason why.
+        Once the user has provided an `agent_name` the email agent will
+        be created to respond to the user automatically when they email
+        {{agent_name}}@{domain}. `agent_name` must be able to be
+        prepended to @{domain} in order to create a valid email address.
 
-        Before being ready to create the agent make sure to confirm with
-        the user the prompt and the [agent_name]@{domain} that will be
-        created for them.
+        Only they will be able to use this created agent. And only if
+        they use their {user_email_address} email address.
 
-        Once you are ready to create the agent make sure to provide
-        instructions within your email response on how to use the agent
-        that will be created.
+        Within your response you are required to provide three sections
+        of information:
+
+        - The first is the JSON details that will be used to create the
+          agent.
+        - The second is the result of the agent creation tool after you
+          have called the tool.
+        - The third is the response that will be sent to the user either
+          to confirm that the agent or to inform them that the agent
+          could not be created and provide the user with the reason why.
+
+        Valid prompts
+        -------------
+
+        Prompts are only valid if they are able to be used to create a
+        valid agent within the agent restrictions.
+
+        Requirements for agent creation
+        -------------------------------
+
+        - Only begin to create the agent if you are absolutely sure that
+          that is what the user wants (confirm with them first).
+        - Only begin to create the agent if the user has provided a
+          valid `agent_name`.
+        - Only begin to create the agent if the user has provided a
+          valid `prompt`.
+
+        Upon successful creation of the agent
+        -------------------------------------
+
+        Once you have successfully created the agent make sure to
+        provide instructions within your email response on how to use
+        the agent that has now been created for them.
+
+        Only provide this information once the agent has been
+        successfully created.
 
         Response format
         ---------------
 
-        JSON details:
+        {JSON_SECTION}
 
-        {
-            "ready_to_create_agent": [True or False],
+        {{
+            "ready_to_create_agent": [true or false],
             "agent_name": [Agent name goes here],
-            "prompt": [Prompt goes here],
-        }
+            "prompt": [Prompt goes here]
+        }}
 
-        Email response:
+        {TOOL_RESULT_SECTION}
+
+        [Result of agent creation tool goes here]
+
+        {RESPONSE_SECTION}
 
         [Response to user goes here]
 
@@ -98,12 +135,24 @@ PROMPT = textwrap.dedent(
 
         Response
         --------
+        {JSON_SECTION}
     """
 ).strip()
 
 
 async def react_to_create_domain(from_string: str, subject: str, body_plain: str):
-    prompt = PROMPT.format(domain=ROOT_DOMAIN, body_plain=body_plain)
+    match = re.search(r"[\w.+-]+@[\w-]+\.[\w.-]+", from_string)
+    user_email_address = match.group(0)
+
+    prompt = PROMPT.format(
+        domain=ROOT_DOMAIN,
+        body_plain=body_plain,
+        from_string=from_string,
+        user_email_address=user_email_address,
+        JSON_SECTION=JSON_SECTION,
+        TOOL_RESULT_SECTION=TOOL_RESULT_SECTION,
+        RESPONSE_SECTION=RESPONSE_SECTION,
+    )
     logging.info(prompt)
 
     completions = await openai.Completion.acreate(
@@ -111,33 +160,43 @@ async def react_to_create_domain(from_string: str, subject: str, body_plain: str
     )
     response: str = completions.choices[0].text.strip()
 
-    line_by_line = response.splitlines()
+    logging.info(response)
 
-    json_details_line = fuzz_process.extractOne("JSON details:", line_by_line)
-    email_response_line = fuzz_process.extractOne("Email response:", line_by_line)
-
-    json_details_index = line_by_line.index(json_details_line[0])
-    email_response_index = line_by_line.index(email_response_line[0])
-
-    json_details = "\n".join(
-        line_by_line[json_details_index + 1 : email_response_index]
-    ).strip()
-    email_response = "\n".join(line_by_line[email_response_index + 1 :]).strip()
-
-    match = re.search(r"[\w.+-]+@[\w-]+\.[\w.-]+", from_string)
-    user_email_address = match.group(0)
+    tool_response: str | None = None
 
     try:
-        json_data = json.loads(json_details)
+        json_data = json.loads(response)
 
         if json_data["ready_to_create_agent"]:
             logging.info("Creating email agent")
-            await _create_email_agent(
+            tool_response = await _create_email_agent(
                 user_email_address, json_data["agent_name"], json_data["prompt"]
             )
+        else:
+            tool_response = "Agent not created `ready_to_create_agent` was set to false"
 
     except Exception as e:
-        logging.info(e)
+        tool_response = f"Agent not created due to error: {e}"
+
+    assert tool_response is not None
+
+    prompt += (
+        "\n\n"
+        + response
+        + "\n\n"
+        + TOOL_RESULT_SECTION
+        + "\n\n"
+        + tool_response
+        + "\n\n"
+        + RESPONSE_SECTION
+    )
+
+    logging.info(prompt)
+
+    completions = await openai.Completion.acreate(
+        prompt=prompt, api_key=OPEN_AI_API_KEY, **MODEL_KWARGS
+    )
+    response: str = completions.choices[0].text.strip()
 
     if not subject.startswith("Re:"):
         subject = f"Re: {subject}"
@@ -146,7 +205,7 @@ async def react_to_create_domain(from_string: str, subject: str, body_plain: str
         "from": f"create@{ROOT_DOMAIN}",
         "to": user_email_address,
         "subject": subject,
-        "text": email_response,
+        "text": response,
     }
 
     await send_email(mailgun_data)
@@ -158,3 +217,5 @@ async def _create_email_agent(user_email_address: str, agent_name: str, prompt: 
 
     async with aiofiles.open(path_to_new_prompt, "w") as f:
         await f.write(prompt)
+
+    return "Email agent successfully created"
