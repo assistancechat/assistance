@@ -139,7 +139,7 @@ PROMPT = textwrap.dedent(
 
 async def react_to_create_domain(from_string: str, subject: str, body_plain: str):
     match = re.search(r"[\w.+-]+@[\w-]+\.[\w.-]+", from_string)
-    user_email_address = match.group(0)
+    user_email_address = match.group(0).lower()
 
     prompt = PROMPT.format(
         domain=ROOT_DOMAIN,
@@ -164,7 +164,9 @@ async def react_to_create_domain(from_string: str, subject: str, body_plain: str
     try:
         json_data = json.loads(response)
 
-        agent_name = json_data["agent_name"]
+        agent_name: str = json_data["agent_name"]
+        agent_name = agent_name.lower().replace(" ", "-")
+
         agent_email = f"{agent_name}@{ROOT_DOMAIN}".lower()
         match = re.search(
             r"^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$",
@@ -179,7 +181,7 @@ async def react_to_create_domain(from_string: str, subject: str, body_plain: str
         if json_data["ready_to_create_agent"]:
             logging.info("Creating email agent")
             tool_response = await _create_email_agent(
-                user_email_address, json_data["agent_name"], json_data["prompt"]
+                user_email_address, agent_name, json_data["prompt"]
             )
         else:
             tool_response = "Agent not created `ready_to_create_agent` was set to false"

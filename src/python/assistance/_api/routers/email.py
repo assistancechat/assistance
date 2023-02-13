@@ -73,23 +73,37 @@ async def email(request: Request):
 
 
 async def _react_to_email(email: Email):
+    try:
+        subject = email["subject"]
+    except KeyError:
+        subject = ""
+
+    try:
+        body_plain = email["body-plain"]
+    except KeyError:
+        body_plain = ""
+
     if email["sender"] == "forwarding-noreply@google.com":
         await _respond_to_gmail_forward_request(email)
+
         return
 
     if email["recipient"] == f"create@{ROOT_DOMAIN}":
         await react_to_create_domain(
             from_string=email["from"],
-            subject=email["subject"],
-            body_plain=email["body-plain"],
+            subject=subject,
+            body_plain=body_plain,
         )
+
         return
+
+    agent_name = email["recipient"].split("@")[0].lower()
 
     await react_to_custom_agent_request(
         from_string=email["from"],
-        subject=email["subject"],
-        body_plain=email["body-plain"],
-        agent_name=email["recipient"].split("@")[0],
+        subject=subject,
+        body_plain=body_plain,
+        agent_name=agent_name,
     )
 
 
