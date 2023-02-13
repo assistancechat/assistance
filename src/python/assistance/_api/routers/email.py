@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import aiofiles
+import re
 import asyncio
 from typing import TypedDict
 from urllib.parse import parse_qs
@@ -20,6 +22,7 @@ import logging
 
 from assistance import _ctx
 from assistance._config import ROOT_DOMAIN
+from assistance._paths import PROMPTS as PROMPTS_PATH
 
 from assistance._agents.email.create import react_to_create_domain
 from assistance._agents.email.custom import react_to_custom_agent_request
@@ -82,6 +85,8 @@ async def _react_to_email(email: Email):
     except KeyError:
         body_plain = ""
 
+    from_string = email["from"]
+
     if email["sender"] == "forwarding-noreply@google.com":
         await _respond_to_gmail_forward_request(email)
 
@@ -89,7 +94,7 @@ async def _react_to_email(email: Email):
 
     if email["recipient"] == f"create@{ROOT_DOMAIN}":
         await react_to_create_domain(
-            from_string=email["from"],
+            from_string=from_string,
             subject=subject,
             body_plain=body_plain,
         )
@@ -98,12 +103,48 @@ async def _react_to_email(email: Email):
 
     agent_name = email["recipient"].split("@")[0].lower()
 
+    match = re.search(r"[\w.+-]+@[\w-]+\.[\w.-]+", from_string)
+    user_email_address = match.group(0)
+
+    path_to_new_prompt = PROMPTS_PATH / user_email_address / agent_name
+
+    try:
+        async with aiofiles.open(path_to_new_prompt) as f:
+            prompt_task = await f.read()
+
+    except FileNotFoundError:
+        await _handle_no_custom_agent_created_yet_request()
+        return
+
     await react_to_custom_agent_request(
         from_string=email["from"],
         subject=subject,
+        user_email_address=user_email_address,
         body_plain=body_plain,
         agent_name=agent_name,
+        prompt_task=prompt_task,
     )
+
+
+def _handle_no_custom_agent_created_yet_request(
+    agent_name: str, user_email_address: str, subject: str
+):
+    response = (
+        f"You have not created a custom agent for {agent_name}@{ROOT_DOMAIN}. "
+        f"Please send an email to create@{ROOT_DOMAIN} to create one."
+    )
+
+    if not subject.startswith("Re:"):
+        subject = f"Re: {subject}"
+
+    mailgun_data = {
+        "from": f"{agent_name}@{ROOT_DOMAIN}",
+        "to": user_email_address,
+        "subject": subject,
+        "text": response,
+    }
+
+    asyncio.create_task(send_email(mailgun_data))
 
 
 VERIFICATION_TOKEN_BASE = "https://mail.google.com/mail/vf-"

@@ -63,26 +63,13 @@ PROMPT = textwrap.dedent(
 
 
 async def react_to_custom_agent_request(
-    from_string: str, subject: str, body_plain: str, agent_name: str
+    from_string: str,
+    user_email_address: str,
+    prompt_task: str,
+    subject: str,
+    body_plain: str,
+    agent_name: str,
 ):
-    match = re.search(r"[\w.+-]+@[\w-]+\.[\w.-]+", from_string)
-    user_email_address = match.group(0)
-
-    path_to_new_prompt = PROMPTS_PATH / user_email_address / agent_name
-
-    try:
-        async with aiofiles.open(path_to_new_prompt) as f:
-            prompt_task = await f.read()
-    except FileNotFoundError:
-        prompt_task = (
-            "The user has not provided a prompt for this agent yet. "
-            "Please ask them to send a prompt to create@{ROOT_DOMAIN}. "
-            "As well as asking them to provide a name for the agent. "
-            "For example, to have this email address work that they "
-            "emailed you with, they would need to use an agent name of "
-            f"{agent_name}."
-        )
-
     prompt = PROMPT.format(
         body_plain=body_plain,
         from_string=from_string,
