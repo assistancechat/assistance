@@ -13,10 +13,10 @@
 # limitations under the License.
 
 import textwrap
+
 from assistance._config import ROOT_DOMAIN
 
 from .create import react_to_create_domain
-
 
 DEFAULT_TASKS = {
     "create": (

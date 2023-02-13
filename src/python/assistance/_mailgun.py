@@ -20,8 +20,8 @@ import aiohttp
 from assistance._paths import USERS
 
 from . import _ctx
-from ._keys import get_mailgun_api_key
 from ._config import ROOT_DOMAIN
+from ._keys import get_mailgun_api_key
 
 EMAIL_SUBJECT = f"Your career.{ROOT_DOMAIN} access link"
 EMAIL_TEMPLATE = (

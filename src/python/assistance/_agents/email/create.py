@@ -15,20 +15,18 @@
 import json
 import logging
 import re
-import aiofiles
 import textwrap
 
-
+import aiofiles
 import openai
 
-from assistance._paths import PROMPTS as PROMPTS_PATH
 from assistance._config import ROOT_DOMAIN
 from assistance._keys import get_openai_api_key
 from assistance._mailgun import send_email
+from assistance._paths import PROMPTS as PROMPTS_PATH
 
 from .reply import create_reply
 from .types import Email
-
 
 OPEN_AI_API_KEY = get_openai_api_key()
 

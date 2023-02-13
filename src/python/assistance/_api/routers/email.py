@@ -12,28 +12,25 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import aiofiles
-import re
 import asyncio
-from typing import TypedDict
-from urllib.parse import parse_qs
 import json
 import logging
+import re
+from typing import TypedDict
+from urllib.parse import parse_qs
 
-from assistance import _ctx
-from assistance._config import ROOT_DOMAIN
-from assistance._paths import PROMPTS as PROMPTS_PATH
-
-from assistance._agents.email.reply import create_reply
-from assistance._agents.email.custom import react_to_custom_agent_request
-from assistance._agents.email.default import DEFAULT_TASKS
-from assistance._agents.email.types import Email
-
-from assistance._mailgun import send_email
+import aiofiles
 from fastapi import APIRouter, Request
 
-
+from assistance import _ctx
+from assistance._agents.email.custom import react_to_custom_agent_request
+from assistance._agents.email.default import DEFAULT_TASKS
+from assistance._agents.email.reply import create_reply
+from assistance._agents.email.types import Email
+from assistance._config import ROOT_DOMAIN
 from assistance._keys import get_mailgun_api_key
+from assistance._mailgun import send_email
+from assistance._paths import PROMPTS as PROMPTS_PATH
 
 MAILGUN_API_KEY = get_mailgun_api_key()
 

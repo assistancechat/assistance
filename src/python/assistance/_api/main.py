@@ -21,8 +21,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from assistance import _ctx
 from assistance._config import ROOT_DOMAIN
 
-
-from .routers import chat, forms, email
+from .routers import chat, email, forms
 
 logging.basicConfig(
     level=logging.INFO,

@@ -21,8 +21,8 @@ from fastapi import APIRouter, Request
 from pydantic import BaseModel
 
 from assistance import _ctx
-from assistance._config import ROOT_DOMAIN
 from assistance._affiliate import decrypt_affiliate_tag
+from assistance._config import ROOT_DOMAIN
 from assistance._keys import get_mailgun_api_key
 from assistance._store.emails import store_contact_us_request
 
