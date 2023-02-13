@@ -126,7 +126,11 @@ async def _react_to_email(email: Email):
             prompt_task = await f.read()
 
     except FileNotFoundError:
-        await _handle_no_custom_agent_created_yet_request()
+        await _handle_no_custom_agent_created_yet_request(
+            agent_name=agent_name,
+            user_email_address=user_email_address,
+            subject=subject,
+        )
         return
 
     await react_to_custom_agent_request(
@@ -139,12 +143,16 @@ async def _react_to_email(email: Email):
     )
 
 
-def _handle_no_custom_agent_created_yet_request(
+async def _handle_no_custom_agent_created_yet_request(
     agent_name: str, user_email_address: str, subject: str
 ):
     response = (
         f"You have not created a custom agent for {agent_name}@{ROOT_DOMAIN}. "
-        f"Please send an email to create@{ROOT_DOMAIN} to create one."
+        f"Please send an email to create@{ROOT_DOMAIN} to create one.\n\n"
+        f"When you send an email to create@{ROOT_DOMAIN} make sure to "
+        f"mention that you want your agent to be called {agent_name} "
+        "as well as provide a reasonable prompt that makes sense for "
+        "your agent."
     )
 
     if not subject.startswith("Re:"):
