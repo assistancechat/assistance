@@ -103,7 +103,7 @@ async def _respond_to_gmail_forward_request(email: Email):
         "to": user_email,
         "subject": "Email forwarding approved",
         "text": (
-            "Hi!",
+            "Hi!\n",
             f"We've approved your ability to be able to forward emails through to {forwarding_email}.",
         ),
     }
