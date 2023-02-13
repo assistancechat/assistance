@@ -21,4 +21,5 @@ CONFIG = STORE / "config"
 SECRETS = CONFIG / "secrets"
 
 USERS = STORE / "users"
+PROMPTS = STORE / "prompts"
 RECORDS = STORE / "records"
