@@ -24,9 +24,11 @@ from assistance import _ctx
 from assistance._config import ROOT_DOMAIN
 from assistance._paths import PROMPTS as PROMPTS_PATH
 
-from assistance._agents.email.create import react_to_create_domain
+from assistance._agents.email.reply import create_reply
 from assistance._agents.email.custom import react_to_custom_agent_request
 from assistance._agents.email.default import DEFAULT_TASKS
+from assistance._agents.email.types import Email
+
 from assistance._mailgun import send_email
 from fastapi import APIRouter, Request
 
@@ -36,20 +38,6 @@ from assistance._keys import get_mailgun_api_key
 MAILGUN_API_KEY = get_mailgun_api_key()
 
 router = APIRouter(prefix="/email")
-
-Email = TypedDict(
-    "Email",
-    {
-        "recipient": str,
-        "sender": str,
-        "from": str,
-        "stripped-text": str,
-        "subject": str,
-        "timestamp": str,
-        "body-plain": str,
-    },
-    total=False,
-)
 
 
 @router.post("")
@@ -77,92 +65,69 @@ async def email(request: Request):
 
 async def _react_to_email(email: Email):
     try:
-        subject = email["subject"]
+        email["subject"]
     except KeyError:
-        subject = ""
+        email["subject"] = ""
 
     try:
-        body_plain = email["body-plain"]
+        email["body-plain"]
     except KeyError:
-        body_plain = ""
-
-    from_string = email["from"]
+        email["body-plain"] = ""
 
     if email["sender"] == "forwarding-noreply@google.com":
         await _respond_to_gmail_forward_request(email)
 
         return
 
-    agent_name = email["recipient"].split("@")[0].lower()
+    email["agent-name"] = email["recipient"].split("@")[0].lower()
+    match = re.search(r"[\w.+-]+@[\w-]+\.[\w.-]+", email["from"])
+    email["user-email"] = match.group(0).lower()
 
-    if email["recipient"] == f"create@{ROOT_DOMAIN}":
-        await react_to_create_domain(
-            from_string=from_string,
-            subject=subject,
-            body_plain=body_plain,
-        )
+    if email["agent-name"] in DEFAULT_TASKS:
+        task = DEFAULT_TASKS[email["agent-name"]][1]
 
-        return
+        if isinstance(task, str):
+            await react_to_custom_agent_request(email=email, prompt_task=task)
 
-    match = re.search(r"[\w.+-]+@[\w-]+\.[\w.-]+", from_string)
-    user_email_address = match.group(0)
+            return
 
-    if agent_name in DEFAULT_TASKS:
-        await react_to_custom_agent_request(
-            from_string=from_string,
-            subject=subject,
-            user_email_address=user_email_address,
-            body_plain=body_plain,
-            agent_name=agent_name,
-            prompt_task=DEFAULT_TASKS[agent_name][1],
-        )
+        await task(email)
 
-        return
-
-    path_to_new_prompt = PROMPTS_PATH / user_email_address / agent_name
+    path_to_new_prompt = PROMPTS_PATH / email["user-email"] / email["agent-name"]
 
     try:
         async with aiofiles.open(path_to_new_prompt) as f:
             prompt_task = await f.read()
 
     except FileNotFoundError:
-        await _handle_no_custom_agent_created_yet_request(
-            agent_name=agent_name,
-            user_email_address=user_email_address,
-            subject=subject,
-        )
+        await _handle_no_custom_agent_created_yet_request(email)
         return
 
-    await react_to_custom_agent_request(
-        from_string=from_string,
-        subject=subject,
-        user_email_address=user_email_address,
-        body_plain=body_plain,
-        agent_name=agent_name,
-        prompt_task=prompt_task,
-    )
+    await react_to_custom_agent_request(email=email, prompt_task=prompt_task)
 
 
-async def _handle_no_custom_agent_created_yet_request(
-    agent_name: str, user_email_address: str, subject: str
-):
+async def _handle_no_custom_agent_created_yet_request(email: Email):
     response = (
-        f"You have not created a custom agent for {agent_name}@{ROOT_DOMAIN}. "
+        f"You have not created a custom agent for {email['agent-name']}@{ROOT_DOMAIN}. "
         f"Please send an email to create@{ROOT_DOMAIN} to create one.\n\n"
         f"When you send an email to create@{ROOT_DOMAIN} make sure to "
-        f"mention that you want your agent to be called {agent_name} "
+        f"mention that you want your agent to be called {email['agent-name']} "
         "as well as provide a reasonable prompt that makes sense for "
         "your agent."
     )
 
-    if not subject.startswith("Re:"):
-        subject = f"Re: {subject}"
+    subject, total_reply = create_reply(
+        subject=email["subject"],
+        body_plain=email["body-plain"],
+        response=response,
+        from_string=email["from"],
+    )
 
     mailgun_data = {
-        "from": f"{agent_name}@{ROOT_DOMAIN}",
-        "to": user_email_address,
+        "from": f"{email['agent-name']}@{ROOT_DOMAIN}",
+        "to": email["user-email"],
         "subject": subject,
-        "text": response,
+        "text": total_reply,
     }
 
     asyncio.create_task(send_email(mailgun_data))

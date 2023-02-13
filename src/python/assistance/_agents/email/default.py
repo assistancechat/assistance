@@ -15,12 +15,31 @@
 import textwrap
 from assistance._config import ROOT_DOMAIN
 
+from .create import react_to_create_domain
+
+
 DEFAULT_TASKS = {
     "create": (
         "Used to create new agents. "
         "When emailing need to provide an agent name and a prompt.",
-        None,
-    )
+        react_to_create_domain,
+    ),
+    "list": ("Provides a raw list of all of the custom agents you have created", None),
+    "poem-demo": (
+        "This is an example assistant who responds with a poem",
+        "Respond to email with a beautiful and relevant poem",
+    ),
+    "sales-demo": (
+        "This is an example sales assistant who is trying to sell you water",
+        "Respond to email with a sales pitch for water. You are trying to sell the user water.",
+    ),
+    "bible-demo": (
+        "An AI bot that gives a relevant bible verse. ",
+        "Make sure to quote both the verse and the reference. "
+        "Give some details about the context and maybe even the meaning "
+        "of some of the words in the original language if it might help "
+        "in understanding.",
+    ),
 }
 
 _task_overviews = ""
@@ -28,11 +47,9 @@ for agent, (overview, _prompt) in DEFAULT_TASKS.items():
     _task_overviews += f"- {agent}@{ROOT_DOMAIN}: {overview}\n"
 
 
-HI_TASK = (
-    (
-        "Used to onboard new users",
-        textwrap.dedent(
-            """
+HI_PROMPT = (
+    textwrap.dedent(
+        """
             You are the user's first port of call to using {ROOT_DOMAIN}.
             You are to have a welcoming discussion with them and provide
             them with an overview of what can be done.
@@ -40,10 +57,10 @@ HI_TASK = (
             Overview of the AI agent emails and what they can do:
             {task_overviews}
         """
-        )
-        .format(task_overviews=_task_overviews, ROOT_DOMAIN=ROOT_DOMAIN)
-        .strip(),
-    ),
+    )
+    .format(task_overviews=_task_overviews, ROOT_DOMAIN=ROOT_DOMAIN)
+    .strip()
 )
 
-DEFAULT_TASKS["hi"] = HI_TASK
+
+DEFAULT_TASKS["hi"] = ("Used to onboard new users", HI_PROMPT)

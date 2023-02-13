@@ -27,7 +27,7 @@ from assistance._keys import get_openai_api_key
 from assistance._mailgun import send_email
 
 from .reply import create_reply
-from .default import DEFAULT_TASKS
+from .types import Email
 
 
 OPEN_AI_API_KEY = get_openai_api_key()
@@ -121,7 +121,10 @@ PROMPT = textwrap.dedent(
         Only provide this information once the agent has been
         successfully created.
 
-        The subject of the email is: {subject}
+        Email subject
+        -------------
+
+        {subject}
 
         The email chain thus far, most recent email first
         -------------------------------------------------
@@ -154,16 +157,16 @@ PROMPT = textwrap.dedent(
 ).strip()
 
 
-async def react_to_create_domain(from_string: str, subject: str, body_plain: str):
-    match = re.search(r"[\w.+-]+@[\w-]+\.[\w.-]+", from_string)
+async def react_to_create_domain(email: Email):
+    match = re.search(r"[\w.+-]+@[\w-]+\.[\w.-]+", email["from"])
     user_email_address = match.group(0).lower()
 
     prompt = PROMPT.format(
         domain=ROOT_DOMAIN,
-        body_plain=body_plain,
-        from_string=from_string,
+        body_plain=email["body-plain"],
+        from_string=email["from"],
         user_email_address=user_email_address,
-        subject=subject,
+        subject=email["subject"],
         JSON_SECTION=JSON_SECTION,
         TOOL_RESULT_SECTION=TOOL_RESULT_SECTION,
         RESPONSE_SECTION=RESPONSE_SECTION,
@@ -204,6 +207,8 @@ async def react_to_create_domain(from_string: str, subject: str, body_plain: str
 
             json_data["agent_name"] = agent_name
 
+            from .default import DEFAULT_TASKS
+
             if agent_name in DEFAULT_TASKS.keys():
                 raise ValueError(
                     "Cannot create an agent with a reserved name. "
@@ -240,10 +245,10 @@ async def react_to_create_domain(from_string: str, subject: str, body_plain: str
     response: str = completions.choices[0].text.strip()
 
     subject, total_reply = create_reply(
-        subject=subject,
-        body_plain=body_plain,
+        subject=email["subject"],
+        body_plain=email["body-plain"],
         response=response,
-        from_string=from_string,
+        from_string=email["from"],
     )
 
     mailgun_data = {

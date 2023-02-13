@@ -25,6 +25,7 @@ from assistance._keys import get_openai_api_key
 from assistance._mailgun import send_email
 
 from .reply import create_reply
+from .types import Email
 
 OPEN_AI_API_KEY = get_openai_api_key()
 
@@ -50,7 +51,10 @@ PROMPT = textwrap.dedent(
 
         {prompt_task}
 
-        The subject of the email is: {subject}
+        Email subject
+        -------------
+
+        {subject}
 
         The email chain thus far, most recent email first
         -------------------------------------------------
@@ -63,20 +67,13 @@ PROMPT = textwrap.dedent(
 ).strip()
 
 
-async def react_to_custom_agent_request(
-    from_string: str,
-    user_email_address: str,
-    prompt_task: str,
-    subject: str,
-    body_plain: str,
-    agent_name: str,
-):
+async def react_to_custom_agent_request(email: Email, prompt_task: str):
     prompt = PROMPT.format(
-        body_plain=body_plain,
-        from_string=from_string,
+        body_plain=email["body-plain"],
+        from_string=email["from"],
         prompt_task=prompt_task,
-        agent_name=agent_name,
-        subject=subject,
+        agent_name=email["agent-name"],
+        subject=email["subject"],
         ROOT_DOMAIN=ROOT_DOMAIN,
     )
     logging.info(prompt)
@@ -89,15 +86,15 @@ async def react_to_custom_agent_request(
     logging.info(response)
 
     subject, total_reply = create_reply(
-        subject=subject,
-        body_plain=body_plain,
+        subject=email["subject"],
+        body_plain=email["body-plain"],
         response=response,
-        from_string=from_string,
+        from_string=email["from"],
     )
 
     mailgun_data = {
-        "from": f"{agent_name}@{ROOT_DOMAIN}",
-        "to": user_email_address,
+        "from": f"{email['agent-name']}@{ROOT_DOMAIN}",
+        "to": email["user-email"],
         "subject": subject,
         "text": total_reply,
     }
