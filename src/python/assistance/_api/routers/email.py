@@ -78,7 +78,9 @@ async def _react_to_email(email: Email):
 
     if email["recipient"] == f"create@{ROOT_DOMAIN}":
         await react_to_create_domain(
-            from_string=email["from"], body_plain=email["body-plain"]
+            from_string=email["from"],
+            subject=email["subject"],
+            body_plain=email["body-plain"],
         )
         return
 
