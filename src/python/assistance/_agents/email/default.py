@@ -16,15 +16,19 @@ import textwrap
 
 from assistance._config import ROOT_DOMAIN
 
-from .create import react_to_create_domain
+from .create import create_agent
+from .list import list_custom_agents
 
 DEFAULT_TASKS = {
     "create": (
         "Used to create new agents. "
         "When emailing need to provide an agent name and a prompt.",
-        react_to_create_domain,
+        create_agent,
     ),
-    "list": ("Provides a raw list of all of the custom agents you have created", None),
+    "list": (
+        "Provides a raw list of all of the custom agents you have created",
+        list_custom_agents,
+    ),
     "poem-demo": (
         "This is an example assistant who responds with a poem",
         "Respond to email with a beautiful and relevant poem",

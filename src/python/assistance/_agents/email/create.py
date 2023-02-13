@@ -155,15 +155,12 @@ PROMPT = textwrap.dedent(
 ).strip()
 
 
-async def react_to_create_domain(email: Email):
-    match = re.search(r"[\w.+-]+@[\w-]+\.[\w.-]+", email["from"])
-    user_email_address = match.group(0).lower()
-
+async def create_agent(email: Email):
     prompt = PROMPT.format(
         domain=ROOT_DOMAIN,
         body_plain=email["body-plain"],
         from_string=email["from"],
-        user_email_address=user_email_address,
+        user_email_address=email["user-email"],
         subject=email["subject"],
         JSON_SECTION=JSON_SECTION,
         TOOL_RESULT_SECTION=TOOL_RESULT_SECTION,
@@ -214,7 +211,7 @@ async def react_to_create_domain(email: Email):
                 )
 
             tool_response = await _create_email_agent(
-                user_email_address, agent_name, json_data["prompt"]
+                email["user-email"], agent_name, json_data["prompt"]
             )
         else:
             tool_response = "Agent not created `ready_to_create_agent` was set to false"
@@ -250,8 +247,8 @@ async def react_to_create_domain(email: Email):
     )
 
     mailgun_data = {
-        "from": f"create@{ROOT_DOMAIN}",
-        "to": user_email_address,
+        "from": f"{email['agent-name']}@{ROOT_DOMAIN}",
+        "to": email["user-email"],
         "subject": subject,
         "text": total_reply,
     }

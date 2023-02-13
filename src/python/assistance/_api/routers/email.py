@@ -85,10 +85,10 @@ async def _react_to_email(email: Email):
 
         if isinstance(task, str):
             await react_to_custom_agent_request(email=email, prompt_task=task)
+        else:
+            await task(email)
 
-            return
-
-        await task(email)
+        return
 
     path_to_new_prompt = PROMPTS_PATH / email["user-email"] / email["agent-name"]
 
