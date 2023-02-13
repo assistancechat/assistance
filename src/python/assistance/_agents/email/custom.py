@@ -15,15 +15,10 @@
 # Prompt inspired by the work provided under an MIT license over at:
 # https://github.com/hwchase17/langchain/blob/ae1b589f60a/langchain/agents/conversational/prompt.py#L1-L36
 
-import json
-import asyncio
 import logging
 import re
 import aiofiles
 import textwrap
-from typing import Callable, Coroutine
-
-from thefuzz import process as fuzz_process
 
 import openai
 
@@ -49,7 +44,7 @@ MODEL_KWARGS = {
 PROMPT = textwrap.dedent(
     """
         You are sending and receiving multiple emails from
-        "{from_string}".
+        "{from_string}". Your email address is {agent_name}@{ROOT_DOMAIN}.
 
         Task
         ----
@@ -89,7 +84,11 @@ async def react_to_custom_agent_request(
         )
 
     prompt = PROMPT.format(
-        body_plain=body_plain, from_string=from_string, prompt_task=prompt_task
+        body_plain=body_plain,
+        from_string=from_string,
+        prompt_task=prompt_task,
+        agent_name=agent_name,
+        ROOT_DOMAIN=ROOT_DOMAIN,
     )
     logging.info(prompt)
 
@@ -104,7 +103,7 @@ async def react_to_custom_agent_request(
         subject = f"Re: {subject}"
 
     mailgun_data = {
-        "from": f"create@{ROOT_DOMAIN}",
+        "from": f"{agent_name}@{ROOT_DOMAIN}",
         "to": user_email_address,
         "subject": subject,
         "text": response,

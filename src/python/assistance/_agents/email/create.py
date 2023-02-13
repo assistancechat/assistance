@@ -164,6 +164,18 @@ async def react_to_create_domain(from_string: str, subject: str, body_plain: str
     try:
         json_data = json.loads(response)
 
+        agent_name = json_data["agent_name"]
+        agent_email = f"{agent_name}@{ROOT_DOMAIN}".lower()
+        match = re.search(
+            r"^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$",
+            agent_email,
+        )
+        if match is None:
+            raise ValueError(
+                f"Invalid agent_name: {agent_name}. The created email "
+                f"address of {agent_email} is not a valid address."
+            )
+
         if json_data["ready_to_create_agent"]:
             logging.info("Creating email agent")
             tool_response = await _create_email_agent(
