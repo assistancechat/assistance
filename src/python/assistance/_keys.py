@@ -13,6 +13,7 @@
 # limitations under the License.
 
 from assistance._paths import SECRETS
+import functools
 
 
 def get_openai_api_key():
@@ -51,6 +52,7 @@ def get_starlette_session_key():
     return _load_secret("starlette-session-key")
 
 
+@functools.cache
 def _load_secret(name: str) -> str:
     secret_path = SECRETS / name
 

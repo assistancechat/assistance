@@ -32,7 +32,7 @@ from assistance._mailgun import send_email
 OPEN_AI_API_KEY = get_openai_api_key()
 
 
-JSON_SECTION = "1. JSON details:"
+JSON_SECTION = "1. JSON details (MUST be valid JSON):"
 TOOL_RESULT_SECTION = "2. Tool result:"
 RESPONSE_SECTION = "3. Next email to send to user:"
 
@@ -50,11 +50,11 @@ MODEL_KWARGS = {
 
 PROMPT = textwrap.dedent(
     """
-        You are sending and receiving multiple emails from
-        "{from_string}". They are asking you to create an automated
-        emailing agent for them. This automated agent will be a large
-        language model that will not have access to the internet or
-        any tooling.
+        You are the Create Assistant and you are sending and receiving
+        multiple emails from "{from_string}". They are asking you to
+        create an automated emailing agent for them. This automated
+        agent will be a large language model that will not have access
+        to the internet or any tooling.
 
         To create an emailing agent there needs to be a prompt as well
         as an agent_name of the agent to be created. They may provide
@@ -69,6 +69,19 @@ PROMPT = textwrap.dedent(
         Only they will be able to use this created agent. And only if
         they use their {user_email_address} email address.
 
+        Keep in mind the below points in everything you say:
+
+        - Personalise with the user's name
+        - Ask open-ended questions to understand the user's needs
+        - Show genuine empathy and interest in user's situation
+        - If they haven't provided a prompt, or you suspect they might
+          like help expanding their prompt, give them some ideas and
+          examples that can be used to create the agent.
+
+        DO NOT CREATE AN AGENT if the user has not yet provided
+        SUFFICIENT information. Instead have an email conversation with
+        them, helping them to appropriately create their agent.
+
         Within your response you are required to provide three sections
         of information:
 
@@ -77,8 +90,9 @@ PROMPT = textwrap.dedent(
         - The second is the result of the agent creation tool after you
           have called the tool.
         - The third is the response that will be sent to the user either
-          to confirm that the agent or to inform them that the agent
-          could not be created and provide the user with the reason why.
+          to confirm that the agent has been created or to inform them
+          that the agent could not be created just yet with the current
+          information and provide the user with the reason why.
 
         Valid prompts
         -------------
@@ -128,6 +142,9 @@ PROMPT = textwrap.dedent(
         The email chain thus far, most recent email first
         -------------------------------------------------
 
+        Subject: {subject}
+
+        Email body:
         {body_plain}
 
         Response
@@ -152,18 +169,23 @@ async def react_to_create_domain(from_string: str, subject: str, body_plain: str
     )
     logging.info(prompt)
 
-    completions = await openai.Completion.acreate(
-        prompt=prompt, api_key=OPEN_AI_API_KEY, **MODEL_KWARGS
-    )
-    response: str = completions.choices[0].text.strip()
+    for _ in range(3):
+        completions = await openai.Completion.acreate(
+            prompt=prompt, api_key=OPEN_AI_API_KEY, **MODEL_KWARGS
+        )
+        response: str = completions.choices[0].text.strip()
+
+        try:
+            json_data = json.loads(response)
+            break
+        except json.JSONDecodeError:
+            json_data = {}
 
     logging.info(response)
 
     tool_response: str | None = None
 
     try:
-        json_data = json.loads(response)
-
         agent_name: str = json_data["agent_name"]
         agent_name = agent_name.lower().replace(" ", "-")
 

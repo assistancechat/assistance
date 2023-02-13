@@ -35,6 +35,8 @@ API_KEY = get_mailgun_api_key()
 async def send_email(mailgun_data):
     url = f"https://api.eu.mailgun.net/v3/{ROOT_DOMAIN}/messages"
 
+    logging.info(mailgun_data)
+
     mailgun_response = await _ctx.session.post(
         url=url,
         auth=aiohttp.BasicAuth(login="api", password=API_KEY),
