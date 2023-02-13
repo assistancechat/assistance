@@ -30,6 +30,7 @@ import openai
 from assistance._paths import PROMPTS as PROMPTS_PATH
 from assistance._config import ROOT_DOMAIN
 from assistance._keys import get_openai_api_key
+from assistance._mailgun import send_email
 
 OPEN_AI_API_KEY = get_openai_api_key()
 
@@ -101,7 +102,7 @@ PROMPT = textwrap.dedent(
 ).strip()
 
 
-async def react_to_create_domain(from_string: str, body_plain: str):
+async def react_to_create_domain(from_string: str, subject: str, body_plain: str):
     prompt = PROMPT.format(domain=ROOT_DOMAIN, body_plain=body_plain)
     logging.info(prompt)
 
@@ -123,25 +124,35 @@ async def react_to_create_domain(from_string: str, body_plain: str):
     ).strip()
     email_response = "\n".join(line_by_line[email_response_index + 1 :]).strip()
 
+    match = re.search(r"[\w.+-]+@[\w-]+\.[\w.-]+", from_string)
+    user_email_address = match.group(0)
+
     try:
         json_data = json.loads(json_details)
 
         if json_data["ready_to_create_agent"]:
             logging.info("Creating email agent")
             await _create_email_agent(
-                from_string, json_data["agent_name"], json_data["prompt"]
+                user_email_address, json_data["agent_name"], json_data["prompt"]
             )
 
     except Exception as e:
         logging.info(e)
 
-    return email_response
+    if not subject.startswith("Re:"):
+        subject = f"Re: {subject}"
+
+    mailgun_data = {
+        "from": f"create@{ROOT_DOMAIN}",
+        "to": user_email_address,
+        "subject": subject,
+        "text": email_response,
+    }
+
+    await send_email(mailgun_data)
 
 
-async def _create_email_agent(from_string: str, agent_name: str, prompt: str):
-    match = re.search(r"[\w.+-]+@[\w-]+\.[\w.-]+", from_string)
-    user_email_address = match.group(0)
-
+async def _create_email_agent(user_email_address: str, agent_name: str, prompt: str):
     path_to_new_prompt = PROMPTS_PATH / user_email_address / agent_name
     path_to_new_prompt.parent.mkdir(parents=True, exist_ok=True)
 

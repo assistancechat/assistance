@@ -22,6 +22,8 @@ import logging
 from assistance import _ctx
 from assistance._config import ROOT_DOMAIN
 
+from assistance._agents.email.create import react_to_create_domain
+from assistance._mailgun import send_email
 from fastapi import APIRouter, Request
 
 
@@ -75,12 +77,10 @@ async def _react_to_email(email: Email):
         return
 
     if email["recipient"] == f"create@{ROOT_DOMAIN}":
-        await _respond_to_create_email(email)
+        await react_to_create_domain(
+            from_string=email["from"], body_plain=email["body-plain"]
+        )
         return
-
-
-async def _respond_to_create_email(email: Email):
-    pass
 
 
 VERIFICATION_TOKEN_BASE = "https://mail.google.com/mail/vf-"
@@ -117,7 +117,7 @@ async def _respond_to_gmail_forward_request(email: Email):
         ),
     }
 
-    asyncio.create_task(_send_email(mailgun_data))
+    asyncio.create_task(send_email(mailgun_data))
 
 
 async def _post_gmail_forwarding_verification(verification_token):
@@ -127,15 +127,3 @@ async def _post_gmail_forwarding_verification(verification_token):
     post_response = await _ctx.session.post(url=forwarding_verification_post_url)
 
     logging.info(await post_response.read())
-
-
-async def _send_email(mailgun_data):
-    url = f"https://api.eu.mailgun.net/v3/{ROOT_DOMAIN}/messages"
-
-    mailgun_response = await _ctx.session.post(
-        url=url,
-        auth=aiohttp.BasicAuth(login="api", password=MAILGUN_API_KEY),
-        data=mailgun_data,
-    )
-
-    logging.info(await mailgun_response.json())

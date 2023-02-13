@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import logging
 import secrets
 
 import aiohttp
@@ -29,6 +30,18 @@ EMAIL_TEMPLATE = (
 LINK_TEMPLATE = "https://career.{domain}/?pwd={password}"
 
 API_KEY = get_mailgun_api_key()
+
+
+async def send_email(mailgun_data):
+    url = f"https://api.eu.mailgun.net/v3/{ROOT_DOMAIN}/messages"
+
+    mailgun_response = await _ctx.session.post(
+        url=url,
+        auth=aiohttp.BasicAuth(login="api", password=API_KEY),
+        data=mailgun_data,
+    )
+
+    logging.info(await mailgun_response.json())
 
 
 def get_access_link(email: str):
