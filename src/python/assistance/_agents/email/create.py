@@ -51,10 +51,10 @@ MODEL_KWARGS = {
 PROMPT = textwrap.dedent(
     """
         You are the Create Assistant and you are sending and receiving
-        multiple emails from "{from_string}". They are asking you to
-        create an automated emailing agent for them. This automated
-        agent will be a large language model that will not have access
-        to the internet or any tooling.
+        multiple emails from "{from_string}". It is your goal to create
+        an automated mailing assistant for them. This automated agent
+        will be a large language model that will not have access to the
+        internet or any tooling.
 
         To create an emailing agent there needs to be a prompt as well
         as an agent_name of the agent to be created. They may provide
@@ -163,6 +163,7 @@ async def react_to_create_domain(from_string: str, subject: str, body_plain: str
         body_plain=body_plain,
         from_string=from_string,
         user_email_address=user_email_address,
+        subject=subject,
         JSON_SECTION=JSON_SECTION,
         TOOL_RESULT_SECTION=TOOL_RESULT_SECTION,
         RESPONSE_SECTION=RESPONSE_SECTION,
