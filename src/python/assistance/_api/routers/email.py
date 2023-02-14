@@ -76,8 +76,18 @@ async def _react_to_email(email: Email):
         return
 
     email["agent-name"] = email["recipient"].split("@")[0].lower()
-    match = re.search(r"[\w.+-]+@[\w-]+\.[\w.-]+", email["from"])
-    email["user-email"] = match.group(0).lower()
+
+    match = re.search(
+        r"^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$",
+        email["sender"],
+    )
+
+    sender_domain = match.group(5)
+    sender_username = match.group(1)
+    cleaned_username = sender_username.split("+")[0]
+    email["user-email"] = f"{cleaned_username}@{sender_domain}".lower()
+
+    logging.info(json.dumps(email, indent=2))
 
     if email["agent-name"] in DEFAULT_TASKS:
         task = DEFAULT_TASKS[email["agent-name"]][1]

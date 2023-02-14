@@ -22,7 +22,7 @@ def create_reply(subject: str, body_plain: str, from_string: str, response: str)
     if not subject.startswith("Re:"):
         subject = f"Re: {subject}"
 
-    with_indent = textwrap.indent(body_plain, ">")
+    with_indent = textwrap.indent(body_plain, "> ")
     previous_emails = f"{from_string} wrote:\n{with_indent}"
 
     total_reply = f"{response}\n\n{previous_emails}"
