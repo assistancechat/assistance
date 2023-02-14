@@ -71,6 +71,13 @@ async def _react_to_email(email: Email):
 
     email["agent-name"] = email["recipient"].split("@")[0].lower()
 
+    if email["from"] == email["recipient"]:
+        logging.info(
+            "Email is from the same address as the recipient. "
+            "Breaking loop. Doing nothing."
+        )
+        return
+
     try:
         x_forwarded_for = email["X-Forwarded-For"]
         email["user-email"] = x_forwarded_for.split(" ")[0].lower()
