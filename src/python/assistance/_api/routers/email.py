@@ -16,7 +16,6 @@ import asyncio
 import json
 import logging
 import re
-from typing import TypedDict
 from urllib.parse import parse_qs
 
 import aiofiles
@@ -55,9 +54,9 @@ async def email(request: Request):
     email = Email(flatten_list_items)
     logging.info(json.dumps(email, indent=2))
 
-    await _react_to_email(email)
+    asyncio.create_task(_react_to_email(email))
 
-    return "Success"
+    return {"message": "Queued. Thank you."}
 
 
 async def _react_to_email(email: Email):

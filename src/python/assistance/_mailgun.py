@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import json
 import logging
 import secrets
 
@@ -43,7 +44,7 @@ async def send_email(mailgun_data):
         data=mailgun_data,
     )
 
-    logging.info(await mailgun_response.json())
+    logging.info(json.dumps(await mailgun_response.json(), indent=2))
 
 
 def get_access_link(email: str):
