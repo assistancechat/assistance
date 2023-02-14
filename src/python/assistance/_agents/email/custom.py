@@ -44,7 +44,7 @@ MODEL_KWARGS = {
 PROMPT = textwrap.dedent(
     """
         You are sending and receiving multiple emails from
-        "{from_string}". Your email address is {agent_name}@{ROOT_DOMAIN}.
+        "{user_email}". Your email address is {agent_name}@{ROOT_DOMAIN}.
 
         Task
         ----
@@ -61,7 +61,7 @@ PROMPT = textwrap.dedent(
 
         {body_plain}
 
-        Next email to send to {from_string}
+        Next email to send to {user_email}
         -----------------------------------
     """
 ).strip()
@@ -70,7 +70,7 @@ PROMPT = textwrap.dedent(
 async def react_to_custom_agent_request(email: Email, prompt_task: str):
     prompt = PROMPT.format(
         body_plain=email["body-plain"],
-        from_string=email["from"],
+        user_email=email["user-email"],
         prompt_task=prompt_task,
         agent_name=email["agent-name"],
         subject=email["subject"],
@@ -89,7 +89,7 @@ async def react_to_custom_agent_request(email: Email, prompt_task: str):
         subject=email["subject"],
         body_plain=email["body-plain"],
         response=response,
-        from_string=email["from"],
+        user_email=email["user-email"],
     )
 
     mailgun_data = {

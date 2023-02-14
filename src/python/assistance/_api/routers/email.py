@@ -52,7 +52,6 @@ async def email(request: Request):
         flatten_list_items[key] = item[0]
 
     email = Email(flatten_list_items)
-    logging.info(json.dumps(email, indent=2))
 
     asyncio.create_task(_react_to_email(email))
 
@@ -70,24 +69,23 @@ async def _react_to_email(email: Email):
     except KeyError:
         email["body-plain"] = ""
 
+    email["agent-name"] = email["recipient"].split("@")[0].lower()
+
+    try:
+        x_forwarded_for = email["X-Forwarded-For"]
+        email["user-email"] = x_forwarded_for.split(" ")[0].lower()
+
+        assert _get_cleaned_email(email["sender"]) == email["user-email"]
+
+    except KeyError:
+        email["user-email"] = _get_cleaned_email(email["from"])
+
+    logging.info(json.dumps(email, indent=2))
+
     if email["sender"] == "forwarding-noreply@google.com":
         await _respond_to_gmail_forward_request(email)
 
         return
-
-    email["agent-name"] = email["recipient"].split("@")[0].lower()
-
-    match = re.search(
-        r"^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$",
-        email["sender"],
-    )
-
-    sender_domain = match.group(5)
-    sender_username = match.group(1)
-    cleaned_username = sender_username.split("+")[0]
-    email["user-email"] = f"{cleaned_username}@{sender_domain}".lower()
-
-    logging.info(json.dumps(email, indent=2))
 
     if email["agent-name"] in DEFAULT_TASKS:
         task = DEFAULT_TASKS[email["agent-name"]][1]
@@ -126,7 +124,7 @@ async def _handle_no_custom_agent_created_yet_request(email: Email):
         subject=email["subject"],
         body_plain=email["body-plain"],
         response=response,
-        from_string=email["from"],
+        user_email=email["user-email"],
     )
 
     mailgun_data = {
@@ -137,6 +135,21 @@ async def _handle_no_custom_agent_created_yet_request(email: Email):
     }
 
     asyncio.create_task(send_email(mailgun_data))
+
+
+EMAIL_PATTERN = re.compile(
+    r"(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))"
+)
+
+
+def _get_cleaned_email(email_string: str):
+    match = re.search(EMAIL_PATTERN, email_string)
+
+    sender_domain = match.group(5)
+    sender_username = match.group(1)
+    cleaned_username = sender_username.split("+")[0]
+
+    return f"{cleaned_username}@{sender_domain}".lower()
 
 
 VERIFICATION_TOKEN_BASE = "https://mail.google.com/mail/vf-"

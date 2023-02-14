@@ -50,7 +50,7 @@ MODEL_KWARGS = {
 PROMPT = textwrap.dedent(
     """
         You are the Create Assistant and you are sending and receiving
-        multiple emails from "{from_string}".
+        multiple emails from "{user_email}".
 
         The record of these emails is at the end of this document
         between the tags [EMAIL BODY START] and [END].
@@ -164,8 +164,7 @@ async def create_agent(email: Email):
     prompt = PROMPT.format(
         domain=ROOT_DOMAIN,
         body_plain=textwrap.indent(email["body-plain"], "    "),
-        from_string=email["from"],
-        user_email_address=email["user-email"],
+        user_email=email["user-email"],
         subject=email["subject"],
         JSON_SECTION=JSON_SECTION,
         TOOL_RESULT_SECTION=TOOL_RESULT_SECTION,
@@ -248,7 +247,7 @@ async def create_agent(email: Email):
         subject=email["subject"],
         body_plain=email["body-plain"],
         response=response,
-        from_string=email["from"],
+        user_email=email["user-email"],
     )
 
     mailgun_data = {
@@ -261,8 +260,8 @@ async def create_agent(email: Email):
     await send_email(mailgun_data)
 
 
-async def _create_email_agent(user_email_address: str, agent_name: str, prompt: str):
-    path_to_new_prompt = PROMPTS_PATH / user_email_address / agent_name
+async def _create_email_agent(user_email: str, agent_name: str, prompt: str):
+    path_to_new_prompt = PROMPTS_PATH / user_email / agent_name
     path_to_new_prompt.parent.mkdir(parents=True, exist_ok=True)
 
     async with aiofiles.open(path_to_new_prompt, "w") as f:

@@ -39,7 +39,7 @@ async def list_custom_agents(email: Email):
         subject=email["subject"],
         body_plain=email["body-plain"],
         response=response,
-        from_string=email["from"],
+        user_email=email["user-email"],
     )
 
     mailgun_data = {
