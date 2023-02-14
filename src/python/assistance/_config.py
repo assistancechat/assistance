@@ -17,6 +17,7 @@ from assistance._paths import CONFIG
 
 ROOT_DOMAIN = "assistance.chat"
 PAYMENT_LINK = "https://buy.stripe.com/bIYeXF2s1d0E4wg9AB"
+EMAIL_PRODUCT_ID = "prod_NLuYISl8KZ6fUX"
 
 
 def get_google_oauth_client_id():

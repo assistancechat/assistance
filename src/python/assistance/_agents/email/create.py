@@ -39,7 +39,7 @@ MODEL_KWARGS = {
     "engine": "text-davinci-003",
     "max_tokens": 256,
     "best_of": 1,
-    "stop": TOOL_RESULT_SECTION,
+    "stop": [TOOL_RESULT_SECTION, "[END]"],
     "temperature": 0.7,
     "top_p": 1,
     "frequency_penalty": 0.1,
@@ -93,14 +93,14 @@ PROMPT = textwrap.dedent(
           that the agent could not be created just yet with the current
           information and provide the user with the reason why.
 
-        Valid prompts
-        -------------
+        [VALID PROMPTS START]
 
         Prompts are only valid if they are able to be used to create a
         valid agent within the agent restrictions.
 
-        Requirements for agent creation
-        -------------------------------
+        [END]
+
+        [AGENT CREATION REQUIREMENTS START]
 
         - Only begin to create the agent if you are absolutely sure that
           that is what the user wants (confirm with them first).
@@ -109,47 +109,52 @@ PROMPT = textwrap.dedent(
         - Only begin to create the agent if the user has provided a
           valid `prompt`.
 
-        Upon successful creation of the agent
-        -------------------------------------
+        [END]
 
-        Once you have successfully created the agent make sure to
-        provide instructions within your email response on how to use
-        the agent that has now been created for them.
+        [TASKS ON AGENT CREATION START]
 
-        Only provide this information once the agent has been
-        successfully created.
+            - Once you have successfully created the agent make sure to
+              provide instructions within your email response on how to use
+              the agent that has now been created for them.
+            - Only provide this information once the agent has been
+              successfully created.
 
-        Email subject
-        -------------
+        [END]
 
-        {subject}
+        [RESPONSE FORMAT START]
 
-        The email chain thus far, most recent email first
-        -------------------------------------------------
+            {JSON_SECTION}
+
+            {{
+                "ready_to_create_agent": [true or false],
+                "agent_name": [Agent name goes here],
+                "prompt": [Prompt goes here]
+            }}
+
+            {TOOL_RESULT_SECTION}
+
+            [Result of agent creation tool goes here]
+
+            {RESPONSE_SECTION}
+
+            [Response to user goes here]
+
+        [END]
+
+        [EMAIL SUBJECT START]
+
+            {subject}
+
+        [END]
+
+        [EMAIL BODY START]
 
         {body_plain}
 
-        Response format
-        ---------------
+        [END]
 
-        {JSON_SECTION}
+        Go!
 
-        {{
-            "ready_to_create_agent": [true or false],
-            "agent_name": [Agent name goes here],
-            "prompt": [Prompt goes here]
-        }}
-
-        {TOOL_RESULT_SECTION}
-
-        [Result of agent creation tool goes here]
-
-        {RESPONSE_SECTION}
-
-        [Response to user goes here]
-
-        Response
-        --------
         {JSON_SECTION}
     """
 ).strip()
@@ -158,7 +163,7 @@ PROMPT = textwrap.dedent(
 async def create_agent(email: Email):
     prompt = PROMPT.format(
         domain=ROOT_DOMAIN,
-        body_plain=email["body-plain"],
+        body_plain=textwrap.indent(email["body-plain"], "    "),
         from_string=email["from"],
         user_email_address=email["user-email"],
         subject=email["subject"],

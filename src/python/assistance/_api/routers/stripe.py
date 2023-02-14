@@ -18,6 +18,7 @@ import stripe
 import stripe.error
 from fastapi import APIRouter, Header, Request
 
+from assistance._config import EMAIL_PRODUCT_ID
 from assistance._keys import get_stripe_webhook_key
 
 router = APIRouter(prefix="/stripe")
@@ -40,3 +41,19 @@ async def handle_stripe(request: Request, stripe_signature: str = Header(None)):
         raise e
 
     logging.info(event)
+
+    if event["type"] != "invoice.payment_succeeded":
+        return
+
+    lines = event["data"]["object"]["lines"]["data"]
+    lines_with_email_product_id = [
+        line for line in lines if line["plan"]["product"] == EMAIL_PRODUCT_ID
+    ]
+    if len(lines_with_email_product_id) == 0:
+        return
+
+    if event["data"]["object"]["plan"]["product"] != EMAIL_PRODUCT_ID:
+        return
+
+    customer_email = event["data"]["object"]["customer_email"]
+    invoice_pdf = event["data"]["object"]["invoice_pdf"]
