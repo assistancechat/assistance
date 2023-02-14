@@ -25,6 +25,7 @@ from typing import Callable, Coroutine
 import openai
 from thefuzz import process as fuzz_process
 
+from assistance._completions import completion_with_back_off
 from assistance._store.transcript import store_prompt_transcript
 from assistance._tools.search import alphacrucis_search
 
@@ -273,7 +274,7 @@ async def _call_gpt_and_store_as_transcript(
     model_kwargs: dict,
     prompt: str,
 ):
-    completions = await openai.Completion.acreate(
+    completions = await completion_with_back_off(
         prompt=prompt, api_key=openai_api_key, **model_kwargs
     )
     response: str = completions.choices[0].text.strip()

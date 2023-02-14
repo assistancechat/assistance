@@ -3146,6 +3146,21 @@ files = [
 requests = {version = ">=2.20", markers = "python_version >= \"3.0\""}
 
 [[package]]
+name = "tenacity"
+version = "8.2.1"
+description = "Retry code until it succeeds"
+category = "main"
+optional = false
+python-versions = ">=3.6"
+files = [
+    {file = "tenacity-8.2.1-py3-none-any.whl", hash = "sha256:dd1b769ca7002fda992322939feca5bee4fa11f39146b0af14e0b8d9f27ea854"},
+    {file = "tenacity-8.2.1.tar.gz", hash = "sha256:c7bb4b86425b977726a7b49971542d4f67baf72096597d283f3ffd01f33b92df"},
+]
+
+[package.extras]
+doc = ["reno", "sphinx", "tornado (>=4.5)"]
+
+[[package]]
 name = "thefuzz"
 version = "0.19.0"
 description = "Fuzzy string matching in python"
@@ -3828,4 +3843,4 @@ testing = ["flake8 (<5)", "func-timeout", "jaraco.functools", "jaraco.itertools"
 [metadata]
 lock-version = "2.0"
 python-versions = "~3.10"
-content-hash = "d125e8e05a1a65e7852efed5db0be283a6ce2146f5d9489f14adbf2ef09b2f10"
+content-hash = "b15ac59ae9f31ea59cf4e9e679cfbc903c96aa29c208c2eb9ea59da36f9c669e"

@@ -22,6 +22,7 @@ import openai
 from thefuzz import process as fuzz_process
 
 from assistance import _ctx
+from assistance._completions import completion_with_back_off
 from assistance._vendor.stackoverflow.web_scraping import scrape
 
 MAX_TEXT_SECTIONS = 10
@@ -256,7 +257,7 @@ async def summarise_with_query(
 ):
     prompt = PROMPT.format(query=query, text=text)
 
-    completions = await openai.Completion.acreate(
+    completions = await completion_with_back_off(
         prompt=prompt, api_key=openai_api_key, **MODEL_KWARGS
     )
     response: str = completions.choices[0].text.strip()
