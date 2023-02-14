@@ -53,6 +53,10 @@ def get_starlette_session_key():
     return _load_secret("starlette-session-key")
 
 
+def get_stripe_webhook_key():
+    return _load_secret("stripe-webhook-key")
+
+
 @functools.cache
 def _load_secret(name: str) -> str:
     secret_path = SECRETS / name

@@ -46,6 +46,7 @@ google-auth = "^2.16.0"
 # streamlit-webrtc = "^0.44.2"
 # pydub = "^0.25.1"
 gunicorn = "^20.1.0"
+stripe = "^5.1.1"
 
 [tool.poetry.group.dev.dependencies]
 autoflake = "*"
