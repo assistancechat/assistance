@@ -32,7 +32,7 @@ OPEN_AI_API_KEY = get_openai_api_key()
 
 MODEL_KWARGS = {
     "engine": "text-davinci-003",
-    "max_tokens": 256,
+    "max_tokens": 512,
     "best_of": 1,
     "temperature": 0.7,
     "top_p": 1,

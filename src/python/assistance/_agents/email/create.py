@@ -37,7 +37,7 @@ RESPONSE_SECTION = "3. Next email to send to user:"
 
 MODEL_KWARGS = {
     "engine": "text-davinci-003",
-    "max_tokens": 256,
+    "max_tokens": 512,
     "best_of": 1,
     "stop": [TOOL_RESULT_SECTION, "[END]"],
     "temperature": 0.7,

@@ -30,7 +30,7 @@ from assistance._tools.search import alphacrucis_search
 
 MODEL_KWARGS = {
     "engine": "text-davinci-003",
-    "max_tokens": 256,
+    "max_tokens": 512,
     "best_of": 1,
     "stop": "Observation:",
     "temperature": 0.7,

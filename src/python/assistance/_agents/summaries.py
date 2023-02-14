@@ -34,7 +34,7 @@ MAX_WORDS_IN_CONTEXT = WORDS_CONTEXT * 2 + 1
 
 MODEL_KWARGS = {
     "engine": "text-davinci-003",
-    "max_tokens": 256,
+    "max_tokens": 512,
     "best_of": 1,
     "temperature": 0.7,
     "top_p": 1,
