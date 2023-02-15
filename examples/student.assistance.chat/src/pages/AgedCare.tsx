@@ -20,12 +20,13 @@ import { useRouter } from "next/router";
 
 import { GoogleOAuthProvider } from "@react-oauth/google";
 
-import Navbar from "@/components/NavBarNoChat";
+import Navbar from "@/components/NavBar";
 import ChatModal from "@/components/ChatModal";
 import ContactUsModal from "@/components/ContactUsModal";
-import HeroOpening from "@/components/HeroOpening";
+import HeroOpening from "@/components/Hero";
 import MoreInfo from "@/components/MoreInfo";
-import TikTokAnalytics from "./TikTokAnalytics";
+import TikTokAnalytics from "@/components/TikTokAnalytics";
+import data from "@/data/agedCare.json";
 
 import {
   ChatContext,
@@ -47,8 +48,8 @@ const AboutUs = lazy(() => import("@/components/AboutUs"));
 
 // TODO: Make this type declaration more flexible so that it works for all of
 // the page types.
-export default function Core(props: { data: any }) {
-
+export default function AgedCare() {
+  
   const [chatData, setChatData] = useState<ChatContextData>(DefaultChatData);
   const value = { chatData, setChatData };
 
@@ -110,7 +111,7 @@ export default function Core(props: { data: any }) {
 
     appendPendingQuestionIfReady();
   }, [chatData]);
-
+  
   return (
     <>
       <Head>
@@ -125,29 +126,18 @@ export default function Core(props: { data: any }) {
           <ChatModal />
           <ContactUsModal />
           <HeroOpening
-            key={props.data.hero.id}
-            portraitPicture={props.data.hero.portraitPicture}
-            landscapePicture={props.data.hero.landscapePicture}
-            alt={props.data.hero.alt}
-            chatButtonText={props.data.hero.chatButtonText}
-          />
-
-          <MoreInfo
-            key={props.data.moreInfo.id}
-            heading={props.data.moreInfo.heading}
-            subHeading={props.data.moreInfo.subHeading}
-            learnButtonText={props.data.moreInfo.learnButtonText}
-            learnButtonLink={props.data.moreInfo.learnButtonLink}
-            chatButtonText={props.data.moreInfo.chatButtonText}
-            videoLink={props.data.moreInfo.videoLink}
-            videoTitle={props.data.moreInfo.videoTitle}
+            key={data.hero.id}
+            portraitPicture={data.hero.portraitPicture}
+            landscapePicture={data.hero.landscapePicture}
+            alt={data.hero.alt}
+            chatButtonText={data.hero.chatButtonText}
           />
           <Suspense fallback={<div>Loading...</div>}>
             <Reviews
-              careerSnapshot={props.data.reviews.careerSnapshot}
-              careerSlogan={props.data.reviews.careerSlogan}
-              sidePanels={props.data.reviews.sidePanels}
-              featured={props.data.reviews.featured}
+              careerSnapshot={data.reviews.careerSnapshot}
+              careerSlogan={data.reviews.careerSlogan}
+              sidePanels={data.reviews.sidePanels}
+              featured={data.reviews.featured}
             />
           </Suspense>
           <Suspense fallback={<div>Loading...</div>}>
@@ -155,10 +145,10 @@ export default function Core(props: { data: any }) {
           </Suspense>
           <Suspense fallback={<div>Loading...</div>}>
             <Blog
-              id={props.data.blog.id}
-              blogHeading={props.data.blog.blogsHeading}
-              blogSubHeading={props.data.blog.blogsSubHeading}
-              posts={props.data.blog.posts}
+              id={data.blog.id}
+              blogHeading={data.blog.blogsHeading}
+              blogSubHeading={data.blog.blogsSubHeading}
+              posts={data.blog.posts}
             />
           </Suspense>
           <Suspense fallback={<div>Loading...</div>}>
@@ -171,3 +161,5 @@ export default function Core(props: { data: any }) {
     </>
   );
 }
+
+

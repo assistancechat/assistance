@@ -13,6 +13,7 @@
 // limitations under the License.
 
 type Panel = {
+  id: number;
   headline: string;
   subHeading: string;
 };

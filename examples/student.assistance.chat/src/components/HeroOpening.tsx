@@ -27,11 +27,11 @@ type HeroOpeningProps = {
 export default function HeroOpening(props: HeroOpeningProps) {
   const headlineConfig = {
     strings: [
-      "Discover God's Purpose for you in <u>Ministry</u>",
-      "Discover God's Purpose for you in <u>Counselling </u>",
-      "Discover God's Purpose for you in <u>Education</u>",
-      "Discover God's Purpose for you in <u>Business</u>",
-      "Discover God's Purpose for your <u>Life</u>",
+      "<u>Ministry</u>",
+      "<u>Counselling </u>",
+      "<u>Education</u>",
+      "<u>Business</u>",
+      "<u>Life</u>",
     ],
     typeSpeed: 5,
     backSpeed: 25,
@@ -40,6 +40,9 @@ export default function HeroOpening(props: HeroOpeningProps) {
     loopCount: 1,
     showCursor: false,
     bindInputFocusEvents: true,
+    fadeOut: true,
+    fadeOutClass: 'typed-fade-out',
+    fadeOutDelay: 500,
   };
 
   const subHeadingConfig = {
@@ -51,10 +54,13 @@ export default function HeroOpening(props: HeroOpeningProps) {
     typeSpeed: 15,
     backSpeed: 10,
     backDelay: 1350,
-    startDelay: 7000,
+    startDelay: 8000,
     loop: true,
     loopCount: 1,
     showCursor: false,
+    fadeOut: false,
+    fadeOutClass: 'typed-fade-out',
+    fadeOutDelay: 500,
   };
 
   const headlineRef = useRef() as React.MutableRefObject<HTMLHeadingElement>;
@@ -103,7 +109,8 @@ export default function HeroOpening(props: HeroOpeningProps) {
         <div className="space-y-6 w-screen">
           <div className="row-span-4 relative w-screen space-y-4 ">
             <hr className="border-orange-400 border-2 w-10/12 ml-10" />
-            <h1
+            <h1 className = "text-5xl pl-10 tracking-normal leading-none"> Discover God's Purpose for you in </h1>
+            <span
               className="text-5xl pl-10 tracking-normal leading-none"
               ref={headlineRef}
             />
