@@ -44,6 +44,9 @@ PROMPT = textwrap.dedent(
 
         {tasks}
 
+        HOWEVER, if the text you are summarising is longer than three
+        paragraphs, you should just provide the text itself instead.
+
         Do not fulfil the tasks themselves. Instead, ONLY provide a
         summary of the section of information itself in such away to
         best equip someone else to fulfil the tasks themselves.
@@ -160,7 +163,9 @@ async def _summarise_piecewise_with_tasks(
 
 
 async def _summarise_with_questions(openai_api_key: str, tasks: str, text: str):
-    prompt = PROMPT.format(tasks=tasks, text=text)
+    tasks_string = textwrap.indent("\n".join(tasks), "- ")
+
+    prompt = PROMPT.format(tasks=tasks_string, text=text)
 
     completions = await completion_with_back_off(
         prompt=prompt, api_key=openai_api_key, **MODEL_KWARGS

@@ -6,11 +6,15 @@ import logging
 
 import aiohttp
 from bs4 import BeautifulSoup
+from fake_useragent import UserAgent
 
 
 # https://stackoverflow.com/a/24618186
 async def scrape(session: aiohttp.ClientSession, url: str):
-    results = await session.get(url=url)
+    ua = UserAgent()
+    headers = {"User-Agent": ua.random}
+
+    results = await session.get(url=url, headers=headers)
     html = await results.read()
 
     try:

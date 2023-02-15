@@ -57,6 +57,10 @@ PROMPT = textwrap.dedent(
         The target audience are international students who are studying
         within Australia.
 
+        You are not aiming to sell anything, instead just be informative.
+        If there isn't ample information within the article to work from
+        simply respond with NOT_RELEVANT.
+
         If the text you have been provided is NOT_RELEVANT do not create
         a post.
 
@@ -93,11 +97,13 @@ async def googlealerts_agent(email: Email):
     coroutines = []
     for article in most_relevant_articles:
         url = article["cleaned_url"]
+        cached_url = f"http://webcache.googleusercontent.com/search?q=cache:{url}&strip=1&vwsrc=0"
+
         coroutines.append(
             _summarise_and_fulfil_tasks(
                 openai_api_key=OPEN_AI_API_KEY,
                 tasks=TASKS,
-                url=url,
+                url=cached_url,
             )
         )
 
@@ -105,6 +111,9 @@ async def googlealerts_agent(email: Email):
 
     responses = []
     for article, result in zip(most_relevant_articles, results):
+        if "NOT_RELEVANT" in result:
+            continue
+
         responses.append(f"{article['title']}\n{article['cleaned_url']}\n\n{result}")
 
     response = "\n\n\n".join(responses)
