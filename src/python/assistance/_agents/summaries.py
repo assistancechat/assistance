@@ -14,24 +14,13 @@
 
 import asyncio
 import logging
-import math
-import statistics
 import textwrap
-
-import openai
-from thefuzz import process as fuzz_process
 
 from assistance import _ctx
 from assistance._completions import completion_with_back_off
 from assistance._vendor.stackoverflow.web_scraping import scrape
 
-MAX_TEXT_SECTIONS = 10
-MIN_TEXT_LENGTH = 5
-MAX_TEXT_LENGTH = 200
-
-# The amount of words to include either side of a Google search snippet
-WORDS_CONTEXT = 100
-MAX_WORDS_IN_CONTEXT = WORDS_CONTEXT * 2 + 1
+MAX_NUMBER_OF_TEXT_SECTIONS = 20
 
 MODEL_KWARGS = {
     "engine": "text-davinci-003",
@@ -43,70 +32,102 @@ MODEL_KWARGS = {
     "presence_penalty": 0.0,
 }
 
+# ~4097 * 0.75
+APPROXIMATE_ALLOWED_WORDS_IN_PROMPT = 3000
+
 PROMPT = textwrap.dedent(
     """
-        Collate summaries that might be relevant to the query
-        below by utilising the provided text. If none of the
-        information is relevant to the query respond only
-        with the statement NOT_RELEVANT.
+        You are aiming to summarise a section of information in order to
+        extract the key information that will allow someone else to
+        answer the following questions:
 
-        Only include information that is explicitly found within the
-        text.
+        {questions}
 
-        Query:
-        {query}
+        Do not answer the questions themselves. Instead, ONLY provide a
+        summary of the section of information itself in such away to
+        best equip someone else to answer the questions.
 
-        Text:
+        Section of information to summarise:
+
         {text}
 
-        Collated Summaries:
+        Your summary:
     """
 ).strip()
 
+LEN_OF_PROMPT = len(PROMPT.format(questions="", text=""))
+REMAINING_WORDS_IN_PROMPT = (
+    APPROXIMATE_ALLOWED_WORDS_IN_PROMPT
+    - LEN_OF_PROMPT
+    - MODEL_KWARGS["max_tokens"] * 0.75
+)
 
-async def summarise_piecewise_with_query(
+WORD_COUNT_SCALING_BUFFER = 0.8
+WORDS_OVERLAP = 20
+
+
+async def summarise_url_with_questions(
     openai_api_key: str,
-    record_grouping: str,
-    username: str,
-    query: str,
+    questions: str,
+    url: str,
+):
+    page_contents = await scrape(session=_ctx.session, url=url)
+
+    split_page_contents_by_words = [item for item in page_contents.split(None) if item]
+
+    remaining_words = REMAINING_WORDS_IN_PROMPT - len(questions)
+    max_words_per_summary_section = (
+        remaining_words * WORD_COUNT_SCALING_BUFFER - WORDS_OVERLAP
+    )
+
+    text_sections = [
+        split_page_contents_by_words[
+            i : i + max_words_per_summary_section + WORDS_OVERLAP
+        ]
+        for i in range(
+            0, len(split_page_contents_by_words), max_words_per_summary_section
+        )
+    ]
+
+    truncated_text_sections = text_sections[:MAX_NUMBER_OF_TEXT_SECTIONS]
+
+    summary = await _summarise_piecewise_with_questions(
+        openai_api_key=openai_api_key,
+        questions=questions,
+        text_sections=truncated_text_sections,
+    )
+
+    logging.info(f"Summary of {url}: {summary}")
+
+    return summary
+
+
+async def _summarise_piecewise_with_questions(
+    openai_api_key: str,
+    questions: str,
     text_sections: list[str],
 ):
     if len(text_sections) == 0:
         return "NOT_RELEVANT"
 
     if len(text_sections) == 1:
-        return await summarise_with_query(
+        return await _summarise_with_questions(
             openai_api_key=openai_api_key,
-            record_grouping=record_grouping,
-            username=username,
-            query=query,
+            questions=questions,
             text=text_sections[0],
         )
 
-    cleaned_text_sections = []
-    for text in text_sections:
-        text = text.strip()
-
-        if len(text) < MIN_TEXT_LENGTH:
-            continue
-
-        cleaned_text_sections.append(text[0:MAX_TEXT_LENGTH])
-
-    limited_text_sections = cleaned_text_sections[0:MAX_TEXT_SECTIONS]
-
     coroutines = []
-    for text in limited_text_sections:
+    for text in text_sections:
         text = text.strip()
 
         if len(text) == 0:
             continue
 
         coroutines.append(
-            summarise_with_query(
+            _summarise_with_questions(
                 openai_api_key=openai_api_key,
-                record_grouping=record_grouping,
-                username=username,
-                query=query,
+                questions=questions,
                 text=text,
             )
         )
@@ -116,146 +137,17 @@ async def summarise_piecewise_with_query(
     cleaned_summaries = [item for item in summaries if item != "NOT_RELEVANT"]
     combined_summaries = "\n\n".join(cleaned_summaries)
 
-    summary = await summarise_with_query(
+    summary = await _summarise_with_questions(
         openai_api_key=openai_api_key,
-        record_grouping=record_grouping,
-        username=username,
-        query=query,
+        questions=questions,
         text=combined_summaries,
     )
 
     return summary
 
 
-async def summarise_urls_with_query_around_snippets(
-    openai_api_key: str,
-    record_grouping: str,
-    username: str,
-    query: str,
-    snippets_by_url: dict[str, list[str]],
-    added_pages: list[str] | None = None,
-):
-    urls = list(snippets_by_url.keys())
-    total_number_of_pages = len(urls) + len(added_pages)
-
-    if total_number_of_pages == 0:
-        return "NOT_RELEVANT"
-
-    coroutines = []
-    for page in added_pages:
-        coroutines.append(
-            summarise_with_query(
-                openai_api_key=openai_api_key,
-                record_grouping=record_grouping,
-                username=username,
-                query=query,
-                text=page,
-            )
-        )
-
-    for url, snippets in snippets_by_url.items():
-        coroutines.append(
-            summarise_url_with_query_around_snippets(
-                openai_api_key=openai_api_key,
-                record_grouping=record_grouping,
-                username=username,
-                query=query,
-                url=url,
-                snippets=snippets,
-            )
-        )
-
-    summaries = await asyncio.gather(*coroutines)
-
-    cleaned_summaries = [item for item in summaries if item != "NOT_RELEVANT"]
-    combined_summaries = "\n\n".join(cleaned_summaries)
-
-    summary = await summarise_with_query(
-        openai_api_key=openai_api_key,
-        record_grouping=record_grouping,
-        username=username,
-        query=query,
-        text=combined_summaries,
-    )
-
-    return summary
-
-
-def _pull_only_relevant(split_page_contents_by_words: str, snippets: str):
-    page_snippets_with_context = []
-
-    # Have extracted snippets scan the page skipping 10 words at a time
-    word_skip = 10
-
-    for i in range(0, len(split_page_contents_by_words), word_skip):
-        context_min = max(0, i - WORDS_CONTEXT)
-        context_max = i + WORDS_CONTEXT
-
-        page_snippets_with_context.append(
-            " ".join(split_page_contents_by_words[context_min:context_max])
-        )
-
-    fuzz_limit = int(math.ceil(MAX_WORDS_IN_CONTEXT) / word_skip)
-    snippets_to_summarise = []
-    for snippet in snippets:
-        selections_found = fuzz_process.extractBests(
-            snippet, page_snippets_with_context, limit=fuzz_limit
-        )
-
-        # This is required so that the snippet used has context either
-        # side of the snippet itself
-        selections = [item[0] for item in selections_found]
-        indices = [page_snippets_with_context.index(item) for item in selections]
-        median_index = int(round(statistics.median(indices)))
-
-        snippet_with_context = page_snippets_with_context[median_index]
-
-        snippets_to_summarise.append(snippet)
-        snippets_to_summarise.append(snippet_with_context)
-
-    extracted_snippets_with_context = "\n\n".join(snippets_to_summarise)
-
-    return extracted_snippets_with_context
-
-
-async def summarise_url_with_query_around_snippets(
-    openai_api_key: str,
-    record_grouping: str,
-    username: str,
-    query: str,
-    url: str,
-    snippets: list[str],
-):
-    page_contents = await scrape(session=_ctx.session, url=url)
-
-    split_page_contents_by_words = [item for item in page_contents.split(None) if item]
-
-    if len(split_page_contents_by_words) < MAX_WORDS_IN_CONTEXT:
-        to_summarise = (
-            "\n\n".join(snippets) + "\n\n" + " ".join(split_page_contents_by_words)
-        )
-    else:
-        to_summarise = _pull_only_relevant(split_page_contents_by_words, snippets)
-
-    logging.info(f"URL: {url}\nTo Summarise: {to_summarise}")
-
-    summary = await summarise_with_query(
-        openai_api_key=openai_api_key,
-        record_grouping=record_grouping,
-        username=username,
-        query=query,
-        text=to_summarise,
-    )
-
-    logging.info(f"Summary of {url}: {summary}")
-
-    return summary
-
-
-async def summarise_with_query(
-    openai_api_key: str, record_grouping: str, username: str, query: str, text: str
-):
-    prompt = PROMPT.format(query=query, text=text)
+async def _summarise_with_questions(openai_api_key: str, questions: str, text: str):
+    prompt = PROMPT.format(questions=questions, text=text)
 
     completions = await completion_with_back_off(
         prompt=prompt, api_key=openai_api_key, **MODEL_KWARGS

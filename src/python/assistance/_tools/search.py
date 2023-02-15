@@ -18,7 +18,7 @@ import logging
 import urllib.parse
 
 from assistance import _ctx
-from assistance._agents.summaries import summarise_urls_with_query_around_snippets
+from assistance._agents.summaries import summarise_urls_with_query
 from assistance._enums import SEARCH_ENGINE_IDS, SearchEngine
 from assistance._keys import get_google_search_api_key
 from assistance._store.search import store_search_result
@@ -84,7 +84,7 @@ async def _search_with_summary(
         summary = "No additional information found"
 
     else:
-        summary = await summarise_urls_with_query_around_snippets(
+        summary = await summarise_urls_with_query(
             openai_api_key=openai_api_key,
             record_grouping=record_grouping,
             username=username,
