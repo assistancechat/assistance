@@ -47,6 +47,10 @@ PROMPT = textwrap.dedent(
         summary of the section of information itself in such away to
         best equip someone else to fulfil the tasks themselves.
 
+        If the information provided does not contain information that
+        is helpful to the tasks simply write NOT_RELEVANT instead of
+        providing a summary.
+
         Section of information to summarise:
 
         {text}
@@ -73,10 +77,12 @@ async def summarise_url_with_tasks(
 ):
     page_contents = await scrape(session=_ctx.session, url=url)
 
+    logging.info(page_contents)
+
     split_page_contents_by_words = [item for item in page_contents.split(None) if item]
 
     remaining_words = REMAINING_WORDS_IN_PROMPT - len(tasks)
-    max_words_per_summary_section = (
+    max_words_per_summary_section = int(
         remaining_words * WORD_COUNT_SCALING_BUFFER - WORDS_OVERLAP
     )
 

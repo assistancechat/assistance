@@ -6,13 +6,15 @@
 
 #     http://www.apache.org/licenses/LICENSE-2.0
 
+import asyncio
+import json
+
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
-import asyncio
+import logging
 import textwrap
 
 from assistance._agents.relevance import get_most_relevant_articles
@@ -48,25 +50,29 @@ TASKS = [
 
 PROMPT = textwrap.dedent(
     """
-        You are aiming to write {num_tasks} paragraphs about a
-        section of text that you have been provided.
+        You are aiming to write an engaging and truthful social media
+        post about an article of text that you have been provided.
 
-        For each of the {num_tasks} below write a paragraph addressing
-        that task:
+        If the text you have been provided is NOT_RELEVANT do not create
+        a post.
+
+        Within you post you are aiming to fulfil the following tasks:
 
         {tasks}
 
-        Fulfil these tasks for the following text:
+        The article of text you have been provided is:
 
         {text}
 
-        Your {num_tasks} paragraphs:
+        Your post:
     """
 ).strip()
 
 
 async def googlealerts_agent(email: Email):
     article_details = parse_alerts(email["body-html"])
+
+    logging.info(json.dumps(article_details, indent=2))
 
     most_relevant_articles = await get_most_relevant_articles(
         openai_api_key=OPEN_AI_API_KEY,
@@ -89,9 +95,11 @@ async def googlealerts_agent(email: Email):
 
     results = await asyncio.gather(*coroutines)
 
-    response = ""
+    responses = []
     for article, result in zip(most_relevant_articles, results):
-        response += f"{article['title']}\n{article['description']}\n{article['url']}\n\n{result}"
+        responses.append(f"{article['title']}\n{article['url']}\n{result}")
+
+    response = "\n\n".join(responses)
 
     subject, _total_reply = create_reply(
         subject=email["subject"],
@@ -113,7 +121,7 @@ async def googlealerts_agent(email: Email):
 async def _summarise_and_fulfil_tasks(
     openai_api_key: str, tasks: list[str], url: str
 ) -> str:
-    summary = summarise_url_with_tasks(
+    summary = await summarise_url_with_tasks(
         openai_api_key=openai_api_key, url=url, tasks=tasks
     )
 

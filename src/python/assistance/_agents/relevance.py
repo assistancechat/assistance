@@ -70,6 +70,8 @@ async def get_most_relevant_articles(
     for index, article in enumerate(articles):
         articles_with_ids.append({"id": index, **article})
 
+    logging.info(json.dumps(articles_with_ids, indent=2))
+
     article_ids: None | list[int] = None
     for _ in range(3):
         prompt = PROMPT.format(
