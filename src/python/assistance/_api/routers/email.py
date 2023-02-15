@@ -53,6 +53,8 @@ async def email(request: Request):
 
     email = Email(flatten_list_items)
 
+    logging.info(json.dumps(email, indent=2))
+
     asyncio.create_task(_react_to_email(email))
 
     return {"message": "Queued. Thank you."}
@@ -87,7 +89,7 @@ async def _react_to_email(email: Email):
     except KeyError:
         email["user-email"] = _get_cleaned_email(email["from"])
 
-    logging.info(json.dumps(email, indent=2))
+    logging.info(f"User email: {email['user-email']}")
 
     if email["sender"] == "forwarding-noreply@google.com":
         await _respond_to_gmail_forward_request(email)
