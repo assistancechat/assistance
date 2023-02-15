@@ -22,12 +22,10 @@ import textwrap
 from enum import Enum
 from typing import Callable, Coroutine
 
-import openai
 from thefuzz import process as fuzz_process
 
 from assistance._completions import completion_with_back_off
 from assistance._store.transcript import store_prompt_transcript
-from assistance._tools.search import alphacrucis_search
 
 MODEL_KWARGS = {
     "engine": "text-davinci-003",
@@ -183,20 +181,20 @@ async def run_conversation(
 
     logging.info(prompt)
 
-    async def _search(query: str):
-        return await alphacrucis_search(
-            openai_api_key=openai_api_key,
-            record_grouping=record_grouping,
-            client_email=client_email,
-            query=query,
-        )
+    # async def _search(query: str):
+    #     return await alphacrucis_search(
+    #         openai_api_key=openai_api_key,
+    #         record_grouping=record_grouping,
+    #         client_email=client_email,
+    #         query=query,
+    #     )
 
-    async def _email(query: str):
-        return "Unfortunately emailing the Supervisors is not currently available"
+    # async def _email(query: str):
+    #     return "Unfortunately emailing the Supervisors is not currently available"
 
     tool_functions = {
-        Tool.SEARCH: _search,
-        Tool.EMAIL: _email,
+        # Tool.SEARCH: _search,
+        # Tool.EMAIL: _email,
     }
 
     response = await _run_llm_process_observation_loop(

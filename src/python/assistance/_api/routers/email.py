@@ -39,6 +39,9 @@ router = APIRouter(prefix="/email")
 @router.post("")
 async def email(request: Request):
     encoded_body = await request.body()
+
+    logging.info(encoded_body)
+
     body = encoded_body.decode(encoding="utf-8", errors="replace")
 
     details = parse_qs(body)

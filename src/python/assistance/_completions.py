@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import logging
 
 import openai
 from tenacity import retry, stop_after_attempt, wait_random_exponential
@@ -19,4 +20,9 @@ from tenacity import retry, stop_after_attempt, wait_random_exponential
 
 @retry(wait=wait_random_exponential(min=1, max=60), stop=stop_after_attempt(6))
 async def completion_with_back_off(**kwargs):
-    return await openai.Completion.acreate(**kwargs)
+    logging.info(kwargs["prompt"])
+
+    response = await openai.Completion.acreate(**kwargs)
+    logging.info(response)
+
+    return response

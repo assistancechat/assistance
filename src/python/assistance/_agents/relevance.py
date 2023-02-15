@@ -64,7 +64,7 @@ async def get_most_relevant_articles(
     articles: list[dict[str, str]],
     num_of_articles_to_select: int,
 ):
-    tasks_string = "\n".join(f"- {tasks}")
+    tasks_string = textwrap.indent("\n".join(tasks), "- ")
 
     articles_with_ids = []
     for index, article in enumerate(articles):

@@ -18,8 +18,6 @@
 import logging
 import textwrap
 
-import openai
-
 from assistance._completions import completion_with_back_off
 from assistance._config import ROOT_DOMAIN
 from assistance._keys import get_openai_api_key

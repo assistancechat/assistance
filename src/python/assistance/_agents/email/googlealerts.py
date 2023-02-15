@@ -68,7 +68,7 @@ PROMPT = textwrap.dedent(
 async def googlealerts_agent(email: Email):
     article_details = parse_alerts(email["body-html"])
 
-    most_relevant_articles = get_most_relevant_articles(
+    most_relevant_articles = await get_most_relevant_articles(
         openai_api_key=OPEN_AI_API_KEY,
         articles=article_details,
         tasks=TASKS,
@@ -117,9 +117,9 @@ async def _summarise_and_fulfil_tasks(
         openai_api_key=openai_api_key, url=url, tasks=tasks
     )
 
-    prompt = PROMPT.format(
-        num_tasks=len(tasks), tasks="\n".join(f"- {tasks}"), text=summary
-    )
+    tasks_string = textwrap.indent("\n".join(tasks), "- ")
+
+    prompt = PROMPT.format(num_tasks=len(tasks), tasks=tasks_string, text=summary)
 
     completions = await completion_with_back_off(
         prompt=prompt, api_key=openai_api_key, **MODEL_KWARGS
