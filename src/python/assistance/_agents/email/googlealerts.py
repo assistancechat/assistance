@@ -12,15 +12,29 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
+import asyncio
 import textwrap
 
 from assistance._agents.relevance import get_most_relevant_articles
 from assistance._agents.summaries import summarise_url_with_tasks
+from assistance._completions import completion_with_back_off
+from assistance._config import ROOT_DOMAIN
 from assistance._keys import get_openai_api_key
+from assistance._mailgun import send_email
 from assistance._parsing.googlealerts import parse_alerts
 
+from .reply import create_reply
 from .types import Email
+
+MODEL_KWARGS = {
+    "engine": "text-davinci-003",
+    "max_tokens": 512,
+    "best_of": 1,
+    "temperature": 0.7,
+    "top_p": 1,
+    "frequency_penalty": 0.1,
+    "presence_penalty": 0.1,
+}
 
 OPEN_AI_API_KEY = get_openai_api_key()
 
@@ -61,9 +75,55 @@ async def googlealerts_agent(email: Email):
         num_of_articles_to_select=NUM_OF_ARTICLES_TO_SELECT,
     )
 
+    coroutines = []
+
     for article in most_relevant_articles:
         url = article["url"]
-        summary = summarise_url_with_tasks(
-            openai_api_key=OPEN_AI_API_KEY, url=url, tasks=TASKS
+        coroutines.append(
+            _summarise_and_fulfil_tasks(
+                openai_api_key=OPEN_AI_API_KEY,
+                tasks=TASKS,
+                url=url,
+            )
         )
-        print(summary)
+
+    results = await asyncio.gather(*coroutines)
+
+    response = ""
+    for article, result in zip(most_relevant_articles, results):
+        response += f"{article['title']}\n{article['description']}\n{article['url']}\n\n{result}"
+
+    subject, _total_reply = create_reply(
+        subject=email["subject"],
+        body_plain=email["body-plain"],
+        response=response,
+        user_email=email["user-email"],
+    )
+
+    mailgun_data = {
+        "from": f"{email['agent-name']}@{ROOT_DOMAIN}",
+        "to": email["user-email"],
+        "subject": subject,
+        "text": response,
+    }
+
+    await send_email(mailgun_data)
+
+
+async def _summarise_and_fulfil_tasks(
+    openai_api_key: str, tasks: list[str], url: str
+) -> str:
+    summary = summarise_url_with_tasks(
+        openai_api_key=openai_api_key, url=url, tasks=tasks
+    )
+
+    prompt = PROMPT.format(
+        num_tasks=len(tasks), tasks="\n".join(f"- {tasks}"), text=summary
+    )
+
+    completions = await completion_with_back_off(
+        prompt=prompt, api_key=openai_api_key, **MODEL_KWARGS
+    )
+    response: str = completions.choices[0].text.strip()
+
+    return response

@@ -17,6 +17,7 @@ import textwrap
 from assistance._config import ROOT_DOMAIN
 
 from .create import create_agent
+from .googlealerts import googlealerts_agent
 from .list import list_custom_agents
 
 DEFAULT_TASKS = {
@@ -28,6 +29,10 @@ DEFAULT_TASKS = {
     "list": (
         "Provides a raw list of all of the custom agents you have created",
         list_custom_agents,
+    ),
+    "googlealerts": (
+        "Creates summary text around the three best google alerts within the provided email",
+        googlealerts_agent,
     ),
     "poem-demo": (
         "This is an example assistant who responds with a poem",
