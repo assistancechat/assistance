@@ -37,9 +37,10 @@ APPROXIMATE_ALLOWED_WORDS_IN_PROMPT = 3000
 
 PROMPT = textwrap.dedent(
     """
-        You are aiming to summarise a section of information in order to
-        extract the key information that will allow someone else to
-        fulfil the following tasks about the information:
+        You are aiming to write a three paragraph summary of a section
+        of information. The goal of this extraction is so as to allow
+        someone else to fulfil the following tasks about the
+        information:
 
         {tasks}
 
@@ -48,8 +49,12 @@ PROMPT = textwrap.dedent(
         best equip someone else to fulfil the tasks themselves.
 
         If the information provided does not contain information that
-        is helpful to the tasks simply write NOT_RELEVANT instead of
+        is relevant to the tasks simply write NOT_RELEVANT instead of
         providing a summary.
+
+        ONLY provide information that is specifically within the
+        information below. Do not utilise any of your outside knowledge
+        to fill in any gaps.
 
         Section of information to summarise:
 
@@ -87,9 +92,11 @@ async def summarise_url_with_tasks(
     )
 
     text_sections = [
-        split_page_contents_by_words[
-            i : i + max_words_per_summary_section + WORDS_OVERLAP
-        ]
+        " ".join(
+            split_page_contents_by_words[
+                i : i + max_words_per_summary_section + WORDS_OVERLAP
+            ]
+        )
         for i in range(
             0, len(split_page_contents_by_words), max_words_per_summary_section
         )

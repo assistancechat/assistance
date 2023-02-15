@@ -2,6 +2,8 @@
 # Attribution-ShareAlike 4.0 International License.
 # <http://creativecommons.org/licenses/by-sa/4.0/>.
 
+import logging
+
 import aiohttp
 from bs4 import BeautifulSoup
 
@@ -17,6 +19,8 @@ async def scrape(session: aiohttp.ClientSession, url: str):
         return "NOT_RELEVANT"
 
     soup = BeautifulSoup(html, features="html.parser")
+
+    # logging.info(soup)
 
     # kill all script and style elements
     for script in soup(["script", "style"]):
