@@ -48,22 +48,22 @@ class Tool(str, Enum):
 
 
 TOOL_DESCRIPTIONS = {
-    Tool.SEARCH: textwrap.dedent(
-        """
-            A tool where Assistant provides a natural language question.
-            The tool initially searches the Alphacrucis student support
-            FAQ page and the main website. After it has undergone a
-            search a separate LLM will summarise the pages found with
-            respect to relevance to the provided question.
-        """
-    ).strip(),
-    Tool.EMAIL: textwrap.dedent(
-        """
-            A tool to send an email to the Assistant's Supervisors.
-            Assistant may use this tool to seek help from the
-            Assistant's supervisors if it is unsure how best to respond.
-        """
-    ).strip(),
+    # Tool.SEARCH: textwrap.dedent(
+    #     """
+    #         A tool where Assistant provides a natural language question.
+    #         The tool initially searches the Alphacrucis student support
+    #         FAQ page and the main website. After it has undergone a
+    #         search a separate LLM will summarise the pages found with
+    #         respect to relevance to the provided question.
+    #     """
+    # ).strip(),
+    # Tool.EMAIL: textwrap.dedent(
+    #     """
+    #         A tool to send an email to the Assistant's Supervisors.
+    #         Assistant may use this tool to seek help from the
+    #         Assistant's supervisors if it is unsure how best to respond.
+    #     """
+    # ).strip(),
 }
 
 
@@ -158,7 +158,11 @@ async def run_conversation(
     for tool, description in TOOL_DESCRIPTIONS.items():
         tools.append(f"{tool.value}: {description}")
 
-    tools_string = "\n".join(tools)
+    if len(tools) == 0:
+        tools_string = "No tools available"
+    else:
+        tools_string = "\n".join(tools)
+
     tool_names = ", ".join(TOOL_DESCRIPTIONS.keys())
 
     task_prompt_with_replacements = task_prompt.format(
