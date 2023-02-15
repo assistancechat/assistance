@@ -21,6 +21,8 @@
     "python.linting.lintOnSave": true,
     "python.linting.pylintEnabled": true,
     "python.linting.mypyEnabled": false,
+    "github.copilot.inlineSuggest.enabled": false,
+    // "editor.maxTokenizationLineLength": 100000,
     "[python]": {
       "editor.rulers": [72, 88],
       "editor.tabSize": 4

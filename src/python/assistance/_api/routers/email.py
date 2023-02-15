@@ -13,10 +13,9 @@
 # limitations under the License.
 
 import asyncio
-import json
 import logging
+import pprint
 import re
-from urllib.parse import parse_qs
 
 import aiofiles
 from fastapi import APIRouter, Request
@@ -38,27 +37,10 @@ router = APIRouter(prefix="/email")
 
 @router.post("")
 async def email(request: Request):
-    encoded_body = await request.body()
+    email = Email(await request.form())
 
-    logging.info(encoded_body)
+    logging.info(_ctx.pp.pprint(email))
 
-    body = encoded_body.decode(encoding="utf-8", errors="replace")
-
-    details = parse_qs(body)
-
-    flatten_list_items = {}
-    for key, item in details.items():
-        if len(item) != 1:
-            flatten_list_items[key] = item
-            continue
-
-        flatten_list_items[key] = item[0]
-
-    email = Email(flatten_list_items)
-
-    logging.info(json.dumps(email, indent=2))
-
-    # TODO: Change this to using a "pub-sub" approach.
     asyncio.create_task(_react_to_email(email))
 
     return {"message": "Queued. Thank you."}

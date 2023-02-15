@@ -12,9 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import pprint
+
 import aiohttp
 
 session: aiohttp.ClientSession
+
+pp = pprint.PrettyPrinter(indent=2)
 
 
 def open_session():

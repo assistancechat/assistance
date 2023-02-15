@@ -42,29 +42,35 @@ MODEL_KWARGS = {
 OPEN_AI_API_KEY = get_openai_api_key()
 
 
-NUM_OF_ARTICLES_TO_SELECT = 3
 TASKS = [
     "Write a paragraph that provides an overview of the main point of this article",
     'Write a paragraph answering the question "Why is this information important for international students to know?"',
     "Provide a discussion provoking question based on this article",
 ]
 
+TARGET_AUDIENCE = "international students who are studying within Australia"
+
 PROMPT = textwrap.dedent(
     """
         You are aiming to write an engaging and truthful social media
-        post about an article of text that you have been provided.
+        post about an article of text that you have been provided while
+        fulfilling a series of detailed tasks.
 
-        The target audience are international students who are studying
-        within Australia.
+        You are not aiming to sell anything, instead just be
+        informative. If there isn't ample information within the article
+        to work from simply respond with NOT_RELEVANT.
 
-        You are not aiming to sell anything, instead just be informative.
-        If there isn't ample information within the article to work from
-        simply respond with NOT_RELEVANT.
+        Make sure your post contains all the relevant information
+        regarding the tasks. The reader should not need to read the
+        article. Nor are you wanting them to actually read the article.
 
-        If the text you have been provided is NOT_RELEVANT do not create
-        a post.
+        Fulfil each task in its own paragraph.
 
-        Within you post you are aiming to fulfil the following tasks:
+        The target audience for your post is:
+
+        {target_audience}
+
+        Within your post you are aiming to fulfil the following tasks:
 
         {tasks}
 
@@ -86,7 +92,7 @@ async def googlealerts_agent(email: Email):
         openai_api_key=OPEN_AI_API_KEY,
         articles=article_details,
         tasks=TASKS,
-        num_of_articles_to_select=NUM_OF_ARTICLES_TO_SELECT,
+        num_of_articles_to_select=5,
     )
 
     for article in most_relevant_articles:
@@ -114,9 +120,26 @@ async def googlealerts_agent(email: Email):
         if "NOT_RELEVANT" in result:
             continue
 
-        responses.append(f"{article['title']}\n{article['cleaned_url']}\n\n{result}")
+        responses.append(
+            {
+                "title": article["title"],
+                "url": article["cleaned_url"],
+                "content": result,
+            }
+        )
 
-    response = "\n\n\n".join(responses)
+    most_relevant_responses = await get_most_relevant_articles(
+        openai_api_key=OPEN_AI_API_KEY,
+        articles=responses,
+        tasks=TASKS,
+        num_of_articles_to_select=3,
+    )
+
+    response_texts = []
+    for item in most_relevant_responses:
+        response_texts.append(f"{item['title']}\n{item['url']}\n\n{item['content']}")
+
+    response = "\n\n\n".join(response_texts)
 
     subject, _total_reply = create_reply(
         subject=email["subject"],
@@ -144,7 +167,12 @@ async def _summarise_and_fulfil_tasks(
 
     tasks_string = textwrap.indent("\n".join(tasks), "- ")
 
-    prompt = PROMPT.format(num_tasks=len(tasks), tasks=tasks_string, text=summary)
+    prompt = PROMPT.format(
+        num_tasks=len(tasks),
+        tasks=tasks_string,
+        text=summary,
+        target_audience=TARGET_AUDIENCE,
+    )
 
     completions = await completion_with_back_off(
         prompt=prompt, api_key=openai_api_key, **MODEL_KWARGS

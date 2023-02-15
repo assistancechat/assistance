@@ -16,8 +16,8 @@ import json
 import logging
 import textwrap
 
+from assistance import _ctx
 from assistance._completions import completion_with_back_off
-from assistance._vendor.stackoverflow.web_scraping import scrape
 
 MODEL_KWARGS = {
     "engine": "text-davinci-003",
@@ -32,8 +32,7 @@ MODEL_KWARGS = {
 PROMPT = textwrap.dedent(
     """
         You are aiming to find the articles that might be the best at
-        helping someone fulfil the following tasks across the whole set
-        of articles:
+        helping someone fulfil the following tasks:
 
         {tasks}
 
@@ -41,19 +40,26 @@ PROMPT = textwrap.dedent(
         tasks. Provide the id of the {num_of_articles_to_select} most
         relevant articles to the tasks as a Python list.
 
-        Do not answer the tasks themselves. Instead, ONLY provide the
-        ids of the articles that you think would be help someone else
-        best at fulfil those tasks.
+        Do not complete the tasks themselves. Instead, ONLY provide the
+        ids of the articles that you think would be the most helpful for
+        someone else to fulfil those tasks.
 
-        Required format:
+        For each article that you select, provide an absolute score
+        between 0 and 100. The score is a measure of how relevant you
+        think the article is to achieving the tasks.
 
-        [<id of most relevant article>, <id of second most relevant article>, ...]
+        Required JSON format:
+
+        {{
+            "scores": [<score of most relevant article>, <score of second most relevant article>, ...],
+            "ids": [<id of most relevant article>, <id of second most relevant article>, ...]
+        }}
 
         Articles:
 
         {articles}
 
-        {num_of_articles_to_select} most relevant article ids:
+        JSON response:
     """
 ).strip()
 
@@ -70,7 +76,7 @@ async def get_most_relevant_articles(
     for index, article in enumerate(articles):
         articles_with_ids.append({"id": index, **article})
 
-    logging.info(json.dumps(articles_with_ids, indent=2))
+    logging.info(_ctx.pp.pprint(articles_with_ids))
 
     article_ids: None | list[int] = None
     for _ in range(3):
@@ -86,19 +92,27 @@ async def get_most_relevant_articles(
         )
         response: str = completions.choices[0].text.strip()
 
+        logging.info(f"Response: {response}")
+
         try:
-            article_ids = json.loads(response)
+            article_ranking = json.loads(response)
+            article_ids = article_ranking["ids"]
+            article_scores = article_ranking["scores"]
+
             break
-        except json.JSONDecodeError:
-            pass
+        except (json.JSONDecodeError, KeyError) as e:
+            logging.info(e)
 
     if not article_ids:
         raise ValueError("Could not parse article ids")
 
     top_articles = []
-    for article_id in article_ids:
-        top_articles.append(articles[article_id])
+    for i, article_id in enumerate(article_ids):
+        article = articles[article_id]
+        article["score"] = article_scores[i]
 
-    logging.info(f"Top articles: {json.dumps(top_articles, indent=2)}")
+        top_articles.append(article)
+
+    logging.info(f"Top articles: {_ctx.pp.pprint(top_articles)}")
 
     return top_articles
