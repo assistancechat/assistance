@@ -27,6 +27,7 @@ Email = TypedDict(
         "user-email": str,
         "agent-name": str,
         "X-Forwarded-For": str,
+        "body-html": str,
     },
     total=False,
 )

@@ -39,13 +39,13 @@ PROMPT = textwrap.dedent(
     """
         You are aiming to summarise a section of information in order to
         extract the key information that will allow someone else to
-        answer the following questions:
+        fulfil the following tasks about the information:
 
-        {questions}
+        {tasks}
 
-        Do not answer the questions themselves. Instead, ONLY provide a
+        Do not fulfil the tasks themselves. Instead, ONLY provide a
         summary of the section of information itself in such away to
-        best equip someone else to answer the questions.
+        best equip someone else to fulfil the tasks themselves.
 
         Section of information to summarise:
 
@@ -55,7 +55,7 @@ PROMPT = textwrap.dedent(
     """
 ).strip()
 
-LEN_OF_PROMPT = len(PROMPT.format(questions="", text=""))
+LEN_OF_PROMPT = len(PROMPT.format(tasks="", text=""))
 REMAINING_WORDS_IN_PROMPT = (
     APPROXIMATE_ALLOWED_WORDS_IN_PROMPT
     - LEN_OF_PROMPT
@@ -66,16 +66,16 @@ WORD_COUNT_SCALING_BUFFER = 0.8
 WORDS_OVERLAP = 20
 
 
-async def summarise_url_with_questions(
+async def summarise_url_with_tasks(
     openai_api_key: str,
-    questions: str,
+    tasks: str,
     url: str,
 ):
     page_contents = await scrape(session=_ctx.session, url=url)
 
     split_page_contents_by_words = [item for item in page_contents.split(None) if item]
 
-    remaining_words = REMAINING_WORDS_IN_PROMPT - len(questions)
+    remaining_words = REMAINING_WORDS_IN_PROMPT - len(tasks)
     max_words_per_summary_section = (
         remaining_words * WORD_COUNT_SCALING_BUFFER - WORDS_OVERLAP
     )
@@ -91,9 +91,9 @@ async def summarise_url_with_questions(
 
     truncated_text_sections = text_sections[:MAX_NUMBER_OF_TEXT_SECTIONS]
 
-    summary = await _summarise_piecewise_with_questions(
+    summary = await _summarise_piecewise_with_tasks(
         openai_api_key=openai_api_key,
-        questions=questions,
+        tasks=tasks,
         text_sections=truncated_text_sections,
     )
 
@@ -102,9 +102,9 @@ async def summarise_url_with_questions(
     return summary
 
 
-async def _summarise_piecewise_with_questions(
+async def _summarise_piecewise_with_tasks(
     openai_api_key: str,
-    questions: str,
+    tasks: str,
     text_sections: list[str],
 ):
     if len(text_sections) == 0:
@@ -113,7 +113,7 @@ async def _summarise_piecewise_with_questions(
     if len(text_sections) == 1:
         return await _summarise_with_questions(
             openai_api_key=openai_api_key,
-            questions=questions,
+            tasks=tasks,
             text=text_sections[0],
         )
 
@@ -127,7 +127,7 @@ async def _summarise_piecewise_with_questions(
         coroutines.append(
             _summarise_with_questions(
                 openai_api_key=openai_api_key,
-                questions=questions,
+                tasks=tasks,
                 text=text,
             )
         )
@@ -139,15 +139,15 @@ async def _summarise_piecewise_with_questions(
 
     summary = await _summarise_with_questions(
         openai_api_key=openai_api_key,
-        questions=questions,
+        tasks=tasks,
         text=combined_summaries,
     )
 
     return summary
 
 
-async def _summarise_with_questions(openai_api_key: str, questions: str, text: str):
-    prompt = PROMPT.format(questions=questions, text=text)
+async def _summarise_with_questions(openai_api_key: str, tasks: str, text: str):
+    prompt = PROMPT.format(tasks=tasks, text=text)
 
     completions = await completion_with_back_off(
         prompt=prompt, api_key=openai_api_key, **MODEL_KWARGS

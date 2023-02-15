@@ -32,17 +32,18 @@ MODEL_KWARGS = {
 PROMPT = textwrap.dedent(
     """
         You are aiming to find the articles that might be the best at
-        answering the following questions:
+        helping someone fulfil the following tasks across the whole set
+        of articles:
 
-        {questions}
+        {tasks}
 
         Below are {num_of_articles} articles that may be relevant to the
-        questions. Provide the id of the {num_of_articles_to_select} most
-        relevant articles to the questions as a Python list.
+        tasks. Provide the id of the {num_of_articles_to_select} most
+        relevant articles to the tasks as a Python list.
 
-        Do not answer the questions themselves. Instead, ONLY provide
-        the ids of the articles that you think is the best at answering
-        the question.
+        Do not answer the tasks themselves. Instead, ONLY provide the
+        ids of the articles that you think would be help someone else
+        best at fulfil those tasks.
 
         Required format:
 
@@ -59,11 +60,11 @@ PROMPT = textwrap.dedent(
 
 async def get_most_relevant_articles(
     openai_api_key: str,
-    questions: list[str],
+    tasks: list[str],
     articles: list[dict[str, str]],
     num_of_articles_to_select: int,
 ):
-    questions_string = "\n".join(f"- {questions}")
+    tasks_string = "\n".join(f"- {tasks}")
 
     articles_with_ids = []
     for index, article in enumerate(articles):
@@ -72,7 +73,7 @@ async def get_most_relevant_articles(
     article_ids: None | list[int] = None
     for _ in range(3):
         prompt = PROMPT.format(
-            questions=questions_string,
+            tasks=tasks_string,
             num_of_articles=len(articles),
             num_of_articles_to_select=num_of_articles_to_select,
             articles=json.dumps(articles_with_ids, indent=2),
