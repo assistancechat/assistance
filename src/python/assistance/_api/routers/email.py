@@ -55,6 +55,7 @@ async def email(request: Request):
 
     logging.info(json.dumps(email, indent=2))
 
+    # TODO: Change this to using a "pub-sub" approach.
     asyncio.create_task(_react_to_email(email))
 
     return {"message": "Queued. Thank you."}
