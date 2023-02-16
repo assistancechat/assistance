@@ -123,12 +123,12 @@ async def googlealerts_agent(email: Email):
 
     results = await asyncio.gather(*coroutines)
 
-    responses = []
+    all_responses = []
     for article, result in zip(most_relevant_articles, results):
         if "NOT_RELEVANT" in result:
             continue
 
-        responses.append(
+        all_responses.append(
             {
                 "title": article["title"],
                 "url": article["cleaned_url"],
@@ -138,32 +138,21 @@ async def googlealerts_agent(email: Email):
 
     most_relevant_responses = await get_most_relevant_articles(
         openai_api_key=OPEN_AI_API_KEY,
-        articles=responses,
+        articles=all_responses,
         tasks=TASKS,
         num_of_articles_to_select=3,
     )
 
-    response_texts = []
-    for item in most_relevant_responses:
-        response_texts.append(f"{item['title']}\n{item['url']}\n\n{item['content']}")
+    for response in most_relevant_responses:
+        text = f"{response['url']}\n\n{response['content']}"
+        mailgun_data = {
+            "from": f"{email['agent-name']}@{ROOT_DOMAIN}",
+            "to": email["user-email"],
+            "subject": response["title"],
+            "text": text,
+        }
 
-    response = "\n\n\n".join(response_texts)
-
-    subject, _total_reply = create_reply(
-        subject=email["subject"],
-        body_plain=email["body-plain"],
-        response=response,
-        user_email=email["user-email"],
-    )
-
-    mailgun_data = {
-        "from": f"{email['agent-name']}@{ROOT_DOMAIN}",
-        "to": email["user-email"],
-        "subject": subject,
-        "text": response,
-    }
-
-    await send_email(mailgun_data)
+        asyncio.create_task(send_email(mailgun_data))
 
 
 async def _summarise_and_fulfil_tasks(
