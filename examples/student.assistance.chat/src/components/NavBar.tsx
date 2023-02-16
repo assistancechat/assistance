@@ -2,7 +2,7 @@ import { useContext } from "react";
 import { Disclosure } from "@headlessui/react";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 import { ChatBubbleOvalLeftEllipsisIcon } from "@heroicons/react/24/solid";
-import { AcademicCapIcon, EnvelopeIcon } from "@heroicons/react/24/solid";
+import { BriefcaseIcon, EnvelopeIcon } from "@heroicons/react/24/solid";
 
 import { ChatContext } from "@/providers/chat";
 
@@ -88,10 +88,10 @@ export default function Navbar() {
                   type="button"
                   className="text-gray-800 flex-col text-md inline-flex items-center px-4 py-2 rounded-md shadow-sm hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2"
                   onClick={() =>
-                    window.open("https://forms.gle/bJohSSgcd2g61WKSA")
+                    window.open("https://forms.gle/GEeMCX6Q95TeYzW37")
                   }
                 >
-                  <AcademicCapIcon
+                  <BriefcaseIcon
                     className="h-5 w-5 text-orange-600"
                     aria-hidden="true"
                   />
