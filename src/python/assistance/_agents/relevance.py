@@ -70,6 +70,7 @@ async def get_most_relevant_articles(
     tasks: list[str],
     articles: list[dict[str, str]],
     num_of_articles_to_select: int,
+    keys: list[str],
 ):
     if len(articles) < num_of_articles_to_select:
         return articles
@@ -78,7 +79,12 @@ async def get_most_relevant_articles(
 
     articles_with_ids = []
     for index, article in enumerate(articles):
-        articles_with_ids.append({"id": index, **article})
+        article_for_prompt = {"id": index}
+
+        for key in keys:
+            article_for_prompt[key] = article[key]
+
+        articles_with_ids.append(article_for_prompt)
 
     logging.info(_ctx.pp.pformat(articles_with_ids))
 

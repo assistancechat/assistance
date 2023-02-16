@@ -111,6 +111,7 @@ async def googlealerts_agent(email: Email):
         articles=article_details,
         tasks=TASKS,
         num_of_articles_to_select=3,
+        keys=["title", "description"],
     )
 
     for article in most_relevant_articles:
