@@ -70,6 +70,9 @@ async def get_most_relevant_articles(
     articles: list[dict[str, str]],
     num_of_articles_to_select: int,
 ):
+    if len(articles) < num_of_articles_to_select:
+        return articles
+
     tasks_string = textwrap.indent("\n".join(tasks), "- ")
 
     articles_with_ids = []
