@@ -116,6 +116,4 @@ async def get_most_relevant_articles(
 
         top_articles.append(article)
 
-    logging.info(f"Top articles: {_ctx.pp.pprint(top_articles)}")
-
     return top_articles

@@ -44,7 +44,7 @@ OPEN_AI_API_KEY = get_openai_api_key()
 
 TASKS = [
     "Write a paragraph that provides an overview of the main point of this article",
-    'Write a paragraph answering the question "Why is this information important for international students to know?"',
+    "Write a paragraph answering why this information is important for your target audience",
     "Provide a discussion provoking question based on this article",
 ]
 
@@ -66,7 +66,7 @@ PROMPT = textwrap.dedent(
         your audience around your post.
 
         If there isn't ample information within the article
-        to work from simply respond with NOT_RELEVANT.
+        to work from set "article-relevant-to-tasks" to false.
 
         Make sure your post contains all the relevant information
         regarding the tasks. The reader should not need to read the
@@ -86,7 +86,15 @@ PROMPT = textwrap.dedent(
 
         {text}
 
-        Your post:
+        Required JSON response format:
+
+        {{
+            "article-relevant-to-tasks": [true or false],
+            "subject": "<Post subject goes here>",
+            "content": "<Post content goes here, include new lines as \\n>"
+        }}
+
+        JSON response:
     """
 ).strip()
 
@@ -125,14 +133,17 @@ async def googlealerts_agent(email: Email):
 
     all_responses = []
     for article, result in zip(most_relevant_articles, results):
-        if "NOT_RELEVANT" in result:
+        result_data = json.loads(result, strict=False)
+
+        if not result_data["article-relevant-to-tasks"]:
             continue
 
         all_responses.append(
             {
                 "title": article["title"],
                 "url": article["cleaned_url"],
-                "content": result,
+                "subject": result_data["subject"],
+                "content": result_data["content"],
             }
         )
 
@@ -144,11 +155,11 @@ async def googlealerts_agent(email: Email):
     )
 
     for response in most_relevant_responses:
-        text = f"{response['url']}\n\n{response['content']}"
+        text = f"{response['content']}\n\n{response['url']}"
         mailgun_data = {
             "from": f"{email['agent-name']}@{ROOT_DOMAIN}",
             "to": email["user-email"],
-            "subject": response["title"],
+            "subject": response["subject"],
             "text": text,
         }
 

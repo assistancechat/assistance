@@ -180,7 +180,7 @@ async def create_agent(email: Email):
         response: str = completions.choices[0].text.strip()
 
         try:
-            json_data = json.loads(response)
+            json_data = json.loads(response, strict=False)
             break
         except json.JSONDecodeError:
             json_data = {}
