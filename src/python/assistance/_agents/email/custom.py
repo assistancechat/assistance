@@ -78,7 +78,7 @@ async def react_to_custom_agent_request(email: Email, prompt_task: str):
     logging.info(prompt)
 
     completions = await completion_with_back_off(
-        prompt=prompt, api_key=OPEN_AI_API_KEY, **MODEL_KWARGS
+        user_email=user_email, prompt=prompt, api_key=OPEN_AI_API_KEY, **MODEL_KWARGS
     )
     response: str = completions.choices[0].text.strip()
 

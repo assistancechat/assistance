@@ -141,6 +141,7 @@ PROMPT = textwrap.dedent(
 
 async def run_conversation(
     record_grouping: str,
+    user_email: str,
     openai_api_key: str,
     task_prompt: str,
     agent_name: str,
@@ -199,6 +200,7 @@ async def run_conversation(
 
     response = await _run_llm_process_observation_loop(
         record_grouping=record_grouping,
+        user_email=user_email,
         openai_api_key=openai_api_key,
         agent_name=agent_name,
         client_email=client_email,
@@ -211,6 +213,7 @@ async def run_conversation(
 
 async def _run_llm_process_observation_loop(
     record_grouping: str,
+    user_email: str,
     openai_api_key: str,
     agent_name: str,
     client_email: str,
@@ -225,6 +228,7 @@ async def _run_llm_process_observation_loop(
 
     while True:
         response = await _call_gpt_and_store_as_transcript(
+            user_email=user_email,
             openai_api_key=openai_api_key,
             record_grouping=record_grouping,
             client_email=client_email,
@@ -253,6 +257,7 @@ async def _run_llm_process_observation_loop(
 
 
 async def _call_gpt_and_store_as_transcript(
+    user_email: str,
     openai_api_key: str,
     record_grouping: str,
     client_email: str,
@@ -260,7 +265,7 @@ async def _call_gpt_and_store_as_transcript(
     prompt: str,
 ):
     completions = await completion_with_back_off(
-        prompt=prompt, api_key=openai_api_key, **model_kwargs
+        user_email=user_email, prompt=prompt, api_key=openai_api_key, **model_kwargs
     )
     response: str = completions.choices[0].text.strip()
 

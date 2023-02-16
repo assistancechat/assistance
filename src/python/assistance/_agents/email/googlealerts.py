@@ -101,14 +101,16 @@ PROMPT = textwrap.dedent(
 
 async def googlealerts_agent(email: Email):
     article_details = parse_alerts(email["body-html"])
+    user_email = email["user-email"]
 
     logging.info(json.dumps(article_details, indent=2))
 
     most_relevant_articles = await get_most_relevant_articles(
+        user_email=user_email,
         openai_api_key=OPEN_AI_API_KEY,
         articles=article_details,
         tasks=TASKS,
-        num_of_articles_to_select=5,
+        num_of_articles_to_select=3,
     )
 
     for article in most_relevant_articles:
@@ -123,6 +125,7 @@ async def googlealerts_agent(email: Email):
 
         coroutines.append(
             _summarise_and_fulfil_tasks(
+                user_email=user_email,
                 openai_api_key=OPEN_AI_API_KEY,
                 tasks=TASKS,
                 url=cached_url,
@@ -131,14 +134,14 @@ async def googlealerts_agent(email: Email):
 
     results = await asyncio.gather(*coroutines)
 
-    all_responses = []
+    responses = []
     for article, result in zip(most_relevant_articles, results):
         result_data = json.loads(result, strict=False)
 
         if not result_data["article-relevant-to-tasks"]:
             continue
 
-        all_responses.append(
+        responses.append(
             {
                 "title": article["title"],
                 "url": article["cleaned_url"],
@@ -147,14 +150,7 @@ async def googlealerts_agent(email: Email):
             }
         )
 
-    most_relevant_responses = await get_most_relevant_articles(
-        openai_api_key=OPEN_AI_API_KEY,
-        articles=all_responses,
-        tasks=TASKS,
-        num_of_articles_to_select=3,
-    )
-
-    for response in most_relevant_responses:
+    for response in responses:
         text = f"{response['content']}\n\n{response['url']}"
         mailgun_data = {
             "from": f"{email['agent-name']}@{ROOT_DOMAIN}",
@@ -167,10 +163,10 @@ async def googlealerts_agent(email: Email):
 
 
 async def _summarise_and_fulfil_tasks(
-    openai_api_key: str, tasks: list[str], url: str
+    user_email: str, openai_api_key: str, tasks: list[str], url: str
 ) -> str:
     summary = await summarise_url_with_tasks(
-        openai_api_key=openai_api_key, url=url, tasks=tasks
+        user_email=user_email, openai_api_key=openai_api_key, url=url, tasks=tasks
     )
 
     tasks_string = textwrap.indent("\n".join(tasks), "- ")
@@ -183,7 +179,7 @@ async def _summarise_and_fulfil_tasks(
     )
 
     completions = await completion_with_back_off(
-        prompt=prompt, api_key=openai_api_key, **MODEL_KWARGS
+        user_email=user_email, prompt=prompt, api_key=openai_api_key, **MODEL_KWARGS
     )
     response: str = completions.choices[0].text.strip()
 

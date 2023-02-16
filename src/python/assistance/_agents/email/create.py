@@ -162,6 +162,8 @@ PROMPT = textwrap.dedent(
 
 
 async def create_agent(email: Email):
+    user_email = email["user-email"]
+
     prompt = PROMPT.format(
         domain=ROOT_DOMAIN,
         body_plain=textwrap.indent(email["body-plain"], "    "),
@@ -175,7 +177,10 @@ async def create_agent(email: Email):
 
     for _ in range(3):
         completions = await completion_with_back_off(
-            prompt=prompt, api_key=OPEN_AI_API_KEY, **MODEL_KWARGS
+            user_email=user_email,
+            prompt=prompt,
+            api_key=OPEN_AI_API_KEY,
+            **MODEL_KWARGS,
         )
         response: str = completions.choices[0].text.strip()
 
@@ -240,7 +245,7 @@ async def create_agent(email: Email):
     logging.info(prompt)
 
     completions = await completion_with_back_off(
-        prompt=prompt, api_key=OPEN_AI_API_KEY, **MODEL_KWARGS
+        user_email=user_email, prompt=prompt, api_key=OPEN_AI_API_KEY, **MODEL_KWARGS
     )
     response: str = completions.choices[0].text.strip()
 

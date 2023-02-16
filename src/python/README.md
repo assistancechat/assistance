@@ -27,6 +27,7 @@ poetry env use $(which python)
 
 ```bash
 rsync -r assistance:~/.assistance/* ~/.assistance/
+rsync -r server:~/.assistance/* ~/.home-assistance/
 ```
 
 ### Add a user to admin

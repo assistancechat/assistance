@@ -65,6 +65,7 @@ PROMPT = textwrap.dedent(
 
 
 async def get_most_relevant_articles(
+    user_email: str,
     openai_api_key: str,
     tasks: list[str],
     articles: list[dict[str, str]],
@@ -79,7 +80,7 @@ async def get_most_relevant_articles(
     for index, article in enumerate(articles):
         articles_with_ids.append({"id": index, **article})
 
-    logging.info(_ctx.pp.pprint(articles_with_ids))
+    logging.info(_ctx.pp.pformat(articles_with_ids))
 
     article_ids: None | list[int] = None
     for _ in range(3):
@@ -91,7 +92,7 @@ async def get_most_relevant_articles(
         )
 
         completions = await completion_with_back_off(
-            prompt=prompt, api_key=openai_api_key, **MODEL_KWARGS
+            user_email=user_email, prompt=prompt, api_key=openai_api_key, **MODEL_KWARGS
         )
         response: str = completions.choices[0].text.strip()
 

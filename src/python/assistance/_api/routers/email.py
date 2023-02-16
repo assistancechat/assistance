@@ -14,7 +14,6 @@
 
 import asyncio
 import logging
-import pprint
 import re
 
 import aiofiles
@@ -39,7 +38,7 @@ router = APIRouter(prefix="/email")
 async def email(request: Request):
     email = Email(await request.form())
 
-    logging.info(_ctx.pp.pprint(email))
+    logging.info(_ctx.pp.pformat(email))
 
     asyncio.create_task(_react_to_email(email))
 

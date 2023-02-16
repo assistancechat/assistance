@@ -95,6 +95,7 @@ async def run_chat(data: ChatData, origin_url: str) -> ChatResponse:
 
     agent_message = await run_conversation(
         record_grouping=record_grouping,
+        user_email=user_email,
         openai_api_key=openai_api_key,
         task_prompt=data.task_prompt,
         agent_name=data.agent_name,

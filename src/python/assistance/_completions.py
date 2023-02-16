@@ -12,17 +12,39 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import asyncio
+import json
 import logging
+import time
 
+import aiofiles
 import openai
 from tenacity import retry, stop_after_attempt, wait_random_exponential
+
+from ._paths import COMPLETIONS
 
 
 @retry(wait=wait_random_exponential(min=1, max=60), stop=stop_after_attempt(6))
 async def completion_with_back_off(**kwargs):
-    logging.info(kwargs["prompt"])
+    user_email: str = kwargs["user_email"]
+    del kwargs["user_email"]
 
+    assert "user_email" not in kwargs
+
+    query_timestamp = time.time_ns()
     response = await openai.Completion.acreate(**kwargs)
     logging.info(response)
 
+    asyncio.create_task(_store_result(user_email, kwargs, response, query_timestamp))
+
     return response
+
+
+async def _store_result(user_email: str, kwargs, response, query_timestamp: int):
+    usage_record_path = COMPLETIONS / user_email / f"{query_timestamp}.json"
+    usage_record_path.parent.mkdir(parents=True, exist_ok=True)
+
+    record = {"input": kwargs, "output": dict(response)}
+
+    async with aiofiles.open(usage_record_path, "w") as f:
+        await f.write(json.dumps(record, indent=2, sort_keys=True))

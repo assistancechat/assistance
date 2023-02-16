@@ -79,6 +79,7 @@ WORDS_OVERLAP = 20
 
 
 async def summarise_url_with_tasks(
+    user_email: str,
     openai_api_key: str,
     tasks: str,
     url: str,
@@ -108,6 +109,7 @@ async def summarise_url_with_tasks(
     truncated_text_sections = text_sections[:MAX_NUMBER_OF_TEXT_SECTIONS]
 
     summary = await _summarise_piecewise_with_tasks(
+        user_email=user_email,
         openai_api_key=openai_api_key,
         tasks=tasks,
         text_sections=truncated_text_sections,
@@ -119,6 +121,7 @@ async def summarise_url_with_tasks(
 
 
 async def _summarise_piecewise_with_tasks(
+    user_email: str,
     openai_api_key: str,
     tasks: str,
     text_sections: list[str],
@@ -128,6 +131,7 @@ async def _summarise_piecewise_with_tasks(
 
     if len(text_sections) == 1:
         return await _summarise_with_questions(
+            user_email=user_email,
             openai_api_key=openai_api_key,
             tasks=tasks,
             text=text_sections[0],
@@ -142,6 +146,7 @@ async def _summarise_piecewise_with_tasks(
 
         coroutines.append(
             _summarise_with_questions(
+                user_email=user_email,
                 openai_api_key=openai_api_key,
                 tasks=tasks,
                 text=text,
@@ -154,6 +159,7 @@ async def _summarise_piecewise_with_tasks(
     combined_summaries = "\n\n".join(cleaned_summaries)
 
     summary = await _summarise_with_questions(
+        user_email=user_email,
         openai_api_key=openai_api_key,
         tasks=tasks,
         text=combined_summaries,
@@ -162,13 +168,15 @@ async def _summarise_piecewise_with_tasks(
     return summary
 
 
-async def _summarise_with_questions(openai_api_key: str, tasks: str, text: str):
+async def _summarise_with_questions(
+    user_email: str, openai_api_key: str, tasks: str, text: str
+):
     tasks_string = textwrap.indent("\n".join(tasks), "- ")
 
     prompt = PROMPT.format(tasks=tasks_string, text=text)
 
     completions = await completion_with_back_off(
-        prompt=prompt, api_key=openai_api_key, **MODEL_KWARGS
+        user_email=user_email, prompt=prompt, api_key=openai_api_key, **MODEL_KWARGS
     )
     response: str = completions.choices[0].text.strip()
 
