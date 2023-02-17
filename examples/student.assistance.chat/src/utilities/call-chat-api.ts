@@ -45,6 +45,8 @@ export async function callChatApi(
     apiData.assistance_token = chatData.assistanceToken;
   }
 
+  console.log(apiData);
+
   const chatResponse = await chat(apiData);
 
   const updatedMessageHistory = [
