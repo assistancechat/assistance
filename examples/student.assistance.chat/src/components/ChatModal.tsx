@@ -66,6 +66,7 @@ function ChatModal() {
                     />
                   </button>
                 </div>
+                <p className="animate-pulse capitalize flex justify-end text-yellow-100">talk to our interviewer now</p>
                 <Chat />
               </Dialog.Panel>
             </Transition.Child>
