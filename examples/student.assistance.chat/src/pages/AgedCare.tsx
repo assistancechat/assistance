@@ -49,7 +49,7 @@ const AboutUs = lazy(() => import("@/components/AboutUs"));
 // TODO: Make this type declaration more flexible so that it works for all of
 // the page types.
 export default function AgedCare() {
-  
+
   const [chatData, setChatData] = useState<ChatContextData>(DefaultChatData);
   const value = { chatData, setChatData };
 

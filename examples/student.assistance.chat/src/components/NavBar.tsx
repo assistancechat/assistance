@@ -1,4 +1,4 @@
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import { Disclosure } from "@headlessui/react";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 import { ChatBubbleOvalLeftEllipsisIcon } from "@heroicons/react/24/solid";
@@ -19,6 +19,7 @@ export default function Navbar() {
   function openEnquireModal() {
     setChatData({ ...chatData, openModal: "enquire" });
   }
+
 
   return (
     <Disclosure as="nav" className="bg-white shadow w-screen fixed z-10">
@@ -76,13 +77,14 @@ export default function Navbar() {
                 <button
                   type="button"
                   onClick={openChatModal}
+                  onLoad={openChatModal}
                   className="text-gray-800 flex-col text-md inline-flex items-center px-4 py-2 rounded-md shadow-sm hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2"
                 >
                   <ChatBubbleOvalLeftEllipsisIcon
                     className="h-5 w-5 text-orange-600"
                     aria-hidden="true"
                   />
-                  <span className="text-gray-800 text-xs">Chat</span>
+                  <span className="text-gray-800 text-xs">Talk To Us</span>
                 </button>
                 <button
                   type="button"
