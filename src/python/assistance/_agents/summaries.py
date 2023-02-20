@@ -20,6 +20,8 @@ from assistance import _ctx
 from assistance._completions import completion_with_back_off
 from assistance._vendor.stackoverflow.web_scraping import scrape
 
+from .utilities import items_to_list_string
+
 MAX_NUMBER_OF_TEXT_SECTIONS = 20
 
 MODEL_KWARGS = {
@@ -39,25 +41,30 @@ PROMPT = textwrap.dedent(
     """
         You are aiming to write a three paragraph summary of a section
         of information. The goal of this extraction is so as to allow
-        someone else to fulfil the following tasks about the
+        someone else to fulfil the following tasks and goals about the
         information:
+
+        Their tasks:
 
         {tasks}
 
-        HOWEVER, if the text you are summarising is longer than three
-        paragraphs, you should just provide the text itself instead.
+        Their goals:
 
-        Do not fulfil the tasks themselves. Instead, ONLY provide a
-        summary of the section of information itself in such away to
-        best equip someone else to fulfil the tasks themselves.
+        {goals}
 
-        If the information provided does not contain information that
-        is relevant to the tasks simply write NOT_RELEVANT instead of
-        providing a summary.
+        Your instructions:
 
-        ONLY provide information that is specifically within the
-        information below. Do not utilise any of your outside knowledge
-        to fill in any gaps.
+        - If the text you are summarising is longer than three
+          paragraphs, you should just provide the text itself instead.
+        - Do not fulfil their tasks. Instead, ONLY provide a
+          summary of the section of information itself in such away to
+          best equip someone else to fulfil the tasks themselves.
+        - If the information provided does not contain information that
+          is relevant to the tasks simply write NOT_RELEVANT instead of
+          providing a summary.
+        - ONLY provide information that is specifically within the
+          information below. Do not utilise any of your outside knowledge
+          to fill in any gaps.
 
         Section of information to summarise:
 
@@ -81,7 +88,8 @@ WORDS_OVERLAP = 20
 async def summarise_url_with_tasks(
     user_email: str,
     openai_api_key: str,
-    tasks: str,
+    tasks: list[str],
+    goals: list[str],
     url: str,
 ):
     page_contents = await scrape(session=_ctx.session, url=url)
@@ -112,6 +120,7 @@ async def summarise_url_with_tasks(
         user_email=user_email,
         openai_api_key=openai_api_key,
         tasks=tasks,
+        goals=goals,
         text_sections=truncated_text_sections,
     )
 
@@ -123,7 +132,8 @@ async def summarise_url_with_tasks(
 async def _summarise_piecewise_with_tasks(
     user_email: str,
     openai_api_key: str,
-    tasks: str,
+    tasks: list[str],
+    goals: list[str],
     text_sections: list[str],
 ):
     if len(text_sections) == 0:
@@ -134,6 +144,7 @@ async def _summarise_piecewise_with_tasks(
             user_email=user_email,
             openai_api_key=openai_api_key,
             tasks=tasks,
+            goals=goals,
             text=text_sections[0],
         )
 
@@ -149,6 +160,7 @@ async def _summarise_piecewise_with_tasks(
                 user_email=user_email,
                 openai_api_key=openai_api_key,
                 tasks=tasks,
+                goals=goals,
                 text=text,
             )
         )
@@ -162,6 +174,7 @@ async def _summarise_piecewise_with_tasks(
         user_email=user_email,
         openai_api_key=openai_api_key,
         tasks=tasks,
+        goals=goals,
         text=combined_summaries,
     )
 
@@ -169,11 +182,13 @@ async def _summarise_piecewise_with_tasks(
 
 
 async def _summarise_with_questions(
-    user_email: str, openai_api_key: str, tasks: str, text: str
+    user_email: str, openai_api_key: str, tasks: list[str], goals: list[str], text: str
 ):
-    tasks_string = textwrap.indent("\n".join(tasks), "- ")
-
-    prompt = PROMPT.format(tasks=tasks_string, text=text)
+    prompt = PROMPT.format(
+        tasks=items_to_list_string(tasks),
+        goals=items_to_list_string(goals),
+        text=text,
+    )
 
     completions = await completion_with_back_off(
         user_email=user_email, prompt=prompt, api_key=openai_api_key, **MODEL_KWARGS

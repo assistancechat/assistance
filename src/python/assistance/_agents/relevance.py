@@ -19,6 +19,8 @@ import textwrap
 from assistance import _ctx
 from assistance._completions import completion_with_back_off
 
+from .utilities import items_to_list_string
+
 MODEL_KWARGS = {
     "engine": "text-davinci-003",
     "max_tokens": 512,
@@ -36,27 +38,43 @@ PROMPT = textwrap.dedent(
 
         {tasks}
 
+        While they are fulfilling the above tasks, they have the
+        following goals throughout:
+
+        {goals}
+
         Below are {num_of_articles} articles that may be relevant to the
-        tasks. Provide the id of the {num_of_articles_to_select} most
-        relevant articles to the tasks as a Python list.
+        tasks and goal(s). For each article id provide a score between 0
+        and 100 for each goal and task. The score is a measure of how
+        relevant you think the article is to achieving each task and
+        goal.
 
-        Do not complete the tasks themselves. Instead, ONLY provide the
-        ids of the articles that you think would be the most helpful for
-        someone else to fulfil those tasks.
-
-        If there are multiple articles that are covering the exact same
-        topic, you should only select one of them.
-
-        For each article that you select, provide an absolute score
-        between 0 and 100. The score is a measure of how relevant you
-        think the article is to achieving the tasks.
+        For each article, if there are other articles within the list
+        that are covering the exact same topic, provide those articles
+        as a "same-topic-covered" list. If no other articles are
+        covering the same topic, provide an empty list.
 
         Required JSON format:
 
-        {{
-            "scores": [<score of most relevant article>, <score of second most relevant article>, ...],
-            "ids": [<id of most relevant article>, <id of second most relevant article>, ...]
-        }}
+        [
+            {{
+                "id": 1,
+                "task-scores": [<provide the relevance score for the first task>, <provide the relevance score for the second task>, ...],
+                "goal-scores": [<provide the relevance score for the first goal>, ...],
+                "same-topic-covered": [<provide the article ids of any articles that are covering the same topic as this one>]
+            }},
+            {{
+                "id": 2,
+                ...
+            }},
+
+            ...
+
+            {{
+                "id": {num_of_articles},
+                ...
+            }}
+        ]
 
         Articles:
 
@@ -70,6 +88,7 @@ PROMPT = textwrap.dedent(
 async def get_most_relevant_articles(
     user_email: str,
     openai_api_key: str,
+    goals: list[str],
     tasks: list[str],
     articles: list[dict[str, str]],
     num_of_articles_to_select: int,
@@ -78,11 +97,9 @@ async def get_most_relevant_articles(
     if len(articles) < num_of_articles_to_select:
         return articles
 
-    tasks_string = textwrap.indent("\n".join(tasks), "- ")
-
     articles_with_ids = []
     for index, article in enumerate(articles):
-        article_for_prompt = {"id": index}
+        article_for_prompt = {"id": index + 1}
 
         for key in keys:
             article_for_prompt[key] = article[key]
@@ -91,12 +108,12 @@ async def get_most_relevant_articles(
 
     logging.info(_ctx.pp.pformat(articles_with_ids))
 
-    article_ids: None | list[int] = None
+    article_ranking: None | list[dict] = None
     for _ in range(3):
         prompt = PROMPT.format(
-            tasks=tasks_string,
+            tasks=items_to_list_string(tasks),
+            goals=items_to_list_string(goals),
             num_of_articles=len(articles),
-            num_of_articles_to_select=num_of_articles_to_select,
             articles=json.dumps(articles_with_ids, indent=2),
         )
 
@@ -109,21 +126,18 @@ async def get_most_relevant_articles(
 
         try:
             article_ranking = json.loads(response)
-            article_ids = article_ranking["ids"]
-            article_scores = article_ranking["scores"]
 
             break
         except (json.JSONDecodeError, KeyError) as e:
             logging.info(e)
 
-    if not article_ids:
+    if not article_ranking:
         raise ValueError("Could not parse article ids")
 
-    top_articles = []
-    for i, article_id in enumerate(article_ids):
-        article = articles[article_id]
-        article["score"] = article_scores[i]
+    for item in article_ranking:
+        assert "id" in item
+        assert "task-scores" in item
+        assert "goal-scores" in item
+        assert "same-topic-covered" in item
 
-        top_articles.append(article)
-
-    return top_articles
+    return article_ranking

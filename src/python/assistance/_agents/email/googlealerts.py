@@ -109,7 +109,11 @@ async def googlealerts_agent(email: Email):
     new_alerts_path = GOOGLE_ALERTS_PIPELINES / "new-alert-articles"
 
     for item in article_details:
-        single_article_details_as_string = json.dumps(item, indent=2, sort_keys=True)
+        details_for_saving = {"subject": email["subject"], **item}
+
+        single_article_details_as_string = json.dumps(
+            details_for_saving, indent=2, sort_keys=True
+        )
         hash_digest: str = hashlib.sha224(
             single_article_details_as_string.encode("utf-8")
         ).hexdigest()
