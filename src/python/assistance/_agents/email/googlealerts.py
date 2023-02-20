@@ -28,7 +28,7 @@ from assistance._config import ROOT_DOMAIN
 from assistance._keys import get_openai_api_key
 from assistance._mailgun import send_email
 from assistance._parsing.googlealerts import parse_alerts
-from assistance._paths import ARTICLES, NEW_GOOGLE_ALERTS
+from assistance._paths import ARTICLES, NEW_GOOGLE_ALERTS, get_article_path
 
 from .reply import create_reply
 from .types import Email
@@ -60,40 +60,40 @@ PROMPT = textwrap.dedent(
         post about an article of text that you have been provided while
         fulfilling a series of detailed tasks.
 
-        You are not aiming to sell anything, instead just be
-        informative. If the article is a "puff piece" make sure not to
-        buy into the hype. Instead, be truthful and provide a balanced
-        view while still being enthusiastic in your writing and making
-        your post interesting and engaging.
+        Within your post you are aiming to fulfil the following tasks and
+        goals for the following target audience:
 
-        Your primary goal is to develop discussion and engagement with
-        your audience around your post.
-
-        If there isn't ample information within the article
-        to work from set "article-relevant-to-tasks" to false.
-
-        Make sure your post contains all the relevant information
-        regarding the tasks. The reader should not need to read the
-        article. Nor are you wanting them to actually read the article.
-
-        Fulfil each task in its own paragraph.
-
-        The target audience for your post is:
-
-        {target_audience}
-
-        Within your post you are aiming to fulfil the following tasks:
+        Your tasks:
 
         {tasks}
 
-        The article of text you have been provided is:
+        Your goals:
 
-        {text}
+        {goals}
+
+        Your target audience:
+
+        {target_audience}
+
+        Your instructions:
+
+        - You are not aiming to sell anything, instead just be
+          informative. If the article is a "puff piece" make sure not to
+          buy into the hype. Instead, be truthful and provide a balanced
+          view while still being enthusiastic in your writing and making
+          your post interesting and engaging.
+        - If there isn't ample information within the article to work
+          from set "article-is-relevant" to false.
+        - Make sure your post contains all the relevant information
+          regarding the tasks. The reader should not need to read the
+          article. Nor are you wanting them to actually read the
+          article.
+        - Fulfil each task in its own paragraph.
 
         Required JSON response format:
 
         {{
-            "article-relevant-to-tasks": [true or false],
+            "article-is-relevant": [true or false],
             "subject": "<Post subject goes here>",
             "content": "<Post content goes here, include new lines as \\n>"
         }}
@@ -116,9 +116,7 @@ async def googlealerts_agent(email: Email):
             single_article_details_as_string.encode("utf-8")
         ).hexdigest()
 
-        article_path = (
-            ARTICLES / hash_digest[0:4] / hash_digest[4:8] / f"{hash_digest}.json"
-        )
+        article_path = get_article_path(hash_digest)
         article_path.parent.mkdir(parents=True, exist_ok=True)
 
         async with aiofiles.open(article_path, "w") as f:

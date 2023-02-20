@@ -34,7 +34,8 @@ MODEL_KWARGS = {
 PROMPT = textwrap.dedent(
     """
         You are aiming to find the articles that might be the best at
-        helping someone fulfil the following tasks and goals:
+        helping someone fulfil the following tasks and goals for their
+        target audience:
 
         Their tasks:
 
@@ -44,13 +45,17 @@ PROMPT = textwrap.dedent(
 
         {goals}
 
+        Their target audience:
+
+        {target_audience}
+
         Your instructions:
 
         Below are {num_of_articles} articles that may be relevant to the
         tasks and goal. For each article id provide a score between 0
-        and 100 for each goal and task. The scores are a measure of how
-        helpful you think the article will be in achieving each
-        respective task and goal.
+        and 100 for each goal and task for their target audience. The
+        scores are a measure of how helpful you think the article will
+        be in achieving each respective task and goal.
 
         For each article, if there are other articles within the list
         that are covering the exact same topic, provide those articles

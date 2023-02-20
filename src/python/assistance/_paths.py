@@ -30,3 +30,11 @@ PIPELINES = STORE / "pipelines"
 
 GOOGLE_ALERTS_PIPELINES = PIPELINES / "google-alerts"
 NEW_GOOGLE_ALERTS = GOOGLE_ALERTS_PIPELINES / "new"
+
+
+def get_article_path(hash_digest: str):
+    article_path = (
+        ARTICLES / hash_digest[0:4] / hash_digest[4:8] / f"{hash_digest}.json"
+    )
+
+    return article_path

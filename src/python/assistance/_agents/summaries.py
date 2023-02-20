@@ -42,7 +42,7 @@ PROMPT = textwrap.dedent(
         You are aiming to write a three paragraph summary of a section
         of information. The goal of this extraction is so as to allow
         someone else to fulfil the following tasks and goals about the
-        information:
+        information for their target audience:
 
         Their tasks:
 
@@ -52,19 +52,23 @@ PROMPT = textwrap.dedent(
 
         {goals}
 
+        Their target audience:
+
+        {target_audience}
+
         Your instructions:
 
         - If the text you are summarising is longer than three
           paragraphs, you should just provide the text itself instead.
-        - Do not fulfil their tasks. Instead, ONLY provide a
-          summary of the section of information itself in such away to
-          best equip someone else to fulfil the tasks themselves.
+        - Do not fulfil their tasks. Instead, ONLY provide a summary of
+          the section of information itself in such away to best equip
+          someone else to fulfil the tasks and goals themselves.
         - If the information provided does not contain information that
-          is relevant to the tasks simply write NOT_RELEVANT instead of
-          providing a summary.
+          is relevant to the tasks or goals simply write NOT_RELEVANT
+          instead of providing a summary.
         - ONLY provide information that is specifically within the
-          information below. Do not utilise any of your outside knowledge
-          to fill in any gaps.
+          information below. DO NOT utilise any of your outside
+          knowledge to fill in any gaps.
 
         Section of information to summarise:
 
@@ -74,7 +78,7 @@ PROMPT = textwrap.dedent(
     """
 ).strip()
 
-LEN_OF_PROMPT = len(PROMPT.format(tasks="", text=""))
+LEN_OF_PROMPT = len(PROMPT.format(tasks="", text="", goals="", target_audience=""))
 REMAINING_WORDS_IN_PROMPT = (
     APPROXIMATE_ALLOWED_WORDS_IN_PROMPT
     - LEN_OF_PROMPT
@@ -90,6 +94,7 @@ async def summarise_url_with_tasks(
     openai_api_key: str,
     tasks: list[str],
     goals: list[str],
+    target_audience: str,
     url: str,
 ):
     page_contents = await scrape(session=_ctx.session, url=url)
@@ -98,7 +103,12 @@ async def summarise_url_with_tasks(
 
     split_page_contents_by_words = [item for item in page_contents.split(None) if item]
 
-    remaining_words = REMAINING_WORDS_IN_PROMPT - len(tasks)
+    extra_prompt_parameters = tasks + goals + [target_audience]
+    extra_prompt_words = sum(
+        [len(item.split(None)) for item in extra_prompt_parameters]
+    )
+
+    remaining_words = REMAINING_WORDS_IN_PROMPT - extra_prompt_words
     max_words_per_summary_section = int(
         remaining_words * WORD_COUNT_SCALING_BUFFER - WORDS_OVERLAP
     )
@@ -121,6 +131,7 @@ async def summarise_url_with_tasks(
         openai_api_key=openai_api_key,
         tasks=tasks,
         goals=goals,
+        target_audience=target_audience,
         text_sections=truncated_text_sections,
     )
 
@@ -134,6 +145,7 @@ async def _summarise_piecewise_with_tasks(
     openai_api_key: str,
     tasks: list[str],
     goals: list[str],
+    target_audience: str,
     text_sections: list[str],
 ):
     if len(text_sections) == 0:
@@ -145,6 +157,7 @@ async def _summarise_piecewise_with_tasks(
             openai_api_key=openai_api_key,
             tasks=tasks,
             goals=goals,
+            target_audience=target_audience,
             text=text_sections[0],
         )
 
@@ -161,6 +174,7 @@ async def _summarise_piecewise_with_tasks(
                 openai_api_key=openai_api_key,
                 tasks=tasks,
                 goals=goals,
+                target_audience=target_audience,
                 text=text,
             )
         )
@@ -175,6 +189,7 @@ async def _summarise_piecewise_with_tasks(
         openai_api_key=openai_api_key,
         tasks=tasks,
         goals=goals,
+        target_audience=target_audience,
         text=combined_summaries,
     )
 
@@ -182,11 +197,17 @@ async def _summarise_piecewise_with_tasks(
 
 
 async def _summarise_with_questions(
-    user_email: str, openai_api_key: str, tasks: list[str], goals: list[str], text: str
+    user_email: str,
+    openai_api_key: str,
+    tasks: list[str],
+    goals: list[str],
+    target_audience: str,
+    text: str,
 ):
     prompt = PROMPT.format(
         tasks=items_to_list_string(tasks),
         goals=items_to_list_string(goals),
+        target_audience=target_audience,
         text=text,
     )
 
