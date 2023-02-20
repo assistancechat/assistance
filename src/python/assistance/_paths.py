@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import hashlib
 import pathlib
 
 LIB = pathlib.Path(__file__).parent
@@ -21,20 +22,46 @@ CONFIG = STORE / "config"
 SECRETS = CONFIG / "secrets"
 
 USERS = STORE / "users"
-PROMPTS = STORE / "prompts"
 RECORDS = STORE / "records"
-COMPLETIONS = STORE / "completions"
-ARTICLES = STORE / "articles"
+
+PROMPTS = RECORDS / "prompts"
+COMPLETIONS = RECORDS / "completions"
+ARTICLES = RECORDS / "articles"
+EMAILS = RECORDS / "emails"
 
 PIPELINES = STORE / "pipelines"
 
 GOOGLE_ALERTS_PIPELINES = PIPELINES / "google-alerts"
 NEW_GOOGLE_ALERTS = GOOGLE_ALERTS_PIPELINES / "new"
 
+EMAIL_PIPELINES = PIPELINES / "email"
+NEW_EMAILS = EMAIL_PIPELINES / "new"
 
-def get_article_path(hash_digest: str):
-    article_path = (
-        ARTICLES / hash_digest[0:4] / hash_digest[4:8] / f"{hash_digest}.json"
-    )
 
-    return article_path
+def get_article_path(hash_digest: str, create_parent: bool = False):
+    path = _get_record_path(ARTICLES, hash_digest, create_parent)
+
+    return path
+
+
+def get_emails_path(hash_digest: str, create_parent: bool = False):
+    path = _get_record_path(EMAILS, hash_digest, create_parent)
+
+    return path
+
+
+def get_hash_digest(text: str) -> str:
+    return hashlib.sha224(text.encode("utf-8")).hexdigest()
+
+
+def _get_record_path(root: pathlib.Path, hash_digest: str, create_parent: bool):
+    path = root / _get_relative_json_path(hash_digest)
+
+    if create_parent:
+        path.parent.mkdir(parents=True, exist_ok=True)
+
+    return path
+
+
+def _get_relative_json_path(hash_digest: str):
+    return pathlib.Path(hash_digest[0:4] / hash_digest[4:8] / f"{hash_digest}.json")

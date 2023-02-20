@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import asyncio
+import json
 import logging
 import re
 
@@ -27,7 +28,9 @@ from assistance._agents.email.types import Email
 from assistance._config import ROOT_DOMAIN
 from assistance._keys import get_mailgun_api_key
 from assistance._mailgun import send_email
+from assistance._paths import NEW_EMAILS
 from assistance._paths import PROMPTS as PROMPTS_PATH
+from assistance._paths import get_emails_path, get_hash_digest
 
 MAILGUN_API_KEY = get_mailgun_api_key()
 
@@ -40,41 +43,62 @@ async def email(request: Request):
 
     logging.info(_ctx.pp.pformat(email))
 
-    asyncio.create_task(_react_to_email(email))
+    hash_digest = await _store_email(email)
+
+    asyncio.create_task(_handle_new_email(hash_digest, email))
 
     return {"message": "Queued. Thank you."}
 
 
+# TODO: Handle attachments
+async def _store_email(email: Email):
+    try:
+        email_to_store = json.dumps(email, indent=2)
+    except json.decoder.JSONDecodeError:
+        json_encodable_items = {}
+        for key, item in email.items():
+            try:
+                json.dumps(item)
+                json_encodable_items[key] = item
+            except json.decoder.JSONDecodeError:
+                json_encodable_items[key] = str(item)
+
+        email_to_store = json.dumps(json_encodable_items, indent=2)
+
+    hash_digest = get_hash_digest(email_to_store)
+    emails_path = get_emails_path(hash_digest, create_parent=True)
+
+    async with aiofiles.open(emails_path, "w") as f:
+        await f.write(email_to_store)
+
+    pipeline_path = _get_new_email_pipeline_path(hash_digest)
+    async with aiofiles.open(pipeline_path, "w") as f:
+        pass
+
+    return hash_digest
+
+
+def _get_new_email_pipeline_path(hash_digest: str):
+    return NEW_EMAILS / hash_digest
+
+
+async def _handle_new_email(hash_digest: str, email: Email):
+    """React to the new email, and once it completes without error, delete the pipeline file."""
+
+    email = await _initial_parsing(email)
+    await _react_to_email(email)
+
+    pipeline_path = _get_new_email_pipeline_path(hash_digest)
+    pipeline_path.unlink()
+
+
 async def _react_to_email(email: Email):
-    try:
-        email["subject"]
-    except KeyError:
-        email["subject"] = ""
-
-    try:
-        email["body-plain"]
-    except KeyError:
-        email["body-plain"] = ""
-
-    email["agent-name"] = email["recipient"].split("@")[0].lower()
-
     if email["from"] == email["recipient"]:
         logging.info(
             "Email is from the same address as the recipient. "
             "Breaking loop. Doing nothing."
         )
         return
-
-    try:
-        x_forwarded_for = email["X-Forwarded-For"]
-        email["user-email"] = x_forwarded_for.split(" ")[0].lower()
-
-        assert _get_cleaned_email(email["sender"]) == email["user-email"]
-
-    except KeyError:
-        email["user-email"] = _get_cleaned_email(email["from"])
-
-    logging.info(f"User email: {email['user-email']}")
 
     if email["sender"] == "forwarding-noreply@google.com":
         await _respond_to_gmail_forward_request(email)
@@ -91,27 +115,21 @@ async def _react_to_email(email: Email):
 
         return
 
-    path_to_new_prompt = PROMPTS_PATH / email["user-email"] / email["agent-name"]
-
-    try:
-        async with aiofiles.open(path_to_new_prompt) as f:
-            prompt_task = await f.read()
-
-    except FileNotFoundError:
-        await _handle_no_custom_agent_created_yet_request(email)
-        return
-
-    await react_to_custom_agent_request(email=email, prompt_task=prompt_task)
+    await _fallback_email_handler(email)
+    return
 
 
-async def _handle_no_custom_agent_created_yet_request(email: Email):
+async def _fallback_email_handler(email: Email):
+    guessed_first_name = email["from"].split(" ")[0].capitalize()
+
     response = (
-        f"You have not created a custom agent for {email['agent-name']}@{ROOT_DOMAIN}. "
-        f"Please send an email to create@{ROOT_DOMAIN} to create one.\n\n"
-        f"When you send an email to create@{ROOT_DOMAIN} make sure to "
-        f"mention that you want your agent to be called {email['agent-name']} "
-        "as well as provide a reasonable prompt that makes sense for "
-        "your agent."
+        f"Hi {guessed_first_name},\n\n"
+        "This particular Assistance.Chat agent has not yet been implemented "
+        "for your user account.\n\n"
+        "I have included Simon, the developer of this software into this email, "
+        "hopefully he might be able to help you on where to go from here.\n\n"
+        "Kind regards,\n"
+        "Assistance.Chat"
     )
 
     subject, total_reply = create_reply(
@@ -124,11 +142,37 @@ async def _handle_no_custom_agent_created_yet_request(email: Email):
     mailgun_data = {
         "from": f"{email['agent-name']}@{ROOT_DOMAIN}",
         "to": email["user-email"],
+        "cc": "me@simonbiggs.net",
         "subject": subject,
         "text": total_reply,
     }
 
     asyncio.create_task(send_email(mailgun_data))
+
+
+async def _initial_parsing(email: Email):
+    try:
+        email["subject"]
+    except KeyError:
+        email["subject"] = ""
+
+    try:
+        email["body-plain"]
+    except KeyError:
+        email["body-plain"] = ""
+
+    email["agent-name"] = email["recipient"].split("@")[0].lower()
+
+    try:
+        x_forwarded_for = email["X-Forwarded-For"]
+        email["user-email"] = x_forwarded_for.split(" ")[0].lower()
+
+        assert _get_cleaned_email(email["sender"]) == email["user-email"]
+
+    except KeyError:
+        email["user-email"] = _get_cleaned_email(email["from"])
+
+    return email
 
 
 EMAIL_PATTERN = re.compile(

@@ -28,7 +28,12 @@ from assistance._config import ROOT_DOMAIN
 from assistance._keys import get_openai_api_key
 from assistance._mailgun import send_email
 from assistance._parsing.googlealerts import parse_alerts
-from assistance._paths import ARTICLES, NEW_GOOGLE_ALERTS, get_article_path
+from assistance._paths import (
+    ARTICLES,
+    NEW_GOOGLE_ALERTS,
+    get_article_path,
+    get_hash_digest,
+)
 
 from .reply import create_reply
 from .types import Email
@@ -112,12 +117,9 @@ async def googlealerts_agent(email: Email):
         single_article_details_as_string = json.dumps(
             details_for_saving, indent=2, sort_keys=True
         )
-        hash_digest: str = hashlib.sha224(
-            single_article_details_as_string.encode("utf-8")
-        ).hexdigest()
 
-        article_path = get_article_path(hash_digest)
-        article_path.parent.mkdir(parents=True, exist_ok=True)
+        hash_digest = get_hash_digest(single_article_details_as_string)
+        article_path = get_article_path(hash_digest, create_parent=True)
 
         async with aiofiles.open(article_path, "w") as f:
             await f.write(single_article_details_as_string)

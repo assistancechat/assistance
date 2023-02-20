@@ -14,13 +14,12 @@
 
 import asyncio
 import json
-import pathlib
 
 import aiofiles
 
 from assistance._utilities import get_cleaned_url
 
-from ._paths import ARTICLES, NEW_GOOGLE_ALERTS, get_article_path
+from ._paths import NEW_GOOGLE_ALERTS, get_article_path
 
 
 async def collect_new_articles():
