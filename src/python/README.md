@@ -11,10 +11,10 @@ The Python AI assistance library.
 
 ### Server Hosting
 
-To view the live logs of the running api service run:
+Restart supervisorctl
 
 ```bash
-sudo journalctl -u run-api.service -f -n 50
+sudo supervisorctl restart chat-api
 ```
 
 ### Poetry Python version

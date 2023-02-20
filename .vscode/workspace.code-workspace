@@ -1,7 +1,10 @@
 {
   "folders": [
+  {
+    "path": "../../../.assistance",
+  },
     {
-      "path": ".."
+      "path": "..",
     }
   ],
   "settings": {
