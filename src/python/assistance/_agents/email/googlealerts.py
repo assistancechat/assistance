@@ -35,7 +35,6 @@ from assistance._paths import (
     get_hash_digest,
 )
 
-from .reply import create_reply
 from .types import Email
 
 MODEL_KWARGS = {

@@ -17,13 +17,24 @@
 
 import textwrap
 
+from .types import Email
 
-def create_reply(subject: str, body_plain: str, user_email: str, response: str):
+
+def create_reply(original_email: Email, response: str):
+    subject = original_email["subject"]
+
     if not subject.startswith("Re:"):
         subject = f"Re: {subject}"
 
-    with_indent = textwrap.indent(body_plain, "> ")
-    previous_emails = f"{user_email} wrote:\n{with_indent}"
+    body_plain = original_email["body-plain"]
+    date = original_email["Date"]
+
+    with_indent = textwrap.indent(
+        body_plain, " ", predicate=lambda line: not line.startswith(">")
+    )
+    with_indent = textwrap.indent(with_indent, ">")
+
+    previous_emails = f"On {date}, {original_email['from']} wrote:\n{with_indent}"
 
     total_reply = f"{response}\n\n{previous_emails}"
 

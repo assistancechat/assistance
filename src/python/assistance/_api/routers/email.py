@@ -166,10 +166,8 @@ async def _fallback_email_handler(email: Email, user_details: dict):
     )
 
     subject, total_reply = create_reply(
-        subject=email["subject"],
-        body_plain=email["body-plain"],
+        original_email=email,
         response=response,
-        user_email=email["user-email"],
     )
 
     mailgun_data = {

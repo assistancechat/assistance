@@ -78,17 +78,18 @@ async def react_to_custom_agent_request(email: Email, prompt_task: str):
     logging.info(prompt)
 
     completions = await completion_with_back_off(
-        user_email=user_email, prompt=prompt, api_key=OPEN_AI_API_KEY, **MODEL_KWARGS
+        user_email=email["user-email"],
+        prompt=prompt,
+        api_key=OPEN_AI_API_KEY,
+        **MODEL_KWARGS,
     )
     response: str = completions.choices[0].text.strip()
 
     logging.info(response)
 
     subject, total_reply = create_reply(
-        subject=email["subject"],
-        body_plain=email["body-plain"],
+        original_email=email,
         response=response,
-        user_email=email["user-email"],
     )
 
     mailgun_data = {

@@ -36,10 +36,8 @@ async def list_custom_agents(email: Email):
         response += f"{agent}@{ROOT_DOMAIN}:\n{prompt}\n\n"
 
     subject, total_reply = create_reply(
-        subject=email["subject"],
-        body_plain=email["body-plain"],
+        original_email=email,
         response=response,
-        user_email=email["user-email"],
     )
 
     mailgun_data = {
