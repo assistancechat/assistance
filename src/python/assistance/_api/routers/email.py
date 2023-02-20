@@ -24,13 +24,19 @@ from assistance import _ctx
 from assistance._agents.email.custom import react_to_custom_agent_request
 from assistance._agents.email.default import DEFAULT_TASKS
 from assistance._agents.email.reply import create_reply
+from assistance._agents.email.restricted import RESTRICTED_TASKS
 from assistance._agents.email.types import Email
 from assistance._config import ROOT_DOMAIN
 from assistance._keys import get_mailgun_api_key
 from assistance._mailgun import send_email
-from assistance._paths import NEW_EMAILS
-from assistance._paths import PROMPTS as PROMPTS_PATH
-from assistance._paths import get_emails_path, get_hash_digest
+from assistance._paths import (
+    NEW_EMAILS,
+    get_agent_mappings,
+    get_emails_path,
+    get_hash_digest,
+    get_user_details,
+    get_user_from_email,
+)
 
 MAILGUN_API_KEY = get_mailgun_api_key()
 
@@ -105,9 +111,22 @@ async def _react_to_email(email: Email):
 
         return
 
-    if email["agent-name"] in DEFAULT_TASKS:
-        task = DEFAULT_TASKS[email["agent-name"]][1]
+    user_details, agent_mappings = _get_user_details_and_mappings(email)
 
+    try:
+        mapped_agent = agent_mappings[email["agent-name"]]
+    except KeyError:
+        pass
+    else:
+        await RESTRICTED_TASKS[mapped_agent](email=email, user_details=user_details)
+
+        return
+
+    try:
+        task = DEFAULT_TASKS[email["agent-name"]][1]
+    except KeyError:
+        pass
+    else:
         if isinstance(task, str):
             await react_to_custom_agent_request(email=email, prompt_task=task)
         else:
@@ -115,15 +134,29 @@ async def _react_to_email(email: Email):
 
         return
 
-    await _fallback_email_handler(email)
+    await _fallback_email_handler(email=email, user_details=user_details)
     return
 
 
-async def _fallback_email_handler(email: Email):
-    guessed_first_name = email["from"].split(" ")[0].capitalize()
+async def _get_user_details_and_mappings(email: Email):
+    try:
+        user = get_user_from_email(email["user-email"])
+    except ValueError:
+        first_name = email["from"].split(" ")[0].capitalize()
+        user_details = {"first_name": first_name}
+        agent_mappings = {}
 
+        return user_details, agent_mappings
+
+    user_details = get_user_details(user)
+    agent_mappings = get_agent_mappings(user)
+
+    return user_details, agent_mappings
+
+
+async def _fallback_email_handler(email: Email, user_details: dict):
     response = (
-        f"Hi {guessed_first_name},\n\n"
+        f"Hi {user_details['first_name']},\n\n"
         "This particular Assistance.Chat agent has not yet been implemented "
         "for your user account.\n\n"
         "I have included Simon, the developer of this software into this email, "
