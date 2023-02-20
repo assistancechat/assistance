@@ -44,6 +44,9 @@ PROMPT = textwrap.dedent(
         ids of the articles that you think would be the most helpful for
         someone else to fulfil those tasks.
 
+        If there are multiple articles that are covering the exact same
+        topic, you should only select one of them.
+
         For each article that you select, provide an absolute score
         between 0 and 100. The score is a measure of how relevant you
         think the article is to achieving the tasks.

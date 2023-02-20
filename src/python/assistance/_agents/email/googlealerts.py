@@ -110,7 +110,7 @@ async def googlealerts_agent(email: Email):
         openai_api_key=OPEN_AI_API_KEY,
         articles=article_details,
         tasks=TASKS,
-        num_of_articles_to_select=3,
+        num_of_articles_to_select=5,
         keys=["title", "description"],
     )
 
@@ -135,14 +135,14 @@ async def googlealerts_agent(email: Email):
 
     results = await asyncio.gather(*coroutines)
 
-    responses = []
+    all_relevant_responses = []
     for article, result in zip(most_relevant_articles, results):
         result_data = json.loads(result, strict=False)
 
         if not result_data["article-relevant-to-tasks"]:
             continue
 
-        responses.append(
+        all_relevant_responses.append(
             {
                 "title": article["title"],
                 "url": article["cleaned_url"],
@@ -151,7 +151,15 @@ async def googlealerts_agent(email: Email):
             }
         )
 
-    for response in responses:
+    most_relevant_responses = await get_most_relevant_articles(
+        openai_api_key=OPEN_AI_API_KEY,
+        articles=all_relevant_responses,
+        tasks=TASKS,
+        num_of_articles_to_select=3,
+        keys=["title", "subject", "description"],
+    )
+
+    for response in most_relevant_responses:
         text = f"{response['content']}\n\n{response['url']}"
         mailgun_data = {
             "from": f"{email['agent-name']}@{ROOT_DOMAIN}",
