@@ -34,20 +34,23 @@ MODEL_KWARGS = {
 PROMPT = textwrap.dedent(
     """
         You are aiming to find the articles that might be the best at
-        helping someone fulfil the following tasks:
+        helping someone fulfil the following tasks and goals:
+
+        Their tasks:
 
         {tasks}
 
-        While they are fulfilling the above tasks, they have the
-        following goals throughout:
+        Their goals:
 
         {goals}
 
+        Your instructions:
+
         Below are {num_of_articles} articles that may be relevant to the
-        tasks and goal(s). For each article id provide a score between 0
-        and 100 for each goal and task. The score is a measure of how
-        relevant you think the article is to achieving each task and
-        goal.
+        tasks and goal. For each article id provide a score between 0
+        and 100 for each goal and task. The scores are a measure of how
+        helpful you think the article will be in achieving each
+        respective task and goal.
 
         For each article, if there are other articles within the list
         that are covering the exact same topic, provide those articles
@@ -85,18 +88,14 @@ PROMPT = textwrap.dedent(
 ).strip()
 
 
-async def get_most_relevant_articles(
+async def article_scoring(
     user_email: str,
     openai_api_key: str,
     goals: list[str],
     tasks: list[str],
     articles: list[dict[str, str]],
-    num_of_articles_to_select: int,
     keys: list[str],
 ):
-    if len(articles) < num_of_articles_to_select:
-        return articles
-
     articles_with_ids = []
     for index, article in enumerate(articles):
         article_for_prompt = {"id": index + 1}

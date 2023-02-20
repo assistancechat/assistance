@@ -12,21 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import asyncio
 import pathlib
 
-LIB = pathlib.Path(__file__).parent
+import aiofiles
 
-STORE = pathlib.Path.home() / ".assistance"
-CONFIG = STORE / "config"
-SECRETS = CONFIG / "secrets"
+from ._paths import ARTICLES, NEW_GOOGLE_ALERTS
 
-USERS = STORE / "users"
-PROMPTS = STORE / "prompts"
-RECORDS = STORE / "records"
-COMPLETIONS = STORE / "completions"
-ARTICLES = STORE / "articles"
 
-PIPELINES = STORE / "pipelines"
-
-GOOGLE_ALERTS_PIPELINES = PIPELINES / "google-alerts"
-NEW_GOOGLE_ALERTS = GOOGLE_ALERTS_PIPELINES / "new"
+async def collect_articles():
+    NEW_GOOGLE_ALERTS

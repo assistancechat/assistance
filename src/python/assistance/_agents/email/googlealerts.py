@@ -21,14 +21,14 @@ from urllib.parse import parse_qs, urlparse
 
 import aiofiles
 
-from assistance._agents.relevance import get_most_relevant_articles
+from assistance._agents.relevance import article_scoring
 from assistance._agents.summaries import summarise_url_with_tasks
 from assistance._completions import completion_with_back_off
 from assistance._config import ROOT_DOMAIN
 from assistance._keys import get_openai_api_key
 from assistance._mailgun import send_email
 from assistance._parsing.googlealerts import parse_alerts
-from assistance._paths import ARTICLES, GOOGLE_ALERTS_PIPELINES
+from assistance._paths import ARTICLES, NEW_GOOGLE_ALERTS
 
 from .reply import create_reply
 from .types import Email
@@ -106,8 +106,6 @@ PROMPT = textwrap.dedent(
 async def googlealerts_agent(email: Email):
     article_details = parse_alerts(email["body-html"])
 
-    new_alerts_path = GOOGLE_ALERTS_PIPELINES / "new-alert-articles"
-
     for item in article_details:
         details_for_saving = {"subject": email["subject"], **item}
 
@@ -126,7 +124,7 @@ async def googlealerts_agent(email: Email):
         async with aiofiles.open(article_path, "w") as f:
             await f.write(single_article_details_as_string)
 
-        pipeline_path = new_alerts_path / hash_digest
+        pipeline_path = NEW_GOOGLE_ALERTS / hash_digest
         async with aiofiles.open(pipeline_path, "w") as f:
             pass
 
