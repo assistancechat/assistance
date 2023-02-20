@@ -13,10 +13,13 @@
 # limitations under the License.
 
 import asyncio
+import hashlib
 import json
 import logging
 import textwrap
 from urllib.parse import parse_qs, urlparse
+
+import aiofiles
 
 from assistance._agents.relevance import get_most_relevant_articles
 from assistance._agents.summaries import summarise_url_with_tasks
@@ -25,6 +28,7 @@ from assistance._config import ROOT_DOMAIN
 from assistance._keys import get_openai_api_key
 from assistance._mailgun import send_email
 from assistance._parsing.googlealerts import parse_alerts
+from assistance._paths import ARTICLES, GOOGLE_ALERTS_PIPELINES
 
 from .reply import create_reply
 from .types import Email
@@ -101,74 +105,93 @@ PROMPT = textwrap.dedent(
 
 async def googlealerts_agent(email: Email):
     article_details = parse_alerts(email["body-html"])
-    user_email = email["user-email"]
 
-    logging.info(json.dumps(article_details, indent=2))
+    new_alerts_path = GOOGLE_ALERTS_PIPELINES / "new-alert-articles"
 
-    most_relevant_articles = await get_most_relevant_articles(
-        user_email=user_email,
-        openai_api_key=OPEN_AI_API_KEY,
-        articles=article_details,
-        tasks=TASKS,
-        num_of_articles_to_select=5,
-        keys=["title", "description"],
-    )
+    for item in article_details:
+        single_article_details_as_string = json.dumps(item, indent=2, sort_keys=True)
+        hash_digest: str = hashlib.sha224(
+            single_article_details_as_string.encode("utf-8")
+        ).hexdigest()
 
-    for article in most_relevant_articles:
-        parsed_url = urlparse(article["url"])
-        cleaned_url = parse_qs(parsed_url.query)["url"][0]
-        article["cleaned_url"] = cleaned_url
-
-    coroutines = []
-    for article in most_relevant_articles:
-        url = article["cleaned_url"]
-        cached_url = f"http://webcache.googleusercontent.com/search?q=cache:{url}&strip=1&vwsrc=0"
-
-        coroutines.append(
-            _summarise_and_fulfil_tasks(
-                user_email=user_email,
-                openai_api_key=OPEN_AI_API_KEY,
-                tasks=TASKS,
-                url=cached_url,
-            )
+        article_path = (
+            ARTICLES / hash_digest[0:4] / hash_digest[4:8] / f"{hash_digest}.json"
         )
+        article_path.parent.mkdir(parents=True, exist_ok=True)
 
-    results = await asyncio.gather(*coroutines)
+        with aiofiles.open(article_path, "w") as f:
+            await f.write(single_article_details_as_string)
 
-    all_relevant_responses = []
-    for article, result in zip(most_relevant_articles, results):
-        result_data = json.loads(result, strict=False)
+        (new_alerts_path / hash_digest).touch()
 
-        if not result_data["article-relevant-to-tasks"]:
-            continue
+    # user_email = email["user-email"]
 
-        all_relevant_responses.append(
-            {
-                "title": article["title"],
-                "url": article["cleaned_url"],
-                "subject": result_data["subject"],
-                "content": result_data["content"],
-            }
-        )
+    # logging.info(json.dumps(article_details, indent=2))
 
-    most_relevant_responses = await get_most_relevant_articles(
-        openai_api_key=OPEN_AI_API_KEY,
-        articles=all_relevant_responses,
-        tasks=TASKS,
-        num_of_articles_to_select=3,
-        keys=["title", "subject", "description"],
-    )
+    # most_relevant_articles = await get_most_relevant_articles(
+    #     user_email=user_email,
+    #     openai_api_key=OPEN_AI_API_KEY,
+    #     articles=article_details,
+    #     tasks=TASKS,
+    #     num_of_articles_to_select=5,
+    #     keys=["title", "description"],
+    # )
 
-    for response in most_relevant_responses:
-        text = f"{response['content']}\n\n{response['url']}"
-        mailgun_data = {
-            "from": f"{email['agent-name']}@{ROOT_DOMAIN}",
-            "to": email["user-email"],
-            "subject": response["subject"],
-            "text": text,
-        }
+    # for article in most_relevant_articles:
+    #     parsed_url = urlparse(article["url"])
+    #     cleaned_url = parse_qs(parsed_url.query)["url"][0]
+    #     article["cleaned_url"] = cleaned_url
 
-        asyncio.create_task(send_email(mailgun_data))
+    # coroutines = []
+    # for article in most_relevant_articles:
+    #     url = article["cleaned_url"]
+    #     cached_url = f"http://webcache.googleusercontent.com/search?q=cache:{url}&strip=1&vwsrc=0"
+
+    #     coroutines.append(
+    #         _summarise_and_fulfil_tasks(
+    #             user_email=user_email,
+    #             openai_api_key=OPEN_AI_API_KEY,
+    #             tasks=TASKS,
+    #             url=cached_url,
+    #         )
+    #     )
+
+    # results = await asyncio.gather(*coroutines)
+
+    # all_relevant_responses = []
+    # for article, result in zip(most_relevant_articles, results):
+    #     result_data = json.loads(result, strict=False)
+
+    #     if not result_data["article-relevant-to-tasks"]:
+    #         continue
+
+    #     all_relevant_responses.append(
+    #         {
+    #             "title": article["title"],
+    #             "url": article["cleaned_url"],
+    #             "subject": result_data["subject"],
+    #             "content": result_data["content"],
+    #         }
+    #     )
+
+    # most_relevant_responses = await get_most_relevant_articles(
+    #     openai_api_key=OPEN_AI_API_KEY,
+    #     articles=all_relevant_responses,
+    #     tasks=TASKS,
+    #     num_of_articles_to_select=3,
+    #     keys=["title", "subject", "description"],
+    # )
+
+    # for response in most_relevant_responses:
+    #     text = f"{response['content']}\n\n{response['url']}"
+    #     mailgun_data = {
+    #         "from": f"{email['agent-name']}@{ROOT_DOMAIN}",
+    #         "to": email["user-email"],
+    #         "subject": response["subject"],
+    #         "text": text,
+    #     }
+
+    #     asyncio.create_task(send_email(mailgun_data))
 
 
 async def _summarise_and_fulfil_tasks(

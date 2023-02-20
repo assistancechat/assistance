@@ -24,3 +24,7 @@ USERS = STORE / "users"
 PROMPTS = STORE / "prompts"
 RECORDS = STORE / "records"
 COMPLETIONS = STORE / "completions"
+ARTICLES = STORE / "articles"
+
+PIPELINES = STORE / "pipelines"
+GOOGLE_ALERTS_PIPELINES = PIPELINES / "google-alerts"
