@@ -111,7 +111,7 @@ async def _react_to_email(email: Email):
 
         return
 
-    user_details, agent_mappings = _get_user_details_and_mappings(email)
+    user_details, agent_mappings = await _get_user_details_and_mappings(email)
 
     try:
         mapped_agent = agent_mappings[email["agent-name"]]
@@ -140,7 +140,7 @@ async def _react_to_email(email: Email):
 
 async def _get_user_details_and_mappings(email: Email):
     try:
-        user = get_user_from_email(email["user-email"])
+        user = await get_user_from_email(email["user-email"])
     except ValueError:
         first_name = email["from"].split(" ")[0].capitalize()
         user_details = {"first_name": first_name}
@@ -148,8 +148,8 @@ async def _get_user_details_and_mappings(email: Email):
 
         return user_details, agent_mappings
 
-    user_details = get_user_details(user)
-    agent_mappings = get_agent_mappings(user)
+    user_details = await get_user_details(user)
+    agent_mappings = await get_agent_mappings(user)
 
     return user_details, agent_mappings
 

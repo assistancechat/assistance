@@ -40,7 +40,7 @@ PIPELINES = STORE / "pipelines"
 GOOGLE_ALERTS_PIPELINES = PIPELINES / "google-alerts"
 NEW_GOOGLE_ALERTS = GOOGLE_ALERTS_PIPELINES / "new"
 
-EMAIL_PIPELINES = PIPELINES / "email"
+EMAIL_PIPELINES = PIPELINES / "emails"
 NEW_EMAILS = EMAIL_PIPELINES / "new"
 
 
@@ -106,4 +106,4 @@ def _get_record_path(root: pathlib.Path, hash_digest: str, create_parent: bool):
 
 
 def _get_relative_json_path(hash_digest: str):
-    return pathlib.Path(hash_digest[0:4] / hash_digest[4:8] / f"{hash_digest}.json")
+    return pathlib.Path(hash_digest[0:4]) / hash_digest[4:8] / f"{hash_digest}.json"
