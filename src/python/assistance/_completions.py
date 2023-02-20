@@ -24,7 +24,7 @@ from tenacity import retry, stop_after_attempt, wait_random_exponential
 from ._paths import COMPLETIONS
 
 
-@retry(wait=wait_random_exponential(min=1, max=60), stop=stop_after_attempt(6))
+@retry(wait=wait_random_exponential(min=1, max=60), stop=stop_after_attempt(12))
 async def completion_with_back_off(**kwargs):
     user_email: str = kwargs["user_email"]
     del kwargs["user_email"]

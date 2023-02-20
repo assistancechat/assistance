@@ -22,13 +22,15 @@ from assistance._utilities import items_to_list_string
 
 MODEL_KWARGS = {
     "engine": "text-davinci-003",
-    "max_tokens": 1280,
+    "max_tokens": 1536,
     "best_of": 1,
     "temperature": 0.7,
     "top_p": 1,
     "frequency_penalty": 0.0,
     "presence_penalty": 0.0,
 }
+
+MAX_ARTICLE_COUNT = 24
 
 PROMPT = textwrap.dedent(
     """
@@ -52,14 +54,14 @@ PROMPT = textwrap.dedent(
 
         Below are {num_of_articles} articles that may be relevant to the
         tasks and goal. For each article id provide a score between 0
-        and 100 for each goal and task for their target audience. The
+        and 10 for each goal and task for their target audience. The
         scores are a measure of how helpful you think the article will
         be in achieving each respective task and goal.
 
         For each article, if there are other articles within the list
-        that are covering the exact same topic, provide those articles
-        as a "same-topic-covered" list. If no other articles are
-        covering the same topic, provide an empty list.
+        that are covering a very similar topic, provide those articles
+        as a "similar-topic-covered" list. If no other articles are
+        covering a similar topic, provide an empty list.
 
         Required JSON format:
 
@@ -68,7 +70,7 @@ PROMPT = textwrap.dedent(
                 "id": 1,
                 "task-scores": [<provide the relevance score for the first task>, <provide the relevance score for the second task>, ...],
                 "goal-scores": [<provide the relevance score for the first goal>, ...],
-                "same-topic-covered": [<provide the article ids of any articles that are covering the same topic as this one>]
+                "similar-topic-covered": [<provide the article id of the first article that is covering a similar topic as this article>, <second similar article>, ...]
             }},
             {{
                 "id": 2,
@@ -141,6 +143,6 @@ async def article_scoring(
         assert "id" in item
         assert "task-scores" in item
         assert "goal-scores" in item
-        assert "same-topic-covered" in item
+        assert "similar-topic-covered" in item
 
     return article_ranking
