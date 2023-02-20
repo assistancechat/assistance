@@ -98,6 +98,7 @@ async def article_scoring(
     openai_api_key: str,
     goals: list[str],
     tasks: list[str],
+    target_audience: str,
     articles: list[dict[str, str]],
     keys: list[str],
 ):
@@ -117,6 +118,7 @@ async def article_scoring(
         prompt = PROMPT.format(
             tasks=items_to_list_string(tasks),
             goals=items_to_list_string(goals),
+            target_audience=target_audience,
             num_of_articles=len(articles),
             articles=json.dumps(articles_with_ids, indent=2),
         )

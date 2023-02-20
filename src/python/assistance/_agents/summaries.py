@@ -20,7 +20,11 @@ from assistance import _ctx
 from assistance._completions import completion_with_back_off
 from assistance._vendor.stackoverflow.web_scraping import scrape
 
-from .utilities import items_to_list_string
+from .utilities import (
+    get_approximate_allowed_remaining_words,
+    get_number_of_words,
+    items_to_list_string,
+)
 
 MAX_NUMBER_OF_TEXT_SECTIONS = 20
 
@@ -33,9 +37,6 @@ MODEL_KWARGS = {
     "frequency_penalty": 0.0,
     "presence_penalty": 0.0,
 }
-
-# ~4097 * 0.75
-APPROXIMATE_ALLOWED_WORDS_IN_PROMPT = 3000
 
 PROMPT = textwrap.dedent(
     """
@@ -78,12 +79,6 @@ PROMPT = textwrap.dedent(
     """
 ).strip()
 
-LEN_OF_PROMPT = len(PROMPT.format(tasks="", text="", goals="", target_audience=""))
-REMAINING_WORDS_IN_PROMPT = (
-    APPROXIMATE_ALLOWED_WORDS_IN_PROMPT
-    - LEN_OF_PROMPT
-    - MODEL_KWARGS["max_tokens"] * 0.75
-)
 
 WORD_COUNT_SCALING_BUFFER = 0.8
 WORDS_OVERLAP = 20
@@ -104,11 +99,15 @@ async def summarise_url_with_tasks(
     split_page_contents_by_words = [item for item in page_contents.split(None) if item]
 
     extra_prompt_parameters = tasks + goals + [target_audience]
-    extra_prompt_words = sum(
-        [len(item.split(None)) for item in extra_prompt_parameters]
+    extra_prompt_words = get_number_of_words(" ".join(extra_prompt_parameters))
+
+    remaining_words_allowed_after_template_prompt = (
+        get_approximate_allowed_remaining_words(
+            prompt=PROMPT, max_tokens=MODEL_KWARGS["max_tokens"]
+        )
     )
 
-    remaining_words = REMAINING_WORDS_IN_PROMPT - extra_prompt_words
+    remaining_words = remaining_words_allowed_after_template_prompt - extra_prompt_words
     max_words_per_summary_section = int(
         remaining_words * WORD_COUNT_SCALING_BUFFER - WORDS_OVERLAP
     )
