@@ -18,12 +18,11 @@ import textwrap
 
 from assistance import _ctx
 from assistance._completions import completion_with_back_off
-
-from .utilities import items_to_list_string
+from assistance._utilities import items_to_list_string
 
 MODEL_KWARGS = {
     "engine": "text-davinci-003",
-    "max_tokens": 512,
+    "max_tokens": 1280,
     "best_of": 1,
     "temperature": 0.7,
     "top_p": 1,
@@ -93,6 +92,13 @@ PROMPT = textwrap.dedent(
 ).strip()
 
 
+# TODO: Make article scoring handle article length larger than available
+# tokens.
+
+# TODO: Adjust max tokens to be a reasonable number given a maximum
+# number of articles.
+
+
 async def article_scoring(
     user_email: str,
     openai_api_key: str,
@@ -114,31 +120,22 @@ async def article_scoring(
     logging.info(_ctx.pp.pformat(articles_with_ids))
 
     article_ranking: None | list[dict] = None
-    for _ in range(3):
-        prompt = PROMPT.format(
-            tasks=items_to_list_string(tasks),
-            goals=items_to_list_string(goals),
-            target_audience=target_audience,
-            num_of_articles=len(articles),
-            articles=json.dumps(articles_with_ids, indent=2),
-        )
+    prompt = PROMPT.format(
+        tasks=items_to_list_string(tasks),
+        goals=items_to_list_string(goals),
+        target_audience=target_audience,
+        num_of_articles=len(articles),
+        articles=json.dumps(articles_with_ids, indent=2),
+    )
 
-        completions = await completion_with_back_off(
-            user_email=user_email, prompt=prompt, api_key=openai_api_key, **MODEL_KWARGS
-        )
-        response: str = completions.choices[0].text.strip()
+    completions = await completion_with_back_off(
+        user_email=user_email, prompt=prompt, api_key=openai_api_key, **MODEL_KWARGS
+    )
+    response: str = completions.choices[0].text.strip()
 
-        logging.info(f"Response: {response}")
+    logging.info(f"Response: {response}")
 
-        try:
-            article_ranking = json.loads(response)
-
-            break
-        except (json.JSONDecodeError, KeyError) as e:
-            logging.info(e)
-
-    if not article_ranking:
-        raise ValueError("Could not parse article ids")
+    article_ranking = json.loads(response)
 
     for item in article_ranking:
         assert "id" in item

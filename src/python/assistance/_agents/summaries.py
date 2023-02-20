@@ -18,13 +18,12 @@ import textwrap
 
 from assistance import _ctx
 from assistance._completions import completion_with_back_off
-from assistance._vendor.stackoverflow.web_scraping import scrape
-
-from .utilities import (
+from assistance._utilities import (
     get_approximate_allowed_remaining_words,
     get_number_of_words,
     items_to_list_string,
 )
+from assistance._vendor.stackoverflow.web_scraping import scrape
 
 MAX_NUMBER_OF_TEXT_SECTIONS = 20
 

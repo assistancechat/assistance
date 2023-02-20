@@ -18,6 +18,8 @@ import pathlib
 
 import aiofiles
 
+from assistance._utilities import get_cleaned_url
+
 from ._paths import ARTICLES, NEW_GOOGLE_ALERTS, get_article_path
 
 
@@ -38,5 +40,7 @@ async def _collect_articles_from_alert(hash_digest: str):
 
     async with aiofiles.open(article_path, "r") as f:
         article_details = json.loads(await f.read())
+
+    article_details["url"] = get_cleaned_url(article_details["url"])
 
     return article_details

@@ -12,8 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
 import textwrap
+from urllib.parse import parse_qs, urlparse
 
 WORDS_PER_TOKEN = 0.75
 APPROXIMATE_ALLOWED_WORDS_IN_PROMPT = 4097 * WORDS_PER_TOKEN
@@ -34,3 +34,10 @@ def get_approximate_allowed_remaining_words(prompt: str, max_tokens: int):
 
 def get_number_of_words(text: str):
     return len(text.split(None))
+
+
+def get_cleaned_url(url: str):
+    parsed_url = urlparse(url)
+    cleaned_url = parse_qs(parsed_url.query)["url"][0]
+
+    return cleaned_url
