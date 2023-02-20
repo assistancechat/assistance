@@ -2,13 +2,19 @@
 # Attribution-ShareAlike 4.0 International License.
 # <http://creativecommons.org/licenses/by-sa/4.0/>.
 
+import logging
+
 import aiohttp
 from bs4 import BeautifulSoup
+from fake_useragent import UserAgent
 
 
 # https://stackoverflow.com/a/24618186
 async def scrape(session: aiohttp.ClientSession, url: str):
-    results = await session.get(url=url)
+    ua = UserAgent()
+    headers = {"User-Agent": ua.random}
+
+    results = await session.get(url=url, headers=headers)
     html = await results.read()
 
     try:
@@ -17,6 +23,8 @@ async def scrape(session: aiohttp.ClientSession, url: str):
         return "NOT_RELEVANT"
 
     soup = BeautifulSoup(html, features="html.parser")
+
+    # logging.info(soup)
 
     # kill all script and style elements
     for script in soup(["script", "style"]):

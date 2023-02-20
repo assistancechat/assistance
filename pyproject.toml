@@ -10,9 +10,6 @@ ignore = [
     "./src/python/assistance/_client"
 ]
 
-# typeCheckingMode = "strict"
-
-
 [tool.pylint.master]
 ignore-patterns = "./src/python/assistance/_client/**/*.py"
 

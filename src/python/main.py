@@ -12,15 +12,4 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import pathlib
-
-LIB = pathlib.Path(__file__).parent
-
-STORE = pathlib.Path.home() / ".assistance"
-CONFIG = STORE / "config"
-SECRETS = CONFIG / "secrets"
-
-USERS = STORE / "users"
-PROMPTS = STORE / "prompts"
-RECORDS = STORE / "records"
-COMPLETIONS = STORE / "completions"
+from assistance._api.main import app as app

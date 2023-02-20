@@ -1,7 +1,10 @@
 {
   "folders": [
+  {
+    "path": "../../../.assistance",
+  },
     {
-      "path": ".."
+      "path": "..",
     }
   ],
   "settings": {
@@ -21,6 +24,8 @@
     "python.linting.lintOnSave": true,
     "python.linting.pylintEnabled": true,
     "python.linting.mypyEnabled": false,
+    "github.copilot.inlineSuggest.enabled": false,
+    // "editor.maxTokenizationLineLength": 100000,
     "[python]": {
       "editor.rulers": [72, 88],
       "editor.tabSize": 4
@@ -43,6 +48,7 @@
       "Aana",
       "Acetabulums",
       "acreate",
+      "aiofiles",
       "aiohttp",
       "Airplane",
       "allclose",
@@ -111,12 +117,14 @@
       "Glenohum",
       "Glnd",
       "gmailjs",
+      "googlealerts",
       "GSPR",
       "Hardpalate",
       "Hausdorff",
       "headlessui",
       "Hepatogastrc",
       "heroicons",
+      "hexsha",
       "Hilum",
       "Hilums",
       "HNSCC",
@@ -131,6 +139,8 @@
       "isacareers",
       "isoparser",
       "isort",
+      "itemprop",
+      "itemtype",
       "journalctl",
       "labeled",
       "Laryngl",
@@ -251,6 +261,7 @@
       "typecheck",
       "typer",
       "Unported",
+      "useragent",
       "userinfo",
       "uvicorn",
       "Venacava",

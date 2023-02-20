@@ -48,7 +48,7 @@ const AboutUs = lazy(() => import("@/components/AboutUs"));
 // TODO: Make this type declaration more flexible so that it works for all of
 // the page types.
 export default function Core(props: { data: any }) {
-  
+
   const [chatData, setChatData] = useState<ChatContextData>(DefaultChatData);
   const value = { chatData, setChatData };
 
@@ -110,7 +110,7 @@ export default function Core(props: { data: any }) {
 
     appendPendingQuestionIfReady();
   }, [chatData]);
-  
+
   return (
     <>
       <Head>
@@ -131,7 +131,7 @@ export default function Core(props: { data: any }) {
             alt={props.data.hero.alt}
             chatButtonText={props.data.hero.chatButtonText}
           />
-          
+
           <MoreInfo
             key={props.data.moreInfo.id}
             heading={props.data.moreInfo.heading}
@@ -171,5 +171,3 @@ export default function Core(props: { data: any }) {
     </>
   );
 }
-
-

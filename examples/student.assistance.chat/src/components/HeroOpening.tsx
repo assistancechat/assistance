@@ -48,7 +48,7 @@ export default function HeroOpening(props: HeroOpeningProps) {
   const subHeadingConfig = {
     strings: [
       "We will help you find the right course and connect you to your purpose",
-      "Don't wait and waste your talent", 
+      "Don't wait and waste your talent",
       "ASK US TODAY."
     ],
     typeSpeed: 15,

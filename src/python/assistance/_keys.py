@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import functools
+
 from assistance._paths import SECRETS
 
 
@@ -51,6 +53,11 @@ def get_starlette_session_key():
     return _load_secret("starlette-session-key")
 
 
+def get_stripe_webhook_key():
+    return _load_secret("stripe-webhook-key")
+
+
+@functools.cache
 def _load_secret(name: str) -> str:
     secret_path = SECRETS / name
 

@@ -12,15 +12,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import pathlib
+# Prompt inspired by the work provided under an MIT license over at:
+# https://github.com/hwchase17/langchain/blob/ae1b589f60a/langchain/agents/conversational/prompt.py#L1-L36
 
-LIB = pathlib.Path(__file__).parent
+import textwrap
 
-STORE = pathlib.Path.home() / ".assistance"
-CONFIG = STORE / "config"
-SECRETS = CONFIG / "secrets"
 
-USERS = STORE / "users"
-PROMPTS = STORE / "prompts"
-RECORDS = STORE / "records"
-COMPLETIONS = STORE / "completions"
+def create_reply(subject: str, body_plain: str, user_email: str, response: str):
+    if not subject.startswith("Re:"):
+        subject = f"Re: {subject}"
+
+    with_indent = textwrap.indent(body_plain, "> ")
+    previous_emails = f"{user_email} wrote:\n{with_indent}"
+
+    total_reply = f"{response}\n\n{previous_emails}"
+
+    return subject, total_reply

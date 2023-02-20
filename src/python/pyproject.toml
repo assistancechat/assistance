@@ -45,6 +45,12 @@ google-auth = "^2.16.0"
 # openai-whisper = "^20230124"
 # streamlit-webrtc = "^0.44.2"
 # pydub = "^0.25.1"
+gunicorn = "^20.1.0"
+stripe = "^5.1.1"
+tenacity = "^8.2.1"
+fake-useragent = "^1.1.1"
+ipykernel = "^6.21.2"
+google-search-results = "^2.4.1"
 
 [tool.poetry.group.dev.dependencies]
 autoflake = "*"

@@ -22,15 +22,14 @@ import textwrap
 from enum import Enum
 from typing import Callable, Coroutine
 
-import openai
 from thefuzz import process as fuzz_process
 
+from assistance._completions import completion_with_back_off
 from assistance._store.transcript import store_prompt_transcript
-from assistance._tools.search import alphacrucis_search
 
 MODEL_KWARGS = {
     "engine": "text-davinci-003",
-    "max_tokens": 256,
+    "max_tokens": 512,
     "best_of": 1,
     "stop": "Observation:",
     "temperature": 0.7,
@@ -47,22 +46,22 @@ class Tool(str, Enum):
 
 
 TOOL_DESCRIPTIONS = {
-    Tool.SEARCH: textwrap.dedent(
-        """
-            A tool where Assistant provides a natural language question.
-            The tool initially searches the Alphacrucis student support
-            FAQ page and the main website. After it has undergone a
-            search a separate LLM will summarise the pages found with
-            respect to relevance to the provided question.
-        """
-    ).strip(),
-    Tool.EMAIL: textwrap.dedent(
-        """
-            A tool to send an email to the Assistant's Supervisors.
-            Assistant may use this tool to seek help from the
-            Assistant's supervisors if it is unsure how best to respond.
-        """
-    ).strip(),
+    # Tool.SEARCH: textwrap.dedent(
+    #     """
+    #         A tool where Assistant provides a natural language question.
+    #         The tool initially searches the Alphacrucis student support
+    #         FAQ page and the main website. After it has undergone a
+    #         search a separate LLM will summarise the pages found with
+    #         respect to relevance to the provided question.
+    #     """
+    # ).strip(),
+    # Tool.EMAIL: textwrap.dedent(
+    #     """
+    #         A tool to send an email to the Assistant's Supervisors.
+    #         Assistant may use this tool to seek help from the
+    #         Assistant's supervisors if it is unsure how best to respond.
+    #     """
+    # ).strip(),
 }
 
 
@@ -142,6 +141,7 @@ PROMPT = textwrap.dedent(
 
 async def run_conversation(
     record_grouping: str,
+    user_email: str,
     openai_api_key: str,
     task_prompt: str,
     agent_name: str,
@@ -157,7 +157,11 @@ async def run_conversation(
     for tool, description in TOOL_DESCRIPTIONS.items():
         tools.append(f"{tool.value}: {description}")
 
-    tools_string = "\n".join(tools)
+    if len(tools) == 0:
+        tools_string = "No tools available"
+    else:
+        tools_string = "\n".join(tools)
+
     tool_names = ", ".join(TOOL_DESCRIPTIONS.keys())
 
     task_prompt_with_replacements = task_prompt.format(
@@ -178,24 +182,25 @@ async def run_conversation(
 
     logging.info(prompt)
 
-    async def _search(query: str):
-        return await alphacrucis_search(
-            openai_api_key=openai_api_key,
-            record_grouping=record_grouping,
-            client_email=client_email,
-            query=query,
-        )
+    # async def _search(query: str):
+    #     return await alphacrucis_search(
+    #         openai_api_key=openai_api_key,
+    #         record_grouping=record_grouping,
+    #         client_email=client_email,
+    #         query=query,
+    #     )
 
-    async def _email(query: str):
-        return "Unfortunately emailing the Supervisors is not currently available"
+    # async def _email(query: str):
+    #     return "Unfortunately emailing the Supervisors is not currently available"
 
     tool_functions = {
-        Tool.SEARCH: _search,
-        Tool.EMAIL: _email,
+        # Tool.SEARCH: _search,
+        # Tool.EMAIL: _email,
     }
 
     response = await _run_llm_process_observation_loop(
         record_grouping=record_grouping,
+        user_email=user_email,
         openai_api_key=openai_api_key,
         agent_name=agent_name,
         client_email=client_email,
@@ -208,6 +213,7 @@ async def run_conversation(
 
 async def _run_llm_process_observation_loop(
     record_grouping: str,
+    user_email: str,
     openai_api_key: str,
     agent_name: str,
     client_email: str,
@@ -222,6 +228,7 @@ async def _run_llm_process_observation_loop(
 
     while True:
         response = await _call_gpt_and_store_as_transcript(
+            user_email=user_email,
             openai_api_key=openai_api_key,
             record_grouping=record_grouping,
             client_email=client_email,
@@ -250,14 +257,15 @@ async def _run_llm_process_observation_loop(
 
 
 async def _call_gpt_and_store_as_transcript(
+    user_email: str,
     openai_api_key: str,
     record_grouping: str,
     client_email: str,
     model_kwargs: dict,
     prompt: str,
 ):
-    completions = await openai.Completion.acreate(
-        prompt=prompt, api_key=openai_api_key, **model_kwargs
+    completions = await completion_with_back_off(
+        user_email=user_email, prompt=prompt, api_key=openai_api_key, **model_kwargs
     )
     response: str = completions.choices[0].text.strip()
 

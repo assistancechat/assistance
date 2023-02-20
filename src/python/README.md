@@ -11,10 +11,10 @@ The Python AI assistance library.
 
 ### Server Hosting
 
-To view the live logs of the running api service run:
+Restart supervisorctl
 
 ```bash
-sudo journalctl -u run-api.service -f -n 50
+sudo supervisorctl restart chat-api
 ```
 
 ### Poetry Python version
@@ -27,6 +27,7 @@ poetry env use $(which python)
 
 ```bash
 rsync -r assistance:~/.assistance/* ~/.assistance/
+rsync -r server:~/.assistance/* ~/.home-assistance/
 ```
 
 ### Add a user to admin

@@ -12,15 +12,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import pathlib
+from typing import TypedDict
 
-LIB = pathlib.Path(__file__).parent
-
-STORE = pathlib.Path.home() / ".assistance"
-CONFIG = STORE / "config"
-SECRETS = CONFIG / "secrets"
-
-USERS = STORE / "users"
-PROMPTS = STORE / "prompts"
-RECORDS = STORE / "records"
-COMPLETIONS = STORE / "completions"
+Email = TypedDict(
+    "Email",
+    {
+        "recipient": str,
+        "sender": str,
+        "from": str,
+        "stripped-text": str,
+        "subject": str,
+        "timestamp": str,
+        "body-plain": str,
+        "user-email": str,
+        "agent-name": str,
+        "X-Forwarded-For": str,
+        "body-html": str,
+    },
+    total=False,
+)
