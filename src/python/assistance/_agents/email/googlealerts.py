@@ -119,10 +119,12 @@ async def googlealerts_agent(email: Email):
         )
         article_path.parent.mkdir(parents=True, exist_ok=True)
 
-        with aiofiles.open(article_path, "w") as f:
+        async with aiofiles.open(article_path, "w") as f:
             await f.write(single_article_details_as_string)
 
-        (new_alerts_path / hash_digest).touch()
+        pipeline_path = new_alerts_path / hash_digest
+        async with aiofiles.open(pipeline_path, "w") as f:
+            pass
 
     # user_email = email["user-email"]
 
