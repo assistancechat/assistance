@@ -18,6 +18,8 @@
 
 from .types import Email
 
+ALIASES = {"phirho@phirho.org"}
+
 
 def create_reply(
     original_email: Email,
@@ -82,6 +84,8 @@ def create_reply(
         item for item in no_overlap_cc_addresses if not "assistance.chat" in item
     ]
 
-    cc_addresses = ", ".join(no_assistance_chat_cc_addresses)
+    aliases_removed = set(no_assistance_chat_cc_addresses).difference(ALIASES)
+
+    cc_addresses = ", ".join(aliases_removed)
 
     return subject, total_reply, cc_addresses

@@ -23,7 +23,7 @@ from fastapi import APIRouter, Request
 from assistance import _ctx
 from assistance._agents.email.custom import react_to_custom_agent_request
 from assistance._agents.email.default import DEFAULT_TASKS
-from assistance._agents.email.reply import create_reply
+from assistance._agents.email.reply import ALIASES, create_reply
 from assistance._agents.email.restricted import RESTRICTED_TASKS
 from assistance._agents.email.types import Email
 from assistance._config import ROOT_DOMAIN
@@ -102,6 +102,12 @@ async def _react_to_email(email: Email):
     if "assistance.chat" in email["from"]:
         logging.info(
             "Email is from an assistance.chat agent. Breaking loop. Doing nothing."
+        )
+        return
+
+    if email["user-email"] in ALIASES:
+        logging.info(
+            "Email is from an alias of an assistance.chat agent. Breaking loop. Doing nothing."
         )
         return
 

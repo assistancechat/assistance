@@ -136,45 +136,17 @@ async def react_to_avatar_request(
     )
     response: str = completions.choices[0].text.strip()
 
-    subject, total_reply = create_reply(
+    subject, total_reply, cc_addresses = create_reply(
         original_email=email,
         response=response,
     )
 
     mailgun_data = {
-        "from": f"{agent_name}@{ROOT_DOMAIN}",
+        "from": "phirho@phirho.org",
         "to": email["user-email"],
+        "cc": cc_addresses,
         "subject": subject,
         "text": total_reply,
     }
-
-    cc_addresses = []
-
-    try:
-        cc_addresses += email["Cc"].split(",")
-    except KeyError:
-        pass
-
-    try:
-        cc_addresses += email["Sender"].split(",")
-    except KeyError:
-        pass
-
-    try:
-        cc_addresses += email["To"].split(",")
-    except KeyError:
-        pass
-
-    stripped_cc_addresses = [item.strip() for item in cc_addresses]
-    no_overlap_cc_addresses = [
-        item for item in set(stripped_cc_addresses) if not email["user-email"] in item
-    ]
-
-    no_assistance_chat_cc_addresses = [
-        item for item in no_overlap_cc_addresses if not "assistance.chat" in item
-    ]
-
-    if len(no_overlap_cc_addresses) > 0:
-        mailgun_data["cc"] = ", ".join(no_assistance_chat_cc_addresses)
 
     await send_email(mailgun_data)
