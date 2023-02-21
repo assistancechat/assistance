@@ -15,14 +15,29 @@
 # Prompt inspired by the work provided under an MIT license over at:
 # https://github.com/hwchase17/langchain/blob/ae1b589f60a/langchain/agents/conversational/prompt.py#L1-L36
 
-
 from assistance._config import ROOT_DOMAIN
 from assistance._keys import get_openai_api_key
+from assistance._mailgun import send_email
 
+from .reply import create_reply
 from .types import Email
 
 OPEN_AI_API_KEY = get_openai_api_key()
 
 
 async def react_to_avatar_request(email: Email, user_details: dict):
-    pass
+    response = "Avatar response!"
+
+    subject, total_reply = create_reply(
+        original_email=email,
+        response=response,
+    )
+
+    mailgun_data = {
+        "from": f"{email['agent-name']}@{ROOT_DOMAIN}",
+        "to": email["user-email"],
+        "subject": subject,
+        "text": total_reply,
+    }
+
+    await send_email(mailgun_data)

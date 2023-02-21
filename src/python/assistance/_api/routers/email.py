@@ -178,7 +178,7 @@ async def _fallback_email_handler(email: Email, user_details: dict):
         "text": total_reply,
     }
 
-    asyncio.create_task(send_email(mailgun_data))
+    await send_email(mailgun_data)
 
 
 async def _initial_parsing(email: Email):
@@ -240,7 +240,7 @@ async def _respond_to_gmail_forward_request(email: Email):
 
     assert found_token is not None
 
-    asyncio.create_task(_post_gmail_forwarding_verification(found_token))
+    await _post_gmail_forwarding_verification(found_token)
 
     user_email = email["stripped-text"].split(" ")[0]
     logging.info(f"User email: {user_email}")
@@ -255,7 +255,7 @@ async def _respond_to_gmail_forward_request(email: Email):
         ),
     }
 
-    asyncio.create_task(send_email(mailgun_data))
+    await send_email(mailgun_data)
 
 
 async def _post_gmail_forwarding_verification(verification_token):
