@@ -47,8 +47,9 @@ PROMPT = textwrap.dedent(
         You are having an email conversation with {email_from}. Your
         email address is {agent_name}@{root_domain}.
 
-        If this is the first email in the chain you should include the
-        following information serendipitously within your first reply:
+        If the following information (or something similar) isn't
+        anywhere within the email chain serendipitously include it
+        within your reply:
 
         - I am Avatar Phi Rho, the digital alter-ego of Philip Rhoades
         - I am available for discussing the various projects that Philip
@@ -147,9 +148,33 @@ async def react_to_avatar_request(
         "text": total_reply,
     }
 
+    cc_addresses = []
+
     try:
-        mailgun_data["cc"] = [email["Cc"], email["Sender"], email["To"]]
+        cc_addresses += email["Cc"].split(",")
     except KeyError:
         pass
+
+    try:
+        cc_addresses += email["Sender"].split(",")
+    except KeyError:
+        pass
+
+    try:
+        cc_addresses += email["To"].split(",")
+    except KeyError:
+        pass
+
+    stripped_cc_addresses = [item.strip() for item in cc_addresses]
+    no_overlap_cc_addresses = [
+        item for item in set(stripped_cc_addresses) if not email["user-email"] in item
+    ]
+
+    no_assistance_chat_cc_addresses = [
+        item for item in no_overlap_cc_addresses if not "assistance.chat" in item
+    ]
+
+    if len(no_overlap_cc_addresses) > 0:
+        mailgun_data["cc"] = ", ".join(no_assistance_chat_cc_addresses)
 
     await send_email(mailgun_data)

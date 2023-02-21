@@ -35,7 +35,7 @@ async def list_custom_agents(email: Email):
     for agent, prompt in agents_and_prompts.items():
         response += f"{agent}@{ROOT_DOMAIN}:\n{prompt}\n\n"
 
-    subject, total_reply = create_reply(
+    subject, total_reply, cc_addresses = create_reply(
         original_email=email,
         response=response,
     )
@@ -43,6 +43,7 @@ async def list_custom_agents(email: Email):
     mailgun_data = {
         "from": f"{email['agent-name']}@{ROOT_DOMAIN}",
         "to": email["user-email"],
+        "cc": cc_addresses,
         "subject": subject,
         "text": total_reply,
     }

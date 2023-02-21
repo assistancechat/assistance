@@ -87,7 +87,7 @@ async def react_to_custom_agent_request(email: Email, prompt_task: str):
 
     logging.info(response)
 
-    subject, total_reply = create_reply(
+    subject, total_reply, cc_addresses = create_reply(
         original_email=email,
         response=response,
     )
@@ -95,6 +95,7 @@ async def react_to_custom_agent_request(email: Email, prompt_task: str):
     mailgun_data = {
         "from": f"{email['agent-name']}@{ROOT_DOMAIN}",
         "to": email["user-email"],
+        "cc": cc_addresses,
         "subject": subject,
         "text": total_reply,
     }

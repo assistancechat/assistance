@@ -99,10 +99,9 @@ async def _handle_new_email(hash_digest: str, email: Email):
 
 
 async def _react_to_email(email: Email):
-    if email["from"] == email["recipient"]:
+    if "assistance.chat" in email["from"]:
         logging.info(
-            "Email is from the same address as the recipient. "
-            "Breaking loop. Doing nothing."
+            "Email is from an assistance.chat agent. Breaking loop. Doing nothing."
         )
         return
 
@@ -165,15 +164,16 @@ async def _fallback_email_handler(user_details: dict, email: Email):
         "Assistance.Chat"
     )
 
-    subject, total_reply = create_reply(
+    subject, total_reply, cc_addresses = create_reply(
         original_email=email,
         response=response,
+        additional_cc_addresses=["me@simonbiggs.net"],
     )
 
     mailgun_data = {
         "from": f"{email['agent-name']}@{ROOT_DOMAIN}",
         "to": email["user-email"],
-        "cc": "me@simonbiggs.net",
+        "cc": cc_addresses,
         "subject": subject,
         "text": total_reply,
     }

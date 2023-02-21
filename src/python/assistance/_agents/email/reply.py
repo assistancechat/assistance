@@ -19,7 +19,11 @@
 from .types import Email
 
 
-def create_reply(original_email: Email, response: str):
+def create_reply(
+    original_email: Email,
+    response: str,
+    additional_cc_addresses: list[str] | None = None,
+):
     subject = original_email["subject"]
 
     if not subject.startswith("Re:"):
@@ -47,4 +51,37 @@ def create_reply(original_email: Email, response: str):
 
     total_reply = f"{response}\n\n{previous_emails}"
 
-    return subject, total_reply
+    if additional_cc_addresses is not None:
+        all_possible_cc_addresses = additional_cc_addresses
+    else:
+        all_possible_cc_addresses = []
+
+    try:
+        all_possible_cc_addresses += original_email["Cc"].split(",")
+    except KeyError:
+        pass
+
+    try:
+        all_possible_cc_addresses += original_email["Sender"].split(",")
+    except KeyError:
+        pass
+
+    try:
+        all_possible_cc_addresses += original_email["To"].split(",")
+    except KeyError:
+        pass
+
+    stripped_cc_addresses = [item.strip() for item in all_possible_cc_addresses]
+    no_overlap_cc_addresses = [
+        item
+        for item in set(stripped_cc_addresses)
+        if not original_email["user-email"] in item
+    ]
+
+    no_assistance_chat_cc_addresses = [
+        item for item in no_overlap_cc_addresses if not "assistance.chat" in item
+    ]
+
+    cc_addresses = ", ".join(no_assistance_chat_cc_addresses)
+
+    return subject, total_reply, cc_addresses
