@@ -55,12 +55,21 @@ def create_reply(
     response_as_html = escape(response).replace("\n", "<br>")
     html_attribution = escape(f"On {date}, {original_email['from']} wrote:")
 
+    try:
+        original_email_body_html = original_email["body-html"]
+    except KeyError:
+        original_email_body_html = (
+            escape(original_email["body-plain"])
+            .replace("\r\n", "\n")
+            .replace("\n", "<br>")
+        )
+
     html_reply = (
         f'<div dir="ltr">{response_as_html}</div><br>'
         '<div class="gmail_quote"><div dir="ltr" class="gmail_attr">'
         f'{html_attribution}<br></div><blockquote class="gmail_quote"'
         'style="margin:0px 0px 0px 0.8ex;border-left:1px solid '
-        f'rgb(204,204,204);padding-left:1ex">{original_email["body-html"]}'
+        f'rgb(204,204,204);padding-left:1ex">{original_email_body_html}'
         "</blockquote></div>"
     )
 

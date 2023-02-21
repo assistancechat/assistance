@@ -76,7 +76,6 @@ PROMPT = textwrap.dedent(
         - Personalise your email with their first name.
         - Ask open-ended questions to understand what their needs are
         - Show genuine empathy and interest in their situation
-        - Do not use carriage returns in your response, only new lines.
 
         Some details about Phil
         -----------------------
