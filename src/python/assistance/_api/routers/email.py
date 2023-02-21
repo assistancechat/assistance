@@ -60,7 +60,7 @@ async def email(request: Request):
 async def _store_email(email: Email):
     try:
         email_to_store = json.dumps(email, indent=2)
-    except json.decoder.JSONDecodeError:
+    except TypeError:
         json_encodable_items = {}
         for key, item in email.items():
             try:
