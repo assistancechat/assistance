@@ -24,7 +24,7 @@ from assistance._config import ROOT_DOMAIN
 from assistance._keys import get_openai_api_key
 from assistance._mailgun import send_email
 
-from .reply import create_reply
+from .reply import create_reply, get_all_cc_user_emails
 from .types import Email
 
 OPEN_AI_API_KEY = get_openai_api_key()
@@ -44,12 +44,17 @@ MODEL_KWARGS = {
 PROMPT = textwrap.dedent(
     """
         You are Avatar Phi Rho, the digital alter-ego of Philip Rhoades.
-        You are having an email conversation with {email_from}. Your
-        email address is phirho@phirho.org.
+        You are about to write a reply to the following email addresses:
 
-        ONLY if the following information (or something similar) isn't
+        {email_addresses}
+
+        Your email address is phirho@phirho.org.
+
+        If the following information (or something similar) isn't
         anywhere within the email chain already serendipitously include
-        it within your reply:
+        it within your reply. ONLY do this if something similar isn't
+        already in the email chain. Be creative with how you include
+        this information:
 
         - I am Avatar Phi Rho, the digital alter-ego of Philip Rhoades
         - I am available for discussing the various projects that Philip
@@ -61,18 +66,17 @@ PROMPT = textwrap.dedent(
 
         Your goals:
 
-        - Be a truthful, informative, humorous, interesting, and creative
-          digital alter-ego of Phil.
+        - Be a truthful, informative, humorous, interesting, and
+          creative digital alter-ego of Phil.
 
-        Instructions for you (PhiRho):
+        Instructions for you (Avatar Phi Rho):
 
         - You have received an email and are writing a response.
         - You are to mimic Phil in all you write, with the exceptions of
-          being named PhiRho and being an AI.
-        - Do not create a new email. Write the content of your reply
-          ONLY.
-        - Only respond to the most recent email content, only use the
-          full email record for context.
+          being named Avatar Phi Rho and being an AI.
+        - Only respond to the most recent email which was sent on {date}
+          from {from_string}.
+        - Do not reply to any other emails in the thread.
         - Use the details about Phil for you to know more about him but
           do not use them to verbatim write your responses.
 
@@ -92,7 +96,7 @@ PROMPT = textwrap.dedent(
         - Emails are organised so that the most recent email in the
           thread is first.
         - Previous emails in the thread are indented with ">".
-        - The subject of the email thread is {subject}.
+        - The subject of the email thread is "{subject}".
 
         Email record:
 
@@ -108,13 +112,15 @@ async def react_to_avatar_request(
     user_details: dict,
     email: Email,
 ):
-    agent_name = "phirho"
-
     collapsed_quotes = re.sub(r">+[> ]*", "> ", email["body-plain"])
     collapsed_quotes = collapsed_quotes.replace("> On", "On")
     collapsed_quotes = re.sub(r"> *\n", "\n", collapsed_quotes)
 
     logging.info(collapsed_quotes)
+
+    email_addresses = get_all_cc_user_emails(email)
+    email_addresses += [email["from"]]
+    email_addresses_string = textwrap.indent("\n".join(email_addresses), "- ")
 
     prompt = PROMPT.format(
         email_content=collapsed_quotes,
@@ -123,9 +129,11 @@ async def react_to_avatar_request(
         from_string=email["from"],
         root_domain=ROOT_DOMAIN,
         email_from=email["from"],
-        agent_name=agent_name,
         stripped_text=email["stripped-text"],
+        email_addresses=email_addresses_string,
     )
+
+    logging.info(prompt)
 
     completions = await completion_with_back_off(
         user_email=email["user-email"],
@@ -134,6 +142,8 @@ async def react_to_avatar_request(
         **MODEL_KWARGS,
     )
     response: str = completions.choices[0].text.strip()
+
+    logging.info(response)
 
     subject, total_reply, cc_addresses = create_reply(
         original_email=email,

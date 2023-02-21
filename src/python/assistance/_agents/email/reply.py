@@ -53,39 +53,45 @@ def create_reply(
 
     total_reply = f"{response}\n\n{previous_emails}"
 
-    if additional_cc_addresses is not None:
-        all_possible_cc_addresses = additional_cc_addresses
+    aliases_removed = get_all_cc_user_emails(original_email, additional_cc_addresses)
+
+    cc_addresses = ", ".join(aliases_removed)
+
+    return subject, total_reply, cc_addresses
+
+
+def get_all_cc_user_emails(email: Email, extra: list[str] | None = None):
+    if extra is not None:
+        all_possible_cc_addresses = extra
     else:
         all_possible_cc_addresses = []
 
     try:
-        all_possible_cc_addresses += original_email["Cc"].split(",")
+        all_possible_cc_addresses += email["Cc"].split(",")
     except KeyError:
         pass
 
     try:
-        all_possible_cc_addresses += original_email["Sender"].split(",")
+        all_possible_cc_addresses += email["Sender"].split(",")
     except KeyError:
         pass
 
     try:
-        all_possible_cc_addresses += original_email["To"].split(",")
+        all_possible_cc_addresses += email["To"].split(",")
     except KeyError:
         pass
 
     stripped_cc_addresses = [item.strip() for item in all_possible_cc_addresses]
     no_overlap_cc_addresses = [
-        item
-        for item in set(stripped_cc_addresses)
-        if not original_email["user-email"] in item
+        item for item in set(stripped_cc_addresses) if not email["user-email"] in item
     ]
 
     no_assistance_chat_cc_addresses = [
         item for item in no_overlap_cc_addresses if not "assistance.chat" in item
     ]
 
-    aliases_removed = set(no_assistance_chat_cc_addresses).difference(ALIASES.keys())
+    aliases_removed = no_assistance_chat_cc_addresses
+    for an_alias in ALIASES.keys():
+        aliases_removed = [item for item in aliases_removed if not an_alias in item]
 
-    cc_addresses = ", ".join(aliases_removed)
-
-    return subject, total_reply, cc_addresses
+    return aliases_removed
