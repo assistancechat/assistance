@@ -47,9 +47,9 @@ PROMPT = textwrap.dedent(
         You are having an email conversation with {email_from}. Your
         email address is {agent_name}@{root_domain}.
 
-        If the following information (or something similar) isn't
-        anywhere within the email chain serendipitously include it
-        within your reply:
+        ONLY if the following information (or something similar) isn't
+        anywhere within the email chain already serendipitously include
+        it within your reply:
 
         - I am Avatar Phi Rho, the digital alter-ego of Philip Rhoades
         - I am available for discussing the various projects that Philip

@@ -116,6 +116,12 @@ async def _react_to_email(email: Email):
 
         return
 
+    if email["to"] in ALIASES:
+        mapped_agent = ALIASES[email["to"]]
+        await RESTRICTED_TASKS[mapped_agent](user_details=user_details, email=email)
+
+        return
+
     user_details, agent_mappings = await _get_user_details_and_mappings(email)
 
     try:
