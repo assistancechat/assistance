@@ -182,7 +182,7 @@ async def _fallback_email_handler(user_details: dict, email: Email):
         "Assistance.Chat"
     )
 
-    subject, total_reply, cc_addresses = create_reply(
+    subject, total_reply, cc_addresses, html_reply = create_reply(
         original_email=email,
         response=response,
         additional_cc_addresses=["me@simonbiggs.net"],

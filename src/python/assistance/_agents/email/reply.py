@@ -12,9 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Prompt inspired by the work provided under an MIT license over at:
-# https://github.com/hwchase17/langchain/blob/ae1b589f60a/langchain/agents/conversational/prompt.py#L1-L36
 
+from html import escape
 
 from .types import Email
 
@@ -53,11 +52,23 @@ def create_reply(
 
     total_reply = f"{response}\n\n{previous_emails}"
 
+    response_as_html = escape(response).replace("\n", "<br>")
+    html_attribution = escape(f"On {date}, {original_email['from']} wrote:")
+
+    html_reply = (
+        f'<div dir="ltr">{response_as_html}</div><br>'
+        '<div class="gmail_quote"><div dir="ltr" class="gmail_attr">'
+        f'{html_attribution}<br></div><blockquote class="gmail_quote"'
+        'style="margin:0px 0px 0px 0.8ex;border-left:1px solid '
+        f'rgb(204,204,204);padding-left:1ex">{original_email["body-html"]}'
+        "</blockquote></div>"
+    )
+
     aliases_removed = get_all_cc_user_emails(original_email, additional_cc_addresses)
 
     cc_addresses = ", ".join(aliases_removed)
 
-    return subject, total_reply, cc_addresses
+    return subject, total_reply, cc_addresses, html_reply
 
 
 def get_all_cc_user_emails(email: Email, extra: list[str] | None = None):

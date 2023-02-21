@@ -87,7 +87,7 @@ async def react_to_custom_agent_request(email: Email, prompt_task: str):
 
     logging.info(response)
 
-    subject, total_reply, cc_addresses = create_reply(
+    subject, total_reply, cc_addresses, html_reply = create_reply(
         original_email=email,
         response=response,
     )

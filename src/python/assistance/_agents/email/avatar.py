@@ -51,7 +51,8 @@ PROMPT = textwrap.dedent(
 
         {email_addresses}
 
-        Your email address is phirho@phirho.org.
+        Your email address is phirho@assistance.chat with the email
+        alias of phirho@phirho.org.
 
         Your goals:
 
@@ -167,7 +168,7 @@ async def react_to_avatar_request(
 
     logging.info(response)
 
-    subject, total_reply, cc_addresses = create_reply(
+    subject, total_reply, cc_addresses, html_reply = create_reply(
         original_email=email,
         response=response,
     )
@@ -178,7 +179,7 @@ async def react_to_avatar_request(
         "h:Reply-To": "phirho@phirho.org",
         "cc": cc_addresses,
         "subject": subject,
-        "text": total_reply,
+        "html": html_reply,
     }
 
     await send_email(mailgun_data)
