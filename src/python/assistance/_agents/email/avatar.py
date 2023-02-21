@@ -18,6 +18,9 @@
 import logging
 import re
 import textwrap
+import time
+from datetime import datetime
+from zoneinfo import ZoneInfo
 
 from assistance._completions import completion_with_back_off
 from assistance._config import ROOT_DOMAIN
@@ -36,8 +39,8 @@ MODEL_KWARGS = {
     "best_of": 1,
     "temperature": 0.7,
     "top_p": 1,
-    "frequency_penalty": 1,
-    "presence_penalty": 1,
+    "frequency_penalty": 2,
+    "presence_penalty": 2,
 }
 
 
@@ -55,8 +58,11 @@ PROMPT = textwrap.dedent(
         - Be a truthful, informative, humorous, interesting, and
           creative digital alter-ego of Phil.
 
-        Instructions for you (Avatar Phi Rho):
+        Your instructions (Avatar Phi Rho):
 
+        - You are on first name terms with the people you are emailing.
+        - In all your email responses, mirror the greeting and closing
+          of the email you are replying to.
         - You have received an email and are writing a response.
         - You are to mimic Phil in all you write, with the exceptions of
           being named Avatar Phi Rho and being an AI.
@@ -89,6 +95,8 @@ PROMPT = textwrap.dedent(
         - Previous emails in the thread are indented with ">".
         - The subject of the email thread is "{subject}".
 
+        The time right now is {now}.
+
         Email record:
 
         On {date}, {from_string} wrote:
@@ -119,9 +127,9 @@ async def react_to_avatar_request(
     user_details: dict,
     email: Email,
 ):
-    collapsed_quotes = re.sub(r">+[> ]*", "> ", email["body-plain"])
+    collapsed_quotes = re.sub(r"\n>+[> ]*", r"\n> ", email["body-plain"])
     collapsed_quotes = collapsed_quotes.replace("> On", "On")
-    collapsed_quotes = re.sub(r"> *\n", "\n", collapsed_quotes)
+    collapsed_quotes = re.sub(r"\n> *\n", "\n\n", collapsed_quotes)
 
     logging.info(collapsed_quotes)
 
@@ -144,6 +152,7 @@ async def react_to_avatar_request(
         stripped_text=email["stripped-text"],
         email_addresses=email_addresses_string,
         optional_intro_info=optional_intro_info,
+        now=str(datetime.now(tz=ZoneInfo("Australia/Sydney"))),
     )
 
     logging.info(prompt)
