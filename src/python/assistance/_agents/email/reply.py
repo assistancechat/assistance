@@ -15,7 +15,6 @@
 # Prompt inspired by the work provided under an MIT license over at:
 # https://github.com/hwchase17/langchain/blob/ae1b589f60a/langchain/agents/conversational/prompt.py#L1-L36
 
-import textwrap
 
 from .types import Email
 
@@ -29,12 +28,22 @@ def create_reply(original_email: Email, response: str):
     body_plain = original_email["body-plain"]
     date = original_email["Date"]
 
-    with_indent = textwrap.indent(
-        body_plain, " ", predicate=lambda line: not line.startswith(">")
-    )
-    with_indent = textwrap.indent(with_indent, ">")
+    email_lines = body_plain.strip().splitlines()
+    if len(email_lines[-1]) == 0:
+        email_lines = email_lines[:-1]
 
-    previous_emails = f"On {date}, {original_email['from']} wrote:\n{with_indent}"
+    quoted_lines = []
+    for line in email_lines:
+        if line.startswith(">"):
+            quoted_lines.append(f">{line}")
+        else:
+            quoted_lines.append(f"> {line}")
+
+    previous_email_with_indent = "\n".join(quoted_lines)
+
+    previous_emails = (
+        f"On {date}, {original_email['from']} wrote:\n{previous_email_with_indent}"
+    )
 
     total_reply = f"{response}\n\n{previous_emails}"
 

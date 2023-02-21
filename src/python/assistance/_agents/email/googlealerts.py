@@ -22,7 +22,7 @@ from urllib.parse import parse_qs, urlparse
 import aiofiles
 
 from assistance._agents.relevance import article_scoring
-from assistance._agents.summaries import summarise_url_with_tasks
+from assistance._agents.summaries import summarise_news_article_url_with_tasks
 from assistance._completions import completion_with_back_off
 from assistance._config import ROOT_DOMAIN
 from assistance._keys import get_openai_api_key
@@ -200,7 +200,7 @@ async def googlealerts_agent(email: Email):
 async def _summarise_and_fulfil_tasks(
     user_email: str, openai_api_key: str, tasks: list[str], url: str
 ) -> str:
-    summary = await summarise_url_with_tasks(
+    summary = await summarise_news_article_url_with_tasks(
         user_email=user_email, openai_api_key=openai_api_key, url=url, tasks=tasks
     )
 

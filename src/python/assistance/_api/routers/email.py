@@ -118,7 +118,7 @@ async def _react_to_email(email: Email):
     except KeyError:
         pass
     else:
-        await RESTRICTED_TASKS[mapped_agent](email=email, user_details=user_details)
+        await RESTRICTED_TASKS[mapped_agent](user_details=user_details, email=email)
 
         return
 
@@ -134,7 +134,7 @@ async def _react_to_email(email: Email):
 
         return
 
-    await _fallback_email_handler(email=email, user_details=user_details)
+    await _fallback_email_handler(user_details=user_details, email=email)
     return
 
 
@@ -154,7 +154,7 @@ async def _get_user_details_and_mappings(email: Email):
     return user_details, agent_mappings
 
 
-async def _fallback_email_handler(email: Email, user_details: dict):
+async def _fallback_email_handler(user_details: dict, email: Email):
     response = (
         f"Hi {user_details['first_name']},\n\n"
         "This particular Assistance.Chat agent has not yet been implemented "
