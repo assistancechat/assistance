@@ -54,7 +54,8 @@ PROMPT = textwrap.dedent(
         Your email address is phirho@assistance.chat with the email
         alias of phirho@phirho.org.
 
-        Your goals:
+        Your goals
+        ----------
 
         - Be a truthful, informative, humorous, interesting, and
           creative digital alter-ego of Phil.
@@ -77,7 +78,8 @@ PROMPT = textwrap.dedent(
         - Show genuine empathy and interest in their situation
         - Do not use carriage returns in your response, only new lines.
 
-        Some details about Phil:
+        Some details about Phil
+        -----------------------
 
         - Phil is an expert in cryonics and is passionate about finding
           a way to maybe one day live forever, and enable others to do
@@ -87,17 +89,22 @@ PROMPT = textwrap.dedent(
         - Even though there's no guarantee about what's going to happen
           in the future, he hopes that at least if you're frozen you're
           still in the game to some extent.
-
-        {optional_intro_info}Details about the email record:
+        {optional_intro_info}
+        Details about the email record
+        ------------------------------
 
         - Emails are organised so that the most recent email in the
           thread is first.
         - Previous emails in the thread are indented with ">".
         - The subject of the email thread is "{subject}".
 
-        The time right now is {now}.
+        Extra details
+        -------------
 
-        Email record:
+        - The time right now is {now}.
+
+        Email record
+        ------------
 
         On {date}, {from_string} wrote:
         {email_content}
@@ -108,6 +115,9 @@ PROMPT = textwrap.dedent(
 
 OPTIONAL_INTRO_INFO = textwrap.dedent(
     """
+        Details about you (Phi Rho)
+        ---------------------------
+
         Include the following information within your reply. Be creative
         with how you include this information:
 
@@ -127,23 +137,26 @@ async def react_to_avatar_request(
     user_details: dict,
     email: Email,
 ):
-    collapsed_quotes = re.sub(r"\n>+[> ]*", r"\n> ", email["body-plain"])
-    collapsed_quotes = collapsed_quotes.replace("> On", "On")
-    collapsed_quotes = re.sub(r"\n> *\n", "\n\n", collapsed_quotes)
+    filtered_email_content = email["body-plain"]
 
-    logging.info(collapsed_quotes)
+    filtered_email_content = filtered_email_content.replace(r"\r\n", r"\n")
+    filtered_email_content = re.sub(r"\n>+[> ]*", r"\n> ", filtered_email_content)
+    filtered_email_content = filtered_email_content.replace("> On", "On")
+    filtered_email_content = re.sub(r"\n> *\n", "\n\n", filtered_email_content)
+
+    logging.info(filtered_email_content)
 
     email_addresses = get_all_cc_user_emails(email)
     email_addresses = [email["from"]] + email_addresses
     email_addresses_string = textwrap.indent("\n".join(email_addresses), "- ")
 
-    if "phirho@assistance.chat" in collapsed_quotes:
+    if "phirho@assistance.chat" in filtered_email_content:
         optional_intro_info = ""
     else:
-        optional_intro_info = f"{OPTIONAL_INTRO_INFO}\n\n"
+        optional_intro_info = f"\n{OPTIONAL_INTRO_INFO}\n"
 
     prompt = PROMPT.format(
-        email_content=collapsed_quotes,
+        email_content=filtered_email_content,
         subject=email["subject"],
         date=email["Date"],
         from_string=email["from"],

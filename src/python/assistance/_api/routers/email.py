@@ -66,7 +66,7 @@ async def _store_email(email: Email):
             try:
                 json.dumps(item)
                 json_encodable_items[key] = item
-            except json.decoder.JSONDecodeError:
+            except TypeError:
                 json_encodable_items[key] = str(item)
 
         email_to_store = json.dumps(json_encodable_items, indent=2)
