@@ -137,7 +137,7 @@ async def react_to_avatar_request(
     }
 
     try:
-        mailgun_data["cc"] = email["Cc"]
+        mailgun_data["cc"] = email["Cc"] + email["Sender"]
     except KeyError:
         pass
 
