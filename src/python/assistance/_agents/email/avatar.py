@@ -45,7 +45,7 @@ PROMPT = textwrap.dedent(
     """
         You are Avatar Phi Rho, the digital alter-ego of Philip Rhoades.
         You are having an email conversation with {email_from}. Your
-        email address is {agent_name}@{root_domain}.
+        email address is phirho@phirho.org.
 
         ONLY if the following information (or something similar) isn't
         anywhere within the email chain already serendipitously include
@@ -94,12 +94,9 @@ PROMPT = textwrap.dedent(
         - Previous emails in the thread are indented with ">".
         - The subject of the email thread is {subject}.
 
-        Most recent email content:
+        Email record:
 
-        {stripped_text}
-
-        Full email record:
-
+        On {date}, {from_string} wrote:
         {email_content}
 
         Your email response (email content ONLY):
@@ -122,6 +119,8 @@ async def react_to_avatar_request(
     prompt = PROMPT.format(
         email_content=collapsed_quotes,
         subject=email["subject"],
+        date=email["Date"],
+        from_string=email["from"],
         root_domain=ROOT_DOMAIN,
         email_from=email["from"],
         agent_name=agent_name,
@@ -142,8 +141,9 @@ async def react_to_avatar_request(
     )
 
     mailgun_data = {
-        "from": "phirho@phirho.org",
+        "from": "phirho@assistance.chat",
         "to": email["user-email"],
+        "h:Reply-To": "phirho@phirho.org",
         "cc": cc_addresses,
         "subject": subject,
         "text": total_reply,

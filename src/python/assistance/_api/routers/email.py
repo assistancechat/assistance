@@ -116,6 +116,8 @@ async def _react_to_email(email: Email):
 
         return
 
+    user_details, agent_mappings = await _get_user_details_and_mappings(email)
+
     try:
         delivered_to = email["Delivered-To"]
     except KeyError:
@@ -123,11 +125,10 @@ async def _react_to_email(email: Email):
     else:
         if delivered_to in ALIASES:
             mapped_agent = ALIASES[delivered_to]
+
             await RESTRICTED_TASKS[mapped_agent](user_details=user_details, email=email)
 
             return
-
-    user_details, agent_mappings = await _get_user_details_and_mappings(email)
 
     try:
         mapped_agent = agent_mappings[email["agent-name"]]
