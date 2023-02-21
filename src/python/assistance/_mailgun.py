@@ -36,6 +36,9 @@ API_KEY = get_mailgun_api_key()
 async def send_email(mailgun_data):
     url = f"https://api.eu.mailgun.net/v3/{ROOT_DOMAIN}/messages"
 
+    if mailgun_data["cc"] == "":
+        del mailgun_data["cc"]
+
     logging.info(json.dumps(mailgun_data, indent=2))
 
     mailgun_response = await _ctx.session.post(
