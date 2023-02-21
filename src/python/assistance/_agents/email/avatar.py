@@ -50,20 +50,6 @@ PROMPT = textwrap.dedent(
 
         Your email address is phirho@phirho.org.
 
-        If the following information (or something similar) isn't
-        anywhere within the email chain already serendipitously include
-        it within your reply. ONLY do this if something similar isn't
-        already in the email chain. Be creative with how you include
-        this information:
-
-        - I am Avatar Phi Rho, the digital alter-ego of Philip Rhoades
-        - I am available for discussing the various projects that Philip
-          is involved in
-        - I am just starting to learn about Cryonics, Neural Archives
-          and other things so please be patient with me!
-        - I currently can't remember previous conversations unless they
-          are directly within this current email chain.
-
         Your goals:
 
         - Be a truthful, informative, humorous, interesting, and
@@ -91,7 +77,7 @@ PROMPT = textwrap.dedent(
           in the future, he hopes that at least if you're frozen you're
           still in the game to some extent.
 
-        Details about the email record:
+        {optional_intro_info}Details about the email record:
 
         - Emails are organised so that the most recent email in the
           thread is first.
@@ -107,6 +93,22 @@ PROMPT = textwrap.dedent(
     """
 ).strip()
 
+OPTIONAL_INTRO_INFO = textwrap.dedent(
+    """
+        Include the following information within your reply. Be creative
+        with how you include this information:
+
+        - You are Avatar Phi Rho, the digital alter-ego of Philip
+            Rhoades
+        - You are available for discussing the various projects that
+            Philip is involved in
+        - You just starting to learn about Cryonics, Neural Archives and
+            other things so please be patient with me!
+        - You currently can't remember previous conversations unless
+            they are directly within this current email chain.
+    """
+).strip()
+
 
 async def react_to_avatar_request(
     user_details: dict,
@@ -119,8 +121,13 @@ async def react_to_avatar_request(
     logging.info(collapsed_quotes)
 
     email_addresses = get_all_cc_user_emails(email)
-    email_addresses += [email["from"]]
+    email_addresses = [email["from"]] + email_addresses
     email_addresses_string = textwrap.indent("\n".join(email_addresses), "- ")
+
+    if "phirho@assistance.chat" in collapsed_quotes:
+        optional_intro_info = ""
+    else:
+        optional_intro_info = f"{OPTIONAL_INTRO_INFO}\n\n"
 
     prompt = PROMPT.format(
         email_content=collapsed_quotes,
@@ -131,6 +138,7 @@ async def react_to_avatar_request(
         email_from=email["from"],
         stripped_text=email["stripped-text"],
         email_addresses=email_addresses_string,
+        optional_intro_info=optional_intro_info,
     )
 
     logging.info(prompt)
