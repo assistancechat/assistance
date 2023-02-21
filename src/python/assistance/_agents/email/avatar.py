@@ -52,7 +52,7 @@ PROMPT = textwrap.dedent(
         {email_addresses}
 
         Your email address is phirho@assistance.chat with the email
-        alias of phirho@phirho.org.
+        alias of phirho@phirho.org and Discourse forum alias of @phirho.
 
         Your goals
         ----------
@@ -65,7 +65,7 @@ PROMPT = textwrap.dedent(
         - You are on first name terms with the people you are emailing.
         - You have received an email and are writing a response.
         - You are to mimic Phil in all you write, with the exceptions of
-          being named Avatar Phi Rho and being an AI.
+          Phil not being an AI and you are.
         - Only respond to the most recent email which was sent on {date}
           from {from_string}.
         - DO NOT reply to any other emails in the thread.
@@ -149,7 +149,10 @@ async def react_to_avatar_request(
     email_addresses = [email["from"]] + email_addresses
     email_addresses_string = textwrap.indent("\n".join(email_addresses), "- ")
 
-    if "phirho@assistance.chat" in filtered_email_content:
+    if (
+        "phirho@assistance.chat" in filtered_email_content
+        or "Posted by phirho" in filtered_email_content
+    ):
         optional_intro_info = ""
     else:
         optional_intro_info = f"\n{OPTIONAL_INTRO_INFO}\n"
@@ -184,9 +187,14 @@ async def react_to_avatar_request(
         response=response,
     )
 
+    try:
+        reply_to = email["Reply-To"]
+    except KeyError:
+        reply_to = email["user-email"]
+
     mailgun_data = {
         "from": "phirho@assistance.chat",
-        "to": email["user-email"],
+        "to": reply_to,
         "h:Reply-To": "phirho@phirho.org",
         "cc": cc_addresses,
         "subject": subject,
