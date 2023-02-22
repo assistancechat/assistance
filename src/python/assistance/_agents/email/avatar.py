@@ -213,6 +213,8 @@ DISCOURSE_PROMPT = textwrap.dedent(
         # The current conversation
 
         {transcript}
+
+        Post from @phirho:
     """
 ).strip()
 
@@ -307,28 +309,34 @@ SIGNATURE_KEY = """---
 def _prompt_as_discourse_thread(email: Email):
     discourse_thread = email["body-plain"]
 
-    current, previous = discourse_thread.split(REPLIES_KEY)
+    split_conversation = discourse_thread.split(REPLIES_KEY)
+
+    if len(split_conversation) == 1:
+        current = split_conversation[0]
+        previous_replies = []
+    else:
+        current, previous = split_conversation
+
+        previous_without_signature = previous.split(SIGNATURE_KEY)[0].strip()
+
+        previous_by_lines = previous_without_signature.splitlines()
+
+        previous_replies = []
+        next_start_index = 0
+
+        for i, line in enumerate(previous_by_lines):
+            match = re.match("Posted by (.*) on (.*)", line)
+            if match:
+                a_reply = {
+                    "from": match.group(1),
+                    "content": "\n".join(previous_by_lines[next_start_index:i]),
+                }
+                previous_replies.append(a_reply)
+                next_start_index = i + 1
+
+        previous_replies = previous_replies[::-1]
 
     current = current.strip()
-
-    previous_without_signature = previous.split(SIGNATURE_KEY)[0].strip()
-
-    previous_by_lines = previous_without_signature.splitlines()
-
-    previous_replies = []
-    next_start_index = 0
-
-    for i, line in enumerate(previous_by_lines):
-        match = re.match("Posted by (.*) on (.*)", line)
-        if match:
-            a_reply = {
-                "from": match.group(1),
-                "content": "\n".join(previous_by_lines[next_start_index:i]),
-            }
-            previous_replies.append(a_reply)
-            next_start_index = i + 1
-
-    previous_replies = previous_replies[::-1]
 
     current_user = (
         email["from"]
