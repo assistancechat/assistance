@@ -12,22 +12,38 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import TypedDict
+from typing import Literal, TypedDict
+
+# Spam and Unknown are guessed here
+SpamStatus = Literal["NotSpam", "Spam", "Unknown"]
 
 Email = TypedDict(
     "Email",
     {
-        "recipient": str,
-        "sender": str,
+        "attachment_quantity": int,
+        "attachments": list,
+        "auto_submitted": None,
+        "bounce": bool,
+        "cc": str | None,
+        "date": str,
         "from": str,
-        "stripped-text": str,
+        "html_body": str,
+        "id": int,
+        "in_reply_to": str | None,
+        "mail_from": str,
+        "message_id": str,
+        "plain_body": str,
+        "rcpt_to": str,
+        "received_with_ssl": bool,
+        "references": None,
+        "replies_from_plain_body": None | str,
+        "reply_to": None | str,
+        "size": str,
+        "spam_status": SpamStatus,
         "subject": str,
-        "timestamp": str,
-        "body-plain": str,
-        "user-email": str,
-        "agent-name": str,
-        "X-Forwarded-For": str,
-        "body-html": str,
+        "timestamp": float,
+        "to": str,
+        "token": str,
     },
     total=False,
 )

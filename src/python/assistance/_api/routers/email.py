@@ -45,7 +45,7 @@ router = APIRouter(prefix="/email")
 
 @router.post("")
 async def email(request: Request):
-    email = Email(await request.form())
+    email = Email(await request.json())
 
     logging.info(_ctx.pp.pformat(email))
 

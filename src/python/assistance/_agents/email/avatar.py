@@ -253,7 +253,7 @@ async def react_to_avatar_request(
     mailgun_data = {
         "from": "phirho@assistance.chat",
         "to": reply_to,
-        "h:Reply-To": "phirho@phirho.org",
+        # "h:Reply-To": "phirho@phirho.org",
         "cc": cc_addresses,
         "subject": subject,
         "html": html_reply,
