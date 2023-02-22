@@ -52,17 +52,13 @@ def create_reply(
 
     total_reply = f"{response}\n\n{previous_emails}"
 
-    response_as_html = escape(response).replace("\n", "<br>")
+    response_as_html = _convert_text_to_html(response)
     html_attribution = escape(f"On {date}, {original_email['from']} wrote:")
 
     try:
         original_email_body_html = original_email["body-html"]
     except KeyError:
-        original_email_body_html = (
-            escape(original_email["body-plain"])
-            .replace("\r\n", "\n")
-            .replace("\n", "<br>")
-        )
+        original_email_body_html = _convert_text_to_html(original_email["body-plain"])
 
     html_reply = (
         f'<div dir="ltr">{response_as_html}</div><br>'
@@ -78,6 +74,12 @@ def create_reply(
     cc_addresses = ", ".join(aliases_removed)
 
     return subject, total_reply, cc_addresses, html_reply
+
+
+def _convert_text_to_html(text: str):
+    return (
+        escape(text).replace("\r\n", "\n").replace("\n", "<br>").replace("\r", "<br>")
+    )
 
 
 def get_all_cc_user_emails(email: Email, extra: list[str] | None = None):
