@@ -29,6 +29,7 @@ class ReplyData(TypedDict):
     cc_addresses: list[str]
     html_reply: str
     to_addresses: list[str]
+    prefer_plain_text: bool
 
 
 def create_reply(
@@ -66,12 +67,13 @@ def create_reply(
     response_as_html = _convert_text_to_html(response)
     html_attribution = escape(f"On {date}, {original_email['from']} wrote:")
 
-    try:
-        original_email_body_html = original_email["html_body"]
-    except KeyError:
+    prefer_plain_text = False
+    original_email_body_html = original_email["html_body"]
+    if original_email_body_html is None:
         original_email_body_html = _convert_text_to_html(
             original_email["plain_all_content"]
         )
+        prefer_plain_text = True
 
     html_reply = (
         f'<div dir="ltr">{response_as_html}</div><br>'
@@ -92,6 +94,7 @@ def create_reply(
         "cc_addresses": cc_addresses,
         "html_reply": html_reply,
         "to_addresses": to_addresses,
+        "prefer_plain_text": prefer_plain_text,
     }
 
 

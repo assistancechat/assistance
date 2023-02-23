@@ -265,6 +265,10 @@ async def react_to_avatar_request(
         "html_body": reply["html_reply"],
     }
 
+    if reply["prefer_plain_text"]:
+        del mailgun_data["html_body"]
+        mailgun_data["plain_body"] = reply["total_reply"]
+
     await send_email(mailgun_data)
 
 
