@@ -16,6 +16,7 @@ import asyncio
 import json
 import logging
 import re
+from typing import Literal, cast
 
 import aiofiles
 from fastapi import APIRouter, Request
@@ -111,7 +112,7 @@ async def _react_to_email(email: Email):
         )
         return
 
-    if email["sender"] == "forwarding-noreply@google.com":
+    if email["mail_from"] == "forwarding-noreply@google.com":
         await _respond_to_gmail_forward_request(email)
 
         return
@@ -119,7 +120,7 @@ async def _react_to_email(email: Email):
     user_details, agent_mappings = await _get_user_details_and_mappings(email)
 
     try:
-        delivered_to = email["Delivered-To"]
+        delivered_to = email["to"]
     except KeyError:
         pass
     else:
@@ -200,9 +201,16 @@ async def _fallback_email_handler(user_details: dict, email: Email):
 
 
 async def _initial_parsing(raw_email: RawEmail):
-    intermediate_email_dict = raw_email.copy()
+    intermediate_email_dict = dict(raw_email.copy())
 
-    keys_to_replace_with_empty_string_for_none = [
+    keys_to_replace_with_empty_string_for_none: list[
+        Literal[
+            "cc",
+            "in_reply_to",
+            "replies_from_plain_body",
+            "reply_to",
+        ]
+    ] = [
         "cc",
         "in_reply_to",
         "replies_from_plain_body",
@@ -213,10 +221,12 @@ async def _initial_parsing(raw_email: RawEmail):
         if intermediate_email_dict[key] is None:
             intermediate_email_dict[key] = ""
 
-    intermediate_email_dict["plain_no_replies"] = intermediate_email_dict["plain_body"]
-    intermediate_email_dict["plain_replies_only"] = intermediate_email_dict[
-        "replies_from_plain_body"
-    ]
+    intermediate_email_dict["plain_no_replies"] = str(
+        intermediate_email_dict["plain_body"]
+    )
+    intermediate_email_dict["plain_replies_only"] = str(
+        intermediate_email_dict["replies_from_plain_body"]
+    )
 
     del intermediate_email_dict["plain_body"]
     del intermediate_email_dict["replies_from_plain_body"]
@@ -226,8 +236,8 @@ async def _initial_parsing(raw_email: RawEmail):
         + intermediate_email_dict["plain_replies_only"]
     )
 
-    to: str = intermediate_email_dict["to"]
-    rcpt_to: str = intermediate_email_dict["rcpt_to"]
+    to = str(intermediate_email_dict["to"])
+    rcpt_to = str(intermediate_email_dict["rcpt_to"])
 
     intermediate_email_dict["agent_name"] = rcpt_to.split("@")[0].lower()
 
@@ -236,10 +246,15 @@ async def _initial_parsing(raw_email: RawEmail):
         intermediate_email_dict["user_email"] = _get_cleaned_email(to.lower())
     else:
         intermediate_email_dict["user_email"] = _get_cleaned_email(
-            intermediate_email_dict["from"]
+            str(intermediate_email_dict["from"])
         )
 
-    email = Email(**intermediate_email_dict)
+        assert (
+            intermediate_email_dict["user_email"]
+            == intermediate_email_dict["mail_from"]
+        )
+
+    email = cast(Email, intermediate_email_dict)
 
     return email
 
@@ -267,7 +282,7 @@ VERIFICATION_TOKEN_BASE_ALTERNATIVE = "https://mail-settings.google.com/mail/vf-
 
 
 async def _respond_to_gmail_forward_request(email: Email):
-    forwarding_email = email["recipient"]
+    forwarding_email = email["to"]
 
     found_token = None
 
