@@ -284,7 +284,7 @@ async def _respond_to_gmail_forward_request(email: Email):
 
     mailgun_data = {
         "from": forwarding_email,
-        "to": user_email,
+        "to": [user_email],
         "subject": "Email forwarding approved",
         "plain_body": (
             "Hi!\n",

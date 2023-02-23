@@ -26,9 +26,9 @@ ALIASES = {"phirho@phirho.org": "avatar"}
 class ReplyData(TypedDict):
     subject: str
     total_reply: str
-    cc_addresses: str
+    cc_addresses: list[str]
     html_reply: str
-    to_addresses: str
+    to_addresses: list[str]
 
 
 def create_reply(
@@ -82,12 +82,9 @@ def create_reply(
         "</blockquote></div>"
     )
 
-    to_addresses_list, cc_addresses_list = get_all_user_emails(
+    to_addresses, cc_addresses = get_all_user_emails(
         original_email, additional_response_addresses
     )
-
-    to_addresses = ", ".join(to_addresses_list)
-    cc_addresses = ", ".join(cc_addresses_list)
 
     return {
         "subject": subject,

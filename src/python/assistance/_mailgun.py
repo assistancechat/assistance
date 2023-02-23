@@ -35,7 +35,10 @@ POSTAL_API_KEY = get_postal_api_key()
 
 
 async def send_email(postal_data):
-    headers = {"X-Server-API-Key": POSTAL_API_KEY}
+    headers = {
+        "Content-Type": "application/json",
+        "X-Server-API-Key": POSTAL_API_KEY,
+    }
 
     url = "https://postal.assistance.chat/api/v1/send/message"
 
@@ -47,7 +50,7 @@ async def send_email(postal_data):
     postal_response = await _ctx.session.post(
         url=url,
         headers=headers,
-        data=postal_data,
+        data=json.dumps(postal_data),
     )
 
     logging.info(json.dumps(await postal_response.json(), indent=2))
