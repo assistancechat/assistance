@@ -45,7 +45,7 @@ def create_reply(
     date = original_email["date"]
 
     email_lines = body_plain.strip().splitlines()
-    if len(email_lines[-1]) == 0:
+    if email_lines and len(email_lines[-1]) == 0:
         email_lines = email_lines[:-1]
 
     quoted_lines = []

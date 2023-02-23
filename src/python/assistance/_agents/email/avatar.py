@@ -261,7 +261,7 @@ async def react_to_avatar_request(
         "to": reply["to_addresses"],
         "cc": reply["cc_addresses"],
         "subject": reply["subject"],
-        "html": reply["html_reply"],
+        "html_body": reply["html_reply"],
     }
 
     await send_email(mailgun_data)

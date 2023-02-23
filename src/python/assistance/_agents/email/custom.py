@@ -97,7 +97,7 @@ async def react_to_custom_agent_request(email: Email, prompt_task: str):
         "to": reply["to_addresses"],
         "cc": reply["cc_addresses"],
         "subject": reply["subject"],
-        "text": reply["total_reply"],
+        "plain_body": reply["total_reply"],
     }
 
     await send_email(mailgun_data)

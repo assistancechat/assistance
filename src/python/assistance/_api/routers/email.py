@@ -200,7 +200,7 @@ async def _fallback_email_handler(user_details: dict, email: Email):
         "to": reply["to_addresses"],
         "cc": reply["cc_addresses"],
         "subject": reply["subject"],
-        "text": reply["total_reply"],
+        "plain_body": reply["total_reply"],
     }
 
     await send_email(mailgun_data)
@@ -286,7 +286,7 @@ async def _respond_to_gmail_forward_request(email: Email):
         "from": forwarding_email,
         "to": user_email,
         "subject": "Email forwarding approved",
-        "text": (
+        "plain_body": (
             "Hi!\n",
             f"We've approved your ability to be able to forward emails through to {forwarding_email}.",
         ),
