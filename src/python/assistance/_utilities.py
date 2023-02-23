@@ -57,6 +57,5 @@ def get_cleaned_email(email_string: str):
 
     sender_domain = match.group(5)
     sender_username = match.group(1)
-    cleaned_username = sender_username.split("+")[0]
 
-    return f"{cleaned_username}@{sender_domain}".lower()
+    return f"{sender_username}@{sender_domain}".lower()
