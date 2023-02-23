@@ -45,5 +45,4 @@ Email = TypedDict(
         "to": str,
         "token": str,
     },
-    total=False,
 )

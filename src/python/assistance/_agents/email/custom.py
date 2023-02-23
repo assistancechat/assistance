@@ -68,7 +68,7 @@ PROMPT = textwrap.dedent(
 
 async def react_to_custom_agent_request(email: Email, prompt_task: str):
     prompt = PROMPT.format(
-        body_plain=email["body-plain"],
+        body_plain=email["plain_body"] + email["replies_from_plain_body"],
         user_email=email["user-email"],
         prompt_task=prompt_task,
         agent_name=email["agent-name"],

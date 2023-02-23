@@ -30,8 +30,10 @@ def create_reply(
     if not subject.startswith("Re:"):
         subject = f"Re: {subject}"
 
-    body_plain = original_email["body-plain"]
-    date = original_email["Date"]
+    body_plain = (
+        original_email["plain_body"] + original_email["replies_from_plain_body"]
+    )
+    date = original_email["date"]
 
     email_lines = body_plain.strip().splitlines()
     if len(email_lines[-1]) == 0:
@@ -58,7 +60,9 @@ def create_reply(
     try:
         original_email_body_html = original_email["body-html"]
     except KeyError:
-        original_email_body_html = _convert_text_to_html(original_email["body-plain"])
+        original_email_body_html = _convert_text_to_html(
+            original_email["plain_body"] + original_email["replies_from_plain_body"]
+        )
 
     html_reply = (
         f'<div dir="ltr">{response_as_html}</div><br>'

@@ -134,11 +134,16 @@ async def article_scoring(
     completions = await completion_with_back_off(
         user_email=user_email, prompt=prompt, api_key=openai_api_key, **MODEL_KWARGS
     )
-    response: str = completions.choices[0].text.strip()
+    response: str = completions.choices[0].text.strip()  # type: ignore
 
     logging.info(f"Response: {response}")
 
     article_ranking = json.loads(response)
+
+    if article_ranking is None:
+        raise ValueError(
+            "AI response returned None when it should be a JSON list of article dicts."
+        )
 
     for item in article_ranking:
         assert "id" in item

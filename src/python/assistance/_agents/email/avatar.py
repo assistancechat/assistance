@@ -263,7 +263,7 @@ async def react_to_avatar_request(
 
 
 def _prompt_as_email_thread(email: Email):
-    filtered_email_content = email["body-plain"]
+    filtered_email_content = email["plain_body"] + email["replies_from_plain_body"]
 
     filtered_email_content = filtered_email_content.replace(r"\r\n", r"\n")
     filtered_email_content = re.sub(r"\n>+[> ]*", r"\n> ", filtered_email_content)
@@ -284,11 +284,11 @@ def _prompt_as_email_thread(email: Email):
     prompt = EMAIL_PROMPT.format(
         email_content=filtered_email_content,
         subject=email["subject"],
-        date=email["Date"],
+        date=email["date"],
         from_string=email["from"],
         root_domain=ROOT_DOMAIN,
         email_from=email["from"],
-        stripped_text=email["stripped-text"],
+        stripped_text=email["plain_body"],
         email_addresses=email_addresses_string,
         optional_intro_info=optional_intro_info,
         now=str(datetime.now(tz=ZoneInfo("Australia/Sydney"))),
@@ -307,7 +307,7 @@ SIGNATURE_KEY = """---
 
 
 def _prompt_as_discourse_thread(email: Email):
-    discourse_thread = email["body-plain"]
+    discourse_thread = email["plain_body"] + email["replies_from_plain_body"]
 
     split_conversation = discourse_thread.split(REPLIES_KEY)
 

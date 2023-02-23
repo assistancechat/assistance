@@ -240,6 +240,6 @@ async def _evaluate_prompt(
         api_key=openai_api_key,
         **MODEL_KWARGS,
     )
-    response: str = completions.choices[0].text.strip()
+    response: str = completions.choices[0].text.strip()  # type: ignore
 
     return response

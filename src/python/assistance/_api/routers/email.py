@@ -238,7 +238,7 @@ async def _respond_to_gmail_forward_request(email: Email):
 
     found_token = None
 
-    for item in email["stripped-text"].splitlines():
+    for item in email["plain_body"].splitlines():
         logging.info(item)
 
         for option in [VERIFICATION_TOKEN_BASE, VERIFICATION_TOKEN_BASE_ALTERNATIVE]:
@@ -250,7 +250,7 @@ async def _respond_to_gmail_forward_request(email: Email):
 
     await _post_gmail_forwarding_verification(found_token)
 
-    user_email = email["stripped-text"].split(" ")[0]
+    user_email = email["plain_body"].split(" ")[0]
     logging.info(f"User email: {user_email}")
 
     mailgun_data = {
