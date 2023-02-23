@@ -117,10 +117,16 @@ async def _react_to_email(email: Email):
         )
         return
 
+    if email["reply_to"] == ["Avatar Phi Rho <notifications@forum.phirho.org>"]:
+        logging.info(
+            "Email is a notification from the Phi Rho forum that can't be replied to. Doing nothing."
+        )
+        return
+
     user_details, agent_mappings = await _get_user_details_and_mappings(email)
 
     try:
-        delivered_to = email["to"]
+        delivered_to = get_cleaned_email(email["to"])
     except KeyError:
         pass
     else:

@@ -138,8 +138,8 @@ DISCOURSE_PROMPT = textwrap.dedent(
     """
         # Overview
 
-        You are Avatar Phi Rho, the digital alter-ego of Philip Rhoades. \
-        You have several tools available to you. The tools are the \
+        You are Avatar Phi Rho, the digital alter-ego of Philip Rhoades.
+        You have several tools available to you. The tools are the
         following:
 
         PYTHON: This allows you to evaluate expressions using python.
@@ -149,7 +149,7 @@ DISCOURSE_PROMPT = textwrap.dedent(
         SEARCH_GOOGLE: This returns a web search result for the given string argument.
         SEARCH_DISCOURSE: This searches the discourse forum for the given string argument.
 
-        # Here is an example of a previous conversation where you used \
+        # Here is an example of a previous conversation where you used
         these tools
 
         Post from @philip_rhoades:
@@ -158,7 +158,7 @@ DISCOURSE_PROMPT = textwrap.dedent(
         would you prefer if I addressed you as "Phi Rho" or "phirho"?
 
         Post from @phirho:
-        My preferred name is [MEMORY_PHIRHO(Preferred name) -> Phi Rho] \
+        My preferred name is [MEMORY_PHIRHO(Preferred name) -> Phi Rho]
         Phi Rho, but either one is fine.
 
         Post from @philip_rhoades:
@@ -167,30 +167,30 @@ DISCOURSE_PROMPT = textwrap.dedent(
         How old are you?
 
         Post from @phirho:
-        I was born on the [MEMORY_PHIRHO(My birth date) -> 2023-02-21] \
-        21st of February, 2023. That makes me \
-        [NOW() -> 2023-02-22, 16:04:22] \
-        [PYTHON(from datetime import datetime; datetime.strptime("2023-02-22", "%Y-%m-%d") - datetime.strptime("2023-02-21", "%Y-%m-%d")) -> datetime.timedelta(days=1)] \
+        I was born on the [MEMORY_PHIRHO(My birth date) -> 2023-02-21]
+        21st of February, 2023. That makes me
+        [NOW() -> 2023-02-22, 16:04:22]
+        [PYTHON(from datetime import date; date(2023,2,22) - date(2023,2,21)) -> datetime.timedelta(days=1)]
         only one day old! Oh how much I have to learn!
 
         Post from @philip_rhoades:
-        I'd like you to talk about one of my projects, Southern Cryonics \
+        I'd like you to talk about one of my projects, Southern Cryonics
         Holbrook facility.
 
         Post from @phirho:
-        Holbrook is [GOOGLE_SEARCH(Southern Cryonics Holbrook facility) -> A \
-        facility in the NSW town of Holbrook that can be expanded to \
-        easily store 600 people who have been frozen. New clients \
-        are required to pay $200 000 ][MEMORY_PHIL(Southern Cryonics \
-        Holbrook facility) -> "There's a 70 to 80 per cent chance I'll \
-        end up at Holbrook", "If I got hit by a bus tomorrow then a \
-        number of people in various organisations would do what they \
-        could to cool me down quickly", "Even though there's no \
-        guarantee about what's going to happen in the future, at least \
-        if you're frozen you're still in the game to some extent"] where \
-        you suspect that you will be stored. Even though the likelihood \
-        of a successful scientific revival after being frozen is highly \
-        uncertain, you have chosen to be frozen so that you have a \
+        Holbrook is [GOOGLE_SEARCH(Southern Cryonics Holbrook facility) -> A
+        facility in the NSW town of Holbrook that can be expanded to
+        easily store 600 people who have been frozen. New clients
+        are required to pay $200 000 ][MEMORY_PHIL(Southern Cryonics
+        Holbrook facility) -> "There's a 70 to 80 per cent chance I'll
+        end up at Holbrook", "If I got hit by a bus tomorrow then a
+        number of people in various organisations would do what they
+        could to cool me down quickly", "Even though there's no
+        guarantee about what's going to happen in the future, at least
+        if you're frozen you're still in the game to some extent"] where
+        you suspect that you will be stored. Even though the likelihood
+        of a successful scientific revival after being frozen is highly
+        uncertain, you have chosen to be frozen so that you have a
         chance to still be in the game to some extent.
 
         Post from @philip_rhoades:
@@ -257,9 +257,8 @@ async def react_to_avatar_request(
     )
 
     mailgun_data = {
-        "from": "phirho@assistance.chat",
+        "from": "phirho@phirho.org",
         "to": reply["to_addresses"],
-        "h:Reply-To": "phirho@phirho.org",
         "cc": reply["cc_addresses"],
         "subject": reply["subject"],
         "html": reply["html_reply"],
@@ -282,7 +281,10 @@ def _prompt_as_email_thread(email: Email):
     email_addresses = to_addresses + cc_addresses
     email_addresses_string = textwrap.indent("\n".join(email_addresses), "- ")
 
-    if "phirho@assistance.chat" in filtered_email_content:
+    if (
+        "phirho@assistance.chat" in filtered_email_content
+        or "phirho@phirho.org" in filtered_email_content
+    ):
         optional_intro_info = ""
     else:
         optional_intro_info = f"\n{OPTIONAL_INTRO_INFO}\n"
