@@ -14,18 +14,28 @@
 
 
 from html import escape
-from typing import Literal
+from typing import Literal, TypedDict
+
+from assistance._utilities import get_cleaned_email
 
 from .types import Email
 
 ALIASES = {"phirho@phirho.org": "avatar"}
 
 
+class ReplyData(TypedDict):
+    subject: str
+    total_reply: str
+    cc_addresses: str
+    html_reply: str
+    to_addresses: str
+
+
 def create_reply(
     original_email: Email,
     response: str,
-    additional_cc_addresses: list[str] | None = None,
-):
+    additional_response_addresses: list[str] | None = None,
+) -> ReplyData:
     subject = original_email["subject"]
 
     if not subject.startswith("Re:"):
@@ -72,11 +82,20 @@ def create_reply(
         "</blockquote></div>"
     )
 
-    aliases_removed = get_all_cc_user_emails(original_email, additional_cc_addresses)
+    to_addresses_list, cc_addresses_list = get_all_user_emails(
+        original_email, additional_response_addresses
+    )
 
-    cc_addresses = ", ".join(aliases_removed)
+    to_addresses = ", ".join(to_addresses_list)
+    cc_addresses = ", ".join(cc_addresses_list)
 
-    return subject, total_reply, cc_addresses, html_reply
+    return {
+        "subject": subject,
+        "total_reply": total_reply,
+        "cc_addresses": cc_addresses,
+        "html_reply": html_reply,
+        "to_addresses": to_addresses,
+    }
 
 
 def _convert_text_to_html(text: str):
@@ -85,7 +104,7 @@ def _convert_text_to_html(text: str):
     )
 
 
-def get_all_cc_user_emails(email: Email, extra: list[str] | None = None):
+def get_all_user_emails(email: Email, extra: list[str] | None = None):
     if extra is not None:
         all_possible_cc_addresses = extra
     else:
@@ -101,7 +120,9 @@ def get_all_cc_user_emails(email: Email, extra: list[str] | None = None):
     for key in keys_to_collect:
         all_possible_cc_addresses += email[key].split(",")
 
-    stripped_cc_addresses = [item.strip() for item in all_possible_cc_addresses]
+    stripped_cc_addresses = [
+        get_cleaned_email(item) for item in all_possible_cc_addresses if item
+    ]
     no_overlap_cc_addresses = [
         item for item in set(stripped_cc_addresses) if not email["user_email"] in item
     ]
@@ -114,4 +135,11 @@ def get_all_cc_user_emails(email: Email, extra: list[str] | None = None):
     for an_alias in ALIASES.keys():
         aliases_removed = [item for item in aliases_removed if not an_alias in item]
 
-    return aliases_removed
+    if email["reply_to"] is not None:
+        to_addresses = [get_cleaned_email(item) for item in email["reply_to"]]
+    else:
+        to_addresses = [get_cleaned_email(email["from"])]
+
+    cc_addresses = list(set(aliases_removed).difference(to_addresses))
+
+    return to_addresses, cc_addresses

@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import re
 import textwrap
 from urllib.parse import parse_qs, urlparse
 
@@ -41,3 +42,21 @@ def get_cleaned_url(url: str):
     cleaned_url = parse_qs(parsed_url.query)["url"][0]
 
     return cleaned_url
+
+
+EMAIL_PATTERN = re.compile(
+    r"(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))"
+)
+
+
+def get_cleaned_email(email_string: str):
+    match = re.search(EMAIL_PATTERN, email_string)
+
+    if match is None:
+        raise ValueError("Email address not found")
+
+    sender_domain = match.group(5)
+    sender_username = match.group(1)
+    cleaned_username = sender_username.split("+")[0]
+
+    return f"{cleaned_username}@{sender_domain}".lower()

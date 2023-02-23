@@ -15,7 +15,6 @@
 import asyncio
 import json
 import logging
-import re
 from typing import Literal, cast
 
 import aiofiles
@@ -38,6 +37,7 @@ from assistance._paths import (
     get_user_details,
     get_user_from_email,
 )
+from assistance._utilities import get_cleaned_email
 
 MAILGUN_API_KEY = get_mailgun_api_key()
 
@@ -75,11 +75,11 @@ async def _store_email(raw_email: RawEmail):
     hash_digest = get_hash_digest(email_to_store)
     emails_path = get_emails_path(hash_digest, create_parent=True)
 
-    async with aiofiles.open(emails_path, "w") as f:
+    async with aiofiles.open(emails_path, mode="w") as f:
         await f.write(email_to_store)
 
     pipeline_path = _get_new_email_pipeline_path(hash_digest)
-    async with aiofiles.open(pipeline_path, "w") as f:
+    async with aiofiles.open(pipeline_path, mode="w") as f:
         pass
 
     return hash_digest
@@ -100,21 +100,21 @@ async def _handle_new_email(hash_digest: str, raw_email: RawEmail):
 
 
 async def _react_to_email(email: Email):
+    if email["mail_from"] == "forwarding-noreply@google.com":
+        await _respond_to_gmail_forward_request(email)
+
+        return
+
     if "assistance.chat" in email["from"]:
         logging.info(
             "Email is from an assistance.chat agent. Breaking loop. Doing nothing."
         )
         return
 
-    if email["user_email"] in ALIASES:
+    if get_cleaned_email(email["from"]) in ALIASES:
         logging.info(
             "Email is from an alias of an assistance.chat agent. Breaking loop. Doing nothing."
         )
-        return
-
-    if email["mail_from"] == "forwarding-noreply@google.com":
-        await _respond_to_gmail_forward_request(email)
-
         return
 
     user_details, agent_mappings = await _get_user_details_and_mappings(email)
@@ -183,18 +183,18 @@ async def _fallback_email_handler(user_details: dict, email: Email):
         "Assistance.Chat"
     )
 
-    subject, total_reply, cc_addresses, html_reply = create_reply(
+    reply = create_reply(
         original_email=email,
         response=response,
-        additional_cc_addresses=["me@simonbiggs.net"],
+        additional_response_addresses=["me@simonbiggs.net"],
     )
 
     mailgun_data = {
         "from": f"{email['agent_name']}@{ROOT_DOMAIN}",
-        "to": email["user_email"],
-        "cc": cc_addresses,
-        "subject": subject,
-        "text": total_reply,
+        "to": reply["to_addresses"],
+        "cc": reply["cc_addresses"],
+        "subject": reply["subject"],
+        "text": reply["total_reply"],
     }
 
     await send_email(mailgun_data)
@@ -208,13 +208,11 @@ async def _initial_parsing(raw_email: RawEmail):
             "cc",
             "in_reply_to",
             "replies_from_plain_body",
-            "reply_to",
         ]
     ] = [
         "cc",
         "in_reply_to",
         "replies_from_plain_body",
-        "reply_to",
     ]
 
     for key in keys_to_replace_with_empty_string_for_none:
@@ -243,38 +241,15 @@ async def _initial_parsing(raw_email: RawEmail):
 
     if rcpt_to != to:
         # This is a forwarded email
-        intermediate_email_dict["user_email"] = _get_cleaned_email(to.lower())
+        intermediate_email_dict["user_email"] = get_cleaned_email(to.lower())
     else:
-        intermediate_email_dict["user_email"] = _get_cleaned_email(
+        intermediate_email_dict["user_email"] = get_cleaned_email(
             str(intermediate_email_dict["from"])
-        )
-
-        assert (
-            intermediate_email_dict["user_email"]
-            == intermediate_email_dict["mail_from"]
         )
 
     email = cast(Email, intermediate_email_dict)
 
     return email
-
-
-EMAIL_PATTERN = re.compile(
-    r"(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))"
-)
-
-
-def _get_cleaned_email(email_string: str):
-    match = re.search(EMAIL_PATTERN, email_string)
-
-    if match is None:
-        raise ValueError("Email address not found")
-
-    sender_domain = match.group(5)
-    sender_username = match.group(1)
-    cleaned_username = sender_username.split("+")[0]
-
-    return f"{cleaned_username}@{sender_domain}".lower()
 
 
 VERIFICATION_TOKEN_BASE = "https://mail.google.com/mail/vf-"

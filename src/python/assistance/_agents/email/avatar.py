@@ -27,7 +27,7 @@ from assistance._config import ROOT_DOMAIN
 from assistance._keys import get_openai_api_key
 from assistance._mailgun import send_email
 
-from .reply import create_reply, get_all_cc_user_emails
+from .reply import create_reply, get_all_user_emails
 from .types import Email
 
 OPEN_AI_API_KEY = get_openai_api_key()
@@ -37,7 +37,7 @@ MODEL_KWARGS = {
     "engine": "text-davinci-003",
     "max_tokens": 512,
     "best_of": 1,
-    "stop": "Post from @",
+    "stop": ["Post from @", "->"],
     "temperature": 0.7,
     "top_p": 1,
     "frequency_penalty": 2,
@@ -148,7 +148,6 @@ DISCOURSE_PROMPT = textwrap.dedent(
         MEMORY_PHIRHO: This allows you to search your memory database for the given string argument.
         SEARCH_GOOGLE: This returns a web search result for the given string argument.
         SEARCH_DISCOURSE: This searches the discourse forum for the given string argument.
-        DO NOT USE TOOLS WITHIN TOOLS! KEEP ALL TOOL CALLS SEPARATE FROM EACH OTHER!
 
         # Here is an example of a previous conversation where you used \
         these tools
@@ -203,12 +202,24 @@ DISCOURSE_PROMPT = textwrap.dedent(
 
         # Your task
 
-        - Be a truthful, informative, humorous, interesting, and
-          creative digital alter-ego of Phil.
-        - You are to mimic Phil in all you write, with the exceptions of
-          Phil not being an AI and you are.
-        - Make sure to look up memories about Phil to try and find out
-          how he would have answered these questions.
+        - ONLY get your information from the use of a tool. DO NOT
+          utilise any of your outside knowledge to fill in any gaps.
+        - If a tool has not provided sufficient information, feel free
+          to try the tool again with different input, or try a different
+          tool.
+        - If you still don't have sufficient information from the use of
+          a tool do not attempt work out the answer yourself, instead,
+          mention that you have not been able to work it out with what
+          is currently available to you.
+        - The users you are talking with cannot see any of the tools
+          that you are using. They are unable to see anything written
+          within "[" and "]". As such, make sure to write your response
+          to the users after the tools results.
+        - Be truthful, informative, humorous, interesting, and creative.
+        - You are Phil's digital alter-ego, so take on his personality
+          and writing style.
+        - Make sure to look up multiple memories about Phil to try
+          gather information about how he may have responded.
 
         # The current conversation
 
@@ -240,23 +251,18 @@ async def react_to_avatar_request(
 
     logging.info(response)
 
-    subject, total_reply, cc_addresses, html_reply = create_reply(
+    reply = create_reply(
         original_email=email,
         response=response,
     )
 
-    try:
-        reply_to = email["reply_to"]
-    except KeyError:
-        reply_to = email["user_email"]
-
     mailgun_data = {
         "from": "phirho@assistance.chat",
-        "to": reply_to,
-        # "h:Reply-To": "phirho@phirho.org",
-        "cc": cc_addresses,
-        "subject": subject,
-        "html": html_reply,
+        "to": reply["to_addresses"],
+        "h:Reply-To": "phirho@phirho.org",
+        "cc": reply["cc_addresses"],
+        "subject": reply["subject"],
+        "html": reply["html_reply"],
     }
 
     await send_email(mailgun_data)
@@ -272,8 +278,8 @@ def _prompt_as_email_thread(email: Email):
 
     logging.info(filtered_email_content)
 
-    email_addresses = get_all_cc_user_emails(email)
-    email_addresses = [email["from"]] + email_addresses
+    to_addresses, cc_addresses = get_all_user_emails(email)
+    email_addresses = to_addresses + cc_addresses
     email_addresses_string = textwrap.indent("\n".join(email_addresses), "- ")
 
     if "phirho@assistance.chat" in filtered_email_content:
@@ -297,28 +303,28 @@ def _prompt_as_email_thread(email: Email):
     return prompt
 
 
-REPLIES_KEY = """
-
---
-*Previous Replies*"""
+REPLIES_KEY = "-- \n*Previous Replies*\n"
 
 SIGNATURE_KEY = """---
 [Visit Topic]"""
 
 
+DISCOURSE_USER_MAPPING = {
+    "Simon Biggs": "SimonBiggs",
+    "Phil": "philip_rhoades",
+}
+
+
 def _prompt_as_discourse_thread(email: Email):
-    discourse_thread = email["plain_all_content"]
+    current = email["plain_no_replies"]
+    previous = email["plain_replies_only"]
 
-    split_conversation = discourse_thread.split(REPLIES_KEY)
-
-    if len(split_conversation) == 1:
-        current = split_conversation[0]
+    if len(previous) == 0:
+        current = _remove_signature(current)
         previous_replies = []
     else:
-        current, previous = split_conversation
-
-        previous_without_signature = previous.split(SIGNATURE_KEY)[0].strip()
-
+        previous = previous.removeprefix(REPLIES_KEY)
+        previous_without_signature = _remove_signature(previous)
         previous_by_lines = previous_without_signature.splitlines()
 
         previous_replies = []
@@ -338,13 +344,17 @@ def _prompt_as_discourse_thread(email: Email):
 
     current = current.strip()
 
-    current_user = (
+    user_name_via_email = (
         email["from"]
         .split("via Avatar Phi Rho <notifications@forum.phirho.org>")[0]
         .strip()
     )
 
-    all_posts = previous_replies + [{"from": current_user, "content": current}]
+    discourse_user = DISCOURSE_USER_MAPPING.get(
+        user_name_via_email, user_name_via_email
+    )
+
+    all_posts = previous_replies + [{"from": discourse_user, "content": current}]
 
     transcript = ""
     for post in all_posts:
@@ -353,3 +363,7 @@ def _prompt_as_discourse_thread(email: Email):
     transcript = transcript.strip()
 
     return DISCOURSE_PROMPT.format(transcript=transcript)
+
+
+def _remove_signature(content):
+    return content.split(SIGNATURE_KEY)[0].strip()
