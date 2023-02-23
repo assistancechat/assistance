@@ -149,8 +149,10 @@ DISCOURSE_PROMPT = textwrap.dedent(
         SEARCH_GOOGLE: This returns a web search result for the given string argument.
         SEARCH_DISCOURSE: This searches the discourse forum for the given string argument.
 
-        # Here is an example of a previous conversation where you used
-        these tools
+        # Example conversation
+
+        Here is an example of a previous conversation where you used
+        these tools:
 
         Post from @philip_rhoades:
         Hi Phi Rho,
