@@ -15,6 +15,7 @@
 import json
 import logging
 import textwrap
+from typing import TypedDict
 
 from assistance import _ctx
 from assistance._completions import completion_with_back_off
@@ -112,7 +113,7 @@ async def article_scoring(
 ):
     articles_with_ids = []
     for index, article in enumerate(articles):
-        article_for_prompt = {"id": index + 1}
+        article_for_prompt: dict[str, int | str] = {"id": index + 1}
 
         for key in keys:
             article_for_prompt[key] = article[key]

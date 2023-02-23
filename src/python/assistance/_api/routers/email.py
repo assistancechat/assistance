@@ -200,17 +200,7 @@ async def _fallback_email_handler(user_details: dict, email: Email):
 
 
 async def _initial_parsing(email: Email):
-    try:
-        email["subject"]
-    except KeyError:
-        email["subject"] = ""
-
-    try:
-        email["body-plain"]
-    except KeyError:
-        email["body-plain"] = ""
-
-    email["agent-name"] = email["recipient"].split("@")[0].lower()
+    email["agent-name"] = email["to"].split("@")[0].lower()
 
     try:
         x_forwarded_for = email["X-Forwarded-For"]
