@@ -45,7 +45,7 @@ router = APIRouter(prefix="/email")
 
 @router.post("")
 async def receive_email(request: Request):
-    raw_email = RawEmail(await request.json())
+    raw_email: RawEmail = await request.json()
 
     logging.info(_ctx.pp.pformat(raw_email))
 
@@ -189,7 +189,7 @@ async def _fallback_email_handler(user_details: dict, email: Email):
     )
 
     mailgun_data = {
-        "from": f"{email['agent-name']}@{ROOT_DOMAIN}",
+        "from": f"{email['agent_name']}@{ROOT_DOMAIN}",
         "to": email["user_email"],
         "cc": cc_addresses,
         "subject": subject,
@@ -200,7 +200,7 @@ async def _fallback_email_handler(user_details: dict, email: Email):
 
 
 async def _initial_parsing(raw_email: RawEmail):
-    intermediate_email_dict = dict(raw_email.copy())
+    intermediate_email_dict = raw_email.copy()
 
     keys_to_replace_with_empty_string_for_none = [
         "cc",
@@ -251,6 +251,9 @@ EMAIL_PATTERN = re.compile(
 
 def _get_cleaned_email(email_string: str):
     match = re.search(EMAIL_PATTERN, email_string)
+
+    if match is None:
+        raise ValueError("Email address not found")
 
     sender_domain = match.group(5)
     sender_username = match.group(1)

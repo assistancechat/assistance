@@ -93,7 +93,7 @@ async def react_to_custom_agent_request(email: Email, prompt_task: str):
     )
 
     mailgun_data = {
-        "from": f"{email['agent-name']}@{ROOT_DOMAIN}",
+        "from": f"{email['agent_name']}@{ROOT_DOMAIN}",
         "to": email["user_email"],
         "cc": cc_addresses,
         "subject": subject,

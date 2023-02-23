@@ -14,6 +14,7 @@
 
 
 from html import escape
+from typing import Literal
 
 from .types import Email
 
@@ -90,20 +91,15 @@ def get_all_cc_user_emails(email: Email, extra: list[str] | None = None):
     else:
         all_possible_cc_addresses = []
 
-    try:
-        all_possible_cc_addresses += email["Cc"].split(",")
-    except KeyError:
-        pass
+    keys_to_collect: list[Literal["cc", "from", "to", "rcpt_to"]] = [
+        "cc",
+        "from",
+        "to",
+        "rcpt_to",
+    ]
 
-    try:
-        all_possible_cc_addresses += email["Sender"].split(",")
-    except KeyError:
-        pass
-
-    try:
-        all_possible_cc_addresses += email["To"].split(",")
-    except KeyError:
-        pass
+    for key in keys_to_collect:
+        all_possible_cc_addresses += email[key].split(",")
 
     stripped_cc_addresses = [item.strip() for item in all_possible_cc_addresses]
     no_overlap_cc_addresses = [

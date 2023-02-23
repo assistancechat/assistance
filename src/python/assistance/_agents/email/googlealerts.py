@@ -188,7 +188,7 @@ async def googlealerts_agent(email: Email):
     # for response in most_relevant_responses:
     #     text = f"{response['content']}\n\n{response['url']}"
     #     mailgun_data = {
-    #         "from": f"{email['agent-name']}@{ROOT_DOMAIN}",
+    #         "from": f"{email['agent_name']}@{ROOT_DOMAIN}",
     #         "to": email["user_email"],
     #         "subject": response["subject"],
     #         "text": text,
@@ -197,25 +197,25 @@ async def googlealerts_agent(email: Email):
     #     asyncio.create_task(send_email(mailgun_data))
 
 
-async def _summarise_and_fulfil_tasks(
-    user_email: str, openai_api_key: str, tasks: list[str], url: str
-) -> str:
-    summary = await summarise_news_article_url_with_tasks(
-        user_email=user_email, openai_api_key=openai_api_key, url=url, tasks=tasks
-    )
+# async def _summarise_and_fulfil_tasks(
+#     user_email: str, openai_api_key: str, tasks: list[str], url: str
+# ) -> str:
+#     summary = await summarise_news_article_url_with_tasks(
+#         user_email=user_email, openai_api_key=openai_api_key, url=url, tasks=tasks
+#     )
 
-    tasks_string = textwrap.indent("\n".join(tasks), "- ")
+#     tasks_string = textwrap.indent("\n".join(tasks), "- ")
 
-    prompt = PROMPT.format(
-        num_tasks=len(tasks),
-        tasks=tasks_string,
-        text=summary,
-        target_audience=TARGET_AUDIENCE,
-    )
+#     prompt = PROMPT.format(
+#         num_tasks=len(tasks),
+#         tasks=tasks_string,
+#         text=summary,
+#         target_audience=TARGET_AUDIENCE,
+#     )
 
-    completions = await completion_with_back_off(
-        user_email=user_email, prompt=prompt, api_key=openai_api_key, **MODEL_KWARGS
-    )
-    response: str = completions.choices[0].text.strip()  # type: ignore
+#     completions = await completion_with_back_off(
+#         user_email=user_email, prompt=prompt, api_key=openai_api_key, **MODEL_KWARGS
+#     )
+#     response: str = completions.choices[0].text.strip()  # type: ignore
 
-    return response
+#     return response
