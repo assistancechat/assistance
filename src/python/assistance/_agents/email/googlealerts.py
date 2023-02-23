@@ -108,7 +108,7 @@ PROMPT = textwrap.dedent(
 
 
 async def googlealerts_agent(email: Email):
-    article_details = parse_alerts(email["body-html"])
+    article_details = parse_alerts(email["html_body"])
 
     for item in article_details:
         details_for_saving = {"subject": email["subject"], **item}
@@ -127,7 +127,7 @@ async def googlealerts_agent(email: Email):
         async with aiofiles.open(pipeline_path, "w") as f:
             pass
 
-    # user_email = email["user-email"]
+    # user_email = email["user_email"]
 
     # logging.info(json.dumps(article_details, indent=2))
 
@@ -189,7 +189,7 @@ async def googlealerts_agent(email: Email):
     #     text = f"{response['content']}\n\n{response['url']}"
     #     mailgun_data = {
     #         "from": f"{email['agent-name']}@{ROOT_DOMAIN}",
-    #         "to": email["user-email"],
+    #         "to": email["user_email"],
     #         "subject": response["subject"],
     #         "text": text,
     #     }
@@ -216,6 +216,6 @@ async def _summarise_and_fulfil_tasks(
     completions = await completion_with_back_off(
         user_email=user_email, prompt=prompt, api_key=openai_api_key, **MODEL_KWARGS
     )
-    response: str = completions.choices[0].text.strip()
+    response: str = completions.choices[0].text.strip()  # type: ignore
 
     return response

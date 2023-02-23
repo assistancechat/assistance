@@ -30,9 +30,7 @@ def create_reply(
     if not subject.startswith("Re:"):
         subject = f"Re: {subject}"
 
-    body_plain = (
-        original_email["plain_body"] + original_email["replies_from_plain_body"]
-    )
+    body_plain = original_email["plain_all_content"]
     date = original_email["date"]
 
     email_lines = body_plain.strip().splitlines()
@@ -58,10 +56,10 @@ def create_reply(
     html_attribution = escape(f"On {date}, {original_email['from']} wrote:")
 
     try:
-        original_email_body_html = original_email["body-html"]
+        original_email_body_html = original_email["html_body"]
     except KeyError:
         original_email_body_html = _convert_text_to_html(
-            original_email["plain_body"] + original_email["replies_from_plain_body"]
+            original_email["plain_all_content"]
         )
 
     html_reply = (
@@ -109,7 +107,7 @@ def get_all_cc_user_emails(email: Email, extra: list[str] | None = None):
 
     stripped_cc_addresses = [item.strip() for item in all_possible_cc_addresses]
     no_overlap_cc_addresses = [
-        item for item in set(stripped_cc_addresses) if not email["user-email"] in item
+        item for item in set(stripped_cc_addresses) if not email["user_email"] in item
     ]
 
     no_assistance_chat_cc_addresses = [

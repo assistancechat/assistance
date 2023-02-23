@@ -231,12 +231,12 @@ async def react_to_avatar_request(
     logging.info(prompt)
 
     completions = await completion_with_back_off(
-        user_email=email["user-email"],
+        user_email=email["user_email"],
         prompt=prompt,
         api_key=OPEN_AI_API_KEY,
         **MODEL_KWARGS,
     )
-    response: str = completions.choices[0].text.strip()
+    response: str = completions.choices[0].text.strip()  # type: ignore
 
     logging.info(response)
 
@@ -246,9 +246,9 @@ async def react_to_avatar_request(
     )
 
     try:
-        reply_to = email["Reply-To"]
+        reply_to = email["reply_to"]
     except KeyError:
-        reply_to = email["user-email"]
+        reply_to = email["user_email"]
 
     mailgun_data = {
         "from": "phirho@assistance.chat",
@@ -263,7 +263,7 @@ async def react_to_avatar_request(
 
 
 def _prompt_as_email_thread(email: Email):
-    filtered_email_content = email["plain_body"] + email["replies_from_plain_body"]
+    filtered_email_content = email["plain_all_content"]
 
     filtered_email_content = filtered_email_content.replace(r"\r\n", r"\n")
     filtered_email_content = re.sub(r"\n>+[> ]*", r"\n> ", filtered_email_content)
@@ -288,7 +288,7 @@ def _prompt_as_email_thread(email: Email):
         from_string=email["from"],
         root_domain=ROOT_DOMAIN,
         email_from=email["from"],
-        stripped_text=email["plain_body"],
+        stripped_text=email["plain_no_replies"],
         email_addresses=email_addresses_string,
         optional_intro_info=optional_intro_info,
         now=str(datetime.now(tz=ZoneInfo("Australia/Sydney"))),
@@ -307,7 +307,7 @@ SIGNATURE_KEY = """---
 
 
 def _prompt_as_discourse_thread(email: Email):
-    discourse_thread = email["plain_body"] + email["replies_from_plain_body"]
+    discourse_thread = email["plain_all_content"]
 
     split_conversation = discourse_thread.split(REPLIES_KEY)
 

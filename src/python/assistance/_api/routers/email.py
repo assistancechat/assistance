@@ -105,7 +105,7 @@ async def _react_to_email(email: Email):
         )
         return
 
-    if email["user-email"] in ALIASES:
+    if email["user_email"] in ALIASES:
         logging.info(
             "Email is from an alias of an assistance.chat agent. Breaking loop. Doing nothing."
         )
@@ -131,7 +131,7 @@ async def _react_to_email(email: Email):
             return
 
     try:
-        mapped_agent = agent_mappings[email["agent-name"]]
+        mapped_agent = agent_mappings[email["agent_name"]]
     except KeyError:
         pass
     else:
@@ -140,7 +140,7 @@ async def _react_to_email(email: Email):
         return
 
     try:
-        task = DEFAULT_TASKS[email["agent-name"]][1]
+        task = DEFAULT_TASKS[email["agent_name"]][1]
     except KeyError:
         pass
     else:
@@ -157,7 +157,7 @@ async def _react_to_email(email: Email):
 
 async def _get_user_details_and_mappings(email: Email):
     try:
-        user = await get_user_from_email(email["user-email"])
+        user = await get_user_from_email(email["user_email"])
     except ValueError:
         first_name = email["from"].split(" ")[0].capitalize()
         user_details = {"first_name": first_name}
@@ -190,7 +190,7 @@ async def _fallback_email_handler(user_details: dict, email: Email):
 
     mailgun_data = {
         "from": f"{email['agent-name']}@{ROOT_DOMAIN}",
-        "to": email["user-email"],
+        "to": email["user_email"],
         "cc": cc_addresses,
         "subject": subject,
         "text": total_reply,
@@ -268,7 +268,7 @@ async def _respond_to_gmail_forward_request(email: Email):
 
     found_token = None
 
-    for item in email["plain_body"].splitlines():
+    for item in email["plain_no_replies"].splitlines():
         logging.info(item)
 
         for option in [VERIFICATION_TOKEN_BASE, VERIFICATION_TOKEN_BASE_ALTERNATIVE]:
@@ -280,7 +280,7 @@ async def _respond_to_gmail_forward_request(email: Email):
 
     await _post_gmail_forwarding_verification(found_token)
 
-    user_email = email["plain_body"].split(" ")[0]
+    user_email = email["plain_no_replies"].split(" ")[0]
     logging.info(f"User email: {user_email}")
 
     mailgun_data = {

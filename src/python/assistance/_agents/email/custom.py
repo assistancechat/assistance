@@ -68,22 +68,22 @@ PROMPT = textwrap.dedent(
 
 async def react_to_custom_agent_request(email: Email, prompt_task: str):
     prompt = PROMPT.format(
-        body_plain=email["plain_body"] + email["replies_from_plain_body"],
-        user_email=email["user-email"],
+        body_plain=email["plain_all_content"],
+        user_email=email["user_email"],
         prompt_task=prompt_task,
-        agent_name=email["agent-name"],
+        agent_name=email["agent_name"],
         subject=email["subject"],
         ROOT_DOMAIN=ROOT_DOMAIN,
     )
     logging.info(prompt)
 
     completions = await completion_with_back_off(
-        user_email=email["user-email"],
+        user_email=email["user_email"],
         prompt=prompt,
         api_key=OPEN_AI_API_KEY,
         **MODEL_KWARGS,
     )
-    response: str = completions.choices[0].text.strip()
+    response: str = completions.choices[0].text.strip()  # type: ignore
 
     logging.info(response)
 
@@ -94,7 +94,7 @@ async def react_to_custom_agent_request(email: Email, prompt_task: str):
 
     mailgun_data = {
         "from": f"{email['agent-name']}@{ROOT_DOMAIN}",
-        "to": email["user-email"],
+        "to": email["user_email"],
         "cc": cc_addresses,
         "subject": subject,
         "text": total_reply,
