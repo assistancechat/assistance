@@ -25,7 +25,7 @@ from assistance._agents.email.custom import react_to_custom_agent_request
 from assistance._agents.email.default import DEFAULT_TASKS
 from assistance._agents.email.reply import ALIASES, create_reply
 from assistance._agents.email.restricted import RESTRICTED_TASKS
-from assistance._agents.email.types import Email
+from assistance._agents.email.types import Email, RawEmail
 from assistance._config import ROOT_DOMAIN
 from assistance._keys import get_mailgun_api_key
 from assistance._mailgun import send_email
@@ -44,25 +44,25 @@ router = APIRouter(prefix="/email")
 
 
 @router.post("")
-async def email(request: Request):
-    email = Email(await request.json())
+async def receive_email(request: Request):
+    raw_email = RawEmail(await request.json())
 
-    logging.info(_ctx.pp.pformat(email))
+    logging.info(_ctx.pp.pformat(raw_email))
 
-    hash_digest = await _store_email(email)
+    hash_digest = await _store_email(raw_email)
 
-    asyncio.create_task(_handle_new_email(hash_digest, email))
+    asyncio.create_task(_handle_new_email(hash_digest, raw_email))
 
     return {"message": "Queued. Thank you."}
 
 
 # TODO: Handle attachments
-async def _store_email(email: Email):
+async def _store_email(raw_email: RawEmail):
     try:
-        email_to_store = json.dumps(email, indent=2)
+        email_to_store = json.dumps(raw_email, indent=2)
     except TypeError:
         json_encodable_items = {}
-        for key, item in email.items():
+        for key, item in raw_email.items():
             try:
                 json.dumps(item)
                 json_encodable_items[key] = item
@@ -88,10 +88,10 @@ def _get_new_email_pipeline_path(hash_digest: str):
     return NEW_EMAILS / hash_digest
 
 
-async def _handle_new_email(hash_digest: str, email: Email):
+async def _handle_new_email(hash_digest: str, raw_email: RawEmail):
     """React to the new email, and once it completes without error, delete the pipeline file."""
 
-    email = await _initial_parsing(email)
+    email = await _initial_parsing(raw_email)
     await _react_to_email(email)
 
     pipeline_path = _get_new_email_pipeline_path(hash_digest)
@@ -199,17 +199,47 @@ async def _fallback_email_handler(user_details: dict, email: Email):
     await send_email(mailgun_data)
 
 
-async def _initial_parsing(email: Email):
-    email["agent-name"] = email["to"].split("@")[0].lower()
+async def _initial_parsing(raw_email: RawEmail):
+    intermediate_email_dict = dict(raw_email.copy())
 
-    try:
-        x_forwarded_for = email["X-Forwarded-For"]
-        email["user-email"] = x_forwarded_for.split(" ")[0].lower()
+    keys_to_replace_with_empty_string_for_none = [
+        "cc",
+        "in_reply_to",
+        "replies_from_plain_body",
+        "reply_to",
+    ]
 
-        assert _get_cleaned_email(email["sender"]) == email["user-email"]
+    for key in keys_to_replace_with_empty_string_for_none:
+        if intermediate_email_dict[key] is None:
+            intermediate_email_dict[key] = ""
 
-    except KeyError:
-        email["user-email"] = _get_cleaned_email(email["from"])
+    intermediate_email_dict["plain_no_replies"] = intermediate_email_dict["plain_body"]
+    intermediate_email_dict["plain_replies_only"] = intermediate_email_dict[
+        "replies_from_plain_body"
+    ]
+
+    del intermediate_email_dict["plain_body"]
+    del intermediate_email_dict["replies_from_plain_body"]
+
+    intermediate_email_dict["plain_all_content"] = (
+        intermediate_email_dict["plain_no_replies"]
+        + intermediate_email_dict["plain_replies_only"]
+    )
+
+    to: str = intermediate_email_dict["to"]
+    rcpt_to: str = intermediate_email_dict["rcpt_to"]
+
+    intermediate_email_dict["agent_name"] = rcpt_to.split("@")[0].lower()
+
+    if rcpt_to != to:
+        # This is a forwarded email
+        intermediate_email_dict["user_email"] = _get_cleaned_email(to.lower())
+    else:
+        intermediate_email_dict["user_email"] = _get_cleaned_email(
+            intermediate_email_dict["from"]
+        )
+
+    email = Email(**intermediate_email_dict)
 
     return email
 

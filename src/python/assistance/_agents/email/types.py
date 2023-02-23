@@ -17,8 +17,8 @@ from typing import Literal, TypedDict
 # Spam and Unknown are guessed here
 SpamStatus = Literal["NotSpam", "Spam", "Unknown"]
 
-Email = TypedDict(
-    "Email",
+RawEmail = TypedDict(
+    "RawEmail",
     {
         "attachment_quantity": int,
         "attachments": list,
@@ -44,5 +44,39 @@ Email = TypedDict(
         "timestamp": float,
         "to": str,
         "token": str,
+    },
+)
+
+
+Email = TypedDict(
+    "Email",
+    {
+        "attachment_quantity": int,
+        "attachments": list,
+        "auto_submitted": None,
+        "bounce": bool,
+        "cc": str,
+        "date": str,
+        "from": str,
+        "html_body": str,
+        "id": int,
+        "in_reply_to": str,
+        "mail_from": str,
+        "message_id": str,
+        "plain_all_content": str,
+        "plain_no_replies": str,
+        "rcpt_to": str,
+        "received_with_ssl": bool,
+        "references": None,
+        "plain_replies_only": str,
+        "reply_to": str,
+        "size": str,
+        "spam_status": SpamStatus,
+        "subject": str,
+        "timestamp": float,
+        "to": str,
+        "token": str,
+        "agent_name": str,
+        "user_email": str,
     },
 )
