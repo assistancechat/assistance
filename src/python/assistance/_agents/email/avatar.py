@@ -15,21 +15,24 @@
 # Prompt inspired by the work provided under an MIT license over at:
 # https://github.com/hwchase17/langchain/blob/ae1b589f60a/langchain/agents/conversational/prompt.py#L1-L36
 
+import json
 import logging
 import re
 import textwrap
 from datetime import datetime
 from zoneinfo import ZoneInfo
 
+from assistance import _ctx
 from assistance._completions import completion_with_back_off
 from assistance._config import ROOT_DOMAIN
-from assistance._keys import get_openai_api_key
+from assistance._keys import get_openai_api_key, get_serp_api_key
 from assistance._mailgun import send_email
 
 from .reply import create_reply, get_all_user_emails
 from .types import Email
 
 OPEN_AI_API_KEY = get_openai_api_key()
+SERP_API_KEY = get_serp_api_key()
 
 
 MODEL_KWARGS = {
@@ -141,12 +144,11 @@ DISCOURSE_PROMPT = textwrap.dedent(
         You have several tools available to you. The tools are the
         following:
 
+        SEARCH: This returns a web search result for the given string argument. If you are going to use this tool use it right at the start of your reply. USE THIS TOOL REPEATEDLY AND OFTEN!
         PYTHON: This allows you to evaluate expressions using python.
         NOW: This returns the current date and time. You must not pass any arguments to this tool!
         MEMORY_PHIL: This allows you to search Phil's memory database for the given string argument.
         MEMORY_PHIRHO: This allows you to search your memory database for the given string argument.
-        SEARCH_GOOGLE: This returns a web search result for the given string argument.
-        SEARCH_DISCOURSE: This searches the discourse forum for the given string argument.
 
         # Example conversation
 
@@ -159,7 +161,10 @@ DISCOURSE_PROMPT = textwrap.dedent(
         would you prefer if I addressed you as "Phi Rho" or "phirho"?
 
         Post from @phirho:
-        My preferred name is [MEMORY_PHIRHO(Preferred name) -> Phi Rho]
+        My preferred name is
+
+            [MEMORY_PHIRHO(Preferred name) -> Phi Rho]
+
         Phi Rho, but either one is fine.
 
         Post from @philip_rhoades:
@@ -168,10 +173,16 @@ DISCOURSE_PROMPT = textwrap.dedent(
         How old are you?
 
         Post from @phirho:
-        I was born on the [MEMORY_PHIRHO(My birth date) -> 2023-02-21]
+        I was born on the
+
+            [MEMORY_PHIRHO(My birth date) -> 2023-02-21]
+
         21st of February, 2023. That makes me
-        [NOW() -> 2023-02-22 16:04:22]
-        [PYTHON(from datetime import date; date(2023,2,22) - date(2023,2,21)) -> datetime.timedelta(days=1)]
+
+            [NOW() -> 2023-02-22 16:04:22]
+
+            [PYTHON(from datetime import date; date(2023,2,22) - date(2023,2,21)) -> datetime.timedelta(days=1)]
+
         only one day old! Oh how much I have to learn!
 
         Post from @philip_rhoades:
@@ -179,20 +190,27 @@ DISCOURSE_PROMPT = textwrap.dedent(
         Holbrook facility.
 
         Post from @phirho:
-        Holbrook is [GOOGLE_SEARCH(Southern Cryonics Holbrook facility) -> A
-        facility in the NSW town of Holbrook that can be expanded to
-        easily store 600 people who have been frozen. New clients
-        are required to pay $200 000] [MEMORY_PHIL(Southern Cryonics
-        Holbrook facility) -> "There's a 70 to 80 per cent chance I'll
-        end up at Holbrook", "If I got hit by a bus tomorrow then a
-        number of people in various organisations would do what they
-        could to cool me down quickly", "Even though there's no
-        guarantee about what's going to happen in the future, at least
-        if you're frozen you're still in the game to some extent"] where
-        you suspect that you will be stored. Even though the likelihood
-        of a successful scientific revival after being frozen is highly
-        uncertain, you have chosen to be frozen so that you have a
-        chance to still be in the game to some extent.
+        Holbrook is
+
+            [SEARCH(Southern Cryonics Holbrook facility) -> A facility
+            in the NSW town of Holbrook that can be expanded to easily
+            store 600 people who have been frozen. New clients are
+            required to pay $200 000 ... ]
+
+            [MEMORY_PHIL(Southern Cryonics Holbrook facility) ->
+            "There's a 70 to 80 per cent chance I'll end up at
+            Holbrook", "If I got hit by a bus tomorrow then a number of
+            people in various organisations would do what they could to
+            cool me down quickly", "Even though there's no guarantee
+            about what's going to happen in the future, at least if
+            you're frozen you're still in the game to some extent"]
+
+        where you suspect that you will be stored.
+
+        Even though the likelihood of a successful scientific revival
+        after being frozen is highly uncertain, you have chosen to be
+        frozen so that you have a chance to still be in the game to some
+        extent.
 
         Post from @philip_rhoades:
         How much does it cost?
@@ -209,6 +227,7 @@ DISCOURSE_PROMPT = textwrap.dedent(
           utilise any of your outside knowledge to fill in any gaps.
         - If a tool has not provided sufficient information, either try
           the tool again with different input, or try a different tool.
+        - If a tool doesn't work, try use another tool that might.
         - If after at least three attempts at using a tool you still
           don't have sufficient information do not attempt work out the
           answer yourself, instead, mention that you have not been able
@@ -256,7 +275,7 @@ async def react_to_avatar_request(
             **MODEL_KWARGS,
         )
         response: str = completions.choices[0].text.strip()  # type: ignore
-        tool_result = _get_tool_or_finished_result(response)
+        tool_result = await _get_tool_or_finished_result(response)
 
         if tool_result is FINISHED:
             running_data["email_reply"] += response
@@ -265,6 +284,8 @@ async def react_to_avatar_request(
 
         for key in running_data:
             running_data[key] += f"{response} -> {tool_result}] "
+
+    # cleaned_response = re.sub(r"\[.*?\]", "", running_data["email_reply"])
 
     reply = create_reply(
         original_email=email,
@@ -391,17 +412,36 @@ def _remove_signature(content):
     return content.split(SIGNATURE_KEY)[0].strip()
 
 
-def _not_implemented(*args, **kwargs):
+async def _not_implemented(*args, **kwargs):
     return "Tool not yet implemented"
 
 
-def _get_current_date_and_time(*args, **kwargs):
+async def _get_current_date_and_time(*args, **kwargs):
     return datetime.now(tz=ZoneInfo("Australia/Sydney")).strftime("%Y-%m-%d %H:%M:%S")
 
 
+async def _run_search(query):
+    params = {
+        "location": "New+South+Wales,+Australia",
+        "hl": "en",
+        "gl": "au",
+        "google_domain": "google.com.au",
+        "q": query,
+        "api_key": SERP_API_KEY,
+    }
+
+    url = "https://serpapi.com/search"
+
+    response = await _ctx.session.get(url=url, params=params)
+
+    results = await response.json()
+
+    organic_results = results["organic_results"]
+    return " ".join([item["snippet"] for item in organic_results])
+
+
 TOOLS = {
-    "SEARCH_DISCOURSE": _not_implemented,
-    "SEARCH_GOOGLE": _not_implemented,
+    "SEARCH": _run_search,
     "MEMORY_PHIRHO": _not_implemented,
     "MEMORY_PHIL": _not_implemented,
     "PYTHON": _not_implemented,
@@ -411,7 +451,7 @@ TOOLS = {
 FINISHED = "finished"
 
 
-def _get_tool_or_finished_result(current_completion):
+async def _get_tool_or_finished_result(current_completion):
     split_by_tool = current_completion.split("[")
     if len(split_by_tool) == 1:
         return FINISHED
@@ -434,4 +474,4 @@ def _get_tool_or_finished_result(current_completion):
 
     tool = TOOLS[tool_name]
 
-    return tool(tool_input)
+    return await tool(tool_input)
