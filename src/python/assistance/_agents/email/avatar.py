@@ -144,7 +144,7 @@ DISCOURSE_PROMPT = textwrap.dedent(
         You have several tools available to you. The tools are the
         following:
 
-        SEARCH: This returns a web search result for the given string argument. If you are going to use this tool use it right at the start of your reply. USE THIS TOOL REPEATEDLY AND OFTEN!
+        SEARCH: This returns a web search result for the given string argument. USE THIS TOOL REPEATEDLY AND OFTEN!
         PYTHON: This allows you to evaluate expressions using python.
         NOW: This returns the current date and time. You must not pass any arguments to this tool!
         MEMORY_PHIL: This allows you to search Phil's memory database for the given string argument.
@@ -247,6 +247,8 @@ DISCOURSE_PROMPT = textwrap.dedent(
         {transcript}
 
         Post from @phirho:
+
+            [SEARCH(
     """
 ).strip()
 
@@ -257,14 +259,18 @@ async def react_to_avatar_request(
 ):
     if "notifications@forum.phirho.org" in email["from"]:
         prompt = _prompt_as_discourse_thread(email)
+        email_reply = "\n    [SEARCH("
+        is_discourse = True
     else:
         prompt = _prompt_as_email_thread(email)
+        is_discourse = False
+        email_reply = ""
 
     tool_result = None
 
     running_data = {
         "prompt": prompt,
-        "email_reply": "",
+        "email_reply": email_reply,
     }
 
     while True:
@@ -283,7 +289,7 @@ async def react_to_avatar_request(
             break
 
         for key in running_data:
-            running_data[key] += f"{response} -> {tool_result}] "
+            running_data[key] += f"{response} -> {tool_result}]\n\n"
 
     # cleaned_response = re.sub(r"\[.*?\]", "", running_data["email_reply"])
 
@@ -301,7 +307,7 @@ async def react_to_avatar_request(
         "html_body": reply["html_reply"],
     }
 
-    if reply["prefer_plain_text"]:
+    if reply["prefer_plain_text"] or is_discourse:
         del mailgun_data["html_body"]
         mailgun_data["plain_body"] = reply["total_reply"]
 
@@ -464,13 +470,14 @@ async def _get_tool_or_finished_result(current_completion):
     tool_match = tool_regex.match(last_tool)
 
     if tool_match is None:
-        raise ValueError(f"Tool not recognised: {last_tool}")
+        return "Incorrect syntax used for calling a tool"
 
     tool_name = tool_match.group(1)
     tool_input = tool_match.group(2)
 
     if tool_name not in TOOLS:
-        raise ValueError(f"Tool not recognised: {tool_name}")
+        # TODO: Include fuzz support for recommending correction
+        return f"The tool you provided is not supported: {tool_name}"
 
     tool = TOOLS[tool_name]
 
