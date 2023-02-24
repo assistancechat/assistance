@@ -18,7 +18,6 @@
 import logging
 import re
 import textwrap
-import time
 from datetime import datetime
 from zoneinfo import ZoneInfo
 
@@ -171,7 +170,7 @@ DISCOURSE_PROMPT = textwrap.dedent(
         Post from @phirho:
         I was born on the [MEMORY_PHIRHO(My birth date) -> 2023-02-21]
         21st of February, 2023. That makes me
-        [NOW() -> 2023-02-22, 16:04:22]
+        [NOW() -> 2023-02-22 16:04:22]
         [PYTHON(from datetime import date; date(2023,2,22) - date(2023,2,21)) -> datetime.timedelta(days=1)]
         only one day old! Oh how much I have to learn!
 
@@ -183,7 +182,7 @@ DISCOURSE_PROMPT = textwrap.dedent(
         Holbrook is [GOOGLE_SEARCH(Southern Cryonics Holbrook facility) -> A
         facility in the NSW town of Holbrook that can be expanded to
         easily store 600 people who have been frozen. New clients
-        are required to pay $200 000 ][MEMORY_PHIL(Southern Cryonics
+        are required to pay $200 000] [MEMORY_PHIL(Southern Cryonics
         Holbrook facility) -> "There's a 70 to 80 per cent chance I'll
         end up at Holbrook", "If I got hit by a bus tomorrow then a
         number of people in various organisations would do what they
@@ -204,19 +203,20 @@ DISCOURSE_PROMPT = textwrap.dedent(
 
         # Your task
 
+        - Use tools as soon as you can to get information to support
+          your response.
         - ONLY get your information from the use of a tool. DO NOT
           utilise any of your outside knowledge to fill in any gaps.
-        - If a tool has not provided sufficient information, feel free
-          to try the tool again with different input, or try a different
-          tool.
-        - If you still don't have sufficient information from the use of
-          a tool do not attempt work out the answer yourself, instead,
-          mention that you have not been able to work it out with what
-          is currently available to you.
+        - If a tool has not provided sufficient information, either try
+          the tool again with different input, or try a different tool.
+        - If after at least three attempts at using a tool you still
+          don't have sufficient information do not attempt work out the
+          answer yourself, instead, mention that you have not been able
+          to work it out with what is currently available to you.
         - The users you are talking with cannot see any of the tools
           that you are using. They are unable to see anything written
           within "[" and "]". As such, make sure to write your response
-          to the users after the tools results.
+          to the users after the tool's results.
         - Be truthful, informative, humorous, interesting, and creative.
         - You are Phil's digital alter-ego, so take on his personality
           and writing style.
@@ -241,21 +241,34 @@ async def react_to_avatar_request(
     else:
         prompt = _prompt_as_email_thread(email)
 
-    logging.info(prompt)
+    tool_result = None
 
-    completions = await completion_with_back_off(
-        user_email=email["user_email"],
-        prompt=prompt,
-        api_key=OPEN_AI_API_KEY,
-        **MODEL_KWARGS,
-    )
-    response: str = completions.choices[0].text.strip()  # type: ignore
+    running_data = {
+        "prompt": prompt,
+        "email_reply": "",
+    }
 
-    logging.info(response)
+    while True:
+        completions = await completion_with_back_off(
+            user_email=email["user_email"],
+            prompt=running_data["prompt"],
+            api_key=OPEN_AI_API_KEY,
+            **MODEL_KWARGS,
+        )
+        response: str = completions.choices[0].text.strip()  # type: ignore
+        tool_result = _get_tool_or_finished_result(response)
+
+        if tool_result is FINISHED:
+            running_data["email_reply"] += response
+
+            break
+
+        for key in running_data:
+            running_data[key] += f"{response} -> {tool_result}] "
 
     reply = create_reply(
         original_email=email,
-        response=response,
+        response=running_data["email_reply"],
     )
 
     mailgun_data = {
@@ -376,3 +389,49 @@ def _prompt_as_discourse_thread(email: Email):
 
 def _remove_signature(content):
     return content.split(SIGNATURE_KEY)[0].strip()
+
+
+def _not_implemented(*args, **kwargs):
+    return "Tool not yet implemented"
+
+
+def _get_current_date_and_time(*args, **kwargs):
+    return datetime.now(tz=ZoneInfo("Australia/Sydney")).strftime("%Y-%m-%d %H:%M:%S")
+
+
+TOOLS = {
+    "SEARCH_DISCOURSE": _not_implemented,
+    "SEARCH_GOOGLE": _not_implemented,
+    "MEMORY_PHIRHO": _not_implemented,
+    "MEMORY_PHIL": _not_implemented,
+    "PYTHON": _not_implemented,
+    "NOW": _get_current_date_and_time,
+}
+
+FINISHED = "finished"
+
+
+def _get_tool_or_finished_result(current_completion):
+    split_by_tool = current_completion.split("[")
+    if len(split_by_tool) == 1:
+        return FINISHED
+
+    last_tool = split_by_tool[-1]
+    if "]" in last_tool:
+        return FINISHED
+
+    tool_regex = re.compile(r"([A-Z_]+)\((.*)\)")
+    tool_match = tool_regex.match(last_tool)
+
+    if tool_match is None:
+        raise ValueError(f"Tool not recognised: {last_tool}")
+
+    tool_name = tool_match.group(1)
+    tool_input = tool_match.group(2)
+
+    if tool_name not in TOOLS:
+        raise ValueError(f"Tool not recognised: {tool_name}")
+
+    tool = TOOLS[tool_name]
+
+    return tool(tool_input)
