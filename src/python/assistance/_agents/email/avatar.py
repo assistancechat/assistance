@@ -242,6 +242,10 @@ DISCOURSE_PROMPT = textwrap.dedent(
         - Make sure to look up multiple memories about Phil to try
           gather information about how he may have responded.
 
+        # Extra details
+
+        - The time right now is {now}.
+
         # The current conversation
 
         {transcript}
@@ -273,6 +277,8 @@ async def react_to_avatar_request(
         "email_reply": email_reply,
     }
 
+    logging.info(prompt)
+
     while True:
         completions = await completion_with_back_off(
             user_email=email["user_email"],
@@ -281,17 +287,21 @@ async def react_to_avatar_request(
             **MODEL_KWARGS,
         )
         response: str = completions.choices[0].text.strip()  # type: ignore
-        tool_result = await _get_tool_or_finished_result(response)
+
+        for key in running_data:
+            running_data[key] += response
+
+        tool_result = await _get_tool_or_finished_result(running_data["email_reply"])
 
         if tool_result is FINISHED:
-            running_data["email_reply"] += response
-
             break
 
         for key in running_data:
-            running_data[key] += f"{response} -> {tool_result}]\n\n"
+            running_data[key] += f" -> {tool_result}]\n\n"
 
     # cleaned_response = re.sub(r"\[.*?\]", "", running_data["email_reply"])
+
+    logging.info(running_data["email_reply"])
 
     reply = create_reply(
         original_email=email,
@@ -411,7 +421,12 @@ def _prompt_as_discourse_thread(email: Email):
 
     transcript = transcript.strip()
 
-    return DISCOURSE_PROMPT.format(transcript=transcript)
+    return DISCOURSE_PROMPT.format(
+        transcript=transcript,
+        now=str(
+            datetime.now(tz=ZoneInfo("Australia/Sydney")),
+        ),
+    )
 
 
 def _remove_signature(content):
@@ -442,8 +457,16 @@ async def _run_search(query):
 
     results = await response.json()
 
+    logging.info(json.dumps(results, indent=2))
+
     organic_results = results["organic_results"]
-    return " ".join([item["snippet"] for item in organic_results])
+
+    snippets = []
+    for item in organic_results:
+        if "snippet" in item:
+            snippets.append(item["snippet"])
+
+    return " ".join(snippets)
 
 
 TOOLS = {
