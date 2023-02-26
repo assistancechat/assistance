@@ -22,7 +22,7 @@ from assistance._paths import USERS
 
 from . import _ctx
 from ._config import ROOT_DOMAIN
-from ._keys import get_mailgun_api_key
+from ._keys import get_mailgun_api_key, get_postal_api_key
 
 EMAIL_SUBJECT = f"Your career.{ROOT_DOMAIN} access link"
 EMAIL_TEMPLATE = (
@@ -31,20 +31,29 @@ EMAIL_TEMPLATE = (
 LINK_TEMPLATE = "https://career.{domain}/?pwd={password}"
 
 API_KEY = get_mailgun_api_key()
+POSTAL_API_KEY = get_postal_api_key()
 
 
-async def send_email(mailgun_data):
-    url = f"https://api.eu.mailgun.net/v3/{ROOT_DOMAIN}/messages"
+async def send_email(postal_data):
+    headers = {
+        "Content-Type": "application/json",
+        "X-Server-API-Key": POSTAL_API_KEY,
+    }
 
-    logging.info(json.dumps(mailgun_data, indent=2))
+    url = "https://postal.assistance.chat/api/v1/send/message"
 
-    mailgun_response = await _ctx.session.post(
+    if postal_data["cc"] == "":
+        del postal_data["cc"]
+
+    logging.info(json.dumps(postal_data, indent=2))
+
+    postal_response = await _ctx.session.post(
         url=url,
-        auth=aiohttp.BasicAuth(login="api", password=API_KEY),
-        data=mailgun_data,
+        headers=headers,
+        data=json.dumps(postal_data),
     )
 
-    logging.info(json.dumps(await mailgun_response.json(), indent=2))
+    logging.info(json.dumps(await postal_response.json(), indent=2))
 
 
 def get_access_link(email: str):

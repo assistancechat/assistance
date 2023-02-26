@@ -68,34 +68,36 @@ PROMPT = textwrap.dedent(
 
 async def react_to_custom_agent_request(email: Email, prompt_task: str):
     prompt = PROMPT.format(
-        body_plain=email["body-plain"],
-        user_email=email["user-email"],
+        body_plain=email["plain_all_content"],
+        user_email=email["user_email"],
         prompt_task=prompt_task,
-        agent_name=email["agent-name"],
+        agent_name=email["agent_name"],
         subject=email["subject"],
         ROOT_DOMAIN=ROOT_DOMAIN,
     )
     logging.info(prompt)
 
     completions = await completion_with_back_off(
-        user_email=user_email, prompt=prompt, api_key=OPEN_AI_API_KEY, **MODEL_KWARGS
+        user_email=email["user_email"],
+        prompt=prompt,
+        api_key=OPEN_AI_API_KEY,
+        **MODEL_KWARGS,
     )
-    response: str = completions.choices[0].text.strip()
+    response: str = completions.choices[0].text.strip()  # type: ignore
 
     logging.info(response)
 
-    subject, total_reply = create_reply(
-        subject=email["subject"],
-        body_plain=email["body-plain"],
+    reply = create_reply(
+        original_email=email,
         response=response,
-        user_email=email["user-email"],
     )
 
     mailgun_data = {
-        "from": f"{email['agent-name']}@{ROOT_DOMAIN}",
-        "to": email["user-email"],
-        "subject": subject,
-        "text": total_reply,
+        "from": f"{email['agent_name']}@{ROOT_DOMAIN}",
+        "to": reply["to_addresses"],
+        "cc": reply["cc_addresses"],
+        "subject": reply["subject"],
+        "plain_body": reply["total_reply"],
     }
 
     await send_email(mailgun_data)

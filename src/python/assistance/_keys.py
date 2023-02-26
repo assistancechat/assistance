@@ -45,6 +45,10 @@ def get_mailgun_api_key():
     return _load_secret("mailgun-api-key")
 
 
+def get_postal_api_key():
+    return _load_secret("postal-api-key")
+
+
 def get_notion_api_key():
     return _load_secret("notion-api-key")
 

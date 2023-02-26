@@ -6,9 +6,9 @@ known_first_party = ["assistance"]
 [tool.pyright]
 ignore = [
     "**/node_modules",
-    "**/__pycache__",
-    "./src/python/assistance/_client"
+    "**/__pycache__"
 ]
+typeCheckingMode = "basic"
 
 [tool.pylint.master]
 ignore-patterns = "./src/python/assistance/_client/**/*.py"

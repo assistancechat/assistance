@@ -12,6 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import json
+
+import aiofiles
 
 from assistance._paths import CONFIG
 
@@ -31,3 +34,10 @@ def _load_config_item(name: str):
         item = f.read().strip()
 
     return item
+
+
+async def load_targeted_news_config():
+    async with aiofiles.open(CONFIG / "targeted-news.json", "r") as f:
+        news_config = json.loads(await f.read())
+
+    return news_config

@@ -13,7 +13,8 @@
 # limitations under the License.
 
 
-from assistance._streamlit import main
+from .avatar import react_to_avatar_request
 
-if __name__ == "__main__":
-    main()  # type: ignore
+RESTRICTED_TASKS = {
+    "avatar": react_to_avatar_request,
+}

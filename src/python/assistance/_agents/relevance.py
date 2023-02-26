@@ -15,13 +15,15 @@
 import json
 import logging
 import textwrap
+from typing import TypedDict
 
 from assistance import _ctx
 from assistance._completions import completion_with_back_off
+from assistance._utilities import items_to_list_string
 
 MODEL_KWARGS = {
     "engine": "text-davinci-003",
-    "max_tokens": 512,
+    "max_tokens": 1536,
     "best_of": 1,
     "temperature": 0.7,
     "top_p": 1,
@@ -29,34 +31,60 @@ MODEL_KWARGS = {
     "presence_penalty": 0.0,
 }
 
+MAX_ARTICLE_COUNT = 24
+
 PROMPT = textwrap.dedent(
     """
         You are aiming to find the articles that might be the best at
-        helping someone fulfil the following tasks:
+        helping someone fulfil the following tasks and goals for their
+        target audience:
+
+        Their tasks:
 
         {tasks}
 
+        Their goals:
+
+        {goals}
+
+        Their target audience:
+
+        {target_audience}
+
+        Your instructions:
+
         Below are {num_of_articles} articles that may be relevant to the
-        tasks. Provide the id of the {num_of_articles_to_select} most
-        relevant articles to the tasks as a Python list.
+        tasks and goal. For each article id provide a score between 0
+        and 10 for each goal and task for their target audience. The
+        scores are a measure of how helpful you think the article will
+        be in achieving each respective task and goal.
 
-        Do not complete the tasks themselves. Instead, ONLY provide the
-        ids of the articles that you think would be the most helpful for
-        someone else to fulfil those tasks.
-
-        If there are multiple articles that are covering the exact same
-        topic, you should only select one of them.
-
-        For each article that you select, provide an absolute score
-        between 0 and 100. The score is a measure of how relevant you
-        think the article is to achieving the tasks.
+        For each article, if there are other articles within the list
+        that are covering a very similar topic, provide those articles
+        as a "similar-topic-covered" list. If no other articles are
+        covering a similar topic, provide an empty list.
 
         Required JSON format:
 
-        {{
-            "scores": [<score of most relevant article>, <score of second most relevant article>, ...],
-            "ids": [<id of most relevant article>, <id of second most relevant article>, ...]
-        }}
+        [
+            {{
+                "id": 1,
+                "task-scores": [<provide the relevance score for the first task>, <provide the relevance score for the second task>, ...],
+                "goal-scores": [<provide the relevance score for the first goal>, ...],
+                "similar-topic-covered": [<provide the article id of the first article that is covering a similar topic as this article>, <second similar article>, ...]
+            }},
+            {{
+                "id": 2,
+                ...
+            }},
+
+            ...
+
+            {{
+                "id": {num_of_articles},
+                ...
+            }}
+        ]
 
         Articles:
 
@@ -67,22 +95,25 @@ PROMPT = textwrap.dedent(
 ).strip()
 
 
-async def get_most_relevant_articles(
+# TODO: Make article scoring handle article length larger than available
+# tokens.
+
+# TODO: Adjust max tokens to be a reasonable number given a maximum
+# number of articles.
+
+
+async def article_scoring(
     user_email: str,
     openai_api_key: str,
+    goals: list[str],
     tasks: list[str],
+    target_audience: str,
     articles: list[dict[str, str]],
-    num_of_articles_to_select: int,
     keys: list[str],
 ):
-    if len(articles) < num_of_articles_to_select:
-        return articles
-
-    tasks_string = textwrap.indent("\n".join(tasks), "- ")
-
     articles_with_ids = []
     for index, article in enumerate(articles):
-        article_for_prompt = {"id": index}
+        article_for_prompt: dict[str, int | str] = {"id": index + 1}
 
         for key in keys:
             article_for_prompt[key] = article[key]
@@ -91,39 +122,33 @@ async def get_most_relevant_articles(
 
     logging.info(_ctx.pp.pformat(articles_with_ids))
 
-    article_ids: None | list[int] = None
-    for _ in range(3):
-        prompt = PROMPT.format(
-            tasks=tasks_string,
-            num_of_articles=len(articles),
-            num_of_articles_to_select=num_of_articles_to_select,
-            articles=json.dumps(articles_with_ids, indent=2),
+    article_ranking: None | list[dict] = None
+    prompt = PROMPT.format(
+        tasks=items_to_list_string(tasks),
+        goals=items_to_list_string(goals),
+        target_audience=target_audience,
+        num_of_articles=len(articles),
+        articles=json.dumps(articles_with_ids, indent=2),
+    )
+
+    completions = await completion_with_back_off(
+        user_email=user_email, prompt=prompt, api_key=openai_api_key, **MODEL_KWARGS
+    )
+    response: str = completions.choices[0].text.strip()  # type: ignore
+
+    logging.info(f"Response: {response}")
+
+    article_ranking = json.loads(response)
+
+    if article_ranking is None:
+        raise ValueError(
+            "AI response returned None when it should be a JSON list of article dicts."
         )
 
-        completions = await completion_with_back_off(
-            user_email=user_email, prompt=prompt, api_key=openai_api_key, **MODEL_KWARGS
-        )
-        response: str = completions.choices[0].text.strip()
+    for item in article_ranking:
+        assert "id" in item
+        assert "task-scores" in item
+        assert "goal-scores" in item
+        assert "similar-topic-covered" in item
 
-        logging.info(f"Response: {response}")
-
-        try:
-            article_ranking = json.loads(response)
-            article_ids = article_ranking["ids"]
-            article_scores = article_ranking["scores"]
-
-            break
-        except (json.JSONDecodeError, KeyError) as e:
-            logging.info(e)
-
-    if not article_ids:
-        raise ValueError("Could not parse article ids")
-
-    top_articles = []
-    for i, article_id in enumerate(article_ids):
-        article = articles[article_id]
-        article["score"] = article_scores[i]
-
-        top_articles.append(article)
-
-    return top_articles
+    return article_ranking
