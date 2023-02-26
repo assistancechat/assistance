@@ -267,7 +267,10 @@ async def _call_gpt_and_store_as_transcript(
     prompt: str,
 ):
     completions = await completion_with_back_off(
-        user_email=user_email, prompt=prompt, api_key=openai_api_key, **model_kwargs
+        llm_usage_record_key=user_email,
+        prompt=prompt,
+        api_key=openai_api_key,
+        **model_kwargs,
     )
     response: str = completions.choices[0].text.strip()  # type: ignore
 

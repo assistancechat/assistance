@@ -17,24 +17,24 @@ import json
 
 import aiofiles
 
+from assistance._paths import NEW_GOOGLE_ALERTS, get_article_path
+from assistance._types import Article
 from assistance._utilities import get_cleaned_url
 
-from ._paths import NEW_GOOGLE_ALERTS, get_article_path
 
-
-async def collect_new_articles():
+async def collect_new_articles() -> dict[str, Article]:
     coroutines = []
     new_alerts = NEW_GOOGLE_ALERTS.glob("*")
 
     for alert in new_alerts:
         coroutines.append(_collect_articles_from_alert(alert.name))
 
-    articles = await asyncio.gather(*coroutines)
+    articles = dict(await asyncio.gather(*coroutines))
 
     return articles
 
 
-async def _collect_articles_from_alert(hash_digest: str):
+async def _collect_articles_from_alert(hash_digest: str) -> tuple[str, Article]:
     article_path = get_article_path(hash_digest)
 
     async with aiofiles.open(article_path, "r") as f:
@@ -42,4 +42,4 @@ async def _collect_articles_from_alert(hash_digest: str):
 
     article_details["url"] = get_cleaned_url(article_details["url"])
 
-    return article_details
+    return hash_digest, article_details

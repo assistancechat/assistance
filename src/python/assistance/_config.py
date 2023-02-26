@@ -12,15 +12,47 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import json
+
+from typing import Literal, TypedDict, cast
 
 import aiofiles
+import toml
 
 from assistance._paths import CONFIG
 
 ROOT_DOMAIN = "assistance.chat"
 PAYMENT_LINK = "https://buy.stripe.com/bIYeXF2s1d0E4wg9AB"
 EMAIL_PRODUCT_ID = "prod_NLuYISl8KZ6fUX"
+
+TargetedNewsFormats = Literal["email-digest-for-linkedin", "separate-discourse-posts"]
+
+
+class TargetedNewsUserOverrides(TypedDict, total=False):
+    delivery_time: str
+    delivery_timezone: str
+    delivery_frequency: str
+    goals: list[str]
+    tasks: list[str]
+
+
+class TargetedNewsSubscriptionDataItem(TypedDict):
+    target_audience: str
+    keywords: list[str]
+    agent_user: str
+    format: TargetedNewsFormats
+    subscribers: list[str]
+    user_overrides: dict[str, TargetedNewsUserOverrides]
+
+
+class TargetedNewsConfig(TypedDict):
+    delivery_time: str
+    delivery_timezone: str
+    delivery_frequency: str
+    goals: list[str]
+    goal_weights: list[float]
+    tasks: list[str]
+    task_weights: list[float]
+    subscription_data: list[TargetedNewsSubscriptionDataItem]
 
 
 def get_google_oauth_client_id():
@@ -36,8 +68,8 @@ def _load_config_item(name: str):
     return item
 
 
-async def load_targeted_news_config():
-    async with aiofiles.open(CONFIG / "targeted-news.json", "r") as f:
-        news_config = json.loads(await f.read())
+async def load_targeted_news_config() -> TargetedNewsConfig:
+    async with aiofiles.open(CONFIG / "targeted-news.toml", "r") as f:
+        news_config = cast(TargetedNewsConfig, toml.loads(await f.read()))
 
     return news_config

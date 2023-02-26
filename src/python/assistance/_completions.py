@@ -26,16 +26,18 @@ from ._paths import COMPLETIONS
 
 @retry(wait=wait_random_exponential(min=1, max=60), stop=stop_after_attempt(12))
 async def completion_with_back_off(**kwargs):
-    user_email: str = kwargs["user_email"]
-    del kwargs["user_email"]
+    llm_usage_record_key: str = kwargs["llm_usage_record_key"]
+    del kwargs["llm_usage_record_key"]
 
-    assert "user_email" not in kwargs
+    assert "llm_usage_record_key" not in kwargs
 
     query_timestamp = time.time_ns()
     response = await openai.Completion.acreate(**kwargs)
     logging.info(response)
 
-    asyncio.create_task(_store_result(user_email, kwargs, response, query_timestamp))
+    asyncio.create_task(
+        _store_result(llm_usage_record_key, kwargs, response, query_timestamp)
+    )
 
     return response
 

@@ -25,7 +25,6 @@ from assistance._agents.email.custom import react_to_custom_agent_request
 from assistance._agents.email.default import DEFAULT_TASKS
 from assistance._agents.email.reply import ALIASES, create_reply
 from assistance._agents.email.restricted import RESTRICTED_TASKS
-from assistance._agents.email.types import Email, RawEmail
 from assistance._config import ROOT_DOMAIN
 from assistance._keys import get_mailgun_api_key
 from assistance._mailgun import send_email
@@ -37,6 +36,7 @@ from assistance._paths import (
     get_user_details,
     get_user_from_email,
 )
+from assistance._types import Email, RawEmail
 from assistance._utilities import get_cleaned_email
 
 MAILGUN_API_KEY = get_mailgun_api_key()

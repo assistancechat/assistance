@@ -15,13 +15,12 @@
 import textwrap
 
 from assistance._config import ROOT_DOMAIN
-
-from .googlealerts import googlealerts_agent
+from assistance._news.pipeline import add_to_google_alerts_pipeline
 
 DEFAULT_TASKS = {
     "googlealerts": (
         "Stores a Google Alert for future use by the targeted-news agent.",
-        googlealerts_agent,
+        add_to_google_alerts_pipeline,
     ),
     "poem-demo": (
         "This is an example assistant who responds with a poem",

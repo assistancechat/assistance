@@ -28,8 +28,8 @@ from assistance._config import ROOT_DOMAIN
 from assistance._keys import get_openai_api_key, get_serp_api_key
 from assistance._mailgun import send_email
 
+from ..._types import Email
 from .reply import create_reply, get_all_user_emails
-from .types import Email
 
 OPEN_AI_API_KEY = get_openai_api_key()
 SERP_API_KEY = get_serp_api_key()
@@ -281,7 +281,7 @@ async def react_to_avatar_request(
 
     while True:
         completions = await completion_with_back_off(
-            user_email=email["user_email"],
+            llm_usage_record_key=email["user_email"],
             prompt=running_data["prompt"],
             api_key=OPEN_AI_API_KEY,
             **MODEL_KWARGS,

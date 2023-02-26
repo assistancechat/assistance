@@ -125,7 +125,7 @@ WORDS_OVERLAP = 20
 
 
 async def summarise_news_article_url_with_tasks(
-    user_email: str,
+    llm_usage_record_key: str,
     openai_api_key: str,
     tasks: list[str],
     goals: list[str],
@@ -144,7 +144,7 @@ async def summarise_news_article_url_with_tasks(
     logging.info(page_contents)
 
     summary = await _summarise_piecewise(
-        user_email=user_email,
+        user_email=llm_usage_record_key,
         openai_api_key=openai_api_key,
         prompt=prompt,
         content_to_summarise=page_contents,
@@ -191,7 +191,7 @@ async def _summarise_piecewise(
 
     if len(text_sections) == 1:
         return await _evaluate_prompt(
-            user_email=user_email,
+            llm_usage_record_key=user_email,
             openai_api_key=openai_api_key,
             prompt=prompt,
             text=text_sections[0],
@@ -206,7 +206,7 @@ async def _summarise_piecewise(
 
         coroutines.append(
             _evaluate_prompt(
-                user_email=user_email,
+                llm_usage_record_key=user_email,
                 openai_api_key=openai_api_key,
                 prompt=prompt,
                 text=text,
@@ -219,7 +219,7 @@ async def _summarise_piecewise(
     combined_summaries = "\n\n".join(cleaned_summaries)
 
     summary = await _evaluate_prompt(
-        user_email=user_email,
+        llm_usage_record_key=user_email,
         openai_api_key=openai_api_key,
         prompt=prompt,
         text=combined_summaries,
@@ -229,13 +229,13 @@ async def _summarise_piecewise(
 
 
 async def _evaluate_prompt(
-    user_email: str,
+    llm_usage_record_key: str,
     openai_api_key: str,
     prompt: str,
     text: str,
 ):
     completions = await completion_with_back_off(
-        user_email=user_email,
+        llm_usage_record_key=llm_usage_record_key,
         prompt=prompt.format(text=text),
         api_key=openai_api_key,
         **MODEL_KWARGS,

@@ -23,8 +23,8 @@ from assistance._config import ROOT_DOMAIN
 from assistance._keys import get_openai_api_key
 from assistance._mailgun import send_email
 
+from ..._types import Email
 from .reply import create_reply
-from .types import Email
 
 OPEN_AI_API_KEY = get_openai_api_key()
 
@@ -78,7 +78,7 @@ async def react_to_custom_agent_request(email: Email, prompt_task: str):
     logging.info(prompt)
 
     completions = await completion_with_back_off(
-        user_email=email["user_email"],
+        llm_usage_record_key=email["user_email"],
         prompt=prompt,
         api_key=OPEN_AI_API_KEY,
         **MODEL_KWARGS,

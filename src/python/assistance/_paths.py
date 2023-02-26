@@ -19,29 +19,29 @@ import aiofiles
 
 LIB = pathlib.Path(__file__).parent
 
-STORE = pathlib.Path.home() / ".assistance"
-CONFIG = STORE / "config"
-SECRETS = CONFIG / "secrets"
+STORE = pathlib.Path.home().joinpath(".assistance")
+CONFIG = STORE.joinpath("config")
+SECRETS = CONFIG.joinpath("secrets")
 
-USERS = STORE / "users"
-EMAIL_MAPPING = USERS / "email-mapping"
-USER_DETAILS = USERS / "details"
-AGENT_MAPPING = USERS / "agent-mapping"
+USERS = STORE.joinpath("users")
+EMAIL_MAPPING = USERS.joinpath("email-mapping")
+USER_DETAILS = USERS.joinpath("details")
+AGENT_MAPPING = USERS.joinpath("agent-mapping")
 
-RECORDS = STORE / "records"
+RECORDS = STORE.joinpath("records")
 
-PROMPTS = RECORDS / "prompts"
-COMPLETIONS = RECORDS / "completions"
-ARTICLES = RECORDS / "articles"
-EMAILS = RECORDS / "emails"
+PROMPTS = RECORDS.joinpath("prompts")
+COMPLETIONS = RECORDS.joinpath("completions")
+ARTICLES = RECORDS.joinpath("articles")
+EMAILS = RECORDS.joinpath("emails")
 
-PIPELINES = STORE / "pipelines"
+PIPELINES = STORE.joinpath("pipelines")
 
-GOOGLE_ALERTS_PIPELINES = PIPELINES / "google-alerts"
-NEW_GOOGLE_ALERTS = GOOGLE_ALERTS_PIPELINES / "new"
+GOOGLE_ALERTS_PIPELINES = PIPELINES.joinpath("google-alerts")
+NEW_GOOGLE_ALERTS = GOOGLE_ALERTS_PIPELINES.joinpath("new")
 
-EMAIL_PIPELINES = PIPELINES / "emails"
-NEW_EMAILS = EMAIL_PIPELINES / "new"
+EMAIL_PIPELINES = PIPELINES.joinpath("emails")
+NEW_EMAILS = EMAIL_PIPELINES.joinpath("new")
 
 
 async def get_user_from_email(email_address: str):
