@@ -32,7 +32,7 @@ RECORDS = STORE.joinpath("records")
 
 PROMPTS = RECORDS.joinpath("prompts")
 COMPLETIONS = RECORDS.joinpath("completions")
-ARTICLES = RECORDS.joinpath("articles")
+ARTICLE_METADATA = RECORDS.joinpath("article-metadata")
 EMAILS = RECORDS.joinpath("emails")
 
 PIPELINES = STORE.joinpath("pipelines")
@@ -80,8 +80,14 @@ async def _get_file_based_mapping(root: pathlib.Path, user: str):
     return details
 
 
-def get_article_path(hash_digest: str, create_parent: bool = False):
-    path = _get_record_path(ARTICLES, hash_digest, create_parent)
+def get_article_metadata_path(hash_digest: str, create_parent: bool = False):
+    path = _get_record_path(ARTICLE_METADATA, hash_digest, create_parent)
+
+    return path
+
+
+def get_downloaded_article_path(hash_digest: str, create_parent: bool = False):
+    path = _get_record_path(ARTICLE_METADATA, hash_digest, create_parent)
 
     return path
 

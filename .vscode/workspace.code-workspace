@@ -1,10 +1,10 @@
 {
   "folders": [
-  {
-    "path": "../../../.assistance",
-  },
     {
-      "path": "..",
+      "path": "../../../.assistance"
+    },
+    {
+      "path": ".."
     }
   ],
   "settings": {
@@ -53,6 +53,7 @@
       "Airplane",
       "allclose",
       "Alphacrucis",
+      "alru",
       "argpartition",
       "ASMIRT",
       "assistancechat",

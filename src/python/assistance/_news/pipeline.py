@@ -30,9 +30,9 @@ from assistance._keys import get_openai_api_key
 from assistance._mailgun import send_email
 from assistance._parsing.googlealerts import parse_alerts
 from assistance._paths import (
-    ARTICLES,
+    ARTICLE_METADATA,
     NEW_GOOGLE_ALERTS,
-    get_article_path,
+    get_article_metadata_path,
     get_hash_digest,
 )
 from assistance._types import Email
@@ -49,7 +49,7 @@ async def add_to_google_alerts_pipeline(email: Email):
         )
 
         hash_digest = get_hash_digest(single_article_details_as_string)
-        article_path = get_article_path(hash_digest, create_parent=True)
+        article_path = get_article_metadata_path(hash_digest, create_parent=True)
 
         async with aiofiles.open(article_path, "w") as f:
             await f.write(single_article_details_as_string)

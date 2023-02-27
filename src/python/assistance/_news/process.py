@@ -33,18 +33,19 @@ MAX_ARTICLES_PER_SCORING = 20
 
 
 async def process_articles(cfg: TargetedNewsConfig):
-    articles_by_hash = await collect_new_articles()
-    articles = list(articles_by_hash.values())
+    new_alerts_hashes, sorted_articles = await collect_new_articles()
 
     coroutines = []
     for i in range(len(cfg["subscription_data"])):
         coroutines.append(
-            _process_subscription(cfg=cfg, subscription_data_index=i, articles=articles)
+            _process_subscription(
+                cfg=cfg, subscription_data_index=i, articles=sorted_articles
+            )
         )
 
     await asyncio.gather(*coroutines)
 
-    # for hash in articles_by_hash:
+    # for hash in new_alerts_hashes:
     #     (NEW_GOOGLE_ALERTS / hash).unlink()
 
 
@@ -60,7 +61,6 @@ async def _process_subscription(
     coroutines = []
     for article in top_articles:
         url = article["url"]
-        cached_url = f"http://webcache.googleusercontent.com/search?q=cache:{url}&strip=1&vwsrc=0"
 
         coroutines.append(
             write_news_post(
@@ -69,7 +69,7 @@ async def _process_subscription(
                 goals=cfg["goals"],
                 tasks=cfg["tasks"],
                 target_audience=subscription_data["target_audience"],
-                url=cached_url,
+                url=url,
             )
         )
 
@@ -123,7 +123,7 @@ async def _process_subscription(
 
             postal_data = {
                 "from": f"{agent_user}@{ROOT_DOMAIN}",
-                "to": subscriber,
+                "to": [subscriber],
                 "subject": response["subject"],
                 "text": text,
             }
@@ -178,6 +178,9 @@ async def _get_top_articles(
 
 
 def _get_top_scoring_article_indices(cfg: TargetedNewsConfig, article_scores, k):
+    if len(article_scores) < k:
+        k = len(article_scores)
+
     weighted_scores = []
     for score in article_scores:
         weighted_score = 0

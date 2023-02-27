@@ -13,12 +13,14 @@
 # limitations under the License.
 
 import asyncio
+import functools
 import json
 import logging
 import time
 
 import aiofiles
 import openai
+from async_lru import alru_cache
 from tenacity import retry, stop_after_attempt, wait_random_exponential
 
 from ._paths import COMPLETIONS
@@ -31,15 +33,26 @@ async def completion_with_back_off(**kwargs):
 
     assert "llm_usage_record_key" not in kwargs
 
-    query_timestamp = time.time_ns()
-    response = await openai.Completion.acreate(**kwargs)
-    logging.info(response)
+    query_timestamp, response = await _run_completion_with_lru_cache(kwargs)
 
+    # Timestamp will be from when it was called the first time through.
     asyncio.create_task(
         _store_result(llm_usage_record_key, kwargs, response, query_timestamp)
     )
 
     return response
+
+
+@alru_cache(maxsize=1024)
+async def _run_completion_with_lru_cache(kwargs):
+    query_timestamp = time.time_ns()
+
+    logging.info(f"New completion request: {kwargs}")
+
+    response = await openai.Completion.acreate(**kwargs)
+    logging.info(response)
+
+    return query_timestamp, response
 
 
 async def _store_result(user_email: str, kwargs, response, query_timestamp: int):
