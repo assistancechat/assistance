@@ -56,4 +56,4 @@ async def _pre_cache_articles(article_details: list[Article]):
     for article in article_details:
         url = article["url"]
         await scrape(_ctx.session, url)
-        await asyncio.sleep(random.uniform(30, 120))
+        await asyncio.sleep(random.uniform(60, 120))
