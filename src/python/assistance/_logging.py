@@ -29,8 +29,11 @@ def main():
 
     handler = RotatingFileHandler(
         PHIRHO_LOGS / "phirho.log",
-        maxBytes=2000,
-        backupCount=10,
+        maxBytes=1000000,
+        backupCount=50,
+    )
+    handler.setFormatter(
+        logging.Formatter("%(asctime)s.%(msecs)d %(levelname)s: %(message)s")
     )
     handler.addFilter(PhiRhoFilter())
     logger.addHandler(handler)

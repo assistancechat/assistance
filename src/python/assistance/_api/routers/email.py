@@ -94,6 +94,9 @@ async def _handle_new_email(hash_digest: str, raw_email: RawEmail):
     """React to the new email, and once it completes without error, delete the pipeline file."""
 
     email = await _initial_parsing(raw_email)
+
+    log_info(email["user_email"], _ctx.pp.pformat(email))
+
     await _react_to_email(email)
 
     pipeline_path = _get_new_email_pipeline_path(hash_digest)
