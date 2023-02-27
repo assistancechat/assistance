@@ -27,6 +27,7 @@ from assistance._agents.email.reply import ALIASES, create_reply
 from assistance._agents.email.restricted import RESTRICTED_TASKS
 from assistance._config import ROOT_DOMAIN
 from assistance._keys import get_mailgun_api_key
+from assistance._logging import log_info
 from assistance._mailgun import send_email
 from assistance._paths import (
     NEW_EMAILS,
@@ -203,7 +204,7 @@ async def _fallback_email_handler(user_details: dict, email: Email):
         "plain_body": reply["total_reply"],
     }
 
-    await send_email(mailgun_data)
+    await send_email(email["user_email"], mailgun_data)
 
 
 async def _initial_parsing(raw_email: RawEmail):
@@ -268,7 +269,7 @@ async def _respond_to_gmail_forward_request(email: Email):
     found_token = None
 
     for item in email["plain_no_replies"].splitlines():
-        logging.info(item)
+        log_info(email["user_email"], item)
 
         for option in [VERIFICATION_TOKEN_BASE, VERIFICATION_TOKEN_BASE_ALTERNATIVE]:
             if item.startswith(option):
@@ -280,7 +281,7 @@ async def _respond_to_gmail_forward_request(email: Email):
     await _post_gmail_forwarding_verification(found_token)
 
     user_email = email["plain_no_replies"].split(" ")[0]
-    logging.info(f"User email: {user_email}")
+    log_info(email["user_email"], f"User email: {user_email}")
 
     mailgun_data = {
         "from": forwarding_email,
@@ -292,7 +293,7 @@ async def _respond_to_gmail_forward_request(email: Email):
         ),
     }
 
-    await send_email(mailgun_data)
+    await send_email(email["user_email"], mailgun_data)
 
 
 async def _post_gmail_forwarding_verification(verification_token):

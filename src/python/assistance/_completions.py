@@ -14,13 +14,14 @@
 
 import asyncio
 import json
-import logging
 import pathlib
 import time
 
 import aiofiles
 import openai
 from tenacity import retry, stop_after_attempt, wait_random_exponential
+
+from assistance._logging import log_info
 
 from ._paths import COMPLETIONS, get_completion_cache_path, get_hash_digest
 
@@ -32,10 +33,10 @@ async def get_completion_only(**kwargs) -> str:
 
 
 async def _completion_with_back_off(**kwargs):
-    llm_usage_record_key: str = kwargs["llm_usage_record_key"]
-    del kwargs["llm_usage_record_key"]
+    scope: str = kwargs["scope"]
+    del kwargs["scope"]
 
-    assert "llm_usage_record_key" not in kwargs
+    assert "scope" not in kwargs
 
     kwargs_for_cache_hash = kwargs.copy()
     del kwargs_for_cache_hash["api_key"]
@@ -52,16 +53,14 @@ async def _completion_with_back_off(**kwargs):
     except (FileNotFoundError, json.JSONDecodeError):
         pass
 
-    logging.info(f"New completion request: {completion_request}")
+    log_info(scope, f"New completion request: {completion_request}")
 
     query_timestamp = time.time_ns()
 
     response = await _run_completion(kwargs)
 
     asyncio.create_task(_store_cache(completion_cache_path, response))
-    asyncio.create_task(
-        _store_result(llm_usage_record_key, kwargs, response, query_timestamp)
-    )
+    asyncio.create_task(_store_result(scope, kwargs, response, query_timestamp))
 
     return response
 

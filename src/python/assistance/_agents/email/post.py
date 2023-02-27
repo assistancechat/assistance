@@ -94,7 +94,7 @@ PROMPT = textwrap.dedent(
 
 
 async def write_news_post(
-    llm_usage_record_key: str,
+    scope: str,
     openai_api_key: str,
     tasks: list[str],
     goals: list[str],
@@ -102,7 +102,7 @@ async def write_news_post(
     url: str,
 ) -> str:
     summary = await summarise_news_article_url_with_tasks(
-        llm_usage_record_key=llm_usage_record_key,
+        scope=scope,
         openai_api_key=openai_api_key,
         tasks=tasks,
         goals=goals,
@@ -118,10 +118,7 @@ async def write_news_post(
     )
 
     response = await get_completion_only(
-        llm_usage_record_key=llm_usage_record_key,
-        prompt=prompt,
-        api_key=openai_api_key,
-        **MODEL_KWARGS
+        scope=scope, prompt=prompt, api_key=openai_api_key, **MODEL_KWARGS
     )
 
     return response

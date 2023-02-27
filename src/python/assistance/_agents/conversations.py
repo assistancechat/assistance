@@ -16,7 +16,6 @@
 # https://github.com/hwchase17/langchain/blob/ae1b589f60a/langchain/agents/conversational/prompt.py#L1-L36
 
 import asyncio
-import logging
 import re
 import textwrap
 from enum import Enum
@@ -25,6 +24,7 @@ from typing import Callable, Coroutine
 from thefuzz import process as fuzz_process
 
 from assistance._completions import get_completion_only
+from assistance._logging import log_info
 from assistance._store.transcript import store_prompt_transcript
 
 MODEL_KWARGS = {
@@ -180,7 +180,7 @@ async def run_conversation(
         transcript=transcript_with_replacements,
     )
 
-    logging.info(prompt)
+    log_info(user_email, prompt)
 
     # async def _search(query: str):
     #     return await alphacrucis_search(
@@ -267,7 +267,7 @@ async def _call_gpt_and_store_as_transcript(
     prompt: str,
 ):
     response = await get_completion_only(
-        llm_usage_record_key=user_email,
+        scope=user_email,
         prompt=prompt,
         api_key=openai_api_key,
         **model_kwargs,

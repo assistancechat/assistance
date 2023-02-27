@@ -45,6 +45,10 @@ NEW_GOOGLE_ALERTS = GOOGLE_ALERTS_PIPELINES.joinpath("new")
 EMAIL_PIPELINES = PIPELINES.joinpath("emails")
 NEW_EMAILS = EMAIL_PIPELINES.joinpath("new")
 
+PYTHON_ROOT = LIB.parent
+LOGS = PYTHON_ROOT.joinpath("logs")
+PHIRHO_LOGS = LOGS.joinpath("phirho")
+
 
 async def get_user_from_email(email_address: str):
     try:

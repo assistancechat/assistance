@@ -14,7 +14,6 @@
 
 import asyncio
 import json
-import logging
 
 import numpy as np
 
@@ -22,6 +21,7 @@ from assistance._agents.email.post import write_news_post
 from assistance._agents.relevance import article_scoring
 from assistance._config import ROOT_DOMAIN, TargetedNewsConfig
 from assistance._keys import get_openai_api_key
+from assistance._logging import log_info
 from assistance._mailgun import send_email
 from assistance._paths import NEW_GOOGLE_ALERTS
 from assistance._types import Article
@@ -53,6 +53,7 @@ async def _process_subscription(
     cfg: TargetedNewsConfig, subscription_data_index: int, articles: list[Article]
 ):
     subscription_data = cfg["subscription_data"][subscription_data_index]
+    scope = subscription_data["agent_user"]
 
     top_articles = await _get_top_articles(
         cfg=cfg, subscription_data_index=subscription_data_index, articles=articles
@@ -64,7 +65,7 @@ async def _process_subscription(
 
         coroutines.append(
             write_news_post(
-                llm_usage_record_key=subscription_data["agent_user"],
+                scope=scope,
                 openai_api_key=OPEN_AI_API_KEY,
                 goals=cfg["goals"],
                 tasks=cfg["tasks"],
@@ -80,7 +81,7 @@ async def _process_subscription(
         try:
             result_data = json.loads(result, strict=False)
         except json.JSONDecodeError:
-            logging.info(f"Failed to decode JSON: {result}")
+            log_info(scope, f"Failed to decode JSON: {result}")
             continue
 
         if not result_data["article-is-relevant"]:
@@ -96,7 +97,7 @@ async def _process_subscription(
         )
 
     article_scores = await article_scoring(
-        llm_usage_record_key=subscription_data["agent_user"],
+        scope=scope,
         openai_api_key=OPEN_AI_API_KEY,
         goals=cfg["goals"],
         tasks=cfg["tasks"],
@@ -128,7 +129,7 @@ async def _process_subscription(
                 "plain_body": text,
             }
 
-            coroutines.append(send_email(postal_data))
+            coroutines.append(send_email(scope, postal_data))
 
     await asyncio.gather(*coroutines)
 
@@ -157,7 +158,7 @@ async def _get_top_articles(
         deduped_articles.append(article)
 
     article_scores = await article_scoring(
-        llm_usage_record_key=subscription_data["agent_user"],
+        scope=subscription_data["agent_user"],
         openai_api_key=OPEN_AI_API_KEY,
         goals=cfg["goals"],
         tasks=cfg["tasks"],

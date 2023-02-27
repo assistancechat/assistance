@@ -13,11 +13,11 @@
 # limitations under the License.
 
 import json
-import logging
 import secrets
 
 import aiohttp
 
+from assistance._logging import log_info
 from assistance._paths import USERS
 
 from . import _ctx
@@ -34,7 +34,7 @@ API_KEY = get_mailgun_api_key()
 POSTAL_API_KEY = get_postal_api_key()
 
 
-async def send_email(postal_data):
+async def send_email(scope: str, postal_data):
     headers = {
         "Content-Type": "application/json",
         "X-Server-API-Key": POSTAL_API_KEY,
@@ -45,7 +45,7 @@ async def send_email(postal_data):
     if "cc" in postal_data and postal_data["cc"] == "":
         del postal_data["cc"]
 
-    logging.info(json.dumps(postal_data, indent=2))
+    log_info(scope, json.dumps(postal_data, indent=2))
 
     postal_response = await _ctx.session.post(
         url=url,
@@ -53,7 +53,7 @@ async def send_email(postal_data):
         data=json.dumps(postal_data),
     )
 
-    logging.info(json.dumps(await postal_response.json(), indent=2))
+    log_info(scope, json.dumps(await postal_response.json(), indent=2))
 
 
 def get_access_link(email: str):

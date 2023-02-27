@@ -16,7 +16,6 @@
 # https://github.com/hwchase17/langchain/blob/ae1b589f60a/langchain/agents/conversational/prompt.py#L1-L36
 
 import json
-import logging
 import re
 import textwrap
 from datetime import datetime
@@ -26,6 +25,7 @@ from assistance import _ctx
 from assistance._completions import get_completion_only
 from assistance._config import ROOT_DOMAIN
 from assistance._keys import get_openai_api_key, get_serp_api_key
+from assistance._logging import log_info
 from assistance._mailgun import send_email
 
 from ..._types import Email
@@ -261,6 +261,8 @@ async def react_to_avatar_request(
     user_details: dict,
     email: Email,
 ):
+    scope = email["user_email"]
+
     if "notifications@forum.phirho.org" in email["from"]:
         prompt = _prompt_as_discourse_thread(email)
         email_reply = "\n    [SEARCH("
@@ -277,11 +279,11 @@ async def react_to_avatar_request(
         "email_reply": email_reply,
     }
 
-    logging.info(prompt)
+    log_info(scope, prompt)
 
     while True:
         response = await get_completion_only(
-            llm_usage_record_key=email["user_email"],
+            scope=scope,
             prompt=running_data["prompt"],
             api_key=OPEN_AI_API_KEY,
             **MODEL_KWARGS,
@@ -290,7 +292,9 @@ async def react_to_avatar_request(
         for key in running_data:
             running_data[key] += response
 
-        tool_result = await _get_tool_or_finished_result(running_data["email_reply"])
+        tool_result = await _get_tool_or_finished_result(
+            scope, running_data["email_reply"]
+        )
 
         if tool_result is FINISHED:
             break
@@ -300,7 +304,7 @@ async def react_to_avatar_request(
 
     # cleaned_response = re.sub(r"\[.*?\]", "", running_data["email_reply"])
 
-    logging.info(running_data["email_reply"])
+    log_info(scope, running_data["email_reply"])
 
     reply = create_reply(
         original_email=email,
@@ -320,10 +324,11 @@ async def react_to_avatar_request(
         del mailgun_data["html_body"]
         mailgun_data["plain_body"] = reply["total_reply"]
 
-    await send_email(mailgun_data)
+    await send_email(scope, mailgun_data)
 
 
 def _prompt_as_email_thread(email: Email):
+    scope = email["user_email"]
     filtered_email_content = email["plain_all_content"]
 
     filtered_email_content = filtered_email_content.replace(r"\r\n", r"\n")
@@ -331,7 +336,7 @@ def _prompt_as_email_thread(email: Email):
     filtered_email_content = filtered_email_content.replace("> On", "On")
     filtered_email_content = re.sub(r"\n> *\n", "\n\n", filtered_email_content)
 
-    logging.info(filtered_email_content)
+    log_info(scope, filtered_email_content)
 
     to_addresses, cc_addresses = get_all_user_emails(email)
     email_addresses = to_addresses + cc_addresses
@@ -440,7 +445,7 @@ async def _get_current_date_and_time(*args, **kwargs):
     return datetime.now(tz=ZoneInfo("Australia/Sydney")).strftime("%Y-%m-%d %H:%M:%S")
 
 
-async def _run_search(query):
+async def _run_search(scope: str, query):
     params = {
         "location": "New+South+Wales,+Australia",
         "hl": "en",
@@ -456,7 +461,7 @@ async def _run_search(query):
 
     results = await response.json()
 
-    logging.info(json.dumps(results, indent=2))
+    log_info(scope, json.dumps(results, indent=2))
 
     organic_results = results["organic_results"]
 
@@ -479,7 +484,7 @@ TOOLS = {
 FINISHED = "finished"
 
 
-async def _get_tool_or_finished_result(current_completion):
+async def _get_tool_or_finished_result(scope: str, current_completion):
     split_by_tool = current_completion.split("[")
     if len(split_by_tool) == 1:
         return FINISHED
@@ -503,4 +508,4 @@ async def _get_tool_or_finished_result(current_completion):
 
     tool = TOOLS[tool_name]
 
-    return await tool(tool_input)
+    return await tool(scope, tool_input)

@@ -14,12 +14,12 @@
 
 import asyncio
 import json
-import logging
 import math
 import textwrap
 
 from assistance import _ctx
 from assistance._completions import get_completion_only
+from assistance._logging import log_info
 from assistance._utilities import items_to_list_string
 
 MAX_ARTICLES_PER_SCORING = 20
@@ -106,7 +106,7 @@ PROMPT = textwrap.dedent(
 
 
 async def article_scoring(
-    llm_usage_record_key: str,
+    scope: str,
     openai_api_key: str,
     goals: list[str],
     tasks: list[str],
@@ -123,7 +123,7 @@ async def article_scoring(
 
         articles_with_ids.append(article_for_prompt)
 
-    logging.info(_ctx.pp.pformat(articles_with_ids))
+    log_info(scope, _ctx.pp.pformat(articles_with_ids))
 
     # TODO: Adjust max articles per scoring based on the number of words
     # within each article.
@@ -143,7 +143,7 @@ async def article_scoring(
     for chunk in chunks:
         coroutines.append(
             _chunk_of_articles(
-                llm_usage_record_key=llm_usage_record_key,
+                scope=scope,
                 openai_api_key=openai_api_key,
                 goals=goals,
                 tasks=tasks,
@@ -161,7 +161,7 @@ async def article_scoring(
 
 
 async def _chunk_of_articles(
-    llm_usage_record_key: str,
+    scope: str,
     openai_api_key: str,
     goals: list[str],
     tasks: list[str],
@@ -178,13 +178,13 @@ async def _chunk_of_articles(
     )
 
     response = await get_completion_only(
-        llm_usage_record_key=llm_usage_record_key,
+        scope=scope,
         prompt=prompt,
         api_key=openai_api_key,
         **MODEL_KWARGS,
     )
 
-    logging.info(f"Response: {response}")
+    log_info(scope, f"Response: {response}")
 
     article_ranking = json.loads(response)
 
