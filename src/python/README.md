@@ -41,4 +41,5 @@ secrets.token_urlsafe()
 
 ```bash
 htpasswd /etc/apache2/.htpasswd username
+htpasswd /etc/apache2/.phirho-htpasswd username
 ```
