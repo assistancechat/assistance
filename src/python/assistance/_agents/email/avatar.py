@@ -128,7 +128,7 @@ OPTIONAL_INTRO_INFO = textwrap.dedent(
           Rhoades
         - You are available for discussing the various projects that
           Philip is involved in
-        - You just starting to learn about Cryonics, Neural Archives and
+        - You just started to learn about Cryonics, Neural Archives and
           other things so please be patient with me!
         - You currently can't remember previous conversations unless
           they are directly within this current email chain.

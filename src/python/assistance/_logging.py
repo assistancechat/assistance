@@ -33,7 +33,10 @@ def main():
         backupCount=50,
     )
     handler.setFormatter(
-        logging.Formatter("%(asctime)s.%(msecs)d %(levelname)s: %(message)s")
+        logging.Formatter(
+            fmt="%(asctime)s.%(msecs)d %(levelname)s: %(message)s",
+            datefmt="%Y-%m-%d %H:%M:%S",
+        )
     )
     handler.addFilter(PhiRhoFilter())
     logger.addHandler(handler)
