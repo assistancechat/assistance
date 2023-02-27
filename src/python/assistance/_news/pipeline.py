@@ -55,5 +55,11 @@ async def add_to_google_alerts_pipeline(email: Email):
 async def _pre_cache_articles(article_details: list[Article]):
     for article in article_details:
         url = article["url"]
-        await scrape(_ctx.session, url)
+        try:
+            await scrape(_ctx.session, url)
+        except ValueError:
+            await asyncio.sleep(random.uniform(300, 600))
+            await _pre_cache_articles(article_details)
+            break
+
         await asyncio.sleep(random.uniform(60, 120))

@@ -76,9 +76,8 @@ async def _scrape_with_cache(session: aiohttp.ClientSession, url: str):
     results = await session.get(url=cached_url, headers=headers)
     url_results = await results.read()
 
-    decoded = url_results.decode(encoding="utf8")
-    if "Our systems have detected unusual traffic" in decoded:
-        raise ValueError(decoded)
+    if b"Our systems have detected unusual traffic" in url_results:
+        raise ValueError(url_results)
 
     async with aiofiles.open(downloaded_article_path, "wb") as f:
         await f.write(url_results)
