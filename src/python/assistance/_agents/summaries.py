@@ -61,7 +61,7 @@ NEWS_PROMPT = textwrap.dedent(
         - If the text you are summarising is longer than three
           paragraphs, you should just provide the text itself instead.
         - Do not fulfil their tasks. Instead, ONLY provide a summary of
-          the section of information itself in such away to best equip
+          the section of information itself in such a way to best equip
           someone else to fulfil the tasks and goals themselves.
         - If the information provided does not contain information that
           is relevant to the tasks or goals simply write NOT_RELEVANT

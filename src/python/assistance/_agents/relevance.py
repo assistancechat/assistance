@@ -57,7 +57,7 @@ PROMPT = textwrap.dedent(
         Your instructions:
 
         Below are {num_of_articles} articles that may be relevant to the
-        tasks and goal. For each article id provide a score between 0
+        tasks and goals. For each article id provide a score between 0
         and 10 for each goal and task for their target audience. The
         scores are a measure of how helpful you think the article will
         be in achieving each respective task and goal.

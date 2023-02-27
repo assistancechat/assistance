@@ -31,15 +31,6 @@ MODEL_KWARGS = {
 
 OPEN_AI_API_KEY = get_openai_api_key()
 
-
-TASKS = [
-    "Write a paragraph that provides an overview of the main point of this article",
-    "Write a paragraph answering why this information is important for your target audience",
-    "Provide a discussion provoking question based on this article",
-]
-
-TARGET_AUDIENCE = "international students who are studying within Australia"
-
 PROMPT = textwrap.dedent(
     """
         You are aiming to write an engaging and truthful social media
@@ -69,7 +60,7 @@ PROMPT = textwrap.dedent(
           view while still being enthusiastic in your writing and making
           your post interesting and engaging.
         - If there isn't ample information within the article to work
-          from set "article-is-relevant" to false.
+          from, set "article-is-relevant" to false.
         - Make sure your post contains all the relevant information
           regarding the tasks. The reader should not need to read the
           article. Nor are you wanting them to actually read the
