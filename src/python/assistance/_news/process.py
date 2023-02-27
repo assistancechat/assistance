@@ -14,6 +14,7 @@
 
 import asyncio
 import json
+import logging
 
 import numpy as np
 
@@ -76,9 +77,13 @@ async def _process_subscription(
 
     all_relevant_responses = []
     for article, result in zip(top_articles, results):
-        result_data = json.loads(result, strict=False)
+        try:
+            result_data = json.loads(result, strict=False)
+        except json.JSONDecodeError:
+            logging.info(f"Failed to decode JSON: {result}")
+            continue
 
-        if not result_data["article-relevant-to-tasks"]:
+        if not result_data["article-is-relevant"]:
             continue
 
         all_relevant_responses.append(
@@ -108,6 +113,7 @@ async def _process_subscription(
     for i in top_scoring_indices:
         top_scoring_posts.append(all_relevant_responses[i])
 
+    coroutines = []
     for response in top_scoring_posts:
         # Discourse format
         text = f"{response['content']}\n\n{response['url']}"
@@ -122,9 +128,9 @@ async def _process_subscription(
                 "text": text,
             }
 
-            asyncio.create_task(send_email(postal_data))
+            coroutines.append(send_email(postal_data))
 
-    return article_scores
+    await asyncio.gather(*coroutines)
 
 
 async def _get_top_articles(

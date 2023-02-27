@@ -42,7 +42,7 @@ async def send_email(postal_data):
 
     url = "https://postal.assistance.chat/api/v1/send/message"
 
-    if postal_data["cc"] == "":
+    if "cc" in postal_data and postal_data["cc"] == "":
         del postal_data["cc"]
 
     logging.info(json.dumps(postal_data, indent=2))

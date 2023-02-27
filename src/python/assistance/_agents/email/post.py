@@ -21,7 +21,7 @@ from assistance._utilities import items_to_list_string
 
 MODEL_KWARGS = {
     "engine": "text-davinci-003",
-    "max_tokens": 512,
+    "max_tokens": 2048,
     "best_of": 1,
     "temperature": 0.7,
     "top_p": 1,
@@ -75,6 +75,10 @@ PROMPT = textwrap.dedent(
           article. Nor are you wanting them to actually read the
           article.
         - Fulfil each task in its own paragraph.
+
+        The article of text you have been provided is:
+
+        {text}
 
         Required JSON response format:
 
