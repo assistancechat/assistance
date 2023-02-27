@@ -9,7 +9,11 @@ import aiohttp
 from bs4 import BeautifulSoup
 from fake_useragent import UserAgent
 
-from assistance._paths import get_downloaded_article_path, get_hash_digest
+from assistance._paths import (
+    get_article_metadata_path,
+    get_downloaded_article_path,
+    get_hash_digest,
+)
 
 
 # https://stackoverflow.com/a/24618186
@@ -47,6 +51,13 @@ async def _scrape_with_cache(session: aiohttp.ClientSession, url: str):
     downloaded_article_path = get_downloaded_article_path(
         url_hash_digest, create_parent=True
     )
+
+    # TODO: Remove this
+    meta_data_path = get_article_metadata_path(url_hash_digest)
+
+    if meta_data_path.exists():
+        meta_data_path.rename(downloaded_article_path)
+    # Down to here
 
     if downloaded_article_path.exists():
         logging.info(f"Using cached version of {url}")

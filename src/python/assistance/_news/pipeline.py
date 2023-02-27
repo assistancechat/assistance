@@ -12,30 +12,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
 import asyncio
-import hashlib
 import json
-import logging
-import textwrap
-from urllib.parse import parse_qs, urlparse
+import random
 
 import aiofiles
 
-from assistance._agents.relevance import article_scoring
-from assistance._agents.summaries import summarise_news_article_url_with_tasks
-from assistance._completions import completion_with_back_off
-from assistance._config import ROOT_DOMAIN
-from assistance._keys import get_openai_api_key
-from assistance._mailgun import send_email
+from assistance import _ctx
 from assistance._parsing.googlealerts import parse_alerts
 from assistance._paths import (
-    ARTICLE_METADATA,
     NEW_GOOGLE_ALERTS,
     get_article_metadata_path,
     get_hash_digest,
 )
-from assistance._types import Email
+from assistance._types import Article, Email
+from assistance._vendor.stackoverflow.web_scraping import scrape
 
 
 async def add_to_google_alerts_pipeline(email: Email):
@@ -57,3 +48,12 @@ async def add_to_google_alerts_pipeline(email: Email):
         pipeline_path = NEW_GOOGLE_ALERTS / hash_digest
         async with aiofiles.open(pipeline_path, "w") as f:
             pass
+
+    asyncio.create_task(_pre_cache_articles(article_details))
+
+
+async def _pre_cache_articles(article_details: list[Article]):
+    for article in article_details:
+        url = article["url"]
+        await scrape(_ctx.session, url)
+        await asyncio.sleep(random.uniform(30, 120))

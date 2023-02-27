@@ -33,6 +33,7 @@ RECORDS = STORE.joinpath("records")
 PROMPTS = RECORDS.joinpath("prompts")
 COMPLETIONS = RECORDS.joinpath("completions")
 ARTICLE_METADATA = RECORDS.joinpath("article-metadata")
+DOWNLOADED_ARTICLES = RECORDS.joinpath("downloaded-articles")
 EMAILS = RECORDS.joinpath("emails")
 
 PIPELINES = STORE.joinpath("pipelines")
@@ -87,7 +88,7 @@ def get_article_metadata_path(hash_digest: str, create_parent: bool = False):
 
 
 def get_downloaded_article_path(hash_digest: str, create_parent: bool = False):
-    path = _get_record_path(ARTICLE_METADATA, hash_digest, create_parent)
+    path = _get_record_path(DOWNLOADED_ARTICLES, hash_digest, create_parent)
 
     return path
 
