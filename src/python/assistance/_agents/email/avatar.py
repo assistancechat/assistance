@@ -23,7 +23,7 @@ from datetime import datetime
 from zoneinfo import ZoneInfo
 
 from assistance import _ctx
-from assistance._completions import completion_with_back_off
+from assistance._completions import get_completion_only
 from assistance._config import ROOT_DOMAIN
 from assistance._keys import get_openai_api_key, get_serp_api_key
 from assistance._mailgun import send_email
@@ -280,13 +280,12 @@ async def react_to_avatar_request(
     logging.info(prompt)
 
     while True:
-        completions = await completion_with_back_off(
+        response = await get_completion_only(
             llm_usage_record_key=email["user_email"],
             prompt=running_data["prompt"],
             api_key=OPEN_AI_API_KEY,
             **MODEL_KWARGS,
         )
-        response: str = completions.choices[0].text.strip()  # type: ignore
 
         for key in running_data:
             running_data[key] += response

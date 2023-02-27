@@ -18,7 +18,7 @@
 import logging
 import textwrap
 
-from assistance._completions import completion_with_back_off
+from assistance._completions import get_completion_only
 from assistance._config import ROOT_DOMAIN
 from assistance._keys import get_openai_api_key
 from assistance._mailgun import send_email
@@ -77,13 +77,12 @@ async def react_to_custom_agent_request(email: Email, prompt_task: str):
     )
     logging.info(prompt)
 
-    completions = await completion_with_back_off(
+    response = await get_completion_only(
         llm_usage_record_key=email["user_email"],
         prompt=prompt,
         api_key=OPEN_AI_API_KEY,
         **MODEL_KWARGS,
     )
-    response: str = completions.choices[0].text.strip()  # type: ignore
 
     logging.info(response)
 

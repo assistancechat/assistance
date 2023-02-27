@@ -15,7 +15,7 @@
 import textwrap
 
 from assistance._agents.summaries import summarise_news_article_url_with_tasks
-from assistance._completions import completion_with_back_off
+from assistance._completions import get_completion_only
 from assistance._keys import get_openai_api_key
 from assistance._utilities import items_to_list_string
 
@@ -117,12 +117,11 @@ async def write_news_post(
         text=summary,
     )
 
-    completions = await completion_with_back_off(
+    response = await get_completion_only(
         llm_usage_record_key=llm_usage_record_key,
         prompt=prompt,
         api_key=openai_api_key,
         **MODEL_KWARGS
     )
-    response: str = completions.choices[0].text.strip()  # type: ignore
 
     return response

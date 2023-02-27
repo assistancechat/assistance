@@ -17,7 +17,7 @@ import logging
 import textwrap
 
 from assistance import _ctx
-from assistance._completions import completion_with_back_off
+from assistance._completions import get_completion_only
 from assistance._utilities import (
     get_approximate_allowed_remaining_words,
     get_number_of_words,
@@ -234,12 +234,11 @@ async def _evaluate_prompt(
     prompt: str,
     text: str,
 ):
-    completions = await completion_with_back_off(
+    response = await get_completion_only(
         llm_usage_record_key=llm_usage_record_key,
         prompt=prompt.format(text=text),
         api_key=openai_api_key,
         **MODEL_KWARGS,
     )
-    response: str = completions.choices[0].text.strip()  # type: ignore
 
     return response

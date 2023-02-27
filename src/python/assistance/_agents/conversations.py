@@ -24,7 +24,7 @@ from typing import Callable, Coroutine
 
 from thefuzz import process as fuzz_process
 
-from assistance._completions import completion_with_back_off
+from assistance._completions import get_completion_only
 from assistance._store.transcript import store_prompt_transcript
 
 MODEL_KWARGS = {
@@ -266,13 +266,12 @@ async def _call_gpt_and_store_as_transcript(
     model_kwargs: dict,
     prompt: str,
 ):
-    completions = await completion_with_back_off(
+    response = await get_completion_only(
         llm_usage_record_key=user_email,
         prompt=prompt,
         api_key=openai_api_key,
         **model_kwargs,
     )
-    response: str = completions.choices[0].text.strip()  # type: ignore
 
     asyncio.create_task(
         store_prompt_transcript(

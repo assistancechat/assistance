@@ -32,8 +32,8 @@ OPEN_AI_API_KEY = get_openai_api_key()
 MAX_ARTICLES_PER_SCORING = 20
 
 
-async def process_articles(cfg: TargetedNewsConfig):
-    new_alerts_hashes, sorted_articles = await collect_new_articles()
+async def process_articles(cfg: TargetedNewsConfig, num_articles: int | None = None):
+    new_alerts_hashes, sorted_articles = await collect_new_articles(num_articles)
 
     coroutines = []
     for i in range(len(cfg["subscription_data"])):
@@ -125,7 +125,7 @@ async def _process_subscription(
                 "from": f"{agent_user}@{ROOT_DOMAIN}",
                 "to": [subscriber],
                 "subject": response["subject"],
-                "text": text,
+                "plain_body": text,
             }
 
             coroutines.append(send_email(postal_data))

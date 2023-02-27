@@ -13,29 +13,52 @@
 # limitations under the License.
 
 import asyncio
-import functools
 import json
 import logging
+import pathlib
 import time
 
 import aiofiles
 import openai
-from async_lru import alru_cache
 from tenacity import retry, stop_after_attempt, wait_random_exponential
 
-from ._paths import COMPLETIONS
+from ._paths import COMPLETIONS, get_completion_cache_path, get_hash_digest
 
 
-@retry(wait=wait_random_exponential(min=1, max=60), stop=stop_after_attempt(12))
-async def completion_with_back_off(**kwargs):
+async def get_completion_only(**kwargs) -> str:
+    response = await _completion_with_back_off(**kwargs)
+
+    return response["choices"][0]["text"].strip()  # type: ignore
+
+
+async def _completion_with_back_off(**kwargs):
     llm_usage_record_key: str = kwargs["llm_usage_record_key"]
     del kwargs["llm_usage_record_key"]
 
     assert "llm_usage_record_key" not in kwargs
 
-    query_timestamp, response = await _run_completion_with_lru_cache(kwargs)
+    kwargs_for_cache_hash = kwargs.copy()
+    del kwargs_for_cache_hash["api_key"]
 
-    # Timestamp will be from when it was called the first time through.
+    completion_request = json.dumps(kwargs_for_cache_hash, indent=2, sort_keys=True)
+    completion_request_hash = get_hash_digest(completion_request)
+    completion_cache_path = get_completion_cache_path(
+        completion_request_hash, create_parent=True
+    )
+
+    try:
+        async with aiofiles.open(completion_cache_path, "r") as f:
+            return json.loads(await f.read())
+    except (FileNotFoundError, json.JSONDecodeError):
+        pass
+
+    logging.info(f"New completion request: {completion_request}")
+
+    query_timestamp = time.time_ns()
+
+    response = await _run_completion(kwargs)
+
+    asyncio.create_task(_store_cache(completion_cache_path, response))
     asyncio.create_task(
         _store_result(llm_usage_record_key, kwargs, response, query_timestamp)
     )
@@ -43,16 +66,16 @@ async def completion_with_back_off(**kwargs):
     return response
 
 
-@alru_cache(maxsize=1024)
-async def _run_completion_with_lru_cache(kwargs):
-    query_timestamp = time.time_ns()
-
-    logging.info(f"New completion request: {kwargs}")
-
+@retry(wait=wait_random_exponential(min=1, max=60), stop=stop_after_attempt(12))
+async def _run_completion(kwargs):
     response = await openai.Completion.acreate(**kwargs)
-    logging.info(response)
 
-    return query_timestamp, response
+    return response
+
+
+async def _store_cache(completion_cache_path: pathlib.Path, response):
+    async with aiofiles.open(completion_cache_path, "w") as f:
+        await f.write(json.dumps(response, indent=2))
 
 
 async def _store_result(user_email: str, kwargs, response, query_timestamp: int):

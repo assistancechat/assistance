@@ -35,6 +35,7 @@ COMPLETIONS = RECORDS.joinpath("completions")
 ARTICLE_METADATA = RECORDS.joinpath("article-metadata")
 DOWNLOADED_ARTICLES = RECORDS.joinpath("downloaded-articles")
 EMAILS = RECORDS.joinpath("emails")
+COMPLETION_CACHE = RECORDS.joinpath("completion-cache")
 
 PIPELINES = STORE.joinpath("pipelines")
 
@@ -95,6 +96,12 @@ def get_downloaded_article_path(hash_digest: str, create_parent: bool = False):
 
 def get_emails_path(hash_digest: str, create_parent: bool = False):
     path = _get_record_path(EMAILS, hash_digest, create_parent)
+
+    return path
+
+
+def get_completion_cache_path(hash_digest: str, create_parent: bool = False):
+    path = _get_record_path(COMPLETION_CACHE, hash_digest, create_parent)
 
     return path
 

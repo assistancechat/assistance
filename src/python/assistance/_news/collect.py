@@ -22,7 +22,9 @@ from assistance._types import Article
 from assistance._utilities import get_cleaned_url
 
 
-async def collect_new_articles() -> tuple[list[str], list[Article]]:
+async def collect_new_articles(
+    num_articles: int | None = None,
+) -> tuple[list[str], list[Article]]:
     coroutines = []
     new_alerts = list(NEW_GOOGLE_ALERTS.glob("*"))
 
@@ -34,6 +36,9 @@ async def collect_new_articles() -> tuple[list[str], list[Article]]:
     new_alerts_hashes = [
         item.name for item in sorted(new_alerts, key=lambda x: x.stat().st_mtime)
     ]
+
+    if num_articles is not None:
+        new_alerts_hashes = new_alerts_hashes[:num_articles]
 
     for alert_hash in new_alerts_hashes:
         coroutines.append(_collect_articles_from_alert(alert_hash))
