@@ -26,6 +26,7 @@ from assistance._paths import (
     get_hash_digest,
 )
 from assistance._types import Article, Email
+from assistance._utilities import get_cleaned_url
 from assistance._vendor.stackoverflow.web_scraping import scrape
 
 
@@ -54,7 +55,8 @@ async def add_to_google_alerts_pipeline(email: Email):
 
 async def _pre_cache_articles(article_details: list[Article]):
     for article in article_details:
-        url = article["url"]
+        url = get_cleaned_url(article["url"])
+
         try:
             await scrape(_ctx.session, url)
         except ValueError:

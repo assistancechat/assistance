@@ -45,8 +45,8 @@ async def process_articles(cfg: TargetedNewsConfig, num_articles: int | None = N
 
     await asyncio.gather(*coroutines)
 
-    # for hash in new_alerts_hashes:
-    #     (NEW_GOOGLE_ALERTS / hash).unlink()
+    for hash in new_alerts_hashes:
+        (NEW_GOOGLE_ALERTS / hash).unlink()
 
 
 async def _process_subscription(

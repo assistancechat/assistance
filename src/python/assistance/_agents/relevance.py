@@ -131,6 +131,9 @@ async def article_scoring(
     num_chunks = math.ceil(num_articles / MAX_ARTICLES_PER_SCORING)
     num_articles_per_chunk = math.ceil(num_articles / num_chunks)
 
+    # Consistent article grouping so that cache is used more often.
+    # num_articles_per_chunk = MAX_ARTICLES_PER_SCORING
+
     chunks = [
         articles_with_ids[i : i + num_articles_per_chunk]
         for i in range(0, num_articles, num_articles_per_chunk)
