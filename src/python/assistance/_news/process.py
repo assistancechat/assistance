@@ -172,7 +172,7 @@ async def _get_top_articles(
 
     top_articles = []
     for i in top_scoring_indices:
-        top_articles.append(articles[i])
+        top_articles.append(deduped_articles[i])
 
     return top_articles
 
