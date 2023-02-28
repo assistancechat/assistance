@@ -121,6 +121,8 @@ async def _react_to_email(email: Email):
         )
         return
 
+    # TODO: Filter out facebook messages. Also make sure that Discourse
+    # posts are being caught in the phirho logging filter.
     if email["reply_to"] == ["Avatar Phi Rho <notifications@forum.phirho.org>"]:
         logging.info(
             "Email is a notification from the Phi Rho forum that can't be replied to. Doing nothing."
