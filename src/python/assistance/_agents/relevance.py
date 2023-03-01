@@ -28,7 +28,6 @@ MAX_ARTICLES_PER_SCORING = 20
 MODEL_KWARGS = {
     "engine": DEFAULT_OPENAI_MODEL,
     "max_tokens": 1536,
-    "best_of": 1,
     "temperature": 0.7,
     "top_p": 1,
     "frequency_penalty": 0.0,

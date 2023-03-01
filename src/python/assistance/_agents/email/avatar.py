@@ -38,7 +38,6 @@ SERP_API_KEY = get_serp_api_key()
 MODEL_KWARGS = {
     "engine": DEFAULT_OPENAI_MODEL,
     "max_tokens": 512,
-    "best_of": 1,
     "stop": ["Post from @", "->"],
     "temperature": 0.7,
     "top_p": 1,

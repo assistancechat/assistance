@@ -24,7 +24,7 @@ from assistance._utilities import get_cleaned_url
 
 async def collect_new_articles(
     num_articles: int | None = None,
-) -> tuple[list[str], list[Article]]:
+) -> dict[str, Article]:
     coroutines = []
     new_alerts = list(NEW_GOOGLE_ALERTS.glob("*"))
 
@@ -49,7 +49,7 @@ async def collect_new_articles(
     for alert_hash in new_alerts_hashes:
         sorted_articles.append(articles[alert_hash])
 
-    return new_alerts_hashes, sorted_articles
+    return dict(zip(new_alerts_hashes, sorted_articles))
 
 
 async def _collect_articles_from_alert(hash_digest: str) -> tuple[str, Article]:

@@ -31,7 +31,6 @@ from assistance._store.transcript import store_prompt_transcript
 MODEL_KWARGS = {
     "engine": DEFAULT_OPENAI_MODEL,
     "max_tokens": 512,
-    "best_of": 1,
     "stop": "Observation:",
     "temperature": 0.7,
     "top_p": 1,

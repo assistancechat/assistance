@@ -44,15 +44,15 @@ async def process_articles(
     delete_alerts: bool = True,
     subscriber_override: list[str] | None = None,
 ):
-    new_alerts_hashes, sorted_articles = await collect_new_articles(num_articles)
+    articles_by_hash = await collect_new_articles(num_articles)
 
-    if len(sorted_articles) < 10:
+    number_of_articles_available = len(articles_by_hash.keys())
+
+    if number_of_articles_available < 10:
         logging.info(
-            f"Too few articles to process. Only {len(sorted_articles)} articles found.",
+            f"Too few articles to process. Only {number_of_articles_available} articles found.",
         )
         return
-
-    articles_by_hash = dict(zip(new_alerts_hashes, sorted_articles))
 
     coroutines = []
     article_hashes_to_save_for_tomorrow = []
@@ -85,7 +85,7 @@ async def process_articles(
     await asyncio.gather(*coroutines)
 
     if delete_alerts:
-        for hash in new_alerts_hashes:
+        for hash in articles_by_hash.keys():
             if hash not in article_hashes_to_save_for_tomorrow:
                 (NEW_GOOGLE_ALERTS / hash).unlink()
 

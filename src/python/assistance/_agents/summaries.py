@@ -31,7 +31,6 @@ MAX_NUMBER_OF_TEXT_SECTIONS = 20
 MODEL_KWARGS = {
     "engine": DEFAULT_OPENAI_MODEL,
     "max_tokens": 512,
-    "best_of": 1,
     "temperature": 0.7,
     "top_p": 1,
     "frequency_penalty": 0.0,

@@ -23,7 +23,6 @@ from assistance._utilities import items_to_list_string
 MODEL_KWARGS = {
     "engine": DEFAULT_OPENAI_MODEL,
     "max_tokens": 2048,
-    "best_of": 1,
     "temperature": 0.7,
     "top_p": 1,
     "frequency_penalty": 0.1,

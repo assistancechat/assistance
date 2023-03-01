@@ -29,7 +29,7 @@ from ._paths import COMPLETIONS, get_completion_cache_path, get_hash_digest
 async def get_completion_only(**kwargs) -> str:
     response = await _completion_with_back_off(**kwargs)
 
-    return response["choices"][0]["text"].strip()  # type: ignore
+    return response["choices"][0]["message"]["content"].strip()  # type: ignore
 
 
 async def _completion_with_back_off(**kwargs):
@@ -67,7 +67,22 @@ async def _completion_with_back_off(**kwargs):
 
 @retry(wait=wait_random_exponential(min=1, max=60), stop=stop_after_attempt(12))
 async def _run_completion(kwargs):
-    response = await openai.Completion.acreate(**kwargs)
+    response = await _chat_completion_wrapper(**kwargs)
+
+    return response
+
+
+async def _chat_completion_wrapper(**kwargs):
+    prompt = kwargs["prompt"]
+    messages = [{"role": "user", "content": prompt}]
+
+    del kwargs["prompt"]
+    kwargs["messages"] = messages
+
+    kwargs["model"] = kwargs["engine"]
+    del kwargs["engine"]
+
+    response = await openai.ChatCompletion.acreate(**kwargs)
 
     return response
 
