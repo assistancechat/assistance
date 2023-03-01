@@ -39,10 +39,9 @@ MODEL_KWARGS = {
 
 NEWS_PROMPT = textwrap.dedent(
     """
-        You are aiming to write a three paragraph summary of a section
-        of information. The goal of this extraction is so as to allow
-        someone else to fulfil the following tasks and goals about the
-        information for their target audience:
+        You are aiming to condense a section of information so as to
+        support someone else in the completion of a series of tasks and
+        goals for their target audience.
 
         Their tasks:
 
@@ -58,25 +57,32 @@ NEWS_PROMPT = textwrap.dedent(
 
         Your instructions:
 
-        - If the text you are summarising is longer than three
-          paragraphs, you should just provide the text itself instead.
-        - Do not fulfil their tasks. Instead, ONLY provide a summary of
-          the section of information itself in such a way to best equip
-          someone else to fulfil the tasks and goals themselves.
+        - Make sure to include all information that may be relevant to
+          the tasks and goals. DO NOT over-condense the information so
+          as to lose important details.
         - If the information provided does not contain information that
           is relevant to the tasks or goals simply write NOT_RELEVANT
-          instead of providing a summary.
+          instead of extracting any information.
         - ONLY provide information that is specifically within the
-          information below. DO NOT utilise any of your outside
+          information provided. DO NOT utilise any of your outside
           knowledge to fill in any gaps.
 
         Section of information to summarise:
 
         {text}
 
-        Your summary:
+        Condensed version:
     """
 ).strip()
+
+# Not in use
+DO_NOT_FULFIL_TASKS_PROMPT = textwrap.dedent(
+    """
+        - Do not fulfil their tasks. Instead, ONLY provide a summary of
+          the section of information itself in such a way to best equip
+          someone else to fulfil the tasks and goals themselves.
+    """
+)
 
 # EMAIL_PROMPT = textwrap.dedent(
 #     """
@@ -120,8 +126,8 @@ NEWS_PROMPT = textwrap.dedent(
 # ).strip()
 
 
-WORD_COUNT_SCALING_BUFFER = 0.8
-WORDS_OVERLAP = 20
+WORD_COUNT_SCALING_BUFFER = 0.5
+WORDS_OVERLAP = 40
 
 
 async def summarise_news_article_url_with_tasks(
@@ -134,20 +140,13 @@ async def summarise_news_article_url_with_tasks(
 ):
     page_contents = await scrape(session=_ctx.session, url=url)
 
-    prompt = NEWS_PROMPT.format(
-        tasks=items_to_list_string(tasks),
-        goals=items_to_list_string(goals),
-        target_audience=target_audience,
-        text="{text}",
-    )
-
-    log_info(scope, page_contents)
-
-    summary = await _summarise_piecewise(
-        user_email=scope,
+    summary = await summarise_text_with_tasks(
+        scope=scope,
         openai_api_key=openai_api_key,
-        prompt=prompt,
-        content_to_summarise=page_contents,
+        tasks=tasks,
+        goals=goals,
+        target_audience=target_audience,
+        text=page_contents,
     )
 
     log_info(scope, f"Summary of {url}: {summary}")
@@ -155,8 +154,35 @@ async def summarise_news_article_url_with_tasks(
     return summary
 
 
+async def summarise_text_with_tasks(
+    scope: str,
+    openai_api_key: str,
+    tasks: list[str],
+    goals: list[str],
+    target_audience: str,
+    text: str,
+):
+    prompt = NEWS_PROMPT.format(
+        tasks=items_to_list_string(tasks),
+        goals=items_to_list_string(goals),
+        target_audience=target_audience,
+        text="{text}",
+    )
+
+    log_info(scope, text)
+
+    summary = await _summarise_piecewise(
+        scope=scope,
+        openai_api_key=openai_api_key,
+        prompt=prompt,
+        content_to_summarise=text,
+    )
+
+    return summary
+
+
 async def _summarise_piecewise(
-    user_email: str,
+    scope: str,
     openai_api_key: str,
     prompt: str,
     content_to_summarise: str,
@@ -184,6 +210,9 @@ async def _summarise_piecewise(
         )
     ]
 
+    if len(all_text_sections) > MAX_NUMBER_OF_TEXT_SECTIONS:
+        log_info(scope, "Too many text sections, truncating...")
+
     text_sections = all_text_sections[:MAX_NUMBER_OF_TEXT_SECTIONS]
 
     if len(text_sections) == 0:
@@ -191,7 +220,7 @@ async def _summarise_piecewise(
 
     if len(text_sections) == 1:
         return await _evaluate_prompt(
-            scope=user_email,
+            scope=scope,
             openai_api_key=openai_api_key,
             prompt=prompt,
             text=text_sections[0],
@@ -206,7 +235,7 @@ async def _summarise_piecewise(
 
         coroutines.append(
             _evaluate_prompt(
-                scope=user_email,
+                scope=scope,
                 openai_api_key=openai_api_key,
                 prompt=prompt,
                 text=text,
@@ -215,14 +244,16 @@ async def _summarise_piecewise(
 
     summaries = await asyncio.gather(*coroutines)
 
+    log_info(scope, f"All summaries: {_ctx.pprint.pformat(summaries)}")
+
     cleaned_summaries = [item for item in summaries if item != "NOT_RELEVANT"]
     combined_summaries = "\n\n".join(cleaned_summaries)
 
-    summary = await _evaluate_prompt(
-        scope=user_email,
+    summary = await _summarise_piecewise(
+        scope=scope,
         openai_api_key=openai_api_key,
         prompt=prompt,
-        text=combined_summaries,
+        content_to_summarise=combined_summaries,
     )
 
     return summary
