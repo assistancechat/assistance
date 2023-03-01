@@ -15,7 +15,7 @@
 import textwrap
 
 from assistance._completions import get_completion_only
-from assistance._config import ROOT_DOMAIN
+from assistance._config import DEFAULT_OPENAI_MODEL, ROOT_DOMAIN
 from assistance._keys import get_openai_api_key
 from assistance._logging import log_info
 from assistance._mailgun import send_email
@@ -27,7 +27,7 @@ OPEN_AI_API_KEY = get_openai_api_key()
 
 
 MODEL_KWARGS = {
-    "engine": "text-davinci-003",
+    "engine": DEFAULT_OPENAI_MODEL,
     "max_tokens": 512,
     "best_of": 1,
     "temperature": 0.7,

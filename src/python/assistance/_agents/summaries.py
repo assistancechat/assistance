@@ -18,6 +18,7 @@ import textwrap
 
 from assistance import _ctx
 from assistance._completions import get_completion_only
+from assistance._config import DEFAULT_OPENAI_MODEL
 from assistance._logging import log_info
 from assistance._utilities import (
     get_approximate_allowed_remaining_words,
@@ -28,7 +29,7 @@ from assistance._vendor.stackoverflow.web_scraping import scrape
 MAX_NUMBER_OF_TEXT_SECTIONS = 20
 
 MODEL_KWARGS = {
-    "engine": "text-davinci-003",
+    "engine": DEFAULT_OPENAI_MODEL,
     "max_tokens": 512,
     "best_of": 1,
     "temperature": 0.7,

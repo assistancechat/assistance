@@ -20,6 +20,7 @@ import toml
 
 from assistance._paths import CONFIG
 
+DEFAULT_OPENAI_MODEL = "gpt-3.5-turbo"
 ROOT_DOMAIN = "assistance.chat"
 PAYMENT_LINK = "https://buy.stripe.com/bIYeXF2s1d0E4wg9AB"
 EMAIL_PRODUCT_ID = "prod_NLuYISl8KZ6fUX"

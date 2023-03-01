@@ -16,11 +16,12 @@ import textwrap
 
 from assistance._agents.summaries import summarise_news_article_url_with_tasks
 from assistance._completions import get_completion_only
+from assistance._config import DEFAULT_OPENAI_MODEL
 from assistance._keys import get_openai_api_key
 from assistance._utilities import items_to_list_string
 
 MODEL_KWARGS = {
-    "engine": "text-davinci-003",
+    "engine": DEFAULT_OPENAI_MODEL,
     "max_tokens": 2048,
     "best_of": 1,
     "temperature": 0.7,
