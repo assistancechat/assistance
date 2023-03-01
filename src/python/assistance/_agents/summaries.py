@@ -39,9 +39,10 @@ MODEL_KWARGS = {
 
 NEWS_PROMPT = textwrap.dedent(
     """
-        You are aiming to condense a section of information so as to
-        support someone else in the completion of a series of tasks and
-        goals for their target audience.
+        You are aiming to write a three paragraph summary of a section
+        of information. The goal of this extraction is so as to allow
+        someone else to fulfil the following tasks and goals about the
+        information for their target audience:
 
         Their tasks:
 
@@ -57,32 +58,25 @@ NEWS_PROMPT = textwrap.dedent(
 
         Your instructions:
 
-        - Make sure to include all information that may be relevant to
-          the tasks and goals. DO NOT over-condense the information so
-          as to lose important details.
+        - If the text you are summarising is longer than three
+          paragraphs, you should just provide the text itself instead.
+        - Do not fulfil their tasks. Instead, ONLY provide a summary of
+          the section of information itself in such a way to best equip
+          someone else to fulfil the tasks and goals themselves.
         - If the information provided does not contain information that
           is relevant to the tasks or goals simply write NOT_RELEVANT
-          instead of extracting any information.
+          instead of providing a summary.
         - ONLY provide information that is specifically within the
-          information provided. DO NOT utilise any of your outside
+          information below. DO NOT utilise any of your outside
           knowledge to fill in any gaps.
 
         Section of information to summarise:
 
         {text}
 
-        Condensed version:
+        Your summary:
     """
 ).strip()
-
-# Not in use
-DO_NOT_FULFIL_TASKS_PROMPT = textwrap.dedent(
-    """
-        - Do not fulfil their tasks. Instead, ONLY provide a summary of
-          the section of information itself in such a way to best equip
-          someone else to fulfil the tasks and goals themselves.
-    """
-)
 
 # EMAIL_PROMPT = textwrap.dedent(
 #     """
