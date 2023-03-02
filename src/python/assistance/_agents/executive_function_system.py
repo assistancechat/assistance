@@ -62,9 +62,6 @@ PROMPT = textwrap.dedent(
         def internet_search('<string query>')
             \"""This returns a web search result for the given string argument.\"""
 
-        def python("<any python expression>")
-            \"""This allows you to evaluate expressions using python.\"""
-
         def now()
             \"""This returns the current date and time.
 
@@ -93,6 +90,14 @@ PROMPT = textwrap.dedent(
             - There may be other tools you'd like to call, but your not
               sure until you see the results of the current tools you
               have requested.
+            \"""
+
+        def python("<any python expression>")
+            \"""This allows you to evaluate expressions using python.
+
+            Only the Python standard library is available to you within
+            this tool. It is running within a WASI sandbox and does not
+            have any network or file access.
             \"""
 
 
@@ -168,7 +173,7 @@ PROMPT = textwrap.dedent(
             }},
             {{
                 "id": 5,
-                "step_by_step_thought_process": "Given I have run a few searches, I want to take the opportunity to potentially call a few more functions once I have seen their results.",
+                "step_by_step_thought_process": "Given I have run a few searches, I want to take the opportunity to potentially call a few more tools once I have seen their results. By calling this function I am able to request more tools than my original quota.",
                 "tool": "iterate_executive_function_system",
                 "args": [3],
                 "score": 4,
@@ -279,6 +284,8 @@ async def get_tools_and_responses(
             number_of_tools=number_of_new_tools_to_run,
             previous_results=tools,
         )
+
+    log_info(scope=scope, message=f"Tools with their results: {tools}")
 
     return tools
 
