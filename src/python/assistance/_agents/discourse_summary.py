@@ -60,8 +60,11 @@ async def run_with_summary_fallback(
     **kwargs,
 ):
     while True:
-        transcript = _create_transcript_string(scope, discourse_posts)
-        prompt_with_transcript = prompt.replace("{transcript}", transcript)
+        transcript = _create_transcript_string(scope, discourse_posts[0:-1])
+        most_recent = _create_transcript_string(scope, discourse_posts[-1:])
+        prompt_with_transcript = prompt.replace("{transcript}", transcript).replace(
+            "{most_recent_post}", most_recent
+        )
 
         try:
             response = await get_completion_only(

@@ -169,6 +169,8 @@ TASK = textwrap.dedent(
 
         ## Instructions
 
+        - Keep your responses succinct. Ideally your post should have
+          less than 100 words.
         - ONLY respond to the most recent post in the thread.
         - If the information from your tool results has already been
           provided in the transcript, then DO NOT repeat it.
@@ -190,6 +192,10 @@ TASK = textwrap.dedent(
         ## The transcript of the conversation thus far
 
         {transcript}
+
+        ## The most recent post (respond ONLY to this post)
+
+        {most_recent_post}
     """
 ).strip()
 

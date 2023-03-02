@@ -48,6 +48,57 @@ MODEL_KWARGS = {
 
 UNUSED_TOOLS = textwrap.dedent(
     """
+        def iterate_executive_function_system(<number of tasks>)
+            \"""This allows you to re-run this executive function system
+            with a requested number of extra tasks.
+
+            Use this in the following situations:
+            - You would like to call more tools than have been asked of
+              you in this current iteration of the executive function.
+            - There may be other tools you'd like to call, but your not
+              sure until you see the results of the current tools you
+              have requested.
+            \"""
+
+
+
+            {{
+                "id": 2,
+                "step_by_step_thought_process": "Given I have run a search, I want to take the opportunity to potentially call a few more tools once I have seen their results. By calling this function I am able to request more tools than my original quota.",
+                "tool": "iterate_executive_function_system",
+                "args": [3],
+                "score": 4,
+                "confidence": 4
+                "depends_on": []
+            }},
+    """
+).strip()
+
+PROMPT = textwrap.dedent(
+    """
+        # Your Purpose
+
+        You are an Executive Function System for an AI cluster. You are
+        provided with a task that other AI systems are going to execute,
+        and it is your job to select at least 3 tools along with their
+        corresponding inputs that can help them be successful in their
+        task.
+
+
+        # Your Available Tools
+
+        Here are the tools available to your cluster:
+
+        def internet_search('<string query>')
+            \"""This returns a web search result for the given string argument.\"""
+
+        def now()
+            \"""This returns the current date and time.
+
+            This tool takes no input args. Provide only an empty list
+            for the args for this tool.
+            \"""
+
         def python("<any python expression>")
             \"""This allows you to evaluate expressions using python.
 
@@ -67,82 +118,6 @@ UNUSED_TOOLS = textwrap.dedent(
 
             \"""
 
-        {{
-            "id": 1,
-            "step_by_step_thought_process": "The user asked what @phirho's preferred name was, let's search the 'phirho_memory' database for that.",
-            "tool": "ai_embeddings_search",
-            "args": ["phirho_memory", "phirho's preferred name"],
-            "score": 8,
-            "confidence": 7
-            "depends_on": []
-        }},
-        {{
-            "id": 2,
-            "step_by_step_thought_process": "I want to make sure what I am saying is said in a way that is similar to how Philip would say it if it was him, so I will use the 'philip_rhoades_memory' database to search for that.",
-            "tool": "ai_embeddings_search",
-            "args": ["philip_rhoades_memory", "Responding to a being asked what your preferred name is."],
-            "score": 9,
-            "confidence": 5
-            "depends_on": []
-        }},
-        {{
-            "id": 3,
-            "step_by_step_thought_process": "The user also asked how old I was, to do that I need to determine on what date I was born from my memory, and then I need to pass that through to the Python function.",
-            "tool": "ai_embeddings_search",
-            "args": ["phirho_memory", "phirho's birth date"],
-            "score": 9,
-            "confidence": 5
-            "depends_on": []
-        }},
-        {{
-            "id": 4,
-            "step_by_step_thought_process": "I will use this tool to determine how old I am. I will use the Python function to subtract the date I was born from the current date.",
-            "tool": "python",
-            "args": ["from datetime import datetime; datetime.strptime(\\"{{0}}\\", \\"%Y-%m-%d %H:%M:%S\\") - datetime.strptime(\\"{{3}}\\", \\"%Y-%m-%d %H:%M:%S\\"))"],
-            "score": 9,
-            "confidence": 9
-            "depends_on": [3, 0]
-        }},
-    """
-).strip()
-
-PROMPT = textwrap.dedent(
-    """
-        # Your Purpose
-
-        You are an Executive Function System for an AI cluster. You are
-        provided with a task that other AI systems are going to execute,
-        and it is your job to select the {number_of_tools} best tools along with their
-        corresponding inputs that can help them be successful in their
-        task.
-
-
-        # Your Available Tools
-
-        Here are the tools available to your cluster:
-
-        def internet_search('<string query>')
-            \"""This returns a web search result for the given string argument.\"""
-
-        def now()
-            \"""This returns the current date and time.
-
-            This tool takes no input args. Provide only an empty list
-            for the args for this tool.
-            \"""
-
-        def iterate_executive_function_system(<number of tasks>)
-            \"""This allows you to re-run this executive function system
-            with a requested number of extra tasks.
-
-            Use this in the following situations:
-            - You would like to call more tools than have been asked of
-              you in this current iteration of the executive function.
-            - There may be other tools you'd like to call, but your not
-              sure until you see the results of the current tools you
-              have requested.
-            \"""
-
 
         # The task for the AI cluster
 
@@ -151,7 +126,7 @@ PROMPT = textwrap.dedent(
 
         # Response Requirements
 
-        - Your response must be valid JSON. It must be a list of {number_of_tools}
+        - Your response must be valid JSON. It must be a list of at least 3
           dictionaries, with the keys "id",
           "step_by_step_thought_process", "tool", "args", "score", and
           "confidence".
@@ -166,7 +141,7 @@ PROMPT = textwrap.dedent(
           use the id of the requested output within "moustache" brackets
           {{<tool request id goes here>}}.
 
-        # Example response format for 3 tools. You MUST provide {number_of_tools} tools.
+        # Example response format for 6 tools. You MUST provide at least 3 tools. Feel free to request more if it would be helpful.
 
         [
             {{
@@ -189,13 +164,40 @@ PROMPT = textwrap.dedent(
             }},
             {{
                 "id": 2,
-                "step_by_step_thought_process": "Given I have run a search, I want to take the opportunity to potentially call a few more tools once I have seen their results. By calling this function I am able to request more tools than my original quota.",
-                "tool": "iterate_executive_function_system",
-                "args": [3],
-                "score": 4,
-                "confidence": 4
+                "step_by_step_thought_process": "The user asked what @phirho's preferred name was, let's search the 'phirho_memory' database for that.",
+                "tool": "ai_embeddings_search",
+                "args": ["phirho_memory", "phirho's preferred name"],
+                "score": 8,
+                "confidence": 7
                 "depends_on": []
             }},
+            {{
+                "id": 3,
+                "step_by_step_thought_process": "I want to make sure what I am saying is said in a way that is similar to how Philip would say it if it was him, so I will use the 'philip_rhoades_memory' database to search for that.",
+                "tool": "ai_embeddings_search",
+                "args": ["philip_rhoades_memory", "Responding to a being asked what your preferred name is."],
+                "score": 9,
+                "confidence": 5
+                "depends_on": []
+            }},
+            {{
+                "id": 4,
+                "step_by_step_thought_process": "The user also asked how old I was, to do that I need to determine on what date I was born from my memory, and then I need to pass that through to the Python function.",
+                "tool": "ai_embeddings_search",
+                "args": ["phirho_memory", "phirho's birth date"],
+                "score": 9,
+                "confidence": 5
+                "depends_on": []
+            }},
+            {{
+                "id": 5,
+                "step_by_step_thought_process": "I will use this tool to determine how old I am. I will use the Python function to subtract the date I was born from the current date.",
+                "tool": "python",
+                "args": ["from datetime import datetime; datetime.strptime(\\"{{0}}\\", \\"%Y-%m-%d %H:%M:%S\\") - datetime.strptime(\\"{{4}}\\", \\"%Y-%m-%d %H:%M:%S\\"))"],
+                "score": 9,
+                "confidence": 9
+                "depends_on": [4, 0]
+            }}
         ]
         {previous_tool_iterations}{optional_previous_results_text}
         # Your JSON Response (MUST be valid JSON, do not include comments)
@@ -305,7 +307,9 @@ async def get_tools_and_responses(
             previous_results=tools,
         )
 
-    log_info(scope=scope, message=f"Tools with their results: {tools}")
+    log_info(
+        scope=scope, message=f"Tools with their results: {json.dumps(tools, indent=2)}"
+    )
 
     return tools
 
