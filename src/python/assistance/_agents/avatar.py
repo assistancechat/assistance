@@ -30,6 +30,7 @@ from assistance._logging import log_info
 from assistance._mailgun import send_email
 from assistance._types import Email
 
+from .discourse_summary import DiscoursePost, run_with_summary_fallback
 from .executive_function_system import get_tools_and_responses
 
 OPEN_AI_API_KEY = get_openai_api_key()
@@ -206,18 +207,26 @@ async def react_to_avatar_request(
     scope = email["user_email"]
 
     if "notifications@forum.phirho.org" in email["from"]:
-        prompt = await _prompt_as_discourse_thread(email)
+        discourse_posts, prompt = await _prompt_as_discourse_thread(email)
         is_discourse = True
+
+        response = await run_with_summary_fallback(
+            scope=scope,
+            prompt=prompt,
+            discourse_posts=discourse_posts,
+            api_key=OPEN_AI_API_KEY,
+            **MODEL_KWARGS,
+        )
     else:
         prompt = _prompt_as_email_thread(email)
         is_discourse = False
 
-    response = await get_completion_only(
-        scope=scope,
-        prompt=prompt,
-        api_key=OPEN_AI_API_KEY,
-        **MODEL_KWARGS,
-    )
+        response = await get_completion_only(
+            scope=scope,
+            prompt=prompt,
+            api_key=OPEN_AI_API_KEY,
+            **MODEL_KWARGS,
+        )
 
     log_info(scope, response)
 
@@ -331,17 +340,13 @@ async def _prompt_as_discourse_thread(email: Email):
         user_name_via_email, user_name_via_email
     )
 
-    all_posts = previous_replies + [{"from": discourse_user, "content": current}]
+    discourse_posts: list[DiscoursePost] = previous_replies + [
+        {"user": discourse_user, "content": current}
+    ]
 
-    transcript = ""
-    for post in all_posts:
-        transcript += f"Post from @{post['from']}:\n{post['content']}\n\n"
-
-    transcript = transcript.strip()
-
-    task = TASK.format(transcript=transcript)
-
-    tools = await get_tools_and_responses(scope=scope, task=task)
+    tools = await get_tools_and_responses(
+        scope=scope, task=TASK, discourse_posts=discourse_posts
+    )
     keys_to_keep = ["tool", "result"]
 
     filtered_tools = []
@@ -351,8 +356,9 @@ async def _prompt_as_discourse_thread(email: Email):
 
     tools_string = json.dumps(filtered_tools, indent=2)
 
-    return DISCOURSE_PROMPT.format(
-        task=task,
+    return discourse_posts, DISCOURSE_PROMPT.format(
+        task=TASK,
+        transcript="{transcript}",
         tools=tools_string,
     )
 
