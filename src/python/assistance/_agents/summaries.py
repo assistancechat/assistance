@@ -65,7 +65,8 @@ NEWS_PROMPT = textwrap.dedent(
           someone else to fulfil the tasks and goals themselves.
         - If the information provided does not contain information that
           is relevant to the tasks or goals simply write NOT_RELEVANT
-          instead of providing a summary.
+          instead of providing a summary. You MUST use exact formatting
+          for NOT_RELEVANT, all caps with underscore.
         - ONLY provide information that is specifically within the
           information below. DO NOT utilise any of your outside
           knowledge to fill in any gaps.

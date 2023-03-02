@@ -64,13 +64,13 @@ PROMPT = textwrap.dedent(
           view while still being enthusiastic in your writing and making
           your post interesting and engaging.
         - If there isn't ample information within the article to work
-          from, set "article-is-relevant" to false.
+          from, set "article_is_relevant" to false.
         - Make sure your post contains all the relevant information
           regarding the tasks. The reader should not need to read the
           article. Nor are you wanting them to actually read the
           article.
         - Fulfil each task in its own paragraph.
-
+        {sentence_blacklist_prompt}
         The article of text you have been provided is:
 
         {text}
@@ -78,12 +78,23 @@ PROMPT = textwrap.dedent(
         Required JSON response format:
 
         {{
-            "article-is-relevant": [true or false],
+            "article_is_relevant": [true or false],
             "subject": "<Post subject goes here>",
+            "things_to_consider": "<A list of things to consider goes here, include new lines as \\n>",
             "content": "<Post content goes here, include new lines as \\n>"
         }}
 
         JSON response:
+    """
+).strip()
+
+
+SENTENCE_BLACKLIST = textwrap.dedent(
+    """
+        The following is a blacklist of sentences. Do not write these
+        sentences, or anything similar, within your post.
+
+        {sentence_blacklist}
     """
 ).strip()
 
@@ -94,8 +105,9 @@ async def write_news_post(
     tasks: list[str],
     goals: list[str],
     target_audience: str,
+    sentence_blacklist: list[str],
     url: str,
-) -> str:
+) -> tuple[str, str]:
     summary = await summarise_news_article_url_with_tasks(
         scope=scope,
         openai_api_key=openai_api_key,
@@ -105,10 +117,22 @@ async def write_news_post(
         url=url,
     )
 
+    if len(sentence_blacklist) > 0:
+        sentence_blacklist_prompt = (
+            "\n"
+            + SENTENCE_BLACKLIST.format(
+                sentence_blacklist=items_to_list_string(sentence_blacklist)
+            )
+            + "\n"
+        )
+    else:
+        sentence_blacklist_prompt = ""
+
     prompt = PROMPT.format(
         tasks=items_to_list_string(tasks),
         goals=items_to_list_string(goals),
         target_audience=target_audience,
+        sentence_blacklist_prompt=sentence_blacklist_prompt,
         text=summary,
     )
 
@@ -116,4 +140,4 @@ async def write_news_post(
         scope=scope, prompt=prompt, api_key=openai_api_key, **MODEL_KWARGS
     )
 
-    return response
+    return summary, response

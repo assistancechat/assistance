@@ -25,7 +25,7 @@ ROOT_DOMAIN = "assistance.chat"
 PAYMENT_LINK = "https://buy.stripe.com/bIYeXF2s1d0E4wg9AB"
 EMAIL_PRODUCT_ID = "prod_NLuYISl8KZ6fUX"
 
-TargetedNewsFormats = Literal["email-digest-for-linkedin", "separate-discourse-posts"]
+TargetedNewsFormats = Literal["digest", "separate-discourse-posts"]
 
 
 class TargetedNewsUserOverrides(TypedDict, total=False):
@@ -38,6 +38,7 @@ class TargetedNewsUserOverrides(TypedDict, total=False):
 
 class TargetedNewsSubscriptionDataItem(TypedDict):
     target_audience: str
+    sentence_blacklist: list[str]
     keywords: list[str]
     agent_user: str
     format: TargetedNewsFormats

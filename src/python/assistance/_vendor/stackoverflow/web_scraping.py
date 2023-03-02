@@ -94,6 +94,6 @@ async def _scrape_with_cache(
         return url_results
 
     if not use_google_cache:
-        return b"NOT RELEVANT"
+        return b"NOT_RELEVANT"
 
     return await _scrape_with_cache(session, url, use_google_cache=False)

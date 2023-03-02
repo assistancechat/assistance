@@ -15,7 +15,8 @@
 import asyncio
 import json
 import logging
-from typing import cast
+import textwrap
+from typing import Any, Coroutine, TypedDict, cast
 
 import numpy as np
 
@@ -37,6 +38,8 @@ from .collect import collect_new_articles
 OPEN_AI_API_KEY = get_openai_api_key()
 MAX_ARTICLES_PER_SCORING = 20
 
+MIN_ARTICLE_COUNT = 6
+
 
 async def process_articles(
     cfg: TargetedNewsConfig,
@@ -48,7 +51,7 @@ async def process_articles(
 
     number_of_articles_available = len(articles_by_hash.keys())
 
-    if number_of_articles_available < 10:
+    if number_of_articles_available < MIN_ARTICLE_COUNT:
         logging.info(
             f"Too few articles to process. Only {number_of_articles_available} articles found.",
         )
@@ -65,7 +68,7 @@ async def process_articles(
             subscription_data, articles_by_hash
         )
 
-        if len(deduped_articles_for_keyword) < 10:
+        if len(deduped_articles_for_keyword) < MIN_ARTICLE_COUNT:
             logging.info(
                 f"Too few articles to process for keywords {subscription_data['keywords']}. Only {len(deduped_articles_for_keyword)} articles found.",
             )
@@ -90,6 +93,40 @@ async def process_articles(
                 (NEW_GOOGLE_ALERTS / hash).unlink()
 
 
+EMAIL_TEMPLATE = textwrap.dedent(
+    """
+        Summary of news article
+        -----------------------
+
+        {summary}
+
+        Link to article
+        ---------------
+
+        {url}
+
+        Things to consider
+        ------------------
+
+        {things_to_consider}
+
+        Something to share
+        ------------------
+
+        {content}
+    """
+).strip()
+
+
+class DetailsForEmail(TypedDict):
+    title: str
+    url: str
+    subject: str
+    summary: str
+    things_to_consider: str
+    content: str
+
+
 async def _process_subscription(
     cfg: TargetedNewsConfig,
     subscription_data: TargetedNewsSubscriptionDataItem,
@@ -104,32 +141,33 @@ async def _process_subscription(
         deduped_articles=deduped_articles,
     )
 
-    coroutines = []
+    write_news_post_coroutines: list[Coroutine[Any, Any, tuple[str, str]]] = []
     for article in top_articles:
         url = article["url"]
 
-        coroutines.append(
+        write_news_post_coroutines.append(
             write_news_post(
                 scope=scope,
                 openai_api_key=OPEN_AI_API_KEY,
                 goals=cfg["goals"],
                 tasks=cfg["tasks"],
                 target_audience=subscription_data["target_audience"],
+                sentence_blacklist=subscription_data["sentence_blacklist"],
                 url=url,
             )
         )
 
-    results = await asyncio.gather(*coroutines)
+    results = await asyncio.gather(*write_news_post_coroutines)
 
-    all_relevant_responses = []
-    for article, result in zip(top_articles, results):
+    all_relevant_responses: list[DetailsForEmail] = []
+    for article, (summary, result) in zip(top_articles, results):
         try:
             result_data = json.loads(result, strict=False)
         except json.JSONDecodeError:
             log_info(scope, f"Failed to decode JSON: {result}")
             continue
 
-        if not result_data["article-is-relevant"]:
+        if not result_data["article_is_relevant"]:
             continue
 
         all_relevant_responses.append(
@@ -137,6 +175,8 @@ async def _process_subscription(
                 "title": article["title"],
                 "url": article["url"],
                 "subject": result_data["subject"],
+                "summary": summary.replace("NOT_RELEVANT", "").strip(),
+                "things_to_consider": result_data["things_to_consider"],
                 "content": result_data["content"],
             }
         )
@@ -147,7 +187,7 @@ async def _process_subscription(
         goals=cfg["goals"],
         tasks=cfg["tasks"],
         target_audience=subscription_data["target_audience"],
-        articles=all_relevant_responses,
+        articles=cast(list[dict[str, str]], all_relevant_responses),
         keys=["subject", "content"],
     )
 
@@ -155,7 +195,7 @@ async def _process_subscription(
         cfg=cfg, article_scores=article_scores, k=3
     )
 
-    top_scoring_posts = []
+    top_scoring_posts: list[DetailsForEmail] = []
     for i in top_scoring_indices:
         top_scoring_posts.append(all_relevant_responses[i])
 
@@ -164,24 +204,48 @@ async def _process_subscription(
     else:
         subscribers_to_use = subscription_data["subscribers"]
 
-    coroutines = []
-    for response in top_scoring_posts:
-        # Discourse format
-        text = f"{response['content']}\n\n{response['url']}"
+    send_email_coroutines: list[Coroutine[Any, Any, None]] = []
 
-        for subscriber in subscribers_to_use:
-            agent_user = subscription_data["agent_user"]
+    digest_email = f"News digest for:\n{subscription_data['target_audience']}\n\n"
+    discourse_emails = []
 
-            postal_data = {
-                "from": f"{agent_user}@{ROOT_DOMAIN}",
-                "to": [subscriber],
+    for i, response in enumerate(top_scoring_posts):
+        text = EMAIL_TEMPLATE.format(**response)
+        digest_email += f"Article {i + 1})\n{text}\n\n-------------------------\n\n"
+
+        discourse_emails.append(
+            {
                 "subject": response["subject"],
                 "plain_body": text,
             }
+        )
 
-            coroutines.append(send_email(scope, postal_data))
+    for subscriber in subscribers_to_use:
+        agent_user = subscription_data["agent_user"]
 
-    await asyncio.gather(*coroutines)
+        # Done inside the loop as in the future want to be able to
+        # handle per user overrides.
+        if subscription_data["format"] == "digest":
+            postal_data = {
+                "from": f"{agent_user}@{ROOT_DOMAIN}",
+                "to": [subscriber],
+                "subject": "Targeted News Digest",
+                "plain_body": digest_email,
+            }
+
+            send_email_coroutines.append(send_email(scope, postal_data))
+        else:
+            for email in discourse_emails:
+                postal_data = {
+                    "from": f"{agent_user}@{ROOT_DOMAIN}",
+                    "to": [subscriber],
+                    "subject": email["subject"],
+                    "plain_body": email["plain_body"],
+                }
+
+                send_email_coroutines.append(send_email(scope, postal_data))
+
+    await asyncio.gather(*send_email_coroutines)
 
 
 async def _get_top_articles(
