@@ -24,12 +24,11 @@ from zoneinfo import ZoneInfo
 from assistance import _ctx
 from assistance._completions import get_completion_only
 from assistance._config import DEFAULT_OPENAI_MODEL, ROOT_DOMAIN
+from assistance._email.reply import create_reply, get_all_user_emails
 from assistance._keys import get_openai_api_key, get_serp_api_key
 from assistance._logging import log_info
 from assistance._mailgun import send_email
-
-from .._email.reply import create_reply, get_all_user_emails
-from .._types import Email
+from assistance._types import Email
 
 OPEN_AI_API_KEY = get_openai_api_key()
 SERP_API_KEY = get_serp_api_key()
@@ -301,14 +300,11 @@ async def react_to_avatar_request(
         for key in running_data:
             running_data[key] += f" -> {tool_result}]\n\n"
 
-    # cleaned_response = re.sub(r"\[.*?\]", "", running_data["email_reply"])
+    cleaned_response = re.sub(r"\[.*?\]", "", running_data["email_reply"])
 
     log_info(scope, running_data["email_reply"])
 
-    reply = create_reply(
-        original_email=email,
-        response=running_data["email_reply"],
-    )
+    reply = create_reply(original_email=email, response=cleaned_response)
 
     mailgun_data = {
         "from": f"phirho@{ROOT_DOMAIN}",
@@ -432,7 +428,7 @@ def _prompt_as_discourse_thread(email: Email):
     )
 
 
-def _remove_signature(content):
+def _remove_signature(content: str):
     return content.split(SIGNATURE_KEY)[0].strip()
 
 
