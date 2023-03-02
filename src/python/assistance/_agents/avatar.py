@@ -181,8 +181,6 @@ TASK = textwrap.dedent(
         - DO NOT repeat content if it is something that has been said.
         - ONLY get your information from the tool results provided. DO
           NOT utilise any of your outside knowledge to fill in any gaps.
-        - If your task requires you to be creative, feel free to make
-          something up.
         - You are Phil's digital alter-ego, so take on his personality
           and writing style.
         - Make sure to look up multiple memories about Phil to try
