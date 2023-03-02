@@ -17,10 +17,11 @@ import logging
 import textwrap
 
 from assistance import _ctx
-from assistance._completions import completion_with_back_off
+from assistance._completions import get_completion_only
+from assistance._config import DEFAULT_OPENAI_MODEL
+from assistance._logging import log_info
 from assistance._utilities import (
     get_approximate_allowed_remaining_words,
-    get_number_of_words,
     items_to_list_string,
 )
 from assistance._vendor.stackoverflow.web_scraping import scrape
@@ -28,9 +29,8 @@ from assistance._vendor.stackoverflow.web_scraping import scrape
 MAX_NUMBER_OF_TEXT_SECTIONS = 20
 
 MODEL_KWARGS = {
-    "engine": "text-davinci-003",
+    "engine": DEFAULT_OPENAI_MODEL,
     "max_tokens": 512,
-    "best_of": 1,
     "temperature": 0.7,
     "top_p": 1,
     "frequency_penalty": 0.0,
@@ -61,7 +61,7 @@ NEWS_PROMPT = textwrap.dedent(
         - If the text you are summarising is longer than three
           paragraphs, you should just provide the text itself instead.
         - Do not fulfil their tasks. Instead, ONLY provide a summary of
-          the section of information itself in such away to best equip
+          the section of information itself in such a way to best equip
           someone else to fulfil the tasks and goals themselves.
         - If the information provided does not contain information that
           is relevant to the tasks or goals simply write NOT_RELEVANT
@@ -121,11 +121,11 @@ NEWS_PROMPT = textwrap.dedent(
 
 
 WORD_COUNT_SCALING_BUFFER = 0.8
-WORDS_OVERLAP = 20
+WORDS_OVERLAP = 40
 
 
 async def summarise_news_article_url_with_tasks(
-    user_email: str,
+    scope: str,
     openai_api_key: str,
     tasks: list[str],
     goals: list[str],
@@ -134,6 +134,28 @@ async def summarise_news_article_url_with_tasks(
 ):
     page_contents = await scrape(session=_ctx.session, url=url)
 
+    summary = await summarise_text_with_tasks(
+        scope=scope,
+        openai_api_key=openai_api_key,
+        tasks=tasks,
+        goals=goals,
+        target_audience=target_audience,
+        text=page_contents,
+    )
+
+    log_info(scope, f"Summary of {url}: {summary}")
+
+    return summary
+
+
+async def summarise_text_with_tasks(
+    scope: str,
+    openai_api_key: str,
+    tasks: list[str],
+    goals: list[str],
+    target_audience: str,
+    text: str,
+):
     prompt = NEWS_PROMPT.format(
         tasks=items_to_list_string(tasks),
         goals=items_to_list_string(goals),
@@ -141,22 +163,20 @@ async def summarise_news_article_url_with_tasks(
         text="{text}",
     )
 
-    logging.info(page_contents)
+    log_info(scope, text)
 
     summary = await _summarise_piecewise(
-        user_email=user_email,
+        scope=scope,
         openai_api_key=openai_api_key,
         prompt=prompt,
-        content_to_summarise=page_contents,
+        content_to_summarise=text,
     )
-
-    logging.info(f"Summary of {url}: {summary}")
 
     return summary
 
 
 async def _summarise_piecewise(
-    user_email: str,
+    scope: str,
     openai_api_key: str,
     prompt: str,
     content_to_summarise: str,
@@ -184,6 +204,9 @@ async def _summarise_piecewise(
         )
     ]
 
+    if len(all_text_sections) > MAX_NUMBER_OF_TEXT_SECTIONS:
+        log_info(scope, "Too many text sections, truncating...")
+
     text_sections = all_text_sections[:MAX_NUMBER_OF_TEXT_SECTIONS]
 
     if len(text_sections) == 0:
@@ -191,7 +214,7 @@ async def _summarise_piecewise(
 
     if len(text_sections) == 1:
         return await _evaluate_prompt(
-            user_email=user_email,
+            scope=scope,
             openai_api_key=openai_api_key,
             prompt=prompt,
             text=text_sections[0],
@@ -206,7 +229,7 @@ async def _summarise_piecewise(
 
         coroutines.append(
             _evaluate_prompt(
-                user_email=user_email,
+                scope=scope,
                 openai_api_key=openai_api_key,
                 prompt=prompt,
                 text=text,
@@ -215,31 +238,32 @@ async def _summarise_piecewise(
 
     summaries = await asyncio.gather(*coroutines)
 
+    log_info(scope, f"All summaries: {_ctx.pprint.pformat(summaries)}")
+
     cleaned_summaries = [item for item in summaries if item != "NOT_RELEVANT"]
     combined_summaries = "\n\n".join(cleaned_summaries)
 
-    summary = await _evaluate_prompt(
-        user_email=user_email,
+    summary = await _summarise_piecewise(
+        scope=scope,
         openai_api_key=openai_api_key,
         prompt=prompt,
-        text=combined_summaries,
+        content_to_summarise=combined_summaries,
     )
 
     return summary
 
 
 async def _evaluate_prompt(
-    user_email: str,
+    scope: str,
     openai_api_key: str,
     prompt: str,
     text: str,
 ):
-    completions = await completion_with_back_off(
-        user_email=user_email,
+    response = await get_completion_only(
+        scope=scope,
         prompt=prompt.format(text=text),
         api_key=openai_api_key,
         **MODEL_KWARGS,
     )
-    response: str = completions.choices[0].text.strip()  # type: ignore
 
     return response

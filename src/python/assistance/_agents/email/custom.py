@@ -12,27 +12,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Prompt inspired by the work provided under an MIT license over at:
-# https://github.com/hwchase17/langchain/blob/ae1b589f60a/langchain/agents/conversational/prompt.py#L1-L36
-
-import logging
 import textwrap
 
-from assistance._completions import completion_with_back_off
-from assistance._config import ROOT_DOMAIN
+from assistance._completions import get_completion_only
+from assistance._config import DEFAULT_OPENAI_MODEL, ROOT_DOMAIN
 from assistance._keys import get_openai_api_key
+from assistance._logging import log_info
 from assistance._mailgun import send_email
 
+from ..._types import Email
 from .reply import create_reply
-from .types import Email
 
 OPEN_AI_API_KEY = get_openai_api_key()
 
 
 MODEL_KWARGS = {
-    "engine": "text-davinci-003",
+    "engine": DEFAULT_OPENAI_MODEL,
     "max_tokens": 512,
-    "best_of": 1,
     "temperature": 0.7,
     "top_p": 1,
     "frequency_penalty": 0.1,
@@ -67,6 +63,8 @@ PROMPT = textwrap.dedent(
 
 
 async def react_to_custom_agent_request(email: Email, prompt_task: str):
+    scope = email["user_email"]
+
     prompt = PROMPT.format(
         body_plain=email["plain_all_content"],
         user_email=email["user_email"],
@@ -75,17 +73,16 @@ async def react_to_custom_agent_request(email: Email, prompt_task: str):
         subject=email["subject"],
         ROOT_DOMAIN=ROOT_DOMAIN,
     )
-    logging.info(prompt)
+    log_info(scope, prompt)
 
-    completions = await completion_with_back_off(
-        user_email=email["user_email"],
+    response = await get_completion_only(
+        scope=email["user_email"],
         prompt=prompt,
         api_key=OPEN_AI_API_KEY,
         **MODEL_KWARGS,
     )
-    response: str = completions.choices[0].text.strip()  # type: ignore
 
-    logging.info(response)
+    log_info(scope, response)
 
     reply = create_reply(
         original_email=email,
@@ -100,4 +97,4 @@ async def react_to_custom_agent_request(email: Email, prompt_task: str):
         "plain_body": reply["total_reply"],
     }
 
-    await send_email(mailgun_data)
+    await send_email(scope, mailgun_data)

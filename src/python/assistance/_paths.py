@@ -19,29 +19,35 @@ import aiofiles
 
 LIB = pathlib.Path(__file__).parent
 
-STORE = pathlib.Path.home() / ".assistance"
-CONFIG = STORE / "config"
-SECRETS = CONFIG / "secrets"
+STORE = pathlib.Path.home().joinpath(".assistance")
+CONFIG = STORE.joinpath("config")
+SECRETS = CONFIG.joinpath("secrets")
 
-USERS = STORE / "users"
-EMAIL_MAPPING = USERS / "email-mapping"
-USER_DETAILS = USERS / "details"
-AGENT_MAPPING = USERS / "agent-mapping"
+USERS = STORE.joinpath("users")
+EMAIL_MAPPING = USERS.joinpath("email-mapping")
+USER_DETAILS = USERS.joinpath("details")
+AGENT_MAPPING = USERS.joinpath("agent-mapping")
 
-RECORDS = STORE / "records"
+RECORDS = STORE.joinpath("records")
 
-PROMPTS = RECORDS / "prompts"
-COMPLETIONS = RECORDS / "completions"
-ARTICLES = RECORDS / "articles"
-EMAILS = RECORDS / "emails"
+PROMPTS = RECORDS.joinpath("prompts")
+COMPLETIONS = RECORDS.joinpath("completions")
+ARTICLE_METADATA = RECORDS.joinpath("article-metadata")
+DOWNLOADED_ARTICLES = RECORDS.joinpath("downloaded-articles")
+EMAILS = RECORDS.joinpath("emails")
+COMPLETION_CACHE = RECORDS.joinpath("completion-cache")
 
-PIPELINES = STORE / "pipelines"
+PIPELINES = STORE.joinpath("pipelines")
 
-GOOGLE_ALERTS_PIPELINES = PIPELINES / "google-alerts"
-NEW_GOOGLE_ALERTS = GOOGLE_ALERTS_PIPELINES / "new"
+GOOGLE_ALERTS_PIPELINES = PIPELINES.joinpath("google-alerts")
+NEW_GOOGLE_ALERTS = GOOGLE_ALERTS_PIPELINES.joinpath("new")
 
-EMAIL_PIPELINES = PIPELINES / "emails"
-NEW_EMAILS = EMAIL_PIPELINES / "new"
+EMAIL_PIPELINES = PIPELINES.joinpath("emails")
+NEW_EMAILS = EMAIL_PIPELINES.joinpath("new")
+
+PYTHON_ROOT = LIB.parent
+LOGS = PYTHON_ROOT.joinpath("logs")
+PHIRHO_LOGS = LOGS.joinpath("phirho")
 
 
 async def get_user_from_email(email_address: str):
@@ -80,14 +86,26 @@ async def _get_file_based_mapping(root: pathlib.Path, user: str):
     return details
 
 
-def get_article_path(hash_digest: str, create_parent: bool = False):
-    path = _get_record_path(ARTICLES, hash_digest, create_parent)
+def get_article_metadata_path(hash_digest: str, create_parent: bool = False):
+    path = _get_record_path(ARTICLE_METADATA, hash_digest, create_parent)
+
+    return path
+
+
+def get_downloaded_article_path(hash_digest: str, create_parent: bool = False):
+    path = _get_record_path(DOWNLOADED_ARTICLES, hash_digest, create_parent)
 
     return path
 
 
 def get_emails_path(hash_digest: str, create_parent: bool = False):
     path = _get_record_path(EMAILS, hash_digest, create_parent)
+
+    return path
+
+
+def get_completion_cache_path(hash_digest: str, create_parent: bool = False):
+    path = _get_record_path(COMPLETION_CACHE, hash_digest, create_parent)
 
     return path
 

@@ -12,22 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import logging
-
 import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from assistance import _ctx
+from assistance import _ctx, _logging
 from assistance._config import ROOT_DOMAIN
 
 from .routers import chat, email, forms, stripe
 
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s.%(msecs)d %(levelname)s: %(message)s",
-    datefmt="%Y-%m-%d %H:%M:%S",
-)
+_logging.main()
 
 
 app = FastAPI()

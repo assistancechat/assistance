@@ -4,18 +4,22 @@
 
 import logging
 
+import aiofiles
 import aiohttp
 from bs4 import BeautifulSoup
 from fake_useragent import UserAgent
 
+from assistance._logging import log_info
+from assistance._paths import (
+    get_article_metadata_path,
+    get_downloaded_article_path,
+    get_hash_digest,
+)
+
 
 # https://stackoverflow.com/a/24618186
-async def scrape(session: aiohttp.ClientSession, url: str):
-    ua = UserAgent()
-    headers = {"User-Agent": ua.random}
-
-    results = await session.get(url=url, headers=headers)
-    html = await results.read()
+async def scrape(session: aiohttp.ClientSession, url: str, use_google_cache=True):
+    html = await _scrape_with_cache(session, url, use_google_cache=use_google_cache)
 
     try:
         html.decode(encoding="utf8")
@@ -24,7 +28,7 @@ async def scrape(session: aiohttp.ClientSession, url: str):
 
     soup = BeautifulSoup(html, features="html.parser")
 
-    # logging.info(soup)
+    # log_info(soup)
 
     # kill all script and style elements
     for script in soup(["script", "style"]):
@@ -41,3 +45,55 @@ async def scrape(session: aiohttp.ClientSession, url: str):
     text = "\n".join(chunk for chunk in chunks if chunk)
 
     return text
+
+
+async def _scrape_with_cache(
+    session: aiohttp.ClientSession, url: str, use_google_cache=True
+):
+    url_hash_digest = get_hash_digest(url)
+    downloaded_article_path = get_downloaded_article_path(
+        url_hash_digest, create_parent=True
+    )
+
+    # TODO: Remove this
+    meta_data_path = get_article_metadata_path(url_hash_digest)
+
+    if meta_data_path.exists():
+        meta_data_path.rename(downloaded_article_path)
+    # Down to here
+
+    if downloaded_article_path.exists():
+        logging.info(f"Using cached version of {url}")
+
+        async with aiofiles.open(downloaded_article_path, "rb") as f:
+            cached_results = await f.read()
+
+        if b"Error 404" not in cached_results:
+            return cached_results
+
+    ua = UserAgent()
+    headers = {"User-Agent": ua.random}
+
+    if use_google_cache:
+        url_to_use = f"http://webcache.googleusercontent.com/search?q=cache:{url}&strip=1&vwsrc=0"
+    else:
+        url_to_use = url
+
+    logging.info(f"Downloading {url_to_use}")
+
+    results = await session.get(url=url_to_use, headers=headers)
+    url_results = await results.read()
+
+    if b"Our systems have detected unusual traffic" in url_results:
+        raise ValueError(url_results)
+
+    async with aiofiles.open(downloaded_article_path, "wb") as f:
+        await f.write(url_results)
+
+    if b"Error 404" not in url_results:
+        return url_results
+
+    if not use_google_cache:
+        return b"NOT RELEVANT"
+
+    return await _scrape_with_cache(session, url, use_google_cache=False)

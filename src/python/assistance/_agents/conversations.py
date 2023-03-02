@@ -16,7 +16,6 @@
 # https://github.com/hwchase17/langchain/blob/ae1b589f60a/langchain/agents/conversational/prompt.py#L1-L36
 
 import asyncio
-import logging
 import re
 import textwrap
 from enum import Enum
@@ -24,13 +23,14 @@ from typing import Callable, Coroutine
 
 from thefuzz import process as fuzz_process
 
-from assistance._completions import completion_with_back_off
+from assistance._completions import get_completion_only
+from assistance._config import DEFAULT_OPENAI_MODEL
+from assistance._logging import log_info
 from assistance._store.transcript import store_prompt_transcript
 
 MODEL_KWARGS = {
-    "engine": "text-davinci-003",
+    "engine": DEFAULT_OPENAI_MODEL,
     "max_tokens": 512,
-    "best_of": 1,
     "stop": "Observation:",
     "temperature": 0.7,
     "top_p": 1,
@@ -180,7 +180,7 @@ async def run_conversation(
         transcript=transcript_with_replacements,
     )
 
-    logging.info(prompt)
+    log_info(user_email, prompt)
 
     # async def _search(query: str):
     #     return await alphacrucis_search(
@@ -266,10 +266,12 @@ async def _call_gpt_and_store_as_transcript(
     model_kwargs: dict,
     prompt: str,
 ):
-    completions = await completion_with_back_off(
-        user_email=user_email, prompt=prompt, api_key=openai_api_key, **model_kwargs
+    response = await get_completion_only(
+        scope=user_email,
+        prompt=prompt,
+        api_key=openai_api_key,
+        **model_kwargs,
     )
-    response: str = completions.choices[0].text.strip()  # type: ignore
 
     asyncio.create_task(
         store_prompt_transcript(

@@ -20,6 +20,7 @@ from fastapi import APIRouter, Header, Request
 
 from assistance._config import EMAIL_PRODUCT_ID
 from assistance._keys import get_stripe_webhook_key
+from assistance._logging import log_info
 
 router = APIRouter(prefix="/stripe")
 

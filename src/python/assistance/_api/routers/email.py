@@ -25,9 +25,9 @@ from assistance._agents.email.custom import react_to_custom_agent_request
 from assistance._agents.email.default import DEFAULT_TASKS
 from assistance._agents.email.reply import ALIASES, create_reply
 from assistance._agents.email.restricted import RESTRICTED_TASKS
-from assistance._agents.email.types import Email, RawEmail
 from assistance._config import ROOT_DOMAIN
 from assistance._keys import get_mailgun_api_key
+from assistance._logging import log_info
 from assistance._mailgun import send_email
 from assistance._paths import (
     NEW_EMAILS,
@@ -37,6 +37,7 @@ from assistance._paths import (
     get_user_details,
     get_user_from_email,
 )
+from assistance._types import Email, RawEmail
 from assistance._utilities import get_cleaned_email
 
 MAILGUN_API_KEY = get_mailgun_api_key()
@@ -93,6 +94,9 @@ async def _handle_new_email(hash_digest: str, raw_email: RawEmail):
     """React to the new email, and once it completes without error, delete the pipeline file."""
 
     email = await _initial_parsing(raw_email)
+
+    log_info(email["user_email"], _ctx.pp.pformat(email))
+
     await _react_to_email(email)
 
     pipeline_path = _get_new_email_pipeline_path(hash_digest)
@@ -117,6 +121,8 @@ async def _react_to_email(email: Email):
         )
         return
 
+    # TODO: Filter out facebook messages. Also make sure that Discourse
+    # posts are being caught in the phirho logging filter.
     if email["reply_to"] == ["Avatar Phi Rho <notifications@forum.phirho.org>"]:
         logging.info(
             "Email is a notification from the Phi Rho forum that can't be replied to. Doing nothing."
@@ -203,7 +209,7 @@ async def _fallback_email_handler(user_details: dict, email: Email):
         "plain_body": reply["total_reply"],
     }
 
-    await send_email(mailgun_data)
+    await send_email(email["user_email"], mailgun_data)
 
 
 async def _initial_parsing(raw_email: RawEmail):
@@ -268,7 +274,7 @@ async def _respond_to_gmail_forward_request(email: Email):
     found_token = None
 
     for item in email["plain_no_replies"].splitlines():
-        logging.info(item)
+        log_info(email["user_email"], item)
 
         for option in [VERIFICATION_TOKEN_BASE, VERIFICATION_TOKEN_BASE_ALTERNATIVE]:
             if item.startswith(option):
@@ -280,7 +286,7 @@ async def _respond_to_gmail_forward_request(email: Email):
     await _post_gmail_forwarding_verification(found_token)
 
     user_email = email["plain_no_replies"].split(" ")[0]
-    logging.info(f"User email: {user_email}")
+    log_info(email["user_email"], f"User email: {user_email}")
 
     mailgun_data = {
         "from": forwarding_email,
@@ -292,7 +298,7 @@ async def _respond_to_gmail_forward_request(email: Email):
         ),
     }
 
-    await send_email(mailgun_data)
+    await send_email(email["user_email"], mailgun_data)
 
 
 async def _post_gmail_forwarding_verification(verification_token):
