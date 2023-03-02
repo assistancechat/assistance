@@ -46,6 +46,13 @@ def log_info(scope: str, message: str):
     logging.info(f"[{scope}] {message}")
 
 
+PHIRHO_SCOPES = ["[notifications@forum.phirho.org]", "[phirho@phirho.org]"]
+
+
 class PhiRhoFilter(logging.Filter):
     def filter(self, record):
-        return record.getMessage().startswith("[phirho@phirho.org]")
+        for scope in PHIRHO_SCOPES:
+            if record.getMessage().startswith(scope):
+                return True
+
+        return False

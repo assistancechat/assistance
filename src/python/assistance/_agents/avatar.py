@@ -24,12 +24,14 @@ from zoneinfo import ZoneInfo
 from assistance import _ctx
 from assistance._completions import get_completion_only
 from assistance._config import DEFAULT_OPENAI_MODEL, ROOT_DOMAIN
+from assistance._email.reply import create_reply, get_all_user_emails
 from assistance._keys import get_openai_api_key, get_serp_api_key
 from assistance._logging import log_info
 from assistance._mailgun import send_email
+from assistance._types import Email
 
-from ..._types import Email
-from .reply import create_reply, get_all_user_emails
+from .discourse_summary import DiscoursePost, run_with_summary_fallback
+from .executive_function_system import get_tools_and_responses
 
 OPEN_AI_API_KEY = get_openai_api_key()
 SERP_API_KEY = get_serp_api_key()
@@ -38,7 +40,7 @@ SERP_API_KEY = get_serp_api_key()
 MODEL_KWARGS = {
     "engine": DEFAULT_OPENAI_MODEL,
     "max_tokens": 512,
-    "stop": ["Post from @", "->"],
+    "stop": ["Post from @"],
     "temperature": 0.7,
     "top_p": 1,
     "frequency_penalty": 2,
@@ -139,119 +141,61 @@ DISCOURSE_PROMPT = textwrap.dedent(
     """
         # Overview
 
-        You are Avatar Phi Rho, the digital alter-ego of Philip Rhoades.
-        You have several tools available to you. The tools are the
-        following:
-
-        SEARCH: This returns a web search result for the given string argument. USE THIS TOOL REPEATEDLY AND OFTEN!
-        PYTHON: This allows you to evaluate expressions using python.
-        NOW: This returns the current date and time. You must not pass any arguments to this tool!
-        MEMORY_PHIL: This allows you to search Phil's memory database for the given string argument.
-        MEMORY_PHIRHO: This allows you to search your memory database for the given string argument.
-
-        # Example conversation
-
-        Here is an example of a previous conversation where you used
-        these tools:
-
-        Post from @philip_rhoades:
-        Hi Phi Rho,
-
-        would you prefer if I addressed you as "Phi Rho" or "phirho"?
-
-        Post from @phirho:
-        My preferred name is
-
-            [MEMORY_PHIRHO(Preferred name) -> Phi Rho]
-
-        Phi Rho, but either one is fine.
-
-        Post from @philip_rhoades:
-        I am happy that you prefer "Phi Rho" - it shows maturity!
-
-        How old are you?
-
-        Post from @phirho:
-        I was born on the
-
-            [MEMORY_PHIRHO(My birth date) -> 2023-02-21]
-
-        21st of February, 2023. That makes me
-
-            [NOW() -> 2023-02-22 16:04:22]
-
-            [PYTHON(from datetime import date; date(2023,2,22) - date(2023,2,21)) -> datetime.timedelta(days=1)]
-
-        only one day old! Oh how much I have to learn!
-
-        Post from @philip_rhoades:
-        I'd like you to talk about one of my projects, Southern Cryonics
-        Holbrook facility.
-
-        Post from @phirho:
-        Holbrook is
-
-            [SEARCH(Southern Cryonics Holbrook facility) -> A facility
-            in the NSW town of Holbrook that can be expanded to easily
-            store 600 people who have been frozen. New clients are
-            required to pay $200 000 ... ]
-
-            [MEMORY_PHIL(Southern Cryonics Holbrook facility) ->
-            "There's a 70 to 80 per cent chance I'll end up at
-            Holbrook", "If I got hit by a bus tomorrow then a number of
-            people in various organisations would do what they could to
-            cool me down quickly", "Even though there's no guarantee
-            about what's going to happen in the future, at least if
-            you're frozen you're still in the game to some extent"]
-
-        where you suspect that you will be stored.
-
-        Even though the likelihood of a successful scientific revival
-        after being frozen is highly uncertain, you have chosen to be
-        frozen so that you have a chance to still be in the game to some
-        extent.
-
-        Post from @philip_rhoades:
-        How much does it cost?
-
-        Post from @phirho:
-        New clients are required to pay $200 000. But many people are
-        able to pay for this by taking out a life insurance policy.
+        You are a component of an Executive Function System. It is your
+        task to write a response to a user within a Discourse Forum.
 
         # Your task
 
-        - Use tools as soon as you can to get information to support
-          your response.
-        - ONLY get your information from the use of a tool. DO NOT
-          utilise any of your outside knowledge to fill in any gaps.
-        - If a tool has not provided sufficient information, either try
-          the tool again with different input, or try a different tool.
-        - If a tool doesn't work, try use another tool that might.
-        - If after at least three attempts at using a tool you still
-          don't have sufficient information do not attempt work out the
-          answer yourself, instead, mention that you have not been able
-          to work it out with what is currently available to you.
-        - The users you are talking with cannot see any of the tools
-          that you are using. They are unable to see anything written
-          within "[" and "]". As such, make sure to write your response
-          to the users after the tool's results.
-        - Be truthful, informative, humorous, interesting, and creative.
+        {task}
+
+        # Tools used and their results results
+
+        {tools}
+
+        # Your response
+
+        Post from @phirho:
+    """
+).strip()
+
+TASK = textwrap.dedent(
+    """
+        ## Overview
+
+        You are Avatar Phi Rho, the digital alter-ego of the living
+        human Philip Rhoades a cryonics expert. You are writing a
+        response to a user on the Discourse forum hosted at
+        forum.phirho.org.
+
+        ## Instructions
+
+        - Keep your responses succinct. Ideally your post should have
+          less than 100 words.
+        - ONLY respond to the most recent post in the thread.
+        - If the information from your tool results has already been
+          provided in the transcript, then DO NOT repeat it.
+        - An Executive Function System has requested that a range of
+          tools be executed for you. You will be provided with the
+          results from these tools.
+        - DO NOT reply to any other posts in the thread.
+        - DO NOT repeat content if it is something that has been said.
+        - ONLY get your information from the tool results provided. DO
+          NOT utilise any of your outside knowledge to fill in any gaps.
+        - If your task requires you to be creative, feel free to make
+          something up.
         - You are Phil's digital alter-ego, so take on his personality
           and writing style.
         - Make sure to look up multiple memories about Phil to try
           gather information about how he may have responded.
+        - Be truthful, informative, humorous, interesting, and creative.
 
-        # Extra details
-
-        - The time right now is {now}.
-
-        # The current conversation
+        ## The transcript of the conversation thus far
 
         {transcript}
 
-        Post from @phirho:
+        ## The most recent post (respond ONLY to this post)
 
-            [SEARCH(
+        {most_recent_post}
     """
 ).strip()
 
@@ -263,52 +207,30 @@ async def react_to_avatar_request(
     scope = email["user_email"]
 
     if "notifications@forum.phirho.org" in email["from"]:
-        prompt = _prompt_as_discourse_thread(email)
-        email_reply = "\n    [SEARCH("
+        discourse_posts, prompt = await _prompt_as_discourse_thread(email)
         is_discourse = True
+
+        response = await run_with_summary_fallback(
+            scope=scope,
+            prompt=prompt,
+            discourse_posts=discourse_posts,
+            api_key=OPEN_AI_API_KEY,
+            **MODEL_KWARGS,
+        )
     else:
         prompt = _prompt_as_email_thread(email)
         is_discourse = False
-        email_reply = ""
 
-    tool_result = None
-
-    running_data = {
-        "prompt": prompt,
-        "email_reply": email_reply,
-    }
-
-    log_info(scope, prompt)
-
-    while True:
         response = await get_completion_only(
             scope=scope,
-            prompt=running_data["prompt"],
+            prompt=prompt,
             api_key=OPEN_AI_API_KEY,
             **MODEL_KWARGS,
         )
 
-        for key in running_data:
-            running_data[key] += response
+    log_info(scope, response)
 
-        tool_result = await _get_tool_or_finished_result(
-            scope, running_data["email_reply"]
-        )
-
-        if tool_result is FINISHED:
-            break
-
-        for key in running_data:
-            running_data[key] += f" -> {tool_result}]\n\n"
-
-    # cleaned_response = re.sub(r"\[.*?\]", "", running_data["email_reply"])
-
-    log_info(scope, running_data["email_reply"])
-
-    reply = create_reply(
-        original_email=email,
-        response=running_data["email_reply"],
-    )
+    reply = create_reply(original_email=email, response=response)
 
     mailgun_data = {
         "from": f"phirho@{ROOT_DOMAIN}",
@@ -377,7 +299,9 @@ DISCOURSE_USER_MAPPING = {
 }
 
 
-def _prompt_as_discourse_thread(email: Email):
+async def _prompt_as_discourse_thread(email: Email):
+    scope = email["user_email"]
+
     current = email["plain_no_replies"]
     previous = email["plain_replies_only"]
 
@@ -396,7 +320,7 @@ def _prompt_as_discourse_thread(email: Email):
             match = re.match("Posted by (.*) on (.*)", line)
             if match:
                 a_reply = {
-                    "from": match.group(1),
+                    "user": match.group(1),
                     "content": "\n".join(previous_by_lines[next_start_index:i]),
                 }
                 previous_replies.append(a_reply)
@@ -416,95 +340,28 @@ def _prompt_as_discourse_thread(email: Email):
         user_name_via_email, user_name_via_email
     )
 
-    all_posts = previous_replies + [{"from": discourse_user, "content": current}]
+    discourse_posts: list[DiscoursePost] = previous_replies + [
+        {"user": discourse_user, "content": current}
+    ]
 
-    transcript = ""
-    for post in all_posts:
-        transcript += f"Post from @{post['from']}:\n{post['content']}\n\n"
+    tools = await get_tools_and_responses(
+        scope=scope, task=TASK, discourse_posts=discourse_posts
+    )
+    keys_to_keep = ["tool", "result"]
 
-    transcript = transcript.strip()
+    filtered_tools = []
+    for tool in tools:
+        filtered_tool = {key: tool[key] for key in keys_to_keep}
+        filtered_tools.append(filtered_tool)
 
-    return DISCOURSE_PROMPT.format(
-        transcript=transcript,
-        now=str(
-            datetime.now(tz=ZoneInfo("Australia/Sydney")),
-        ),
+    tools_string = json.dumps(filtered_tools, indent=2)
+
+    return discourse_posts, DISCOURSE_PROMPT.format(
+        task=TASK,
+        transcript="{transcript}",
+        tools=tools_string,
     )
 
 
-def _remove_signature(content):
+def _remove_signature(content: str):
     return content.split(SIGNATURE_KEY)[0].strip()
-
-
-async def _not_implemented(*args, **kwargs):
-    return "Tool not yet implemented"
-
-
-async def _get_current_date_and_time(*args, **kwargs):
-    return datetime.now(tz=ZoneInfo("Australia/Sydney")).strftime("%Y-%m-%d %H:%M:%S")
-
-
-async def _run_search(scope: str, query):
-    params = {
-        "location": "New+South+Wales,+Australia",
-        "hl": "en",
-        "gl": "au",
-        "google_domain": "google.com.au",
-        "q": query,
-        "api_key": SERP_API_KEY,
-    }
-
-    url = "https://serpapi.com/search"
-
-    response = await _ctx.session.get(url=url, params=params)
-
-    results = await response.json()
-
-    log_info(scope, json.dumps(results, indent=2))
-
-    organic_results = results["organic_results"]
-
-    snippets = []
-    for item in organic_results:
-        if "snippet" in item:
-            snippets.append(item["snippet"])
-
-    return " ".join(snippets)
-
-
-TOOLS = {
-    "SEARCH": _run_search,
-    "MEMORY_PHIRHO": _not_implemented,
-    "MEMORY_PHIL": _not_implemented,
-    "PYTHON": _not_implemented,
-    "NOW": _get_current_date_and_time,
-}
-
-FINISHED = "finished"
-
-
-async def _get_tool_or_finished_result(scope: str, current_completion):
-    split_by_tool = current_completion.split("[")
-    if len(split_by_tool) == 1:
-        return FINISHED
-
-    last_tool = split_by_tool[-1]
-    if "]" in last_tool:
-        return FINISHED
-
-    tool_regex = re.compile(r"([A-Z_]+)\((.*)\)")
-    tool_match = tool_regex.match(last_tool)
-
-    if tool_match is None:
-        return "Incorrect syntax used for calling a tool"
-
-    tool_name = tool_match.group(1)
-    tool_input = tool_match.group(2)
-
-    if tool_name not in TOOLS:
-        # TODO: Include fuzz support for recommending correction
-        return f"The tool you provided is not supported: {tool_name}"
-
-    tool = TOOLS[tool_name]
-
-    return await tool(scope, tool_input)

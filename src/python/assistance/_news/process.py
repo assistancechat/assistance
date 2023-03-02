@@ -19,7 +19,7 @@ from typing import cast
 
 import numpy as np
 
-from assistance._agents.email.post import write_news_post
+from assistance._agents.post import write_news_post
 from assistance._agents.relevance import article_scoring
 from assistance._config import (
     ROOT_DOMAIN,

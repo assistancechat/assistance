@@ -20,8 +20,8 @@ from assistance._keys import get_openai_api_key
 from assistance._logging import log_info
 from assistance._mailgun import send_email
 
-from ..._types import Email
-from .reply import create_reply
+from .._email.reply import create_reply
+from .._types import Email
 
 OPEN_AI_API_KEY = get_openai_api_key()
 

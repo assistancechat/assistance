@@ -114,6 +114,10 @@ async def article_scoring(
     articles: list[dict[str, str]],
     keys: list[str],
 ):
+    # TODO: Make the prompt handle custom amounts here
+    assert len(tasks) == 3
+    assert len(goals) == 2
+
     articles_with_ids = []
     for index, article in enumerate(articles):
         article_for_prompt: dict[str, int | str] = {"id": index}
