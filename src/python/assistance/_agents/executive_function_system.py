@@ -39,12 +39,72 @@ SERP_API_KEY = get_serp_api_key()
 
 MODEL_KWARGS = {
     "engine": DEFAULT_OPENAI_MODEL,
-    "max_tokens": 1024,
+    "max_tokens": 512,
     "temperature": 0.7,
     "top_p": 1,
     "frequency_penalty": 0,
     "presence_penalty": 0,
 }
+
+UNUSED_TOOLS = textwrap.dedent(
+    """
+        def python("<any python expression>")
+            \"""This allows you to evaluate expressions using python.
+
+            Only the Python standard library is available to you within
+            this tool. It is running within a WASI sandbox and does not
+            have any network or file access.
+            \"""
+
+        def ai_embeddings_search('<database_name>', '<text to search for within the database>')
+            \"""This allows you to search a range of AI embeddings
+            databases for the given string argument.
+
+            The current supported databases are:
+            - 'philip_rhoades_memory'
+            - 'phirho_memory'
+            - 'discourse_history'
+
+            \"""
+
+        {{
+            "id": 1,
+            "step_by_step_thought_process": "The user asked what @phirho's preferred name was, let's search the 'phirho_memory' database for that.",
+            "tool": "ai_embeddings_search",
+            "args": ["phirho_memory", "phirho's preferred name"],
+            "score": 8,
+            "confidence": 7
+            "depends_on": []
+        }},
+        {{
+            "id": 2,
+            "step_by_step_thought_process": "I want to make sure what I am saying is said in a way that is similar to how Philip would say it if it was him, so I will use the 'philip_rhoades_memory' database to search for that.",
+            "tool": "ai_embeddings_search",
+            "args": ["philip_rhoades_memory", "Responding to a being asked what your preferred name is."],
+            "score": 9,
+            "confidence": 5
+            "depends_on": []
+        }},
+        {{
+            "id": 3,
+            "step_by_step_thought_process": "The user also asked how old I was, to do that I need to determine on what date I was born from my memory, and then I need to pass that through to the Python function.",
+            "tool": "ai_embeddings_search",
+            "args": ["phirho_memory", "phirho's birth date"],
+            "score": 9,
+            "confidence": 5
+            "depends_on": []
+        }},
+        {{
+            "id": 4,
+            "step_by_step_thought_process": "I will use this tool to determine how old I am. I will use the Python function to subtract the date I was born from the current date.",
+            "tool": "python",
+            "args": ["from datetime import datetime; datetime.strptime(\\"{{0}}\\", \\"%Y-%m-%d %H:%M:%S\\") - datetime.strptime(\\"{{3}}\\", \\"%Y-%m-%d %H:%M:%S\\"))"],
+            "score": 9,
+            "confidence": 9
+            "depends_on": [3, 0]
+        }},
+    """
+).strip()
 
 PROMPT = textwrap.dedent(
     """
@@ -71,17 +131,6 @@ PROMPT = textwrap.dedent(
             for the args for this tool.
             \"""
 
-        def ai_embeddings_search('<database_name>', '<text to search for within the database>')
-            \"""This allows you to search a range of AI embeddings
-            databases for the given string argument.
-
-            The current supported databases are:
-            - 'philip_rhoades_memory'
-            - 'phirho_memory'
-            - 'discourse_history'
-
-            \"""
-
         def iterate_executive_function_system(<number of tasks>)
             \"""This allows you to re-run this executive function system
             with a requested number of extra tasks.
@@ -92,14 +141,6 @@ PROMPT = textwrap.dedent(
             - There may be other tools you'd like to call, but your not
               sure until you see the results of the current tools you
               have requested.
-            \"""
-
-        def python("<any python expression>")
-            \"""This allows you to evaluate expressions using python.
-
-            Only the Python standard library is available to you within
-            this tool. It is running within a WASI sandbox and does not
-            have any network or file access.
             \"""
 
 
@@ -125,7 +166,7 @@ PROMPT = textwrap.dedent(
           use the id of the requested output within "moustache" brackets
           {{<tool request id goes here>}}.
 
-        # Example response format for 6 tools. You MUST provide {number_of_tools} tools.
+        # Example response format for 3 tools. You MUST provide {number_of_tools} tools.
 
         [
             {{
@@ -139,43 +180,16 @@ PROMPT = textwrap.dedent(
             }},
             {{
                 "id": 1,
-                "step_by_step_thought_process": "The user asked what @phirho's preferred name was, let's search the 'phirho_memory' database for that.",
-                "tool": "ai_embeddings_search",
-                "args": ["phirho_memory", "phirho's preferred name"],
-                "score": 8,
-                "confidence": 7
+                "step_by_step_thought_process": "There was a query about the Holbrook Cryonics facility. I'm going to do an internet search for that.",
+                "tool": "internet_search",
+                "args": ["Holbrook Cryonics facility"],
+                "score": 9,
+                "confidence": 8
                 "depends_on": []
             }},
             {{
                 "id": 2,
-                "step_by_step_thought_process": "I want to make sure what I am saying is said in a way that is similar to how Philip would say it if it was him, so I will use the 'philip_rhoades_memory' database to search for that.",
-                "tool": "ai_embeddings_search",
-                "args": ["philip_rhoades_memory", "Responding to a being asked what your preferred name is."],
-                "score": 9,
-                "confidence": 5
-                "depends_on": []
-            }},
-            {{
-                "id": 3,
-                "step_by_step_thought_process": "The user also asked how old I was, to do that I need to determine on what date I was born from my memory, and then I need to pass that through to the Python function.",
-                "tool": "ai_embeddings_search",
-                "args": ["phirho_memory", "phirho's birth date"],
-                "score": 9,
-                "confidence": 5
-                "depends_on": []
-            }},
-            {{
-                "id": 4,
-                "step_by_step_thought_process": "I will use this tool to determine how old I am. I will use the Python function to subtract the date I was born from the current date.",
-                "tool": "python",
-                "args": ["from datetime import datetime; datetime.strptime(\\"{{0}}\\", \\"%Y-%m-%d %H:%M:%S\\") - datetime.strptime(\\"{{3}}\\", \\"%Y-%m-%d %H:%M:%S\\"))"],
-                "score": 9,
-                "confidence": 9
-                "depends_on": [3, 0]
-            }},
-            {{
-                "id": 5,
-                "step_by_step_thought_process": "Given I have run a few searches, I want to take the opportunity to potentially call a few more tools once I have seen their results. By calling this function I am able to request more tools than my original quota.",
+                "step_by_step_thought_process": "Given I have run a search, I want to take the opportunity to potentially call a few more tools once I have seen their results. By calling this function I am able to request more tools than my original quota.",
                 "tool": "iterate_executive_function_system",
                 "args": [3],
                 "score": 4,

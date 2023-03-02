@@ -14,12 +14,20 @@
 
 import asyncio
 import json
+import logging
 import pathlib
 import time
 
 import aiofiles
 import openai
-from tenacity import retry, stop_after_attempt, wait_random_exponential
+from tenacity import (
+    retry,
+    retry_all,
+    retry_if_exception_type,
+    retry_if_not_exception_message,
+    stop_after_attempt,
+    wait_random_exponential,
+)
 
 from assistance._logging import log_info
 
@@ -71,7 +79,14 @@ async def _completion_with_back_off(**kwargs):
     return response
 
 
-@retry(wait=wait_random_exponential(min=1, max=60), stop=stop_after_attempt(12))
+@retry(
+    retry=retry_all(
+        retry_if_not_exception_message("Model maximum reached"),
+        retry_if_exception_type(),
+    ),
+    wait=wait_random_exponential(min=1, max=60),
+    stop=stop_after_attempt(12),
+)
 async def _run_completion(kwargs):
     response = await _chat_completion_wrapper(**kwargs)
 
@@ -88,7 +103,13 @@ async def _chat_completion_wrapper(**kwargs):
     kwargs["model"] = kwargs["engine"]
     del kwargs["engine"]
 
-    response = await openai.ChatCompletion.acreate(**kwargs)
+    try:
+        response = await openai.ChatCompletion.acreate(**kwargs)
+    except Exception as e:
+        if "This model's maximum context length is 4096 tokens" in str(e):
+            raise ValueError("Model maximum reached")
+
+        raise
 
     return response
 

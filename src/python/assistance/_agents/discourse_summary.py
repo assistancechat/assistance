@@ -22,6 +22,8 @@ from datetime import datetime
 from typing import Any, TypedDict
 from zoneinfo import ZoneInfo
 
+import openai
+
 from assistance import _ctx
 from assistance._completions import get_completion_only
 from assistance._config import DEFAULT_OPENAI_MODEL, ROOT_DOMAIN
@@ -57,14 +59,23 @@ async def run_with_summary_fallback(
     api_key: str,
     **kwargs,
 ):
-    max_tokens = kwargs["max_tokens"]
-
     while True:
-        transcript = _create_transcript_string(discourse_posts)
+        transcript = _create_transcript_string(scope, discourse_posts)
+        prompt_with_transcript = prompt.replace("{transcript}", transcript)
 
-        if len(prompt) + len(transcript) + max_tokens > MAX_MODEL_TOKENS:
+        try:
+            response = await get_completion_only(
+                scope=scope,
+                prompt=prompt_with_transcript,
+                api_key=api_key,
+                **kwargs,
+            )
+        except ValueError as e:
+            if "Model maximum reached" not in str(e):
+                raise e
+
             to_summarise = discourse_posts[0:5]
-            transcript_to_summarise = _create_transcript_string(to_summarise)
+            transcript_to_summarise = _create_transcript_string(scope, to_summarise)
 
             summary = await get_completion_only(
                 scope=scope,
@@ -79,26 +90,22 @@ async def run_with_summary_fallback(
             }
 
             discourse_posts = [summary_post] + discourse_posts[5:]
-        else:
-            break
 
-    transcript = _create_transcript_string(discourse_posts)
-    prompt = prompt.format(transcript=transcript)
+            continue
 
-    response = await get_completion_only(
-        scope=scope,
-        prompt=prompt,
-        api_key=api_key,
-        **kwargs,
-    )
+        break
 
     return response
 
 
-def _create_transcript_string(discourse_posts: list[DiscoursePost]):
+def _create_transcript_string(scope, discourse_posts: list[DiscoursePost]):
     transcript = ""
     for post in discourse_posts:
-        user = post["user"]
+        try:
+            user = post["user"]
+        except KeyError as e:
+            log_info(scope, f"Missing user in post: {post}")
+            raise e
 
         if user == "Summary":
             transcript += f"Summary of some omitted posts:\n\n{post['content']}\n\n"
