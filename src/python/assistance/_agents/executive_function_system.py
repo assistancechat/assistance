@@ -36,11 +36,11 @@ SERP_API_KEY = get_serp_api_key()
 
 MODEL_KWARGS = {
     "engine": DEFAULT_OPENAI_MODEL,
-    "max_tokens": 512,
+    "max_tokens": 2048,
     "temperature": 0.7,
     "top_p": 1,
-    "frequency_penalty": 2,
-    "presence_penalty": 2,
+    "frequency_penalty": 0,
+    "presence_penalty": 0,
 }
 
 PROMPT = textwrap.dedent(
@@ -61,7 +61,7 @@ PROMPT = textwrap.dedent(
         def internet_search('<string query>')
             \"""This returns a web search result for the given string argument.\"""
 
-        def python(\"""<any python expression>\""")
+        def python("<any python expression>")
             \"""This allows you to evaluate expressions using python.\"""
 
         def now()
@@ -88,31 +88,74 @@ PROMPT = textwrap.dedent(
         {task}
 
 
-        # Required JSON Response Format:
+        # Response Requirements
+
+        - Your response must be valid JSON. It must be a list of 10
+          dictionaries, with the keys "id",
+          "step-by-step-thought-process", "tool", "args", "score", and
+          "confidence".
+        - Before writing any lines of the JSON you validate that what
+          you are about to write is valid JSON.
+        - Do not include comments in the JSON response, as that is not
+          valid JSON.
+        - If you would like to use the result of one tool as the input
+          for another tool, you must specify the "depends-on" key in
+          the dictionary for the tool that depends on the other tool.
+        - To use the output of one tool as the input for another tool,
+          use the id of the requested output within "mustach" brackets
+          {{<tool request id goes here>}}.
+
+        # Example response format for 5 tools. You MUST provide 10 tools.
 
         [
             {{
                 "id": 0,
-                "step-by-step-thought-process": "<your thoughts for why this tool is needed, with new lines written as \\n>",
-                "tool": "<the name of the tool>",
-                "args": ["<the first input to the tool, with new lines written as \\n>", "the second input (if the tool has a second input)"],
-                "score": <the score of the usefulness of this tool / inputs combination given the other tools that have already been requested, between 0 and 1>,
-                "confidence": <the confidence that you have in your score, between 0 and 1>
+                "step-by-step-thought-process": "I will start by using the 'now' tool to get the current date and time.",
+                "tool": "now",
+                "args": [],
+                "score": 9,
+                "confidence": 8
+                "depends-on": []
             }},
             {{
                 "id": 1,
-                ...
+                "step-by-step-thought-process": "The user asked what @phirho's preferred name was, let's search the 'phirho_memory' database for that.",
+                "tool": "ai_embeddings_search",
+                "args": ["phirho_memory", "phirho's preferred name"],
+                "score": 8,
+                "confidence": 7
+                "depends-on": []
             }},
-
-            ...
-
             {{
-                "id": 9,
-                ...
+                "id": 2,
+                "step-by-step-thought-process": "I want to make sure what I am saying is said in a way that is similar to how Philip would say it if it was him, so I will use the 'philip_rhoades_memory' database to search for that.",
+                "tool": "ai_embeddings_search",
+                "args": ["philip_rhoades_memory", "Responding to a being asked what your preferred name is."],
+                "score": 9,
+                "confidence": 5
+                "depends-on": []
+            }},
+            {{
+                "id": 3,
+                "step-by-step-thought-process": "The user also asked how old I was, to do that I need to determine on what date I was born from my memory, and then I need to pass that through to the Python function.",
+                "tool": "ai_embeddings_search",
+                "args": ["phirho_memory", "phirho's birth date"],
+                "score": 9,
+                "confidence": 5
+                "depends-on": []
+            }},
+            {{
+                "id": 4,
+                "step-by-step-thought-process": "I will use this tool to determine how old I am. I will use the Python function to subtract the date I was born from the current date.",
+                "tool": "python",
+                "args": ["from datetime import datetime; datetime.strptime(\\"{{0}}\\", \\"%Y-%m-%d %H:%M:%S\\") - datetime.strptime(\\"{{3}}\\", \\"%Y-%m-%d %H:%M:%S\\"))"],
+                "score": 9,
+                "confidence": 9
+                "depends-on": [3, 0]
             }}
         ]
 
-        # Your JSON Response
+        # Your JSON Response (MUST be valid JSON, do not include comments)
     """
 ).strip()
 
@@ -127,13 +170,17 @@ async def get_tools_and_responses(scope: str, task: str):
         **MODEL_KWARGS,
     )
 
-    tools = json.loads(response)
+    try:
+        tools = json.loads(response)
+    except json.JSONDecodeError:
+        log_info(scope, f"Response is not valid JSON: {response}")
+        raise
 
     for tool in tools:
         tool_name = tool["tool"]
         tool_args = tool["args"]
 
-        tool["response"] = await TOOLS[tool_name](*tool_args)
+        tool["result"] = await TOOLS[tool_name](*tool_args)
 
     return tools
 

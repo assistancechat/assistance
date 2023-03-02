@@ -29,7 +29,11 @@ from ._paths import COMPLETIONS, get_completion_cache_path, get_hash_digest
 async def get_completion_only(**kwargs) -> str:
     response = await _completion_with_back_off(**kwargs)
 
-    return response["choices"][0]["message"]["content"].strip()  # type: ignore
+    stripped_response = response["choices"][0]["message"]["content"].strip()  # type: ignore
+
+    log_info(kwargs["scope"], f"Response: {stripped_response}")
+
+    return stripped_response
 
 
 async def _completion_with_back_off(**kwargs):
@@ -58,6 +62,8 @@ async def _completion_with_back_off(**kwargs):
     query_timestamp = time.time_ns()
 
     response = await _run_completion(kwargs)
+
+    log_info(scope, f"Completion result: {response}")
 
     asyncio.create_task(_store_cache(completion_cache_path, response))
     asyncio.create_task(_store_result(scope, kwargs, response, query_timestamp))

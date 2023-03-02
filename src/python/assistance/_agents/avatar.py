@@ -339,7 +339,14 @@ async def _prompt_as_discourse_thread(email: Email):
     task = TASK.format(transcript=transcript)
 
     tools = await get_tools_and_responses(scope=scope, task=task)
-    tools_string = json.dumps(tools, indent=2)
+    keys_to_keep = ["tool", "result"]
+
+    filtered_tools = []
+    for tool in tools:
+        filtered_tool = {key: tool[key] for key in keys_to_keep}
+        filtered_tools.append(filtered_tool)
+
+    tools_string = json.dumps(filtered_tools, indent=2)
 
     return DISCOURSE_PROMPT.format(
         task=task,
