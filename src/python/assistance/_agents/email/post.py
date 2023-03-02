@@ -48,19 +48,16 @@ PROMPT = textwrap.dedent(
 
         {goals}
 
-        Your target audience:
+        Your target audience definition:
 
         {target_audience}
 
         Your instructions:
 
+        - DO NOT provide headers titles for any of the task paragraphs.
+        - DO NOT mention the target audience definition within your post.
         - Write as if you are speaking directly to the target audience,
           in second person.
-        - DO NOT state or restate who the target audience is within your
-          post. Assume that it is already known and they are the ones
-          currently reading your post. Address them directly in second
-          person.
-        - DO NOT address the reader by their target audience definition.
         - You are not aiming to sell anything, instead just be
           informative. If the article is a "puff piece" make sure not to
           buy into the hype. Instead, be truthful and provide a balanced

@@ -72,8 +72,8 @@ PROMPT = textwrap.dedent(
         [
             {{
                 "id": 1,
-                "task-scores": [<provide the relevance score for the first task>, <provide the relevance score for the second task>, ...],
-                "goal-scores": [<provide the relevance score for the first goal>, ...],
+                "task-scores": [<relevance score for the first task>, <relevance score for the second task>, <relevance score for the third task>],
+                "goal-scores": [<relevance score for the first goal>, <relevance score for the second goal>],
                 "similar-topic-covered": [<provide the article id of the first article that is covering a similar topic as this article>, <second similar article>, ...]
             }},
             {{
