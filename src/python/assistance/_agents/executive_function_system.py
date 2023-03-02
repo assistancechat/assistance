@@ -37,7 +37,7 @@ SERP_API_KEY = get_serp_api_key()
 
 MODEL_KWARGS = {
     "engine": DEFAULT_OPENAI_MODEL,
-    "max_tokens": 2048,
+    "max_tokens": 1024,
     "temperature": 0.7,
     "top_p": 1,
     "frequency_penalty": 0,
@@ -87,9 +87,12 @@ PROMPT = textwrap.dedent(
             \"""This allows you to re-run this executive function system
             with a requested number of extra tasks.
 
-            Use this if there may be other tools you'd like to call,
-            but you won't know until you see the results of the current
-            tools you have requested.
+            Use this in the following situations:
+            - You would like to call more tools than have been asked of
+              you in this current iteration of the executive function.
+            - There may be other tools you'd like to call, but your not
+              sure until you see the results of the current tools you
+              have requested.
             \"""
 
 
@@ -223,7 +226,7 @@ PREVIOUS_RESULTS_TEMPLATE = textwrap.dedent(
 async def get_tools_and_responses(
     scope: str,
     task: str,
-    number_of_tools: int = 10,
+    number_of_tools: int = 3,
     previous_results: None | list[AiToolRequest] = None,
 ):
     optional_previous_results_text = ""
