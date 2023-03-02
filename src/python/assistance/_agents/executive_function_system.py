@@ -232,8 +232,12 @@ async def get_tools_and_responses(
     optional_previous_results_text = ""
     if previous_results is not None:
         tools_string = json.dumps(previous_results, indent=2)
-        previous_tool_iterations = PREVIOUS_RESULTS_TEMPLATE.format(
-            tools_string=tools_string, next_index=len(previous_results)
+        previous_tool_iterations = (
+            "\n"
+            + PREVIOUS_RESULTS_TEMPLATE.format(
+                tools_string=tools_string, next_index=len(previous_results)
+            )
+            + "\n"
         )
     else:
         previous_tool_iterations = ""
