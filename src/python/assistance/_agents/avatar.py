@@ -28,8 +28,8 @@ from assistance._keys import get_openai_api_key, get_serp_api_key
 from assistance._logging import log_info
 from assistance._mailgun import send_email
 
-from ..._types import Email
-from .reply import create_reply, get_all_user_emails
+from .._email.reply import create_reply, get_all_user_emails
+from .._types import Email
 
 OPEN_AI_API_KEY = get_openai_api_key()
 SERP_API_KEY = get_serp_api_key()
