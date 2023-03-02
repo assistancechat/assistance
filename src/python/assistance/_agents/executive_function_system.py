@@ -19,6 +19,7 @@ import json
 import re
 import textwrap
 from datetime import datetime
+from typing import Any, TypedDict
 from zoneinfo import ZoneInfo
 
 from assistance import _ctx
@@ -49,7 +50,7 @@ PROMPT = textwrap.dedent(
 
         You are an Executive Function System for an AI cluster. You are
         provided with a task that other AI systems are going to execute,
-        and it is your job to select the 10 best tools along with their
+        and it is your job to select the {number_of_tools} best tools along with their
         corresponding inputs that can help them be successful in their
         task.
 
@@ -82,6 +83,15 @@ PROMPT = textwrap.dedent(
 
             \"""
 
+        def iterate_executive_function_system(<number of tasks>)
+            \"""This allows you to re-run this executive function system
+            with a requested number of extra tasks.
+
+            Use this if there may be other tools you'd like to call,
+            but you won't know until you see the results of the current
+            tools you have requested.
+            \"""
+
 
         # The task for the AI cluster
 
@@ -90,99 +100,217 @@ PROMPT = textwrap.dedent(
 
         # Response Requirements
 
-        - Your response must be valid JSON. It must be a list of 10
+        - Your response must be valid JSON. It must be a list of {number_of_tools}
           dictionaries, with the keys "id",
-          "step-by-step-thought-process", "tool", "args", "score", and
+          "step_by_step_thought_process", "tool", "args", "score", and
           "confidence".
         - Before writing any lines of the JSON you validate that what
           you are about to write is valid JSON.
         - Do not include comments in the JSON response, as that is not
           valid JSON.
         - If you would like to use the result of one tool as the input
-          for another tool, you must specify the "depends-on" key in
+          for another tool, you must specify the "depends_on" key in
           the dictionary for the tool that depends on the other tool.
         - To use the output of one tool as the input for another tool,
-          use the id of the requested output within "mustach" brackets
+          use the id of the requested output within "moustache" brackets
           {{<tool request id goes here>}}.
 
-        # Example response format for 5 tools. You MUST provide 10 tools.
+        # Example response format for 6 tools. You MUST provide {number_of_tools} tools.
 
         [
             {{
                 "id": 0,
-                "step-by-step-thought-process": "I will start by using the 'now' tool to get the current date and time.",
+                "step_by_step_thought_process": "I will start by using the 'now' tool to get the current date and time.",
                 "tool": "now",
                 "args": [],
                 "score": 9,
                 "confidence": 8
-                "depends-on": []
+                "depends_on": []
             }},
             {{
                 "id": 1,
-                "step-by-step-thought-process": "The user asked what @phirho's preferred name was, let's search the 'phirho_memory' database for that.",
+                "step_by_step_thought_process": "The user asked what @phirho's preferred name was, let's search the 'phirho_memory' database for that.",
                 "tool": "ai_embeddings_search",
                 "args": ["phirho_memory", "phirho's preferred name"],
                 "score": 8,
                 "confidence": 7
-                "depends-on": []
+                "depends_on": []
             }},
             {{
                 "id": 2,
-                "step-by-step-thought-process": "I want to make sure what I am saying is said in a way that is similar to how Philip would say it if it was him, so I will use the 'philip_rhoades_memory' database to search for that.",
+                "step_by_step_thought_process": "I want to make sure what I am saying is said in a way that is similar to how Philip would say it if it was him, so I will use the 'philip_rhoades_memory' database to search for that.",
                 "tool": "ai_embeddings_search",
                 "args": ["philip_rhoades_memory", "Responding to a being asked what your preferred name is."],
                 "score": 9,
                 "confidence": 5
-                "depends-on": []
+                "depends_on": []
             }},
             {{
                 "id": 3,
-                "step-by-step-thought-process": "The user also asked how old I was, to do that I need to determine on what date I was born from my memory, and then I need to pass that through to the Python function.",
+                "step_by_step_thought_process": "The user also asked how old I was, to do that I need to determine on what date I was born from my memory, and then I need to pass that through to the Python function.",
                 "tool": "ai_embeddings_search",
                 "args": ["phirho_memory", "phirho's birth date"],
                 "score": 9,
                 "confidence": 5
-                "depends-on": []
+                "depends_on": []
             }},
             {{
                 "id": 4,
-                "step-by-step-thought-process": "I will use this tool to determine how old I am. I will use the Python function to subtract the date I was born from the current date.",
+                "step_by_step_thought_process": "I will use this tool to determine how old I am. I will use the Python function to subtract the date I was born from the current date.",
                 "tool": "python",
                 "args": ["from datetime import datetime; datetime.strptime(\\"{{0}}\\", \\"%Y-%m-%d %H:%M:%S\\") - datetime.strptime(\\"{{3}}\\", \\"%Y-%m-%d %H:%M:%S\\"))"],
                 "score": 9,
                 "confidence": 9
-                "depends-on": [3, 0]
-            }}
+                "depends_on": [3, 0]
+            }},
+            {{
+                "id": 5,
+                "step_by_step_thought_process": "Given I have run a few searches, I want to take the opportunity to potentially call a few more functions once I have seen their results.",
+                "tool": "iterate_executive_function_system",
+                "args": [3],
+                "score": 4,
+                "confidence": 4
+                "depends_on": []
+            }},
         ]
-
+        {previous_tool_iterations}{optional_previous_results_text}
         # Your JSON Response (MUST be valid JSON, do not include comments)
     """
 ).strip()
 
 
-async def get_tools_and_responses(scope: str, task: str):
-    prompt = PROMPT.format(task=task)
+class AiToolRequest(TypedDict):
+    id: int
+    step_by_step_thought_process: str
+    tool: str
+    args: list[str]
+    score: int
+    confidence: int
+    depends_on: list[int]
 
-    response = await get_completion_only(
-        scope=scope,
-        prompt=prompt,
-        api_key=OPEN_AI_API_KEY,
-        **MODEL_KWARGS,
-    )
+    # TODO: Maybe change this
+    result: str
 
+
+FAILED_ATTEMPT_TEMPLATE = textwrap.dedent(
+    """
+        # Previous attempt
+
+        You previously submitted the following JSON tools request:
+
+        {previous_request}
+
+        But it resulted in the following error message:
+
+        {error_message}
+
+        Please try again.
+    """
+).strip()
+
+
+PREVIOUS_RESULTS_TEMPLATE = textwrap.dedent(
+    """
+        # Previous iterations of this executive function system has given the following results
+
+        {tools_string}
+
+        For your remaining tools please start your index at {next_index}.
+    """
+).strip()
+
+
+async def get_tools_and_responses(
+    scope: str,
+    task: str,
+    number_of_tools: int = 10,
+    previous_results: None | list[AiToolRequest] = None,
+):
+    optional_previous_results_text = ""
+    if previous_results is not None:
+        tools_string = json.dumps(previous_results, indent=2)
+        previous_tool_iterations = PREVIOUS_RESULTS_TEMPLATE.format(
+            tools_string=tools_string, next_index=len(previous_results)
+        )
+    else:
+        previous_tool_iterations = ""
+
+    while True:
+        prompt = PROMPT.format(
+            task=task,
+            optional_previous_results_text=optional_previous_results_text,
+            number_of_tools=number_of_tools,
+            previous_tool_iterations=previous_tool_iterations,
+        )
+
+        response = await get_completion_only(
+            scope=scope,
+            prompt=prompt,
+            api_key=OPEN_AI_API_KEY,
+            **MODEL_KWARGS,
+        )
+
+        try:
+            tools, number_of_new_tools_to_run = await _evaluate_tools(scope, response)
+        except Exception as e:
+            optional_previous_results_text = (
+                "\n"
+                + FAILED_ATTEMPT_TEMPLATE.format(
+                    previous_request=response, error_message=str(e)
+                )
+                + "\n"
+            )
+
+            continue
+
+        break
+
+    if number_of_new_tools_to_run > 0:
+        tools = await get_tools_and_responses(
+            scope=scope,
+            task=task,
+            number_of_tools=number_of_new_tools_to_run,
+            previous_results=tools,
+        )
+
+    return tools
+
+
+async def _evaluate_tools(scope, response):
     try:
-        tools = json.loads(response)
+        tools: list[AiToolRequest] = json.loads(response)
     except json.JSONDecodeError:
-        log_info(scope, f"Response is not valid JSON: {response}")
-        raise
+        raise ValueError(f"Response is not valid JSON: {response}")
+
+    number_of_new_tools_to_run = 0
 
     for tool in tools:
         tool_name = tool["tool"]
         tool_args = tool["args"]
 
-        tool["result"] = await TOOLS[tool_name](*tool_args)
+        tool_dependencies = tool["depends_on"]
+        if len(tool_dependencies) > 0:
+            input_formatting = {}
+            for dependency in tool_dependencies:
+                input_formatting[dependency] = tools[dependency]["result"]
 
-    return tools
+            tool_args = [arg.format(input_formatting) for arg in tool_args]
+
+        args = [scope] + tool_args
+
+        try:
+            if tool_name == "iterate_executive_function_system":
+                number_of_new_tools_to_run = max(number_of_new_tools_to_run, args[0])
+
+                continue
+
+            tool["result"] = await TOOLS[tool_name](*args)
+        except Exception as e:
+            raise ValueError(
+                scope, f"Error running tool `{tool_name}` with args {tool_args}: {e}"
+            )
+
+    return tools, number_of_new_tools_to_run
 
 
 async def _run_search(scope: str, query):

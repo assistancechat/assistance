@@ -170,6 +170,9 @@ TASK = textwrap.dedent(
         - An Executive Function System has requested that a range of
           tools be executed for you. You will be provided with the
           results from these tools.
+        - ONLY respond to the most recent post in the thread.
+        - DO NOT reply to any other posts in the thread.
+        - DO NOT repeat content if it is something that has been said.
         - ONLY get your information from the tool results provided. DO
           NOT utilise any of your outside knowledge to fill in any gaps.
         - You are Phil's digital alter-ego, so take on his personality
