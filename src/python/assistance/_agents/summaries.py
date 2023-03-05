@@ -65,7 +65,8 @@ NEWS_PROMPT = textwrap.dedent(
           someone else to fulfil the tasks and goals themselves.
         - If the information provided does not contain information that
           is relevant to the tasks or goals simply write NOT_RELEVANT
-          instead of providing a summary.
+          instead of providing a summary. You MUST use exact formatting
+          for NOT_RELEVANT, all caps with underscore.
         - ONLY provide information that is specifically within the
           information below. DO NOT utilise any of your outside
           knowledge to fill in any gaps.
@@ -120,7 +121,7 @@ NEWS_PROMPT = textwrap.dedent(
 # ).strip()
 
 
-WORD_COUNT_SCALING_BUFFER = 0.8
+WORD_COUNT_SCALING_BUFFER = 0.7
 WORDS_OVERLAP = 40
 
 
@@ -131,8 +132,11 @@ async def summarise_news_article_url_with_tasks(
     goals: list[str],
     target_audience: str,
     url: str,
+    use_google_cache=True,
 ):
-    page_contents = await scrape(session=_ctx.session, url=url)
+    page_contents = await scrape(
+        session=_ctx.session, url=url, use_google_cache=use_google_cache
+    )
 
     summary = await summarise_text_with_tasks(
         scope=scope,
