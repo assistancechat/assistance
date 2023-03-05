@@ -154,6 +154,7 @@ async def _process_subscription(
                 target_audience=subscription_data["target_audience"],
                 sentence_blacklist=subscription_data["sentence_blacklist"],
                 url=url,
+                use_google_cache=False,
             )
         )
 

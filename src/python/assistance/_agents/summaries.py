@@ -121,7 +121,7 @@ NEWS_PROMPT = textwrap.dedent(
 # ).strip()
 
 
-WORD_COUNT_SCALING_BUFFER = 0.8
+WORD_COUNT_SCALING_BUFFER = 0.7
 WORDS_OVERLAP = 40
 
 
@@ -132,8 +132,11 @@ async def summarise_news_article_url_with_tasks(
     goals: list[str],
     target_audience: str,
     url: str,
+    use_google_cache=True,
 ):
-    page_contents = await scrape(session=_ctx.session, url=url)
+    page_contents = await scrape(
+        session=_ctx.session, url=url, use_google_cache=use_google_cache
+    )
 
     summary = await summarise_text_with_tasks(
         scope=scope,

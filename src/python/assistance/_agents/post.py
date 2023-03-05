@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import asyncio
 import textwrap
 
 from assistance._agents.summaries import summarise_news_article_url_with_tasks
@@ -107,15 +108,20 @@ async def write_news_post(
     target_audience: str,
     sentence_blacklist: list[str],
     url: str,
+    use_google_cache=True,
 ) -> tuple[str, str]:
-    summary = await summarise_news_article_url_with_tasks(
-        scope=scope,
-        openai_api_key=openai_api_key,
-        tasks=tasks,
-        goals=goals,
-        target_audience=target_audience,
-        url=url,
-    )
+    try:
+        summary = await summarise_news_article_url_with_tasks(
+            scope=scope,
+            openai_api_key=openai_api_key,
+            tasks=tasks,
+            goals=goals,
+            target_audience=target_audience,
+            url=url,
+            use_google_cache=use_google_cache,
+        )
+    except asyncio.TimeoutError:
+        return "NOT_RELEVANT", '{"article_is_relevant": false}'
 
     if len(sentence_blacklist) > 0:
         sentence_blacklist_prompt = (
