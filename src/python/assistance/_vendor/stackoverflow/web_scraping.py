@@ -7,7 +7,6 @@ import logging
 import aiofiles
 import aiohttp
 from bs4 import BeautifulSoup
-from fake_useragent import UserAgent
 
 from assistance._logging import log_info
 from assistance._paths import (

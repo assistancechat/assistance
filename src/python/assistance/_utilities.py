@@ -38,8 +38,14 @@ def get_number_of_words(text: str):
 
 
 def get_cleaned_url(url: str):
-    parsed_url = urlparse(url)
-    cleaned_url = parse_qs(parsed_url.query)["url"][0]
+    replaced_and = url.replace("\r\n", "").replace("\n", "").replace("&amp;", "&")
+    parsed_url = urlparse(replaced_and)
+    try:
+        cleaned_url = parse_qs(parsed_url.query)["url"][0]
+    except KeyError:
+        raise ValueError(
+            f"URL not found within query:\n{replaced_and}\ngave:\n{parsed_url}"
+        )
 
     return cleaned_url
 
