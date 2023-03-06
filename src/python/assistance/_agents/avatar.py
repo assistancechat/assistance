@@ -12,8 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Prompt inspired by the work provided under an MIT license over at:
-# https://github.com/hwchase17/langchain/blob/ae1b589f60a/langchain/agents/conversational/prompt.py#L1-L36
 
 import json
 import re
@@ -30,7 +28,7 @@ from assistance._logging import log_info
 from assistance._mailgun import send_email
 from assistance._types import Email
 
-from .discourse_summary import DiscoursePost, run_with_summary_fallback
+from .discourse_summary import EmailInThread, run_with_summary_fallback
 from .executive_function_system import get_tools_and_responses
 
 OPEN_AI_API_KEY = get_openai_api_key()
@@ -205,13 +203,13 @@ async def react_to_avatar_request(
     scope = email["user_email"]
 
     if "notifications@forum.phirho.org" in email["from"]:
-        discourse_posts, prompt = await _prompt_as_discourse_thread(email)
+        email_thread, prompt = await _prompt_as_discourse_thread(email)
         is_discourse = True
 
         response = await run_with_summary_fallback(
             scope=scope,
             prompt=prompt,
-            discourse_posts=discourse_posts,
+            email_thread=email_thread,
             api_key=OPEN_AI_API_KEY,
             **MODEL_KWARGS,
         )
@@ -317,11 +315,10 @@ async def _prompt_as_discourse_thread(email: Email):
         for i, line in enumerate(previous_by_lines):
             match = re.match("Posted by (.*) on (.*)", line)
             if match:
-                a_reply = {
-                    "user": match.group(1),
-                    "content": "\n".join(previous_by_lines[next_start_index:i]),
-                }
-                previous_replies.append(a_reply)
+                user = match.group(1)
+                content = "\n".join(previous_by_lines[next_start_index:i])
+
+                previous_replies.append(_convert_post_to_email_thread(user, content))
                 next_start_index = i + 1
 
         previous_replies = previous_replies[::-1]
@@ -338,12 +335,12 @@ async def _prompt_as_discourse_thread(email: Email):
         user_name_via_email, user_name_via_email
     )
 
-    discourse_posts: list[DiscoursePost] = previous_replies + [
-        {"user": discourse_user, "content": current}
+    email_thread: list[str] = previous_replies + [
+        _convert_post_to_email_thread(discourse_user, current)
     ]
 
     tools = await get_tools_and_responses(
-        scope=scope, task=TASK, discourse_posts=discourse_posts
+        scope=scope, task=TASK, email_thread=email_thread
     )
     keys_to_keep = ["tool", "result"]
 
@@ -354,7 +351,7 @@ async def _prompt_as_discourse_thread(email: Email):
 
     tools_string = json.dumps(filtered_tools, indent=2)
 
-    return discourse_posts, DISCOURSE_PROMPT.format(
+    return email_thread, DISCOURSE_PROMPT.format(
         task=TASK,
         transcript="{transcript}",
         tools=tools_string,
@@ -363,3 +360,7 @@ async def _prompt_as_discourse_thread(email: Email):
 
 def _remove_signature(content: str):
     return content.split(SIGNATURE_KEY)[0].strip()
+
+
+def _convert_post_to_email_thread(user: str, content: str):
+    return f"Post from @{user}:\n{content}"

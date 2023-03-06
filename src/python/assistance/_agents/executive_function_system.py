@@ -31,7 +31,7 @@ from assistance._logging import log_info
 from assistance._mailgun import send_email
 from assistance._types import Email
 
-from .discourse_summary import DiscoursePost, run_with_summary_fallback
+from .discourse_summary import EmailInThread, run_with_summary_fallback
 
 OPEN_AI_API_KEY = get_openai_api_key()
 SERP_API_KEY = get_serp_api_key()
@@ -249,7 +249,7 @@ PREVIOUS_RESULTS_TEMPLATE = textwrap.dedent(
 async def get_tools_and_responses(
     scope: str,
     task: str,
-    discourse_posts: list[DiscoursePost],
+    email_thread: list[str],
     number_of_tools: int = 3,
     previous_results: None | list[AiToolRequest] = None,
 ):
@@ -278,7 +278,7 @@ async def get_tools_and_responses(
         response = await run_with_summary_fallback(
             scope=scope,
             prompt=prompt,
-            discourse_posts=discourse_posts,
+            email_thread=email_thread,
             api_key=OPEN_AI_API_KEY,
             **MODEL_KWARGS,
         )
@@ -302,7 +302,7 @@ async def get_tools_and_responses(
         tools = await get_tools_and_responses(
             scope=scope,
             task=task,
-            discourse_posts=discourse_posts,
+            email_thread=email_thread,
             number_of_tools=number_of_new_tools_to_run,
             previous_results=tools,
         )

@@ -55,6 +55,7 @@ matplotlib = "^3.7.0"
 async-lru = "^2.0.2"
 aiocron = "^1.8"
 passporteye = "^2.2.1"
+mail-parser-reply = "^1.22"
 
 [tool.poetry.group.dev.dependencies]
 autoflake = "*"

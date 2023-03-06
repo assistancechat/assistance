@@ -2025,6 +2025,18 @@ files = [
 rapidfuzz = ">=2.3.0,<3.0.0"
 
 [[package]]
+name = "mail-parser-reply"
+version = "1.22"
+description = "📧 Email reply parser library for Python with multi-language support"
+category = "main"
+optional = false
+python-versions = "*"
+files = [
+    {file = "mail-parser-reply-1.22.tar.gz", hash = "sha256:1e9f0a96980cf8832468a4d81529686b23970823b28df756a258cb74ad72e131"},
+    {file = "mail_parser_reply-1.22-py3-none-any.whl", hash = "sha256:01dc17cbae6097091f207322d367b5b7b1ec85f473d5b60d1afe0b9fdfbdebf8"},
+]
+
+[[package]]
 name = "markdown-it-py"
 version = "2.2.0"
 description = "Python port of markdown-it. Markdown parsing, done right!"
@@ -4884,4 +4896,4 @@ testing = ["big-O", "flake8 (<5)", "jaraco.functools", "jaraco.itertools", "more
 [metadata]
 lock-version = "2.0"
 python-versions = "~3.10"
-content-hash = "384d21e1fa9b614c68dac42a4b1f3fc1a1e19ea1d1ad96dfc8ede191cc717448"
+content-hash = "6dcedd23bfc2aa5a210eae9d41faee3e63242f04f1fd2b48726906cb37b33a43"

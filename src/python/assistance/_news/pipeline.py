@@ -50,7 +50,7 @@ async def add_to_google_alerts_pipeline(email: Email):
         async with aiofiles.open(pipeline_path, "w") as f:
             pass
 
-    asyncio.create_task(_pre_cache_articles(article_details))
+    # asyncio.create_task(_pre_cache_articles(article_details))
 
 
 async def _pre_cache_articles(article_details: list[Article]):
