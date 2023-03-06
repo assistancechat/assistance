@@ -50,18 +50,10 @@ async def add_to_google_alerts_pipeline(email: Email):
         async with aiofiles.open(pipeline_path, "w") as f:
             pass
 
-    # asyncio.create_task(_pre_cache_articles(article_details))
+    asyncio.create_task(_pre_cache_articles(article_details))
 
 
 async def _pre_cache_articles(article_details: list[Article]):
     for article in article_details:
         url = get_cleaned_url(article["url"])
-
-        try:
-            await scrape(_ctx.session, url)
-        except ValueError:
-            await asyncio.sleep(random.uniform(300, 600))
-            await _pre_cache_articles(article_details)
-            break
-
-        await asyncio.sleep(random.uniform(60, 120))
+        await scrape(_ctx.session, url)

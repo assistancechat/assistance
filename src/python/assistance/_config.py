@@ -25,7 +25,7 @@ ROOT_DOMAIN = "assistance.chat"
 PAYMENT_LINK = "https://buy.stripe.com/bIYeXF2s1d0E4wg9AB"
 EMAIL_PRODUCT_ID = "prod_NLuYISl8KZ6fUX"
 
-TargetedNewsFormats = Literal["digest", "separate-discourse-posts"]
+TargetedNewsFormats = Literal["digest", "discourse"]
 
 
 class TargetedNewsUserOverrides(TypedDict, total=False):

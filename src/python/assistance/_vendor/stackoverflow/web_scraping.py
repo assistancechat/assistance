@@ -18,8 +18,8 @@ from assistance._paths import (
 
 
 # https://stackoverflow.com/a/24618186
-async def scrape(session: aiohttp.ClientSession, url: str, use_google_cache=True):
-    html = await _scrape_with_cache(session, url, use_google_cache=use_google_cache)
+async def scrape(session: aiohttp.ClientSession, url: str):
+    html = await _scrape_with_cache(session, url)
 
     try:
         html.decode(encoding="utf8")
@@ -47,9 +47,7 @@ async def scrape(session: aiohttp.ClientSession, url: str, use_google_cache=True
     return text
 
 
-async def _scrape_with_cache(
-    session: aiohttp.ClientSession, url: str, use_google_cache=True
-):
+async def _scrape_with_cache(session: aiohttp.ClientSession, url: str):
     url_hash_digest = get_hash_digest(url)
     downloaded_article_path = get_downloaded_article_path(
         url_hash_digest, create_parent=True
@@ -71,17 +69,9 @@ async def _scrape_with_cache(
         if b"Error 404" not in cached_results:
             return cached_results
 
-    ua = UserAgent()
-    headers = {"User-Agent": ua.random}
+    logging.info(f"Downloading {url}")
 
-    if use_google_cache:
-        url_to_use = f"http://webcache.googleusercontent.com/search?q=cache:{url}&strip=1&vwsrc=0"
-    else:
-        url_to_use = url
-
-    logging.info(f"Downloading {url_to_use}")
-
-    results = await session.get(url=url_to_use, headers=headers)
+    results = await session.get(url=url)
     url_results = await results.read()
 
     if b"Our systems have detected unusual traffic" in url_results:
@@ -93,7 +83,4 @@ async def _scrape_with_cache(
     if b"Error 404" not in url_results:
         return url_results
 
-    if not use_google_cache:
-        return b"NOT_RELEVANT"
-
-    return await _scrape_with_cache(session, url, use_google_cache=False)
+    return b"NOT_RELEVANT"
