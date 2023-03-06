@@ -49,6 +49,9 @@ PYTHON_ROOT = LIB.parent
 LOGS = PYTHON_ROOT.joinpath("logs")
 PHIRHO_LOGS = LOGS.joinpath("phirho")
 
+TEST_DIR = LIB.joinpath("tests")
+TESTS_DATA = TEST_DIR.joinpath("data")
+
 
 async def get_user_from_email(email_address: str):
     try:
