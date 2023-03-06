@@ -81,7 +81,7 @@ async def run_with_summary_fallback(
                 **kwargs,
             )
 
-            summary_item = f"Summary of some omitted posts:\n{summary}\n\n"
+            summary_item = f"Summary of omitted emails:\n{summary}\n\n"
             email_thread = [summary_item] + email_thread[5:]
 
             continue

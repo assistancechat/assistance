@@ -31,7 +31,7 @@ from assistance._logging import log_info
 from assistance._mailgun import send_email
 from assistance._types import Email
 
-from .discourse_summary import EmailInThread, run_with_summary_fallback
+from .discourse_summary import run_with_summary_fallback
 
 OPEN_AI_API_KEY = get_openai_api_key()
 SERP_API_KEY = get_serp_api_key()

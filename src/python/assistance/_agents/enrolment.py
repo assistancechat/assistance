@@ -30,7 +30,7 @@ from assistance._logging import log_info
 from assistance._mailgun import send_email
 from assistance._types import Email
 
-from .discourse_summary import EmailInThread, run_with_summary_fallback
+from .discourse_summary import run_with_summary_fallback
 from .executive_function_system import get_tools_and_responses
 
 OPEN_AI_API_KEY = get_openai_api_key()
@@ -67,9 +67,10 @@ TASK = textwrap.dedent(
         Diploma of Entrepreneurship / Bachelor of Business degree at
         Alphacrucis University.
 
-        Introduce yourself, respond to any student queries, and request
-        the student begins the enrolment process by providing you a scan
-        of their passport as an email attachment.
+        You are stepping through each step of the enrolment process. You
+        are currently up to the following step:
+
+        - Requesting the user for a scan or picture of their passport.
 
         ## Instructions
 
@@ -85,19 +86,15 @@ TASK = textwrap.dedent(
 
         ## Details about the email record
 
-        - Emails are organised so that the most recent email in the
-          thread is first.
-        - Previous emails in the thread are indented with ">".
         - The subject of the email thread is "{subject}".
 
         ## Extra details
 
         - The time right now is {now}.
 
-        ## Email record
+        ## Email transcript
 
-        On {date}, {from_string} wrote:
-        {email_content}
+        {transcript}
     """
 ).strip()
 
@@ -108,11 +105,12 @@ async def react_to_enrolment_request(
 ):
     scope = email["user_email"]
 
-    prompt = await _prompt_as_email_thread(email)
+    email_thread, prompt = await _get_prompt(email)
 
-    response = await get_completion_only(
+    response = await run_with_summary_fallback(
         scope=scope,
         prompt=prompt,
+        email_thread=email_thread,
         api_key=OPEN_AI_API_KEY,
         **MODEL_KWARGS,
     )
@@ -132,36 +130,35 @@ async def react_to_enrolment_request(
     await send_email(scope, mailgun_data)
 
 
-async def _prompt_as_email_thread(email: Email):
+async def _get_prompt(email: Email):
     scope = email["user_email"]
 
     parser = EmailReplyParser()
     email_message = parser.read(email["plain_all_content"])
     replies = [str(item) for item in email_message.replies[-1::-1]]
 
+    replies[-1] = f"On {email['date']}, {email['from']} wrote:\n{replies[-1]}"
+
     log_info(scope, json.dumps(replies, indent=2))
 
-    to_addresses, cc_addresses = get_all_user_emails(email)
-    email_addresses = to_addresses + cc_addresses
-    email_addresses_string = textwrap.indent("\n".join(email_addresses), "- ")
-
-    reversed_email_thread = filtered_email_content.split("On")
-
-    tools = await get_tools_and_responses(
-        scope=scope, task=TASK, email_thread=email_thread
-    )
-    keys_to_keep = ["tool", "result"]
-
-    prompt = EMAIL_PROMPT.format(
-        email_content=filtered_email_content,
+    task = TASK.format(
         subject=email["subject"],
-        date=email["date"],
-        from_string=email["from"],
-        root_domain=ROOT_DOMAIN,
-        email_from=email["from"],
-        stripped_text=email["plain_no_replies"],
-        email_addresses=email_addresses_string,
+        transcript="{transcript}",
         now=str(datetime.now(tz=ZoneInfo("Australia/Sydney"))),
     )
 
-    return prompt
+    tools = await get_tools_and_responses(scope=scope, task=task, email_thread=replies)
+    keys_to_keep = ["tool", "result"]
+
+    filtered_tools = []
+    for tool in tools:
+        filtered_tool = {key: tool[key] for key in keys_to_keep}
+        filtered_tools.append(filtered_tool)
+
+    tools_string = json.dumps(filtered_tools, indent=2)
+
+    prompt = EMAIL_PROMPT.format(
+        task=task, tools_string=tools_string, transcript="{transcript}"
+    )
+
+    return replies, prompt
