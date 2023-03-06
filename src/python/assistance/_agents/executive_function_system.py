@@ -46,33 +46,6 @@ MODEL_KWARGS = {
     "presence_penalty": 0,
 }
 
-UNUSED_TOOLS = textwrap.dedent(
-    """
-        def iterate_executive_function_system(<number of tasks>)
-            \"""This allows you to re-run this executive function system
-            with a requested number of extra tasks.
-
-            Use this in the following situations:
-            - You would like to call more tools than have been asked of
-              you in this current iteration of the executive function.
-            - There may be other tools you'd like to call, but your not
-              sure until you see the results of the current tools you
-              have requested.
-            \"""
-
-
-            {{
-                "id": 2,
-                "step_by_step_thought_process": "Given I have run a search, I want to take the opportunity to potentially call a few more tools once I have seen their results. By calling this function I am able to request more tools than my original quota.",
-                "tool": "iterate_executive_function_system",
-                "args": [3],
-                "score": 4,
-                "confidence": 4
-                "depends_on": []
-            }},
-    """
-).strip()
-
 PROMPT = textwrap.dedent(
     """
         # Your Purpose
@@ -115,12 +88,6 @@ PROMPT = textwrap.dedent(
           you are about to write is valid JSON.
         - Do not include comments in the JSON response, as that is not
           valid JSON.
-        - If you would like to use the result of one tool as the input
-          for another tool, you must specify the "depends_on" key in
-          the dictionary for the tool that depends on the other tool.
-        - To use the output of one tool as the input for another tool,
-          use the id of the requested output within "moustache" brackets
-          {{<tool request id goes here>}}.
 
         # Example response format for tools. You MUST provide at least 3 tools.
 
@@ -141,7 +108,6 @@ EXAMPLE_TOOL_USE = textwrap.dedent(
                 "args": [],
                 "score": 9,
                 "confidence": 8
-                "depends_on": []
             }},
             {{
                 "id": 1,
@@ -150,7 +116,6 @@ EXAMPLE_TOOL_USE = textwrap.dedent(
                 "args": ["Holbrook Cryonics facility"],
                 "score": 9,
                 "confidence": 8
-                "depends_on": []
             }},
             {{
                 "id": 2,
@@ -159,7 +124,6 @@ EXAMPLE_TOOL_USE = textwrap.dedent(
                 "args": ["phirho_memory", "phirho's preferred name"],
                 "score": 8,
                 "confidence": 7
-                "depends_on": []
             }},
             {{
                 "id": 3,
@@ -168,7 +132,6 @@ EXAMPLE_TOOL_USE = textwrap.dedent(
                 "args": ["philip_rhoades_memory", "Responding to a being asked what your preferred name is."],
                 "score": 9,
                 "confidence": 5
-                "depends_on": []
             }},
             {{
                 "id": 4,
@@ -177,16 +140,6 @@ EXAMPLE_TOOL_USE = textwrap.dedent(
                 "args": ["phirho_memory", "phirho's birth date"],
                 "score": 9,
                 "confidence": 5
-                "depends_on": []
-            }},
-            {{
-                "id": 5,
-                "step_by_step_thought_process": "I will use this tool to determine how old I am. I will use the Python function to subtract the date I was born from the current date.",
-                "tool": "python",
-                "args": ["from datetime import datetime; datetime.strptime(\\"{{0}}\\", \\"%Y-%m-%d %H:%M:%S\\") - datetime.strptime(\\"{{4}}\\", \\"%Y-%m-%d %H:%M:%S\\"))"],
-                "score": 9,
-                "confidence": 9
-                "depends_on": [4, 0]
             }}
         ]
     """
@@ -224,7 +177,6 @@ class AiToolRequest(TypedDict):
     args: list[str]
     score: int
     confidence: int
-    depends_on: list[int]
 
     # TODO: Maybe change this
     result: str
@@ -341,15 +293,6 @@ async def _evaluate_tools(scope, response):
     for tool in tools:
         tool_name = tool["tool"]
         tool_args = tool["args"]
-
-        tool_dependencies = tool["depends_on"]
-        if len(tool_dependencies) > 0:
-            input_formatting = {}
-            for dependency in tool_dependencies:
-                input_formatting[dependency] = tools[dependency]["result"]
-
-            tool_args = [arg.format(input_formatting) for arg in tool_args]
-
         args = [scope] + tool_args
 
         try:

@@ -99,10 +99,7 @@ TASK = textwrap.dedent(
 ).strip()
 
 
-async def react_to_enrolment_request(
-    user_details: dict,
-    email: Email,
-):
+async def react_to_enrolment_request(email: Email):
     scope = email["user_email"]
 
     email_thread, prompt = await _get_prompt(email)
@@ -140,7 +137,6 @@ EXAMPLE_TOOL_USE = textwrap.dedent(
                 "args": [],
                 "score": 9,
                 "confidence": 8
-                "depends_on": []
             }},
             {{
                 "id": 1,
@@ -149,7 +145,6 @@ EXAMPLE_TOOL_USE = textwrap.dedent(
                 "args": ["Courses at Alphacrucis University"],
                 "score": 9,
                 "confidence": 8
-                "depends_on": []
             }}
         ]
     """
@@ -193,7 +188,7 @@ async def _get_prompt(email: Email):
     tools_string = json.dumps(filtered_tools, indent=2)
 
     prompt = EMAIL_PROMPT.format(
-        task=task, tools_string=tools_string, transcript="{transcript}"
+        task=task, tool_results=tools_string, transcript="{transcript}"
     )
 
     return replies, prompt
