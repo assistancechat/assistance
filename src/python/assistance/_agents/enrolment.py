@@ -130,6 +130,35 @@ async def react_to_enrolment_request(
     await send_email(scope, mailgun_data)
 
 
+EXAMPLE_TOOL_USE = textwrap.dedent(
+    """
+        [
+            {{
+                "id": 0,
+                "step_by_step_thought_process": "I will start by using the 'now' tool to get the current date and time.",
+                "tool": "now",
+                "args": [],
+                "score": 9,
+                "confidence": 8
+                "depends_on": []
+            }},
+            {{
+                "id": 1,
+                "step_by_step_thought_process": "I am going to search for more details about the courses at Alphacrucis.",
+                "tool": "internet_search",
+                "args": ["Courses at Alphacrucis University"],
+                "score": 9,
+                "confidence": 8
+                "depends_on": []
+            }}
+        ]
+    """
+).strip()
+
+
+EXTRA_TOOLS = ""
+
+
 async def _get_prompt(email: Email):
     scope = email["user_email"]
 
@@ -147,7 +176,13 @@ async def _get_prompt(email: Email):
         now=str(datetime.now(tz=ZoneInfo("Australia/Sydney"))),
     )
 
-    tools = await get_tools_and_responses(scope=scope, task=task, email_thread=replies)
+    tools = await get_tools_and_responses(
+        scope=scope,
+        task=task,
+        email_thread=replies,
+        example_tool_use=EXAMPLE_TOOL_USE,
+        extra_tools=EXTRA_TOOLS,
+    )
     keys_to_keep = ["tool", "result"]
 
     filtered_tools = []

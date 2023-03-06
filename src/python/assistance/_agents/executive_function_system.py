@@ -61,7 +61,6 @@ UNUSED_TOOLS = textwrap.dedent(
             \"""
 
 
-
             {{
                 "id": 2,
                 "step_by_step_thought_process": "Given I have run a search, I want to take the opportunity to potentially call a few more tools once I have seen their results. By calling this function I am able to request more tools than my original quota.",
@@ -99,25 +98,7 @@ PROMPT = textwrap.dedent(
             for the args for this tool.
             \"""
 
-        def python("<any python expression>")
-            \"""This allows you to evaluate expressions using python.
-
-            Only the Python standard library is available to you within
-            this tool. It is running within a WASI sandbox and does not
-            have any network or file access.
-            \"""
-
-        def ai_embeddings_search('<database_name>', '<text to search for within the database>')
-            \"""This allows you to search a range of AI embeddings
-            databases for the given string argument.
-
-            The current supported databases are:
-            - 'philip_rhoades_memory'
-            - 'phirho_memory'
-            - 'discourse_history'
-
-            \"""
-
+        {extra_tools}
 
         # The task for the AI cluster
 
@@ -141,8 +122,17 @@ PROMPT = textwrap.dedent(
           use the id of the requested output within "moustache" brackets
           {{<tool request id goes here>}}.
 
-        # Example response format for 6 tools. You MUST provide at least 3 tools. Feel free to request more if it would be helpful.
+        # Example response format for tools. You MUST provide at least 3 tools.
 
+        {example_tool_use}
+        {previous_tool_iterations}{optional_previous_results_text}
+        # Your JSON Response (MUST be valid JSON, do not include comments)
+    """
+).strip()
+
+
+EXAMPLE_TOOL_USE = textwrap.dedent(
+    """
         [
             {{
                 "id": 0,
@@ -199,8 +189,30 @@ PROMPT = textwrap.dedent(
                 "depends_on": [4, 0]
             }}
         ]
-        {previous_tool_iterations}{optional_previous_results_text}
-        # Your JSON Response (MUST be valid JSON, do not include comments)
+    """
+).strip()
+
+
+EXTRA_TOOLS = textwrap.dedent(
+    """
+        def python("<any python expression>")
+            \"""This allows you to evaluate expressions using python.
+
+            Only the Python standard library is available to you within
+            this tool. It is running within a WASI sandbox and does not
+            have any network or file access.
+            \"""
+
+        def ai_embeddings_search('<database_name>', '<text to search for within the database>')
+            \"""This allows you to search a range of AI embeddings
+            databases for the given string argument.
+
+            The current supported databases are:
+            - 'philip_rhoades_memory'
+            - 'phirho_memory'
+            - 'discourse_history'
+
+            \"""
     """
 ).strip()
 
@@ -252,6 +264,8 @@ async def get_tools_and_responses(
     email_thread: list[str],
     number_of_tools: int = 3,
     previous_results: None | list[AiToolRequest] = None,
+    example_tool_use=EXAMPLE_TOOL_USE,
+    extra_tools=EXTRA_TOOLS,
 ):
     optional_previous_results_text = ""
     if previous_results is not None:
@@ -273,6 +287,8 @@ async def get_tools_and_responses(
             optional_previous_results_text=optional_previous_results_text,
             number_of_tools=number_of_tools,
             previous_tool_iterations=previous_tool_iterations,
+            example_tool_use=example_tool_use,
+            extra_tools=extra_tools,
         )
 
         response = await run_with_summary_fallback(
