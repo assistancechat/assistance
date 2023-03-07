@@ -15,8 +15,6 @@
 import hashlib
 import pathlib
 
-import aiofiles
-
 LIB = pathlib.Path(__file__).parent
 
 STORE = pathlib.Path.home().joinpath(".assistance")
@@ -45,8 +43,7 @@ NEW_GOOGLE_ALERTS = GOOGLE_ALERTS_PIPELINES.joinpath("new")
 EMAIL_PIPELINES = PIPELINES.joinpath("emails")
 NEW_EMAILS = EMAIL_PIPELINES.joinpath("new")
 
-PYTHON_ROOT = LIB.parent
-LOGS = PYTHON_ROOT.joinpath("logs")
+LOGS = STORE.joinpath("server", "logs")
 PHIRHO_LOGS = LOGS.joinpath("phirho")
 
 TEST_DIR = LIB.joinpath("tests")

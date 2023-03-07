@@ -1,18 +1,24 @@
 #!/bin/bash
 
 # TODO: Pull the relevant home directory from a .env file
-
-NAME=chat-api
-DIR=/home/simon/git/assistance
 USER=simon
 GROUP=simon
 WORKERS=25
+
+NAME=assistance
+
+HOME=/home/$USER
+GIT_ROOT=$HOME/git/assistance
+DATA_ROOT=$HOME/.assistance
+
+VENV=$GIT_ROOT/.venv/bin/activate
+
+BIND=unix:$DATA_ROOT/server/run/gunicorn.sock
+
 WORKER_CLASS=uvicorn.workers.UvicornWorker
-VENV=$DIR/.venv/bin/activate
-BIND=unix:$DIR/dev/run/gunicorn.sock
 LOG_LEVEL=info
 
-cd $DIR
+cd $GIT_ROOT
 source $VENV
 
 exec gunicorn assistance._api.main:app \
