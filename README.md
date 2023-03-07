@@ -37,17 +37,3 @@ poetry env use $(which python)
 rsync -r assistance:~/.assistance/* ~/.assistance/
 rsync -r server:~/.assistance/* ~/.assistance/
 ```
-
-### Add a user to admin
-
-Create password in ipython:
-
-```ipython
-import secrets
-secrets.token_urlsafe()
-```
-
-```bash
-htpasswd /etc/apache2/.htpasswd username
-htpasswd /etc/apache2/.phirho-htpasswd username
-```
