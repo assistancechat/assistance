@@ -284,6 +284,7 @@
       "Vomer",
       "waivable",
       "WASI",
+      "wasmedge",
       "wasmtime",
       "webextension",
       "webrtc",
