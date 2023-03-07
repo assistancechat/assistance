@@ -52,6 +52,8 @@ PHIRHO_LOGS = LOGS.joinpath("phirho")
 TEST_DIR = LIB.joinpath("tests")
 TESTS_DATA = TEST_DIR.joinpath("data")
 
+FORM_TEMPLATES = CONFIG.joinpath("form-templates")
+
 
 async def get_user_from_email(email_address: str):
     try:

@@ -28,10 +28,9 @@ from assistance._email.reply import create_reply, get_all_user_emails
 from assistance._keys import get_openai_api_key, get_serp_api_key
 from assistance._logging import log_info
 from assistance._mailgun import send_email
+from assistance._summarisation.thread import run_with_summary_fallback
+from assistance._tooling.executive_function_system import get_tools_and_responses
 from assistance._types import Email
-
-from .discourse_summary import run_with_summary_fallback
-from .executive_function_system import get_tools_and_responses
 
 OPEN_AI_API_KEY = get_openai_api_key()
 SERP_API_KEY = get_serp_api_key()
@@ -69,9 +68,7 @@ TASK = textwrap.dedent(
 
         You are stepping through each step of the enrolment process. You
         are currently up to the following step:
-
-        - Requesting the user for a scan or picture of their passport.
-
+        {current_step}
         ## Instructions
 
         - Ask open-ended questions to understand what their needs are
@@ -82,7 +79,9 @@ TASK = textwrap.dedent(
         - If the information within your tools isn't enough to provide
           a response, simply mention that you don't have enough
           information to provide a response and to please reach out to
-          me@simonbiggs.net for further support around that query.
+          simon@assistance.chat for further support around that query.
+        - Do not ask the user to email anyone else except those at the
+          assistance.chat domain.
 
         ## Details about the email record
 

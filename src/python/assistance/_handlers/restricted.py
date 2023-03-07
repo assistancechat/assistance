@@ -13,7 +13,7 @@
 # limitations under the License.
 
 
-from .avatar import react_to_avatar_request
+from assistance._avatar.phirho import react_to_avatar_request
 
 RESTRICTED_TASKS = {
     "avatar": react_to_avatar_request,

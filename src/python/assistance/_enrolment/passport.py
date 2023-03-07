@@ -43,14 +43,14 @@ def get_fields_from_passport(passport_path: str) -> PassportDetails:
 
     names = results_as_dict["names"]
     split_names = names.split(" ")
-    first_name = split_names[0]
+    first_name = split_names[0].capitalize()
 
     if len(split_names) > 1:
-        middle_names = " ".join(split_names[1:])
+        middle_names = " ".join([item.capitalize() for item in split_names[1:]])
     else:
         middle_names = ""
 
-    family_name = results_as_dict["surname"]
+    family_name = results_as_dict["surname"].capitalize()
     date_of_birth = _convert_date_to_iso_format(results_as_dict["date_of_birth"])
 
     nationality = results_as_dict["nationality"]

@@ -12,13 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
 from typing import Literal, TypedDict, cast
 
 import aiofiles
 import toml
 
-from assistance._paths import CONFIG
+from assistance._paths import CONFIG, FORM_TEMPLATES
 
 DEFAULT_OPENAI_MODEL = "gpt-3.5-turbo"
 ROOT_DOMAIN = "assistance.chat"
@@ -75,3 +74,10 @@ async def load_targeted_news_config() -> TargetedNewsConfig:
         news_config = cast(TargetedNewsConfig, toml.loads(await f.read()))
 
     return news_config
+
+
+async def load_form_config(name: str):
+    async with aiofiles.open(FORM_TEMPLATES / f"{name}.toml", encoding="utf8") as f:
+        form_template = toml.loads(await f.read())
+
+    return form_template

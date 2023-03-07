@@ -14,8 +14,8 @@
 
 import textwrap
 
-from assistance._agents.enrolment import react_to_enrolment_request
 from assistance._config import ROOT_DOMAIN
+from assistance._enrolment.response import react_to_enrolment_request
 from assistance._news.pipeline import add_to_google_alerts_pipeline
 
 DEFAULT_TASKS = {

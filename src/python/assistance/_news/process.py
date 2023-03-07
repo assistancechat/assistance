@@ -20,8 +20,6 @@ from typing import Any, Coroutine, TypedDict, cast
 
 import numpy as np
 
-from assistance._agents.post import write_news_post
-from assistance._agents.relevance import article_scoring
 from assistance._config import (
     ROOT_DOMAIN,
     TargetedNewsConfig,
@@ -30,6 +28,8 @@ from assistance._config import (
 from assistance._keys import get_openai_api_key
 from assistance._logging import log_info
 from assistance._mailgun import send_email
+from assistance._news.post import write_news_post
+from assistance._news.relevance import article_scoring
 from assistance._paths import NEW_GOOGLE_ALERTS
 from assistance._types import Article
 
