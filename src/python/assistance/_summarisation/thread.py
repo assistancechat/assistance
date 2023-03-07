@@ -47,21 +47,16 @@ PROMPT = textwrap.dedent(
 MAX_MODEL_TOKENS = 4096
 
 
-class DiscoursePost(TypedDict):
-    user: str
-    content: str
-
-
 async def run_with_summary_fallback(
     scope: str,
     prompt: str,
-    discourse_posts: list[DiscoursePost],
+    email_thread: list[str],
     api_key: str,
     **kwargs,
 ):
     while True:
-        transcript = _create_transcript_string(scope, discourse_posts[0:-1])
-        most_recent = _create_transcript_string(scope, discourse_posts[-1:])
+        transcript = "\n\n".join(email_thread[0:-1])
+        most_recent = email_thread[-1]
         prompt_with_transcript = prompt.replace("{transcript}", transcript).replace(
             "{most_recent_post}", most_recent
         )
@@ -77,8 +72,7 @@ async def run_with_summary_fallback(
             if "Model maximum reached" not in str(e):
                 raise e
 
-            to_summarise = discourse_posts[0:5]
-            transcript_to_summarise = _create_transcript_string(scope, to_summarise)
+            transcript_to_summarise = "\n\n".join(email_thread[0:5])
 
             summary = await get_completion_only(
                 scope=scope,
@@ -87,33 +81,11 @@ async def run_with_summary_fallback(
                 **kwargs,
             )
 
-            summary_post: DiscoursePost = {
-                "user": "Summary",
-                "content": summary,
-            }
-
-            discourse_posts = [summary_post] + discourse_posts[5:]
+            summary_item = f"Summary of omitted emails:\n{summary}\n\n"
+            email_thread = [summary_item] + email_thread[5:]
 
             continue
 
         break
 
     return response
-
-
-def _create_transcript_string(scope, discourse_posts: list[DiscoursePost]):
-    transcript = ""
-    for post in discourse_posts:
-        try:
-            user = post["user"]
-        except KeyError as e:
-            log_info(scope, f"Missing user in post: {post}")
-            raise e
-
-        if user == "Summary":
-            transcript += f"Summary of some omitted posts:\n\n{post['content']}\n\n"
-            continue
-
-        transcript += f"Post from @{user}:\n{post['content']}\n\n"
-
-    return transcript

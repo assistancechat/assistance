@@ -15,10 +15,10 @@
 import asyncio
 import textwrap
 
-from assistance._agents.summaries import summarise_news_article_url_with_tasks
 from assistance._completions import get_completion_only
 from assistance._config import DEFAULT_OPENAI_MODEL
 from assistance._keys import get_openai_api_key
+from assistance._summarisation.with_tasks import summarise_news_article_url_with_tasks
 from assistance._utilities import items_to_list_string
 
 MODEL_KWARGS = {
@@ -108,7 +108,6 @@ async def write_news_post(
     target_audience: str,
     sentence_blacklist: list[str],
     url: str,
-    use_google_cache=True,
 ) -> tuple[str, str]:
     try:
         summary = await summarise_news_article_url_with_tasks(
@@ -118,7 +117,6 @@ async def write_news_post(
             goals=goals,
             target_audience=target_audience,
             url=url,
-            use_google_cache=use_google_cache,
         )
     except asyncio.TimeoutError:
         return "NOT_RELEVANT", '{"article_is_relevant": false}'

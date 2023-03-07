@@ -12,20 +12,26 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
+import pathlib
 from typing import Literal, TypedDict, cast
 
 import aiofiles
 import toml
 
-from assistance._paths import CONFIG
+from assistance._paths import (
+    AGENT_MAPPING,
+    CONFIG,
+    EMAIL_MAPPING,
+    FORM_TEMPLATES,
+    USER_DETAILS,
+)
 
 DEFAULT_OPENAI_MODEL = "gpt-3.5-turbo"
 ROOT_DOMAIN = "assistance.chat"
 PAYMENT_LINK = "https://buy.stripe.com/bIYeXF2s1d0E4wg9AB"
 EMAIL_PRODUCT_ID = "prod_NLuYISl8KZ6fUX"
 
-TargetedNewsFormats = Literal["digest", "separate-discourse-posts"]
+TargetedNewsFormats = Literal["digest", "discourse"]
 
 
 class TargetedNewsUserOverrides(TypedDict, total=False):
@@ -75,3 +81,46 @@ async def load_targeted_news_config() -> TargetedNewsConfig:
         news_config = cast(TargetedNewsConfig, toml.loads(await f.read()))
 
     return news_config
+
+
+async def load_form_config(name: str):
+    async with aiofiles.open(FORM_TEMPLATES / f"{name}.toml", encoding="utf8") as f:
+        form_template = toml.loads(await f.read())
+
+    return form_template
+
+
+async def get_user_from_email(email_address: str):
+    try:
+        async with aiofiles.open(EMAIL_MAPPING / email_address) as f:
+            user = await f.read()
+    except FileNotFoundError as e:
+        raise ValueError("User not found") from e
+
+    return user
+
+
+async def get_user_details(user: str):
+    details = await _get_file_based_mapping(USER_DETAILS, user)
+
+    return details
+
+
+async def get_agent_mappings(user: str):
+    details = await _get_file_based_mapping(AGENT_MAPPING, user)
+
+    return details
+
+
+async def _get_file_based_mapping(root: pathlib.Path, user: str):
+    user_details_files = (root / user).glob("*")
+
+    details = {"user": user}
+
+    for file in user_details_files:
+        assert file.name != "user"
+
+        async with aiofiles.open(file) as f:
+            details[file.name] = (await f.read()).strip()
+
+    return details

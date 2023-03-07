@@ -20,8 +20,6 @@ from typing import Any, Coroutine, TypedDict, cast
 
 import numpy as np
 
-from assistance._agents.post import write_news_post
-from assistance._agents.relevance import article_scoring
 from assistance._config import (
     ROOT_DOMAIN,
     TargetedNewsConfig,
@@ -30,6 +28,8 @@ from assistance._config import (
 from assistance._keys import get_openai_api_key
 from assistance._logging import log_info
 from assistance._mailgun import send_email
+from assistance._news.post import write_news_post
+from assistance._news.relevance import article_scoring
 from assistance._paths import NEW_GOOGLE_ALERTS
 from assistance._types import Article
 
@@ -118,6 +118,15 @@ EMAIL_TEMPLATE = textwrap.dedent(
 ).strip()
 
 
+DISCOURSE_TEMPLATE = textwrap.dedent(
+    """
+        {content}
+
+        {url}
+    """
+).strip()
+
+
 class DetailsForEmail(TypedDict):
     title: str
     url: str
@@ -154,7 +163,6 @@ async def _process_subscription(
                 target_audience=subscription_data["target_audience"],
                 sentence_blacklist=subscription_data["sentence_blacklist"],
                 url=url,
-                use_google_cache=False,
             )
         )
 
@@ -205,15 +213,63 @@ async def _process_subscription(
     else:
         subscribers_to_use = subscription_data["subscribers"]
 
-    send_email_coroutines: list[Coroutine[Any, Any, None]] = []
+    for subscriber in subscribers_to_use:
+        agent_user = subscription_data["agent_user"]
 
-    digest_email = f"News digest for:\n{subscription_data['target_audience']}\n\n"
-    discourse_emails = []
+        if subscription_data["format"] == "digest":
+            await _digest_email(
+                scope=scope,
+                target_audience=subscription_data["target_audience"],
+                posts=top_scoring_posts,
+                subscriber=subscriber,
+                agent_user=agent_user,
+            )
 
-    for i, response in enumerate(top_scoring_posts):
+        elif subscription_data["format"] == "discourse":
+            await _separate_discourse_posts(
+                scope=scope,
+                posts=top_scoring_posts,
+                subscriber=subscriber,
+                agent_user=agent_user,
+            )
+
+        else:
+            raise ValueError(f"Unknown format: {subscription_data['format']}")
+
+
+async def _digest_email(
+    scope: str,
+    target_audience: str,
+    posts: list[DetailsForEmail],
+    subscriber: str,
+    agent_user: str,
+):
+    digest_email = f"News digest for:\n{target_audience}\n\n"
+
+    for i, response in enumerate(posts):
         text = EMAIL_TEMPLATE.format(**response)
         digest_email += f"Article {i + 1})\n{text}\n\n-------------------------\n\n"
 
+    postal_data = {
+        "from": f"{agent_user}@{ROOT_DOMAIN}",
+        "to": [subscriber],
+        "subject": "Targeted News Digest",
+        "plain_body": digest_email,
+    }
+
+    await send_email(scope, postal_data)
+
+
+async def _separate_discourse_posts(
+    scope: str,
+    posts: list[DetailsForEmail],
+    subscriber: str,
+    agent_user: str,
+):
+    discourse_emails = []
+
+    for response in posts:
+        text = DISCOURSE_TEMPLATE.format(**response)
         discourse_emails.append(
             {
                 "subject": response["subject"],
@@ -221,32 +277,19 @@ async def _process_subscription(
             }
         )
 
-    for subscriber in subscribers_to_use:
-        agent_user = subscription_data["agent_user"]
+    coroutines: list[Coroutine[Any, Any, None]] = []
 
-        # Done inside the loop as in the future want to be able to
-        # handle per user overrides.
-        if subscription_data["format"] == "digest":
-            postal_data = {
-                "from": f"{agent_user}@{ROOT_DOMAIN}",
-                "to": [subscriber],
-                "subject": "Targeted News Digest",
-                "plain_body": digest_email,
-            }
+    for email in discourse_emails:
+        postal_data = {
+            "from": f"{agent_user}@{ROOT_DOMAIN}",
+            "to": [subscriber],
+            "subject": email["subject"],
+            "plain_body": email["plain_body"],
+        }
 
-            send_email_coroutines.append(send_email(scope, postal_data))
-        else:
-            for email in discourse_emails:
-                postal_data = {
-                    "from": f"{agent_user}@{ROOT_DOMAIN}",
-                    "to": [subscriber],
-                    "subject": email["subject"],
-                    "plain_body": email["plain_body"],
-                }
+        coroutines.append(send_email(scope, postal_data))
 
-                send_email_coroutines.append(send_email(scope, postal_data))
-
-    await asyncio.gather(*send_email_coroutines)
+    await asyncio.gather(*coroutines)
 
 
 async def _get_top_articles(

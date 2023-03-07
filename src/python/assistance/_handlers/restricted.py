@@ -12,13 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import streamlit as st
 
-from assistance._admin import categories
+from assistance._avatar.phirho import react_to_avatar_request
 
-CATEGORY = categories.DEMO
-TITLE = "Hello World!"
-
-
-async def main():
-    pass
+RESTRICTED_TASKS = {
+    "avatar": react_to_avatar_request,
+}

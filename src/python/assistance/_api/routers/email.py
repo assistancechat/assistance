@@ -21,22 +21,20 @@ import aiofiles
 from fastapi import APIRouter, Request
 
 from assistance import _ctx
-from assistance._agents.custom import react_to_custom_agent_request
-from assistance._agents.default import DEFAULT_TASKS
-from assistance._agents.restricted import RESTRICTED_TASKS
-from assistance._config import ROOT_DOMAIN
-from assistance._email.reply import ALIASES, create_reply
-from assistance._keys import get_mailgun_api_key
-from assistance._logging import log_info
-from assistance._mailgun import send_email
-from assistance._paths import (
-    NEW_EMAILS,
+from assistance._config import (
+    ROOT_DOMAIN,
     get_agent_mappings,
-    get_emails_path,
-    get_hash_digest,
     get_user_details,
     get_user_from_email,
 )
+from assistance._email.reply import ALIASES, create_reply
+from assistance._handlers.custom import react_to_custom_agent_request
+from assistance._handlers.default import DEFAULT_TASKS
+from assistance._handlers.restricted import RESTRICTED_TASKS
+from assistance._keys import get_mailgun_api_key
+from assistance._logging import log_info
+from assistance._mailgun import send_email
+from assistance._paths import NEW_EMAILS, get_emails_path, get_hash_digest
 from assistance._types import Email, RawEmail
 from assistance._utilities import get_cleaned_email
 

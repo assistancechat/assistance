@@ -12,28 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import subprocess
+from passporteye import read_mrz
 
-import streamlit as st
+from assistance._paths import TESTS_DATA
 
-from assistance._admin import categories
-
-CATEGORY = categories.DEMO
-TITLE = "Talking"
+MOCK_PASSPORT_PATH = TESTS_DATA / "mock-passport.png"
 
 
-async def main():
-    words = st.text_area("Write words")
+def test_passport_data_extraction():
+    passport_results = read_mrz(str(MOCK_PASSPORT_PATH), extra_cmdline_params="legacy")
+    assert passport_results is not None
 
-    if not st.button("Play"):
-        st.stop()
-
-    output = subprocess.check_output(
-        [
-            "/home/simon/.cache/pypoetry/virtualenvs/assistance-zIqiKnAa-py3.10/bin/mimic3",
-            "--cuda",
-            words,
-        ]
-    )
-
-    st.audio(output)
+    results = passport_results.to_dict()
+    assert results["names"] == "GEORGE MADE UP"
+    assert results["surname"] == "MACDONALD"

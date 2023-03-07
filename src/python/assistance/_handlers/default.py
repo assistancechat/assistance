@@ -15,9 +15,11 @@
 import textwrap
 
 from assistance._config import ROOT_DOMAIN
+from assistance._forms.response import react_to_enrolment_request
 from assistance._news.pipeline import add_to_google_alerts_pipeline
 
 DEFAULT_TASKS = {
+    "enrolment": ("", react_to_enrolment_request),
     "googlealerts": (
         "Stores a Google Alert for future use by the targeted-news agent.",
         add_to_google_alerts_pipeline,

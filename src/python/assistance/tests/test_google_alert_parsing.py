@@ -12,15 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
-import pathlib
-
-HERE = pathlib.Path(__file__).parent
-DATA = HERE / "data"
-
-ALERTS_PATH = DATA / "google-alert-example.html"
-
 from assistance._parsing import googlealerts
+from assistance._paths import TESTS_DATA
+
+ALERTS_PATH = TESTS_DATA / "google-alert-example.html"
 
 
 def test_google_alerts_parsing():

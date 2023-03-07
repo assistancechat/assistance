@@ -31,7 +31,7 @@ from assistance._logging import log_info
 from assistance._mailgun import send_email
 from assistance._types import Email
 
-from .discourse_summary import DiscoursePost, run_with_summary_fallback
+from .._summarisation.thread import run_with_summary_fallback
 
 OPEN_AI_API_KEY = get_openai_api_key()
 SERP_API_KEY = get_serp_api_key()
@@ -45,34 +45,6 @@ MODEL_KWARGS = {
     "frequency_penalty": 0,
     "presence_penalty": 0,
 }
-
-UNUSED_TOOLS = textwrap.dedent(
-    """
-        def iterate_executive_function_system(<number of tasks>)
-            \"""This allows you to re-run this executive function system
-            with a requested number of extra tasks.
-
-            Use this in the following situations:
-            - You would like to call more tools than have been asked of
-              you in this current iteration of the executive function.
-            - There may be other tools you'd like to call, but your not
-              sure until you see the results of the current tools you
-              have requested.
-            \"""
-
-
-
-            {{
-                "id": 2,
-                "step_by_step_thought_process": "Given I have run a search, I want to take the opportunity to potentially call a few more tools once I have seen their results. By calling this function I am able to request more tools than my original quota.",
-                "tool": "iterate_executive_function_system",
-                "args": [3],
-                "score": 4,
-                "confidence": 4
-                "depends_on": []
-            }},
-    """
-).strip()
 
 PROMPT = textwrap.dedent(
     """
@@ -99,6 +71,83 @@ PROMPT = textwrap.dedent(
             for the args for this tool.
             \"""
 
+        {extra_tools}
+
+        # The task for the AI cluster
+
+        {task}
+
+
+        # Response Requirements
+
+        - Your response must be valid JSON. It must be a list of at least 3
+          dictionaries, with the keys "id",
+          "step_by_step_thought_process", "tool", "args", "score", and
+          "confidence".
+        - Before writing any lines of the JSON you validate that what
+          you are about to write is valid JSON.
+        - Do not include comments in the JSON response, as that is not
+          valid JSON.
+
+        # Example response format for tools. You MUST provide at least 3 tools.
+
+        {example_tool_use}
+        {previous_tool_iterations}{optional_previous_results_text}
+        # Your JSON Response (MUST be valid JSON, do not include comments)
+    """
+).strip()
+
+
+EXAMPLE_TOOL_USE = textwrap.dedent(
+    """
+        [
+            {{
+                "id": 0,
+                "step_by_step_thought_process": "I will start by using the 'now' tool to get the current date and time.",
+                "tool": "now",
+                "args": [],
+                "score": 9,
+                "confidence": 8
+            }},
+            {{
+                "id": 1,
+                "step_by_step_thought_process": "There was a query about the Holbrook Cryonics facility. I'm going to do an internet search for that.",
+                "tool": "internet_search",
+                "args": ["Holbrook Cryonics facility"],
+                "score": 9,
+                "confidence": 8
+            }},
+            {{
+                "id": 2,
+                "step_by_step_thought_process": "The user asked what @phirho's preferred name was, let's search the 'phirho_memory' database for that.",
+                "tool": "ai_embeddings_search",
+                "args": ["phirho_memory", "phirho's preferred name"],
+                "score": 8,
+                "confidence": 7
+            }},
+            {{
+                "id": 3,
+                "step_by_step_thought_process": "I want to make sure what I am saying is said in a way that is similar to how Philip would say it if it was him, so I will use the 'philip_rhoades_memory' database to search for that.",
+                "tool": "ai_embeddings_search",
+                "args": ["philip_rhoades_memory", "Responding to a being asked what your preferred name is."],
+                "score": 9,
+                "confidence": 5
+            }},
+            {{
+                "id": 4,
+                "step_by_step_thought_process": "The user also asked how old I was, to do that I need to determine on what date I was born from my memory, and then I need to pass that through to the Python function.",
+                "tool": "ai_embeddings_search",
+                "args": ["phirho_memory", "phirho's birth date"],
+                "score": 9,
+                "confidence": 5
+            }}
+        ]
+    """
+).strip()
+
+
+EXTRA_TOOLS = textwrap.dedent(
+    """
         def python("<any python expression>")
             \"""This allows you to evaluate expressions using python.
 
@@ -117,90 +166,6 @@ PROMPT = textwrap.dedent(
             - 'discourse_history'
 
             \"""
-
-
-        # The task for the AI cluster
-
-        {task}
-
-
-        # Response Requirements
-
-        - Your response must be valid JSON. It must be a list of at least 3
-          dictionaries, with the keys "id",
-          "step_by_step_thought_process", "tool", "args", "score", and
-          "confidence".
-        - Before writing any lines of the JSON you validate that what
-          you are about to write is valid JSON.
-        - Do not include comments in the JSON response, as that is not
-          valid JSON.
-        - If you would like to use the result of one tool as the input
-          for another tool, you must specify the "depends_on" key in
-          the dictionary for the tool that depends on the other tool.
-        - To use the output of one tool as the input for another tool,
-          use the id of the requested output within "moustache" brackets
-          {{<tool request id goes here>}}.
-
-        # Example response format for 6 tools. You MUST provide at least 3 tools. Feel free to request more if it would be helpful.
-
-        [
-            {{
-                "id": 0,
-                "step_by_step_thought_process": "I will start by using the 'now' tool to get the current date and time.",
-                "tool": "now",
-                "args": [],
-                "score": 9,
-                "confidence": 8
-                "depends_on": []
-            }},
-            {{
-                "id": 1,
-                "step_by_step_thought_process": "There was a query about the Holbrook Cryonics facility. I'm going to do an internet search for that.",
-                "tool": "internet_search",
-                "args": ["Holbrook Cryonics facility"],
-                "score": 9,
-                "confidence": 8
-                "depends_on": []
-            }},
-            {{
-                "id": 2,
-                "step_by_step_thought_process": "The user asked what @phirho's preferred name was, let's search the 'phirho_memory' database for that.",
-                "tool": "ai_embeddings_search",
-                "args": ["phirho_memory", "phirho's preferred name"],
-                "score": 8,
-                "confidence": 7
-                "depends_on": []
-            }},
-            {{
-                "id": 3,
-                "step_by_step_thought_process": "I want to make sure what I am saying is said in a way that is similar to how Philip would say it if it was him, so I will use the 'philip_rhoades_memory' database to search for that.",
-                "tool": "ai_embeddings_search",
-                "args": ["philip_rhoades_memory", "Responding to a being asked what your preferred name is."],
-                "score": 9,
-                "confidence": 5
-                "depends_on": []
-            }},
-            {{
-                "id": 4,
-                "step_by_step_thought_process": "The user also asked how old I was, to do that I need to determine on what date I was born from my memory, and then I need to pass that through to the Python function.",
-                "tool": "ai_embeddings_search",
-                "args": ["phirho_memory", "phirho's birth date"],
-                "score": 9,
-                "confidence": 5
-                "depends_on": []
-            }},
-            {{
-                "id": 5,
-                "step_by_step_thought_process": "I will use this tool to determine how old I am. I will use the Python function to subtract the date I was born from the current date.",
-                "tool": "python",
-                "args": ["from datetime import datetime; datetime.strptime(\\"{{0}}\\", \\"%Y-%m-%d %H:%M:%S\\") - datetime.strptime(\\"{{4}}\\", \\"%Y-%m-%d %H:%M:%S\\"))"],
-                "score": 9,
-                "confidence": 9
-                "depends_on": [4, 0]
-            }}
-        ]
-        {previous_tool_iterations}{optional_previous_results_text}
-        # Your JSON Response (MUST be valid JSON, do not include comments)
     """
 ).strip()
 
@@ -212,7 +177,6 @@ class AiToolRequest(TypedDict):
     args: list[str]
     score: int
     confidence: int
-    depends_on: list[int]
 
     # TODO: Maybe change this
     result: str
@@ -249,9 +213,11 @@ PREVIOUS_RESULTS_TEMPLATE = textwrap.dedent(
 async def get_tools_and_responses(
     scope: str,
     task: str,
-    discourse_posts: list[DiscoursePost],
+    email_thread: list[str],
     number_of_tools: int = 3,
     previous_results: None | list[AiToolRequest] = None,
+    example_tool_use=EXAMPLE_TOOL_USE,
+    extra_tools=EXTRA_TOOLS,
 ):
     optional_previous_results_text = ""
     if previous_results is not None:
@@ -273,12 +239,14 @@ async def get_tools_and_responses(
             optional_previous_results_text=optional_previous_results_text,
             number_of_tools=number_of_tools,
             previous_tool_iterations=previous_tool_iterations,
+            example_tool_use=example_tool_use,
+            extra_tools=extra_tools,
         )
 
         response = await run_with_summary_fallback(
             scope=scope,
             prompt=prompt,
-            discourse_posts=discourse_posts,
+            email_thread=email_thread,
             api_key=OPEN_AI_API_KEY,
             **MODEL_KWARGS,
         )
@@ -302,7 +270,7 @@ async def get_tools_and_responses(
         tools = await get_tools_and_responses(
             scope=scope,
             task=task,
-            discourse_posts=discourse_posts,
+            email_thread=email_thread,
             number_of_tools=number_of_new_tools_to_run,
             previous_results=tools,
         )
@@ -325,15 +293,6 @@ async def _evaluate_tools(scope, response):
     for tool in tools:
         tool_name = tool["tool"]
         tool_args = tool["args"]
-
-        tool_dependencies = tool["depends_on"]
-        if len(tool_dependencies) > 0:
-            input_formatting = {}
-            for dependency in tool_dependencies:
-                input_formatting[dependency] = tools[dependency]["result"]
-
-            tool_args = [arg.format(input_formatting) for arg in tool_args]
-
         args = [scope] + tool_args
 
         try:

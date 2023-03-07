@@ -132,11 +132,8 @@ async def summarise_news_article_url_with_tasks(
     goals: list[str],
     target_audience: str,
     url: str,
-    use_google_cache=True,
 ):
-    page_contents = await scrape(
-        session=_ctx.session, url=url, use_google_cache=use_google_cache
-    )
+    page_contents = await scrape(session=_ctx.session, url=url)
 
     summary = await summarise_text_with_tasks(
         scope=scope,
