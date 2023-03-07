@@ -22,7 +22,7 @@ sudo supervisorctl status assistance
 Restart supervisorctl
 
 ```bash
-sudo supervisorctl restart chat-api
+sudo supervisorctl restart assistance
 ```
 
 ### Poetry Python version
