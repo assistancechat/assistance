@@ -25,6 +25,7 @@ from assistance import _ctx
 from assistance._completions import get_completion_only
 from assistance._config import DEFAULT_OPENAI_MODEL, ROOT_DOMAIN
 from assistance._email.reply import create_reply, get_all_user_emails
+from assistance._email.thread import get_email_thread
 from assistance._keys import get_openai_api_key, get_serp_api_key
 from assistance._logging import log_info
 from assistance._mailgun import send_email
@@ -156,13 +157,9 @@ EXTRA_TOOLS = ""
 async def _get_prompt(email: Email):
     scope = email["user_email"]
 
-    parser = EmailReplyParser()
-    email_message = parser.read(email["plain_all_content"])
-    replies = [str(item) for item in email_message.replies[-1::-1]]
+    email_thread = get_email_thread(email)
 
-    replies[-1] = f"On {email['date']}, {email['from']} wrote:\n{replies[-1]}"
-
-    log_info(scope, json.dumps(replies, indent=2))
+    log_info(scope, json.dumps(email_thread, indent=2))
 
     task = TASK.format(
         subject=email["subject"],
@@ -173,7 +170,7 @@ async def _get_prompt(email: Email):
     tools = await get_tools_and_responses(
         scope=scope,
         task=task,
-        email_thread=replies,
+        email_thread=email_thread,
         example_tool_use=EXAMPLE_TOOL_USE,
         extra_tools=EXTRA_TOOLS,
     )
@@ -190,4 +187,4 @@ async def _get_prompt(email: Email):
         task=task, tool_results=tools_string, transcript="{transcript}"
     )
 
-    return replies, prompt
+    return email_thread, prompt

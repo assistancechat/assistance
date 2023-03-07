@@ -12,9 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import asyncio
 
-from assistance._admin.index import main
+from mailparser_reply import EmailReplyParser
 
-if __name__ == "__main__":
-    asyncio.run(main())
+from assistance._types import Email
+
+
+def get_email_thread(email: Email):
+    parser = EmailReplyParser()
+    email_message = parser.read(email["plain_all_content"])
+    email_thread = [str(item) for item in email_message.replies[-1::-1]]
+
+    email_thread[-1] = f"On {email['date']}, {email['from']} wrote:\n{email_thread[-1]}"
+
+    return email_thread

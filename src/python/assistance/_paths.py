@@ -55,42 +55,6 @@ TESTS_DATA = TEST_DIR.joinpath("data")
 FORM_TEMPLATES = CONFIG.joinpath("form-templates")
 
 
-async def get_user_from_email(email_address: str):
-    try:
-        async with aiofiles.open(EMAIL_MAPPING / email_address) as f:
-            user = await f.read()
-    except FileNotFoundError as e:
-        raise ValueError("User not found") from e
-
-    return user
-
-
-async def get_user_details(user: str):
-    details = await _get_file_based_mapping(USER_DETAILS, user)
-
-    return details
-
-
-async def get_agent_mappings(user: str):
-    details = await _get_file_based_mapping(AGENT_MAPPING, user)
-
-    return details
-
-
-async def _get_file_based_mapping(root: pathlib.Path, user: str):
-    user_details_files = (root / user).glob("*")
-
-    details = {"user": user}
-
-    for file in user_details_files:
-        assert file.name != "user"
-
-        async with aiofiles.open(file) as f:
-            details[file.name] = (await f.read()).strip()
-
-    return details
-
-
 def get_article_metadata_path(hash_digest: str, create_parent: bool = False):
     path = _get_record_path(ARTICLE_METADATA, hash_digest, create_parent)
 

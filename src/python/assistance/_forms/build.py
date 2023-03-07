@@ -15,7 +15,7 @@
 
 # TODO: Handle conditionals, pull in already filled out components and
 # only print parts of the form that have not yet been completed.
-def _walk_and_build_remaining_form_fields(
+def walk_and_build_remaining_form_fields(
     field: dict[str, dict | str], parents=None, form_text=""
 ):
     if parents is None:
@@ -38,7 +38,7 @@ def _walk_and_build_remaining_form_fields(
             if "optional" in item and item["optional"]:
                 continue
 
-            form_text = _walk_and_build_remaining_form_fields(
+            form_text = walk_and_build_remaining_form_fields(
                 item, parents=parents + [key], form_text=form_text
             )
 

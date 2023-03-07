@@ -19,7 +19,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from assistance import _ctx, _logging
 from assistance._config import ROOT_DOMAIN
 
-from .routers import chat, email, forms, stripe
+from .routers import email, stripe
 
 _logging.main()
 
@@ -42,9 +42,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(chat.router)
 app.include_router(stripe.router)
-app.include_router(forms.router)
 app.include_router(email.router)
 
 
