@@ -10,6 +10,15 @@ The Python AI assistance library.
 
 ### Server Hosting
 
+First time setup of supervisor:
+
+```bash
+sudo ln -s $HOME/git/assistance/dev/server/supervisor.conf /etc/supervisor/conf.d/assistance.conf
+sudo supervisorctl reread
+sudo supervisorctl update
+sudo supervisorctl status assistance
+```
+
 Restart supervisorctl
 
 ```bash

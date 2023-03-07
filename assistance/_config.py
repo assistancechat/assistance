@@ -16,7 +16,7 @@ import pathlib
 from typing import Literal, TypedDict, cast
 
 import aiofiles
-import toml
+import tomllib
 
 from assistance._paths import (
     AGENT_MAPPING,
@@ -78,14 +78,14 @@ def _load_config_item(name: str):
 
 async def load_targeted_news_config() -> TargetedNewsConfig:
     async with aiofiles.open(CONFIG / "targeted-news.toml", "r") as f:
-        news_config = cast(TargetedNewsConfig, toml.loads(await f.read()))
+        news_config = cast(TargetedNewsConfig, tomllib.loads(await f.read()))
 
     return news_config
 
 
 async def load_form_config(name: str):
     async with aiofiles.open(FORM_TEMPLATES / f"{name}.toml", encoding="utf8") as f:
-        form_template = toml.loads(await f.read())
+        form_template = tomllib.loads(await f.read())
 
     return form_template
 
