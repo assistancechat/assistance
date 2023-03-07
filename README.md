@@ -6,24 +6,24 @@ The Python AI assistance library.
 
 ### WASI Python Sandbox
 
-Install `wasmedge`:
+Install `wasmtime`:
 
 ```
-curl -sSf https://raw.githubusercontent.com/WasmEdge/WasmEdge/master/utils/install.sh | bash
+curl https://wasmtime.dev/install.sh -sSf | bash
 ```
 
 Download `python.wasm`:
 
 ```
-wget https://github.com/assistancechat/assistance/releases/download/python-wasm/python-3.11.1-wasmedge.wasm -O ~/.assistance/wasm/python.wasm
+wget https://github.com/assistancechat/assistance/releases/download/python-wasm/python-3.11.1.wasm -O ~/.assistance/wasm/python.wasm
 ```
 
 Test that it works:
 
 ```
-wasmedge \
+wasmtime \
   --env PYTHONPATH=/assistance:/assistance/.venv/lib/python3.11/site-packages \
-  --dir /assistance:$HOME/git/assistance \
+  --mapdir /assistance::$HOME/git/assistance \
   ~/.assistance/wasm/python.wasm
 ```
 
