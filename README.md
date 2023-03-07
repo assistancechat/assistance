@@ -6,7 +6,6 @@ The Python AI assistance library.
 
 ### Dev Tooling
 
-- [Pants](https://www.pantsbuild.org/docs/installation)
 - [VSCode](https://code.visualstudio.com/)
 
 ### Server Hosting

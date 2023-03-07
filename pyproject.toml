@@ -1,3 +1,77 @@
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry]
+name = "assistance"
+version = "0.1.1"
+description = ""
+authors = [
+  "Simon Biggs <simon@assistance.chat>",
+  "Ken Cheung <ken@assistance.chat>",
+  "Alex Carpenter <alex@assistance.chat>",
+]
+license = "Apache-2.0"
+readme = "README.md"
+
+[tool.poetry.scripts]
+assistance = "assistance.__main__:main"
+
+[tool.poetry.dependencies]
+python = "~3.11"
+
+# For GPT to use
+numpy = "*"
+scipy = "*"
+requests = "*"
+
+thefuzz = { extras = ["speedup"], version = "*" }
+openai = "*"
+beautifulsoup4 = "*"
+
+aiofiles = "*"
+aiohttp = "*"
+fastapi = "*"
+keyring = "*"
+passlib = { extras = ["bcrypt"], version = "*" }
+python-jose = { extras = ["cryptography"], version = "*" }
+python-multipart = "*"
+uvicorn = { extras = ["standard"], version = "*" }
+
+streamlit = ">=1.17.0"
+typer = "^0.7.0"
+authlib = "^1.2.0"
+itsdangerous = "^2.1.2"
+httpx = "^0.23.3"
+google-auth = "^2.16.0"
+
+gunicorn = "^20.1.0"
+stripe = "^5.1.1"
+tenacity = "^8.2.1"
+ipykernel = "^6.21.2"
+google-search-results = "^2.4.1"
+
+async-lru = "^2.0.2"
+aiocron = "^1.8"
+passporteye = "^2.2.1"
+mail-parser-reply = "^1.22"
+
+[tool.poetry.group.dev.dependencies]
+autoflake = "*"
+bandit = "*"
+black = "*"
+docformatter = "*"
+flake8 = "*"
+ipython = "*"
+isort = "*"
+mypy = "*"
+pre-commit = "*"
+pylint = "*"
+pyright = "*"
+pytest = "*"
+pytest-bandit = "*"
+pyupgrade = "*"
+
 [tool.isort]
 profile = "black"
 color_output = true
