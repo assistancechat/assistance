@@ -2,6 +2,31 @@
 
 The Python AI assistance library.
 
+## Installation
+
+### WASI Python Sandbox
+
+Install `wasmtime`:
+
+```
+curl https://wasmtime.dev/install.sh -sSf | bash
+```
+
+Download `python.wasm`:
+
+```
+wget https://github.com/assistancechat/assistance/releases/download/python-wasm/python-3.11.1.wasm -O ~/.assistance/wasm/python.wasm
+```
+
+Test that it works:
+
+```
+wasmtime \
+  --env PYTHONPATH=/assistance:/assistance/.venv/lib/python3.11/site-packages \
+  --mapdir /assistance::$HOME/git/assistance \
+  ~/.assistance/wasm/python.wasm
+```
+
 ## Notes
 
 ### Dev Tooling
