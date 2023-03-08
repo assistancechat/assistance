@@ -34,6 +34,8 @@ PROMPT = textwrap.dedent(
 
 MAX_MODEL_TOKENS = 4096
 
+SUMMARY_BATCH_SIZE = 3
+
 
 async def run_with_summary_fallback(
     scope: str,
@@ -57,7 +59,7 @@ async def run_with_summary_fallback(
             if "Model maximum reached" not in str(e):
                 raise e
 
-            transcript_to_summarise = "\n\n".join(email_thread[0:5])
+            transcript_to_summarise = "\n\n".join(email_thread[0:SUMMARY_BATCH_SIZE])
 
             summary = await get_completion_only(
                 scope=scope,
@@ -67,7 +69,7 @@ async def run_with_summary_fallback(
             )
 
             summary_item = f"Summary of omitted emails:\n{summary}\n\n"
-            email_thread = [summary_item] + email_thread[5:]
+            email_thread = [summary_item] + email_thread[SUMMARY_BATCH_SIZE:]
 
             continue
 
