@@ -54,6 +54,9 @@ TASK = textwrap.dedent(
         been able to be determined. DO NOT use null or N/A as a value,
         instead, just do not include that field in your response.
 
+        For every field that you do include YOU MUST include both the
+        "value" and the "confirmed" fields.
+
         ## Descriptions of the form fields that need to be confirmed
 
         {confirmation_form_fields_text}
@@ -74,22 +77,34 @@ TASK = textwrap.dedent(
                 "confirmed": <true or false>
             }}
         }}
-
+        {error_details}
         ## Your JSON response (ONLY respond with JSON, nothing else)
     """
 ).strip()
 
 
 async def confirming_form_items(
-    email: Email, confirmation_form_fields_text: str
+    email: Email, confirmation_form_fields_text: str, error: str | None
 ) -> dict[str, FormItem]:
     scope = email["user_email"]
 
     email_thread = get_email_thread(email)
 
+    if error is not None:
+        error_details = textwrap.dedent(
+            f"""
+                ## Your previous attempt gave the following error message
+
+                {error}
+            """
+        ).strip()
+    else:
+        error_details = ""
+
     prompt = TASK.format(
         transcript="{transcript}",
         confirmation_form_fields_text=confirmation_form_fields_text,
+        error_details=error_details,
     )
 
     response = await run_with_summary_fallback(

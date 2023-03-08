@@ -52,17 +52,35 @@ async def handle_enrolment_email(form_name: str, email: Email):
             cfg["field"], allow=fields_that_need_confirmation
         )
 
-        form_fields_with_updated_confirmation = await confirming_form_items(
-            email=email, confirmation_form_fields_text=confirmation_form_fields_text
-        )
+        error = None
 
-        for key, item in form_fields_with_updated_confirmation.items():
-            if key not in form_entries:
+        while True:
+            try:
+                form_fields_with_updated_confirmation = await confirming_form_items(
+                    email=email,
+                    confirmation_form_fields_text=confirmation_form_fields_text,
+                    error=str(error),
+                )
+            except json.JSONDecodeError as e:
+                error = e
                 continue
 
-            # We don't want to overwrite a previous confirmation
-            if form_entries[key]["value"] == item["value"] and item["confirmed"]:
-                form_entries[key]["confirmed"] = True
+            try:
+                for key, item in form_fields_with_updated_confirmation.items():
+                    if key not in form_entries:
+                        continue
+
+                    # We don't want to overwrite a previous confirmation
+                    if (
+                        form_entries[key]["value"] == item["value"]
+                        and item["confirmed"]
+                    ):
+                        form_entries[key]["confirmed"] = True
+            except KeyError as e:
+                error = e
+                continue
+
+            break
 
     remaining_form_fields_text = walk_and_build_form_fields(
         cfg["field"], ignore=set(form_entries.keys())

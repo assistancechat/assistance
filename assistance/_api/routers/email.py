@@ -249,9 +249,12 @@ async def _initial_parsing(raw_email: RawEmail):
 
     intermediate_email_dict["agent_name"] = rcpt_to.split("@")[0].lower()
 
-    if rcpt_to != to:
+    cleaned_to = get_cleaned_email(to.lower())
+    cleaned_rcpt_to = get_cleaned_email(rcpt_to.lower())
+
+    if cleaned_rcpt_to != cleaned_to:
         # This is a forwarded email
-        intermediate_email_dict["user_email"] = get_cleaned_email(to.lower())
+        intermediate_email_dict["user_email"] = cleaned_to
     else:
         intermediate_email_dict["user_email"] = get_cleaned_email(
             str(intermediate_email_dict["from"])
