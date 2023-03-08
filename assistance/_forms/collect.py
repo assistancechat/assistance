@@ -48,6 +48,9 @@ TASK = textwrap.dedent(
         present them in JSON format. Only provide the fields that you
         are able to extract with confidence.
 
+        DO NOT include a field in your response at all if it has not
+        been able to be determined.
+
         ## The email transcript
 
         {transcript}

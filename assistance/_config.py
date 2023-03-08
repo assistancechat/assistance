@@ -148,14 +148,11 @@ async def save_form_entries(
     form_name: str, user_email: str, form_entries: dict[str, FormItem]
 ):
     dir = FORM_DATA / form_name / "entries" / user_email
-    coroutines = []
     for key, item in form_entries.items():
-        path = dir / key
+        path = dir / f"{key}.json"
 
         async with aiofiles.open(path, "w") as f:
-            coroutines.append(f.write(json.dumps(item)))
-
-    asyncio.gather(*coroutines)
+            await f.write(json.dumps(item))
 
 
 async def get_complete_form_progression_keys(

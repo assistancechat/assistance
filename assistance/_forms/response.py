@@ -111,6 +111,7 @@ TASK = textwrap.dedent(
 
 async def write_and_send_email_response(
     email: Email,
+    form_name: str,
     current_step: str,
     remaining_form_fields: str,
     confirmation_still_needed: str,
@@ -141,7 +142,7 @@ async def write_and_send_email_response(
     reply = create_reply(original_email=email, response=response)
 
     mailgun_data = {
-        "from": f"enrolment@{ROOT_DOMAIN}",
+        "from": f"{form_name}-enrolment@{ROOT_DOMAIN}",
         "to": reply["to_addresses"],
         "cc": reply["cc_addresses"],
         "subject": reply["subject"],

@@ -112,6 +112,8 @@ async def handle_enrolment_email(form_name: str, email: Email):
             await set_progression_key(form_name, user_email, stage)
             continue
 
+        break
+
     if stage is None or task is None:
         stage = cfg["progression"][-1]["key"]
         task = cfg["progression"][-1]["task"]
@@ -132,6 +134,7 @@ async def handle_enrolment_email(form_name: str, email: Email):
 
     await write_and_send_email_response(
         email=email,
+        form_name=form_name,
         current_step=task,
         remaining_form_fields=updated_remaining_form_fields_text,
         confirmation_still_needed=confirmation_still_needed_text,
