@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import hashlib
 import re
 import textwrap
 from urllib.parse import parse_qs, urlparse
@@ -65,3 +66,7 @@ def get_cleaned_email(email_string: str):
     sender_username = match.group(1)
 
     return f"{sender_username}@{sender_domain}".lower()
+
+
+def get_hash_digest(text: str) -> str:
+    return hashlib.sha224(text.encode("utf-8")).hexdigest()

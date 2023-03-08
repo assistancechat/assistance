@@ -34,9 +34,9 @@ from assistance._handlers.restricted import RESTRICTED_TASKS
 from assistance._keys import get_mailgun_api_key
 from assistance._logging import log_info
 from assistance._mailgun import send_email
-from assistance._paths import NEW_EMAILS, get_emails_path, get_hash_digest
+from assistance._paths import NEW_EMAILS, get_emails_path
 from assistance._types import Email, RawEmail
-from assistance._utilities import get_cleaned_email
+from assistance._utilities import get_cleaned_email, get_hash_digest
 
 MAILGUN_API_KEY = get_mailgun_api_key()
 

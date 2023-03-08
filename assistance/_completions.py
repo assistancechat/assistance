@@ -31,7 +31,8 @@ from tenacity import (
 
 from assistance._logging import log_info
 
-from ._paths import COMPLETIONS, get_completion_cache_path, get_hash_digest
+from ._paths import COMPLETIONS, get_completion_cache_path
+from ._utilities import get_hash_digest
 
 
 async def get_completion_only(**kwargs) -> str:
