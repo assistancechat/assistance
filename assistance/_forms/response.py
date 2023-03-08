@@ -77,9 +77,9 @@ TASK = textwrap.dedent(
 
         ## Instructions
 
-        - DO NOT ask the user to fill in more than a few fields at any
-          one time. This is to prevent the user from getting
-          overwhelmed.
+        - You must be very careful not to overwhelm the user by asking
+          them to fill out too much of the form at once. Only ask them
+          for a few related fields in any one email response.
         - Ask open-ended questions to understand what their needs are
         - Show genuine empathy and interest in their situation
         - You have been provided with a range of tool results. Only get
@@ -91,6 +91,8 @@ TASK = textwrap.dedent(
           simon@assistance.chat for further support around that query.
         - Do not ask the user to email anyone else except those at the
           assistance.chat domain.
+        - If you have some results that need to be confirmed, make sure
+          to ask the user to confirm a few of them in your response.
 
         ## Details about the email record
 
@@ -100,7 +102,7 @@ TASK = textwrap.dedent(
 
         - The time right now is {now}.
 
-        ## Form fields that still need to be collected
+        ## Form fields that still need to be collected (only ask a few at once)
 
         {remaining_form_fields}
 
