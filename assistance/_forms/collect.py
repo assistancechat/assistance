@@ -12,22 +12,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
+import json
 import textwrap
 
-from assistance._config import DEFAULT_OPENAI_MODEL, ROOT_DOMAIN
-from assistance._email.reply import create_reply
+from assistance._config import DEFAULT_OPENAI_MODEL
+
 from assistance._email.thread import get_email_thread
-from assistance._keys import get_openai_api_key, get_serp_api_key
+from assistance._keys import get_openai_api_key
 from assistance._logging import log_info
-from assistance._mailgun import send_email
+
 from assistance._summarisation.thread import run_with_summary_fallback
 from assistance._types import Email
 
-from .build import walk_and_build_remaining_form_fields
-
 OPEN_AI_API_KEY = get_openai_api_key()
-SERP_API_KEY = get_serp_api_key()
 
 MODEL_KWARGS = {
     "engine": DEFAULT_OPENAI_MODEL,
@@ -47,7 +44,7 @@ TASK = textwrap.dedent(
         range of form fields that need to be filled out from the email
         record.
 
-        Determine which fields are able to be accurately extracted at
+        Determine which fields are able to be accurately extracted and
         present them in JSON format. Only provide the fields that you
         are able to extract with confidence.
 
@@ -62,7 +59,7 @@ TASK = textwrap.dedent(
         ## Example required JSON format
 
         {{
-            "personal.passport-number": "<number goes here>",
+            "personal.passport-number": "<passport number goes here>",
             "contact.email": "<email goes here>"
         }}
 
@@ -71,14 +68,16 @@ TASK = textwrap.dedent(
 ).strip()
 
 
-async def collect_form_items(email: Email):
+async def collect_form_items(
+    email: Email, remaining_form_fields_text: str
+) -> dict[str, str]:
     scope = email["user_email"]
 
     email_thread = get_email_thread(email)
 
-    # prompt = TASK.format(
-    #     transcript="{transcript}",
-    #     form_field_descriptions=,
+    prompt = TASK.format(
+        transcript="{transcript}", form_field_descriptions=remaining_form_fields_text
+    )
 
     response = await run_with_summary_fallback(
         scope=scope,
@@ -90,14 +89,6 @@ async def collect_form_items(email: Email):
 
     log_info(scope, response)
 
-    reply = create_reply(original_email=email, response=response)
+    new_form_items = json.loads(response)
 
-    mailgun_data = {
-        "from": f"enrolment@{ROOT_DOMAIN}",
-        "to": reply["to_addresses"],
-        "cc": reply["cc_addresses"],
-        "subject": reply["subject"],
-        "html_body": reply["html_reply"],
-    }
-
-    await send_email(scope, mailgun_data)
+    return new_form_items

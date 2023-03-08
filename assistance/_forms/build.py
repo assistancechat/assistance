@@ -18,9 +18,10 @@ from assistance._config import FormItem
 
 # TODO: Handle conditionals, pull in already filled out components and
 # only print parts of the form that have not yet been completed.
-def walk_and_build_remaining_form_fields(
+def walk_and_build_form_fields(
     field: dict[str, dict | str],
-    current_form_entries: dict[str, FormItem],
+    ignore: None | set[str] = None,
+    allow: None | set[str] = None,
     parents=None,
     form_text="",
 ):
@@ -38,25 +39,33 @@ def walk_and_build_remaining_form_fields(
             continue
 
         if isinstance(item, dict):
+            # TODO Handle conditionals
             if "conditional" in item:
                 continue
 
             if "optional" in item and item["optional"]:
                 continue
 
-            form_text = walk_and_build_remaining_form_fields(
+            record_path = parents + [key]
+            record = ".".join(record_path)
+            if ignore is not None and record in ignore:
+                continue
+
+            if allow is not None and record not in allow:
+                continue
+
+            form_text = walk_and_build_form_fields(
                 item,
-                parents=parents + [key],
+                parents=record_path,
                 form_text=form_text,
-                current_form_entries=current_form_entries,
+                ignore=ignore,
+                allow=allow,
             )
 
             continue
 
         if key == "text":
             record = ".".join(parents)
-
-            if record not in current_form_entries:
-                form_text += f"- {record}: {item}\n"
+            form_text += f"- {record}: {item}\n"
 
     return form_text
