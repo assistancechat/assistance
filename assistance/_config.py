@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import asyncio
 import json
 import pathlib
 from typing import Literal, TypedDict, cast, Any
@@ -139,6 +140,20 @@ async def get_form_entries(form_name: str, user_email: str) -> dict[str, FormIte
     )
 
     return file_contents
+
+
+async def save_form_entries(
+    form_name: str, user_email: str, form_entries: dict[str, FormItem]
+):
+    dir = FORM_DATA / form_name / "entries" / user_email
+    coroutines = []
+    for key, item in form_entries.items():
+        path = dir / key
+
+        async with aiofiles.open(path, "w") as f:
+            coroutines.append(f.write(json.dumps(item)))
+
+    asyncio.gather(*coroutines)
 
 
 async def get_complete_form_progression_keys(

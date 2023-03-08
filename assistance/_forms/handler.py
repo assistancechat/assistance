@@ -21,6 +21,7 @@ from assistance._config import (
     get_complete_form_progression_keys,
     FormItem,
     set_progression_key,
+    save_form_entries,
 )
 from assistance._email.thread import get_email_thread
 
@@ -132,7 +133,7 @@ async def handle_enrolment_email(form_name: str, email: Email):
         cfg["field"], ignore=set(form_entries.keys())
     )
 
-    # TODO: Save the form entries to disk
+    await save_form_entries(form_name, user_email, form_entries)
 
     # TODO: Write the email response
 
