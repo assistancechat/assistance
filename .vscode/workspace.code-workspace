@@ -318,7 +318,8 @@
       "firefox-devtools.vscode-firefox-debug",
       "ms-edgedevtools.vscode-edge-devtools",
       "aaravb.chrome-extension-developer-tools",
-      "codemooseus.vscode-devtools-for-chrome"
+      "codemooseus.vscode-devtools-for-chrome",
+      "william-voyek.vscode-nginx"
     ]
   }
 }

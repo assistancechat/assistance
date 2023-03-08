@@ -38,6 +38,8 @@ of the above was inspired from.
 
 ### Server Hosting
 
+#### Supervisor
+
 First time setup of supervisor:
 
 ```bash
@@ -51,6 +53,15 @@ Restart supervisorctl
 
 ```bash
 sudo supervisorctl restart assistance
+```
+
+#### Nginx
+
+First time setup of nginx:
+
+```bash
+sudo ln -s $HOME/git/assistance/dev/server/nginx-site.conf /etc/nginx/sites-enabled/assistance
+sudo nginx -s reload
 ```
 
 ### Poetry Python version
