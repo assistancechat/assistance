@@ -30,13 +30,9 @@ wasmtime \
 Acknowledgment to https://wasmlabs.dev/articles/python-wasm32-wasi/ where much
 of the above was inspired from.
 
-## Notes
+## Server Hosting
 
-### Dev Tooling
-
-- [VSCode](https://code.visualstudio.com/)
-
-### Server Hosting
+### Supervisor
 
 First time setup of supervisor:
 
@@ -53,6 +49,21 @@ Restart supervisorctl
 sudo supervisorctl restart assistance
 ```
 
+### Nginx
+
+First time setup of nginx:
+
+```bash
+sudo ln -s $HOME/git/assistance/dev/server/nginx-site.conf /etc/nginx/sites-enabled/assistance
+sudo nginx -s reload
+```
+
+## Notes
+
+### Dev Tooling
+
+- [VSCode](https://code.visualstudio.com/)
+
 ### Poetry Python version
 
 ```bash
@@ -64,4 +75,11 @@ poetry env use $(which python)
 ```bash
 rsync -r assistance:~/.assistance/* ~/.assistance/
 rsync -r server:~/.assistance/* ~/.assistance/
+```
+
+### Jupyter
+
+```
+poetry run python -m ipykernel install --user --name assistance
+jupyter lab --ip=10.0.0.163
 ```

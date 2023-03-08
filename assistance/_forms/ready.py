@@ -28,7 +28,7 @@ OPEN_AI_API_KEY = get_openai_api_key()
 
 MODEL_KWARGS = {
     "engine": DEFAULT_OPENAI_MODEL,
-    "max_tokens": 2048,
+    "max_tokens": 512,
     "temperature": 0.7,
     "top_p": 1,
     "frequency_penalty": 0,
@@ -36,55 +36,46 @@ MODEL_KWARGS = {
 }
 
 
-TASK = textwrap.dedent(
+PROMPT = textwrap.dedent(
     """
         # Overview
 
-        You have been provided with an email transcript as well as a
-        range of form fields that need to be filled out from the email
-        record.
+        You have been provided with an email transcript.
 
-        Determine which fields are able to be accurately extracted and
-        present them in JSON format. Only provide the fields that you
-        are able to extract with confidence.
+        You are undergoing the process of filling out a form on the
+        behalf of the user.
 
-        DO NOT include a field in your response at all if it has not
-        been able to be determined.
+        Your current task is to determine whether or not the user is
+        ready to be asked more questions to fill out the form. If they
+        haven't yet responded to your previous queries, or they have
+        questions of their own, this is a good indicator that they are
+        not yet ready to continue with the form.
 
         ## The email transcript
 
         {transcript}
 
-        ## Descriptions for each of the form fields
-
-        {form_field_descriptions}
-
         ## Example required JSON format
 
-        {{
-            "personal.passport-number": "<passport number goes here>",
-            "contact.email": "<email goes here>"
-        }}
+        {
+            "thinking-step-by-step": "<thought process for your decision>"
+            "is-the-user-ready-to-continue": <true or false>,
+            "justification": "<the justification for your choice goes here>"
+        }
 
-        ## Your JSON response (ONLY respond with JSON, nothing else)
+        ## Your JSON response
     """
 ).strip()
 
 
-async def collect_form_items(
-    email: Email, remaining_form_fields_text: str
-) -> dict[str, str]:
+async def check_if_user_is_ready_to_continue(email: Email) -> bool:
     scope = email["user_email"]
 
     email_thread = get_email_thread(email)
 
-    prompt = TASK.format(
-        transcript="{transcript}", form_field_descriptions=remaining_form_fields_text
-    )
-
     response = await run_with_summary_fallback(
         scope=scope,
-        prompt=prompt,
+        prompt=PROMPT,
         email_thread=email_thread,
         api_key=OPEN_AI_API_KEY,
         **MODEL_KWARGS,
@@ -92,6 +83,8 @@ async def collect_form_items(
 
     log_info(scope, response)
 
-    new_form_items = json.loads(response)
+    is_the_user_ready_to_continue = json.loads(response)[
+        "is-the-user-ready-to-continue"
+    ]
 
-    return new_form_items
+    return is_the_user_ready_to_continue

@@ -15,27 +15,15 @@
 # Prompt inspired by the work provided under an MIT license over at:
 # https://github.com/hwchase17/langchain/blob/ae1b589f60a/langchain/agents/conversational/prompt.py#L1-L36
 
-import json
-import re
+
 import textwrap
-from datetime import datetime
-from typing import Any, TypedDict
-from zoneinfo import ZoneInfo
 
-import openai
-
-from assistance import _ctx
 from assistance._completions import get_completion_only
-from assistance._config import DEFAULT_OPENAI_MODEL, ROOT_DOMAIN
-from assistance._email.reply import create_reply, get_all_user_emails
-from assistance._keys import get_openai_api_key, get_serp_api_key
-from assistance._logging import log_info
-from assistance._mailgun import send_email
-from assistance._types import Email
+
 
 PROMPT = textwrap.dedent(
     """
-        Write a summary of the following Discourse posts:
+        Write a summary of the following email thread:
 
         {transcript}
 
@@ -46,6 +34,8 @@ PROMPT = textwrap.dedent(
 
 MAX_MODEL_TOKENS = 4096
 
+SUMMARY_BATCH_SIZE = 3
+
 
 async def run_with_summary_fallback(
     scope: str,
@@ -55,11 +45,8 @@ async def run_with_summary_fallback(
     **kwargs,
 ):
     while True:
-        transcript = "\n\n".join(email_thread[0:-1])
-        most_recent = email_thread[-1]
-        prompt_with_transcript = prompt.replace("{transcript}", transcript).replace(
-            "{most_recent_post}", most_recent
-        )
+        transcript = "\n\n".join(email_thread)
+        prompt_with_transcript = prompt.replace("{transcript}", transcript)
 
         try:
             response = await get_completion_only(
@@ -72,7 +59,7 @@ async def run_with_summary_fallback(
             if "Model maximum reached" not in str(e):
                 raise e
 
-            transcript_to_summarise = "\n\n".join(email_thread[0:5])
+            transcript_to_summarise = "\n\n".join(email_thread[0:SUMMARY_BATCH_SIZE])
 
             summary = await get_completion_only(
                 scope=scope,
@@ -82,7 +69,7 @@ async def run_with_summary_fallback(
             )
 
             summary_item = f"Summary of omitted emails:\n{summary}\n\n"
-            email_thread = [summary_item] + email_thread[5:]
+            email_thread = [summary_item] + email_thread[SUMMARY_BATCH_SIZE:]
 
             continue
 

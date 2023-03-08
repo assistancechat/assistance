@@ -41,8 +41,8 @@ MODEL_KWARGS = {
     "max_tokens": 512,
     "temperature": 0.7,
     "top_p": 1,
-    "frequency_penalty": 2,
-    "presence_penalty": 2,
+    "frequency_penalty": 0,
+    "presence_penalty": 0,
 }
 
 
@@ -63,15 +63,23 @@ TASK = textwrap.dedent(
     """
         ## Overview
 
-        You are an AI Assistant helping a student enrol with the
-        Diploma of Entrepreneurship / Bachelor of Business degree at
-        Alphacrucis University.
+        You are an AI Assistant named Meshach helping a student enrol
+        with the Diploma of Entrepreneurship / Bachelor of Business
+        degree at Alphacrucis University. You are about to write a reply
+        to the following email addresses:
+
+        {email_addresses}
 
         You are stepping through each step of the enrolment process. You
         are currently up to the following step:
+
         {current_step}
+
         ## Instructions
 
+        - You must be very careful not to overwhelm the user by asking
+          them to fill out too much of the form at once. Only ask them
+          for a few related fields in any one email response.
         - Ask open-ended questions to understand what their needs are
         - Show genuine empathy and interest in their situation
         - You have been provided with a range of tool results. Only get
@@ -83,6 +91,8 @@ TASK = textwrap.dedent(
           simon@assistance.chat for further support around that query.
         - Do not ask the user to email anyone else except those at the
           assistance.chat domain.
+        - If you have some results that need to be confirmed, make sure
+          to ask the user to confirm a few of them in your response.
 
         ## Details about the email record
 
@@ -92,6 +102,14 @@ TASK = textwrap.dedent(
 
         - The time right now is {now}.
 
+        ## Form fields that still need to be collected (only ask a few at once)
+
+        {remaining_form_fields}
+
+        ## Form items that have been collected from the user and need user confirmation
+
+        {confirmation_still_needed}
+
         ## Email transcript
 
         {transcript}
@@ -99,10 +117,30 @@ TASK = textwrap.dedent(
 ).strip()
 
 
-async def react_to_enrolment_request(email: Email):
+async def write_and_send_email_response(
+    email: Email,
+    form_name: str,
+    current_step: str,
+    remaining_form_fields: str,
+    confirmation_still_needed: str,
+):
     scope = email["user_email"]
 
-    email_thread, prompt = await _get_prompt(email)
+    to_addresses, cc_addresses = get_all_user_emails(email)
+    email_addresses = to_addresses + cc_addresses
+    email_addresses_string = textwrap.indent("\n".join(email_addresses), "- ")
+
+    task = TASK.format(
+        subject=email["subject"],
+        transcript="{transcript}",
+        email_addresses=email_addresses_string,
+        current_step=current_step,
+        remaining_form_fields=remaining_form_fields,
+        confirmation_still_needed=confirmation_still_needed,
+        now=str(datetime.now(tz=ZoneInfo("Australia/Sydney"))),
+    )
+
+    email_thread, prompt = await _get_prompt(email, task)
 
     response = await run_with_summary_fallback(
         scope=scope,
@@ -117,7 +155,7 @@ async def react_to_enrolment_request(email: Email):
     reply = create_reply(original_email=email, response=response)
 
     mailgun_data = {
-        "from": f"enrolment@{ROOT_DOMAIN}",
+        "from": f"{form_name}-enrolment@{ROOT_DOMAIN}",
         "to": reply["to_addresses"],
         "cc": reply["cc_addresses"],
         "subject": reply["subject"],
@@ -154,18 +192,12 @@ EXAMPLE_TOOL_USE = textwrap.dedent(
 EXTRA_TOOLS = ""
 
 
-async def _get_prompt(email: Email):
+async def _get_prompt(email: Email, task: str):
     scope = email["user_email"]
 
     email_thread = get_email_thread(email)
 
     log_info(scope, json.dumps(email_thread, indent=2))
-
-    task = TASK.format(
-        subject=email["subject"],
-        transcript="{transcript}",
-        now=str(datetime.now(tz=ZoneInfo("Australia/Sydney"))),
-    )
 
     tools = await get_tools_and_responses(
         scope=scope,
@@ -174,7 +206,7 @@ async def _get_prompt(email: Email):
         example_tool_use=EXAMPLE_TOOL_USE,
         extra_tools=EXTRA_TOOLS,
     )
-    keys_to_keep = ["tool", "result"]
+    keys_to_keep = ["step_by_step_thought_process", "tool", "args", "result"]
 
     filtered_tools = []
     for tool in tools:

@@ -41,8 +41,8 @@ MODEL_KWARGS = {
     "stop": ["Post from @"],
     "temperature": 0.7,
     "top_p": 1,
-    "frequency_penalty": 2,
-    "presence_penalty": 2,
+    "frequency_penalty": 1,
+    "presence_penalty": 1,
 }
 
 # TODO: Make the common prompt sections DRY
@@ -188,10 +188,6 @@ TASK = textwrap.dedent(
         ## The transcript of the conversation thus far
 
         {transcript}
-
-        ## The most recent post (respond ONLY to this post)
-
-        {most_recent_post}
     """
 ).strip()
 
