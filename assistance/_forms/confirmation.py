@@ -31,8 +31,8 @@ MODEL_KWARGS = {
     "max_tokens": 512,
     "temperature": 0.7,
     "top_p": 1,
-    "frequency_penalty": 2,
-    "presence_penalty": 2,
+    "frequency_penalty": 0,
+    "presence_penalty": 0,
 }
 
 
@@ -84,7 +84,8 @@ async def confirming_form_items(
     email_thread = get_email_thread(email)
 
     prompt = TASK.format(
-        transcript="{transcript}", form_field_descriptions=confirmation_form_fields_text
+        transcript="{transcript}",
+        confirmation_form_fields_text=confirmation_form_fields_text,
     )
 
     response = await run_with_summary_fallback(

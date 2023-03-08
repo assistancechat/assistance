@@ -139,6 +139,8 @@ async def get_form_entries(form_name: str, user_email: str) -> dict[str, FormIte
         form_name=form_name, data_type="entries", user_email=user_email
     )
 
+    del file_contents["empty_files"]
+
     return file_contents
 
 

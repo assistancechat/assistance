@@ -30,8 +30,8 @@ MODEL_KWARGS = {
     "max_tokens": 1536,
     "temperature": 0.7,
     "top_p": 1,
-    "frequency_penalty": 0.0,
-    "presence_penalty": 0.0,
+    "frequency_penalty": 0,
+    "presence_penalty": 0,
 }
 
 MAX_ARTICLE_COUNT = 24

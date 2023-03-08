@@ -36,7 +36,6 @@ from .response import write_and_send_email_response
 
 async def handle_enrolment_email(form_name: str, email: Email):
     user_email = email["user_email"]
-    email_thread = get_email_thread(email)
 
     cfg = await load_form_config(form_name)
     form_entries = await get_form_entries(form_name, user_email)

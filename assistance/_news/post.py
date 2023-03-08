@@ -26,8 +26,8 @@ MODEL_KWARGS = {
     "max_tokens": 2048,
     "temperature": 0.7,
     "top_p": 1,
-    "frequency_penalty": 0.1,
-    "presence_penalty": 0.1,
+    "frequency_penalty": 0,
+    "presence_penalty": 0,
 }
 
 OPEN_AI_API_KEY = get_openai_api_key()
