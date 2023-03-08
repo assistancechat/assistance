@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import json
 import pathlib
 from typing import Literal, TypedDict, cast
 
@@ -113,21 +114,39 @@ async def get_agent_mappings(user: str):
     return details
 
 
-async def get_form_mapping(form_name: str, user_email: str):
-    details = await _get_file_based_mapping(FORM_DATA / form_name, user_email)
+class FormItem(TypedDict):
+    value: str
+    confirmed: bool
 
-    return details
+
+async def get_current_form_entries(
+    form_name: str, user_email: str
+) -> dict[str, FormItem]:
+    file_contents = await _get_file_based_mapping(
+        FORM_DATA / form_name, user_email, include_user=False
+    )
+
+    return file_contents
 
 
-async def _get_file_based_mapping(root: pathlib.Path, user: str):
+async def _get_file_based_mapping(root: pathlib.Path, user: str, include_user=True):
     user_details_files = (root / user).glob("*")
 
-    details = {"user": user}
+    details = {}
+
+    if include_user:
+        details["user"] = user
 
     for file in user_details_files:
         assert file.name != "user"
 
         async with aiofiles.open(file) as f:
-            details[file.name] = (await f.read()).strip()
+            file_contents = (await f.read()).strip()
+
+        if file.name.endswith(".json"):
+            details[file.name[:-5]] = json.loads(file_contents)
+            continue
+
+        details[file.name] = file_contents
 
     return details

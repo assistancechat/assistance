@@ -13,10 +13,16 @@
 # limitations under the License.
 
 
+from assistance._config import FormItem
+
+
 # TODO: Handle conditionals, pull in already filled out components and
 # only print parts of the form that have not yet been completed.
 def walk_and_build_remaining_form_fields(
-    field: dict[str, dict | str], parents=None, form_text=""
+    field: dict[str, dict | str],
+    current_form_entries: dict[str, FormItem],
+    parents=None,
+    form_text="",
 ):
     if parents is None:
         parents = []
@@ -39,13 +45,18 @@ def walk_and_build_remaining_form_fields(
                 continue
 
             form_text = walk_and_build_remaining_form_fields(
-                item, parents=parents + [key], form_text=form_text
+                item,
+                parents=parents + [key],
+                form_text=form_text,
+                current_form_entries=current_form_entries,
             )
 
             continue
 
         if key == "text":
             record = ".".join(parents)
-            form_text += f"- {record}: {item}\n"
+
+            if record not in current_form_entries:
+                form_text += f"- {record}: {item}\n"
 
     return form_text
