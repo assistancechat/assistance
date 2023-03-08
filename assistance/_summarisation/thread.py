@@ -55,11 +55,8 @@ async def run_with_summary_fallback(
     **kwargs,
 ):
     while True:
-        transcript = "\n\n".join(email_thread[0:-1])
-        most_recent = email_thread[-1]
-        prompt_with_transcript = prompt.replace("{transcript}", transcript).replace(
-            "{most_recent_post}", most_recent
-        )
+        transcript = "\n\n".join(email_thread)
+        prompt_with_transcript = prompt.replace("{transcript}", transcript)
 
         try:
             response = await get_completion_only(

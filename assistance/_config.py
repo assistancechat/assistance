@@ -151,6 +151,12 @@ async def get_complete_form_progression_keys(
     return file_contents["empty_files"]
 
 
+async def set_progression_key(form_name: str, user_email: str, key: str):
+    path = FORM_DATA / form_name / "progression" / user_email / key
+    async with aiofiles.open(path, "w"):
+        pass
+
+
 async def _get_form_data(form_name: str, data_type: str, user_email: str):
     results = await _get_file_based_mapping(
         FORM_DATA / form_name / data_type, user_email, include_user=False

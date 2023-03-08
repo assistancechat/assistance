@@ -29,10 +29,15 @@ def walk_and_build_form_fields(
         parents = []
 
     if allow is not None:
+        allow = set(allow)
+
         frozen_allow = allow.copy()
 
         for item in frozen_allow:
             elements = item.split(".")
+            if len(elements) < 2:
+                continue
+
             for i in range(len(elements)):
                 allow.add(".".join(elements[: i + 1]))
 

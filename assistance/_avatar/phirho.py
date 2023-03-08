@@ -188,10 +188,6 @@ TASK = textwrap.dedent(
         ## The transcript of the conversation thus far
 
         {transcript}
-
-        ## The most recent post (respond ONLY to this post)
-
-        {most_recent_post}
     """
 ).strip()
 
