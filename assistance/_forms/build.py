@@ -28,6 +28,14 @@ def walk_and_build_form_fields(
     if parents is None:
         parents = []
 
+    if allow is not None:
+        frozen_allow = allow.copy()
+
+        for item in frozen_allow:
+            elements = item.split(".")
+            for i in range(len(elements)):
+                allow.add(".".join(elements[: i + 1]))
+
     for key, item in field.items():
         if len(key) == 2 and key.startswith("h"):
             header_level = int(key[1])

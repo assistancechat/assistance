@@ -51,6 +51,8 @@ async def handle_enrolment_email(form_name: str, email: Email):
 
         updated_form_entries[key] = item
 
+    # fields_that_need_validation = pa
+
     # TODO: Check for user confirmations of previously collected data
 
     # TODO: Collect items to validate with the user
