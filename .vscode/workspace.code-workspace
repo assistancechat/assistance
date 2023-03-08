@@ -176,6 +176,7 @@
       "nojekyll",
       "NONPLANAR",
       "nptyping",
+      "numpydoc",
       "Obturator",
       "openai",
       "openapi",

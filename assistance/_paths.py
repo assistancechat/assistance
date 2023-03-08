@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import hashlib
+
 import pathlib
 
 LIB = pathlib.Path(__file__).parent
@@ -74,10 +74,6 @@ def get_completion_cache_path(hash_digest: str, create_parent: bool = False):
     path = _get_record_path(COMPLETION_CACHE, hash_digest, create_parent)
 
     return path
-
-
-def get_hash_digest(text: str) -> str:
-    return hashlib.sha224(text.encode("utf-8")).hexdigest()
 
 
 def _get_record_path(root: pathlib.Path, hash_digest: str, create_parent: bool):

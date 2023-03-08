@@ -9,11 +9,9 @@ import aiohttp
 from bs4 import BeautifulSoup
 
 from assistance._logging import log_info
-from assistance._paths import (
-    get_article_metadata_path,
-    get_downloaded_article_path,
-    get_hash_digest,
-)
+from assistance._paths import get_article_metadata_path, get_downloaded_article_path
+
+from assistance._utilities import get_hash_digest
 
 
 # https://stackoverflow.com/a/24618186
