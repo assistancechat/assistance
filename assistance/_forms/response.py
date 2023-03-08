@@ -69,7 +69,9 @@ TASK = textwrap.dedent(
 
         You are stepping through each step of the enrolment process. You
         are currently up to the following step:
+
         {current_step}
+
         ## Instructions
 
         - Ask open-ended questions to understand what their needs are
@@ -92,6 +94,14 @@ TASK = textwrap.dedent(
 
         - The time right now is {now}.
 
+        ## Form fields that still need to be collected
+
+        {remaining_form_fields}
+
+        ## Form items that have been collected from the user and need user confirmation
+
+        {confirmation_still_needed}
+
         ## Email transcript
 
         {transcript}
@@ -99,10 +109,24 @@ TASK = textwrap.dedent(
 ).strip()
 
 
-async def react_to_enrolment_request(email: Email):
+async def write_and_send_email_response(
+    email: Email,
+    current_step: str,
+    remaining_form_fields: str,
+    confirmation_still_needed: str,
+):
     scope = email["user_email"]
 
-    email_thread, prompt = await _get_prompt(email)
+    task = TASK.format(
+        subject=email["subject"],
+        transcript="{transcript}",
+        current_step=current_step,
+        remaining_form_fields=remaining_form_fields,
+        confirmation_still_needed=confirmation_still_needed,
+        now=str(datetime.now(tz=ZoneInfo("Australia/Sydney"))),
+    )
+
+    email_thread, prompt = await _get_prompt(email, task)
 
     response = await run_with_summary_fallback(
         scope=scope,
@@ -154,18 +178,12 @@ EXAMPLE_TOOL_USE = textwrap.dedent(
 EXTRA_TOOLS = ""
 
 
-async def _get_prompt(email: Email):
+async def _get_prompt(email: Email, task: str):
     scope = email["user_email"]
 
     email_thread = get_email_thread(email)
 
     log_info(scope, json.dumps(email_thread, indent=2))
-
-    task = TASK.format(
-        subject=email["subject"],
-        transcript="{transcript}",
-        now=str(datetime.now(tz=ZoneInfo("Australia/Sydney"))),
-    )
 
     tools = await get_tools_and_responses(
         scope=scope,

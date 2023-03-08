@@ -13,7 +13,12 @@
 # limitations under the License.
 
 
+from typing import Literal
+
 from assistance._config import FormItem
+
+
+text_format = Literal["record-description", "results", "description-only"]
 
 
 # TODO: Handle conditionals, pull in already filled out components and
@@ -24,6 +29,8 @@ def walk_and_build_form_fields(
     allow: None | set[str] = None,
     parents=None,
     form_text="",
+    text_format="record-description",
+    form_entries: None | dict[str, FormItem] = None,
 ):
     if parents is None:
         parents = []
@@ -73,12 +80,26 @@ def walk_and_build_form_fields(
                 form_text=form_text,
                 ignore=ignore,
                 allow=allow,
+                text_format=text_format,
+                form_entries=form_entries,
             )
 
             continue
 
         if key == "text":
             record = ".".join(parents)
-            form_text += f"- {record}: {item}\n"
+
+            if text_format == "record-description":
+                new_text = f"- {record}: {item}\n"
+            elif text_format == "description-only":
+                new_text = f"- {item}\n"
+            else:
+                assert form_entries is not None
+
+                form_entry_item = form_entries[record]
+
+                new_text = f"{item}:\n{form_entry_item['value']}\n\n"
+
+            form_text += new_text
 
     return form_text

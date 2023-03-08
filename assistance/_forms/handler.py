@@ -31,6 +31,7 @@ from .confirmation import confirming_form_items
 
 from .collect import collect_form_items
 from .ready import check_if_user_is_ready_to_continue
+from .response import write_and_send_email_response
 
 
 async def handle_enrolment_email(form_name: str, email: Email):
@@ -90,17 +91,12 @@ async def handle_enrolment_email(form_name: str, email: Email):
 
         fields_that_still_need_confirmation.add(key)
 
-    confirmation_still_needed_field_descriptions = walk_and_build_form_fields(
-        cfg["field"], allow=fields_that_still_need_confirmation
+    confirmation_still_needed_text = walk_and_build_form_fields(
+        cfg["field"],
+        allow=fields_that_still_need_confirmation,
+        form_entries=form_entries,
+        text_format="results",
     )
-    confirmation_field_values = {}
-    for key, item in form_entries.items():
-        if key not in fields_that_still_need_confirmation:
-            continue
-
-        confirmation_field_values[key] = item["value"]
-
-    confirmation_field_values_text = json.dumps(confirmation_field_values, indent=2)
 
     while True:
         form_progression = await get_complete_form_progression_keys(
@@ -117,7 +113,7 @@ async def handle_enrolment_email(form_name: str, email: Email):
             await set_progression_key(form_name, user_email, stage)
             continue
 
-    if stage is None:
+    if stage is None or task is None:
         stage = cfg["progression"][-1]["key"]
         task = cfg["progression"][-1]["task"]
 
@@ -130,12 +126,17 @@ async def handle_enrolment_email(form_name: str, email: Email):
         task = "- Be helpful and responsive to the user's queries.\n- Ask the user whether or not they are ready to continue with the questions for the form."
 
     updated_remaining_form_fields_text = walk_and_build_form_fields(
-        cfg["field"], ignore=set(form_entries.keys())
+        cfg["field"], ignore=set(form_entries.keys()), text_format="description-only"
     )
 
     await save_form_entries(form_name, user_email, form_entries)
 
-    # TODO: Write the email response
+    await write_and_send_email_response(
+        email=email,
+        current_step=task,
+        remaining_form_fields=updated_remaining_form_fields_text,
+        confirmation_still_needed=confirmation_still_needed_text,
+    )
 
     if fields_for_stage_completion is None:
         await set_progression_key(form_name, user_email, stage)
