@@ -22,6 +22,8 @@ from assistance._config import (
     FormItem,
     set_progression_key,
 )
+from assistance._email.thread import get_email_thread
+
 from .build import walk_and_build_form_fields
 from .progression import get_current_stage_and_task
 from .confirmation import confirming_form_items
@@ -32,8 +34,34 @@ from .ready import check_if_user_is_ready_to_continue
 
 async def handle_enrolment_email(form_name: str, email: Email):
     user_email = email["user_email"]
+    email_thread = get_email_thread(email)
+
     cfg = await load_form_config(form_name)
     form_entries = await get_form_entries(form_name, user_email)
+
+    fields_that_need_confirmation = set()
+    for key, item in form_entries.items():
+        if item["confirmed"]:
+            continue
+
+        fields_that_need_confirmation.add(key)
+
+    if fields_that_need_confirmation:
+        confirmation_form_fields_text = walk_and_build_form_fields(
+            cfg["field"], allow=fields_that_need_confirmation
+        )
+
+        form_fields_with_updated_confirmation = await confirming_form_items(
+            email=email, confirmation_form_fields_text=confirmation_form_fields_text
+        )
+
+        for key, item in form_fields_with_updated_confirmation.items():
+            if key not in form_entries:
+                continue
+
+            # We don't want to overwrite a previous confirmation
+            if form_entries[key]["value"] == item["value"] and item["confirmed"]:
+                form_entries[key]["confirmed"] = True
 
     remaining_form_fields_text = walk_and_build_form_fields(
         cfg["field"], ignore=set(form_entries.keys())
@@ -53,29 +81,6 @@ async def handle_enrolment_email(form_name: str, email: Email):
                 continue
 
         form_entries[key] = item
-
-    fields_that_need_confirmation = set()
-    for key, item in form_entries.items():
-        if item["confirmed"]:
-            continue
-
-        fields_that_need_confirmation.add(key)
-
-    confirmation_form_fields_text = walk_and_build_form_fields(
-        cfg["field"], allow=fields_that_need_confirmation
-    )
-
-    form_fields_with_updated_confirmation = await confirming_form_items(
-        email=email, confirmation_form_fields_text=confirmation_form_fields_text
-    )
-
-    for key, item in form_fields_with_updated_confirmation.items():
-        if key not in form_entries:
-            continue
-
-        # We don't want to overwrite a previous confirmation
-        if form_entries[key]["value"] == item["value"] and item["confirmed"]:
-            form_entries[key]["confirmed"] = True
 
     fields_that_still_need_confirmation = set()
     for key, item in form_entries.items():
