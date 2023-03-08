@@ -24,6 +24,7 @@ from assistance._paths import (
     EMAIL_MAPPING,
     FORM_TEMPLATES,
     USER_DETAILS,
+    FORM_DATA,
 )
 
 DEFAULT_OPENAI_MODEL = "gpt-3.5-turbo"
@@ -108,6 +109,12 @@ async def get_user_details(user: str):
 
 async def get_agent_mappings(user: str):
     details = await _get_file_based_mapping(AGENT_MAPPING, user)
+
+    return details
+
+
+async def get_form_mapping(form_name: str, user_email: str):
+    details = await _get_file_based_mapping(FORM_DATA / form_name, user_email)
 
     return details
 
