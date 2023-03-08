@@ -28,7 +28,7 @@ OPEN_AI_API_KEY = get_openai_api_key()
 
 MODEL_KWARGS = {
     "engine": DEFAULT_OPENAI_MODEL,
-    "max_tokens": 512,
+    "max_tokens": 2048,
     "temperature": 0.7,
     "top_p": 1,
     "frequency_penalty": 0,
@@ -49,6 +49,10 @@ TASK = textwrap.dedent(
         your task to identify for the following form fields whether or
         not the extracted value has been explicitly confirmed by the
         user within the email record.
+
+        DO NOT include a field in your response at all if it has not
+        been able to be determined. DO NOT use null or N/A as a value,
+        instead, just do not include that field in your response.
 
         ## Descriptions of the form fields that need to be confirmed
 
@@ -71,7 +75,7 @@ TASK = textwrap.dedent(
             }}
         }}
 
-        ## Your JSON response
+        ## Your JSON response (ONLY respond with JSON, nothing else)
     """
 ).strip()
 

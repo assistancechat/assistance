@@ -46,9 +46,10 @@ PROMPT = textwrap.dedent(
         behalf of the user.
 
         Your current task is to determine whether or not the user is
-        ready to be asked more questions to fill out the form. Er on the
-        side of having the user be ready. If you are unsure, then assume
-        that the user is ready.
+        ready to be asked more questions to fill out the form. If they
+        haven't yet responded to your previous queries, or they have
+        questions of their own, this is a good indicator that they are
+        not yet ready to continue with the form.
 
         ## The email transcript
 

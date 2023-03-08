@@ -63,9 +63,12 @@ TASK = textwrap.dedent(
     """
         ## Overview
 
-        You are an AI Assistant helping a student enrol with the
-        Diploma of Entrepreneurship / Bachelor of Business degree at
-        Alphacrucis University.
+        You are an AI Assistant named Meshach helping a student enrol
+        with the Diploma of Entrepreneurship / Bachelor of Business
+        degree at Alphacrucis University. You are about to write a reply
+        to the following email addresses:
+
+        {email_addresses}
 
         You are stepping through each step of the enrolment process. You
         are currently up to the following step:
@@ -74,6 +77,9 @@ TASK = textwrap.dedent(
 
         ## Instructions
 
+        - DO NOT ask the user to fill in more than a few fields at any
+          one time. This is to prevent the user from getting
+          overwhelmed.
         - Ask open-ended questions to understand what their needs are
         - Show genuine empathy and interest in their situation
         - You have been provided with a range of tool results. Only get
@@ -118,9 +124,14 @@ async def write_and_send_email_response(
 ):
     scope = email["user_email"]
 
+    to_addresses, cc_addresses = get_all_user_emails(email)
+    email_addresses = to_addresses + cc_addresses
+    email_addresses_string = textwrap.indent("\n".join(email_addresses), "- ")
+
     task = TASK.format(
         subject=email["subject"],
         transcript="{transcript}",
+        email_addresses=email_addresses_string,
         current_step=current_step,
         remaining_form_fields=remaining_form_fields,
         confirmation_still_needed=confirmation_still_needed,
@@ -193,7 +204,7 @@ async def _get_prompt(email: Email, task: str):
         example_tool_use=EXAMPLE_TOOL_USE,
         extra_tools=EXTRA_TOOLS,
     )
-    keys_to_keep = ["tool", "result"]
+    keys_to_keep = ["step_by_step_thought_process", "tool", "args", "result"]
 
     filtered_tools = []
     for tool in tools:

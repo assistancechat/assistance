@@ -118,13 +118,13 @@ async def handle_enrolment_email(form_name: str, email: Email):
         stage = cfg["progression"][-1]["key"]
         task = cfg["progression"][-1]["task"]
 
-    if stage == cfg["progression"][0]["key"]:
-        ready_to_continue = True
-    else:
-        ready_to_continue = await check_if_user_is_ready_to_continue(email)
+    # if stage == cfg["progression"][0]["key"]:
+    #     ready_to_continue = True
+    # else:
+    #     ready_to_continue = await check_if_user_is_ready_to_continue(email)
 
-    if not ready_to_continue:
-        task = "- Be helpful and responsive to the user's queries.\n- Ask the user whether or not they are ready to continue with the questions for the form."
+    # if not ready_to_continue:
+    #     task = "- Be helpful and responsive to the user's queries.\n- Ask the user whether or not they are ready to continue with the questions for the form."
 
     updated_remaining_form_fields_text = walk_and_build_form_fields(
         cfg["field"], ignore=set(form_entries.keys()), text_format="description-only"

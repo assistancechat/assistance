@@ -148,6 +148,8 @@ async def save_form_entries(
     form_name: str, user_email: str, form_entries: dict[str, FormItem]
 ):
     dir = FORM_DATA / form_name / "entries" / user_email
+    dir.mkdir(parents=True, exist_ok=True)
+
     for key, item in form_entries.items():
         path = dir / f"{key}.json"
 
@@ -167,6 +169,9 @@ async def get_complete_form_progression_keys(
 
 async def set_progression_key(form_name: str, user_email: str, key: str):
     path = FORM_DATA / form_name / "progression" / user_email / key
+
+    path.parent.mkdir(parents=True, exist_ok=True)
+
     async with aiofiles.open(path, "w"):
         pass
 

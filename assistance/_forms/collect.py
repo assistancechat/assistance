@@ -28,7 +28,7 @@ OPEN_AI_API_KEY = get_openai_api_key()
 
 MODEL_KWARGS = {
     "engine": DEFAULT_OPENAI_MODEL,
-    "max_tokens": 512,
+    "max_tokens": 2048,
     "temperature": 0.7,
     "top_p": 1,
     "frequency_penalty": 0,
@@ -66,7 +66,7 @@ TASK = textwrap.dedent(
             "contact.email": "<email goes here>"
         }}
 
-        ## Your JSON response
+        ## Your JSON response (ONLY respond with JSON, nothing else)
     """
 ).strip()
 
