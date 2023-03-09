@@ -66,7 +66,7 @@ PROMPT = textwrap.dedent(
             "At what point during studies does one get to run a franchise?",
             "Age limits for the course",
             "Am I required to pay back the loan during my studies or after, if I do go the loan route?",
-            "What is the education component of the program and how is it delivered?",
+            "What is the education component of the program and how is it delivered?"
         ]
 
         ## Your JSON response (ONLY respond with JSON, nothing else)

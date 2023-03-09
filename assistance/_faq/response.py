@@ -70,9 +70,10 @@ TASK = textwrap.dedent(
         ## Overview
 
         You have been forwarded an email from Alex Carpenter. A
-        prospective student is asking him questions about the Diploma of
-        Entrepreneurship / Bachelor of Business degree at Alphacrucis
-        University.
+        prospective student is asking him questions about Jim's
+        International Pathway Program. You are happy to help answer any
+        questions that the prospective student may have about the Jim's
+        International Pathway Program.
 
         You are to draft Alex's response for him. Below are a range of
         previous FAQ responses that Alex has provided to other students.
