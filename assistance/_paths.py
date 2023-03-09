@@ -51,6 +51,7 @@ TEST_DIR = LIB.joinpath("tests")
 TESTS_DATA = TEST_DIR.joinpath("data")
 
 FORM_TEMPLATES = CONFIG.joinpath("form-templates")
+FAQ_DATA = CONFIG.joinpath("faq")
 
 
 def get_article_metadata_path(hash_digest: str, create_parent: bool = False):

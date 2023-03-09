@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import asyncio
 import json
 import pathlib
 from typing import Literal, TypedDict, cast, Any
@@ -27,6 +26,7 @@ from assistance._paths import (
     FORM_TEMPLATES,
     USER_DETAILS,
     FORM_DATA,
+    FAQ_DATA,
 )
 
 DEFAULT_OPENAI_MODEL = "gpt-3.5-turbo"
@@ -127,6 +127,13 @@ async def load_form_config(name: str) -> FormConfig:
         form_template = cast(FormConfig, tomllib.loads(await f.read()))
 
     return form_template
+
+
+async def load_faq_data(name: str):
+    async with aiofiles.open(FAQ_DATA / f"{name}.toml", encoding="utf8") as f:
+        data = cast(FormConfig, tomllib.loads(await f.read()))
+
+    return data
 
 
 class FormItem(TypedDict):

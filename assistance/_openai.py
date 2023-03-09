@@ -128,3 +128,33 @@ async def _store_result(user_email: str, kwargs, response, query_timestamp: int)
 
     async with aiofiles.open(usage_record_path, "w") as f:
         await f.write(json.dumps(record, indent=2, sort_keys=True))
+
+
+async def get_embedding(block: str, api_key) -> list[float]:
+    result = await _get_embedding_with_cache(block, api_key)
+    return result["data"][0]["embedding"]  # type: ignore
+
+
+async def _get_embedding_with_cache(block: str, api_key):
+    block_hash = get_hash_digest(block)
+    cache_path = get_completion_cache_path(block_hash, create_parent=True)
+
+    try:
+        async with aiofiles.open(cache_path, "r") as f:
+            return json.loads(await f.read())
+    except (FileNotFoundError, json.JSONDecodeError):
+        pass
+
+    result = await _get_embedding(block, api_key)
+
+    asyncio.create_task(_store_cache(cache_path, result))
+
+    return result
+
+
+@retry(wait=wait_random_exponential(min=1, max=60), stop=stop_after_attempt(12))
+async def _get_embedding(block: str, api_key):
+    result = await openai.Embedding.acreate(
+        input=block, api_key=api_key, model="text-embedding-ada-002"
+    )
+    return result

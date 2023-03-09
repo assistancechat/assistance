@@ -14,7 +14,7 @@
 
 import textwrap
 
-from assistance._completions import get_completion_only
+from assistance._openai import get_completion_only
 from assistance._config import DEFAULT_OPENAI_MODEL, ROOT_DOMAIN
 from assistance._email.reply import create_reply
 from assistance._keys import get_openai_api_key

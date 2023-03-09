@@ -22,7 +22,7 @@ from zoneinfo import ZoneInfo
 from mailparser_reply import EmailReplyParser
 
 from assistance import _ctx
-from assistance._completions import get_completion_only
+from assistance._openai import get_completion_only
 from assistance._config import DEFAULT_OPENAI_MODEL, ROOT_DOMAIN
 from assistance._email.reply import create_reply, get_all_user_emails
 from assistance._email.thread import get_email_thread
