@@ -47,6 +47,10 @@ PROMPT = textwrap.dedent(
         the email transcript. You are required to respond in JSON
         format.
 
+        Make sure that each query includes any information relevant to
+        the query from the email. You may have to slightly reword the
+        query to achieve this.
+
         ## The email transcript
 
         {transcript}

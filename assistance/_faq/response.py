@@ -154,6 +154,7 @@ async def write_and_send_email_response(
         "from": f"{faq_name}-faq@{ROOT_DOMAIN}",
         "to": ["alexcarpenter2000@gmail.com"],
         "cc": ["me@simonbiggs.net"],
+        "reply_to": email["from"],
         "subject": reply["subject"],
         "html_body": reply["html_reply"],
     }
