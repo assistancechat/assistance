@@ -39,6 +39,7 @@ from assistance._types import Email
 from assistance._config import load_faq_data
 from .queries import get_queries
 from assistance._utilities import items_to_list_string
+from assistance._utilities import get_cleaned_email
 
 
 OPEN_AI_API_KEY = get_openai_api_key()
@@ -138,6 +139,8 @@ async def write_and_send_email_response(
 
     email_thread, prompt = await _get_prompt(email, task)
 
+    log_info(scope, _ctx.pp.pformat(email_thread))
+
     response = await run_with_summary_fallback(
         scope=scope,
         prompt=prompt,
@@ -150,11 +153,25 @@ async def write_and_send_email_response(
 
     reply = create_reply(original_email=email, response=response)
 
+    if email["subject"].startswith("Fwd: "):
+        reply["subject"] = email["subject"][5:]
+
+        last_message_lower = email_thread[-1].lower()
+
+        try:
+            reply_to = get_cleaned_email(
+                last_message_lower.split("forwarded message")[-1]
+            )
+        except ValueError:
+            reply_to = email["from"]
+    else:
+        reply_to = email["from"]
+
     mailgun_data = {
         "from": f"{faq_name}-faq@{ROOT_DOMAIN}",
         "to": ["alexcarpenter2000@gmail.com"],
         "cc": ["me@simonbiggs.net"],
-        "reply_to": email["from"],
+        "reply_to": reply_to,
         "subject": reply["subject"],
         "html_body": reply["html_reply"],
     }
