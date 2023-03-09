@@ -83,7 +83,7 @@ TASK = textwrap.dedent(
         You have also been provided with a range of tool results. Use
         these tool results to help you draft your own response.
 
-        FAQ Responses:
+        ## Previous Responses to Other Students
 
         {faq_responses}
 
