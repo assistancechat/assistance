@@ -36,59 +36,52 @@ MODEL_KWARGS = {
 }
 
 
-TASK = textwrap.dedent(
+PROMPT = textwrap.dedent(
     """
         # Overview
 
-        You have been provided with an email transcript as well as a
-        range of form fields that need to be filled out from the email
-        record.
+        You have been provided with an email transcript.
 
-        Determine which fields are able to be accurately extracted and
-        present them in JSON format. Only provide the fields that you
-        are able to extract with confidence.
-
-        DO NOT include a field in your response at all if it has not
-        been able to be determined. DO NOT use null, N/A or an empty
-        string as a value, instead, just do not include that field in
-        your response.
+        It is your job to extract a list of all of the questions,
+        queries, as well as any requests for information that are within
+        the email transcript. You are required to respond in JSON
+        format.
 
         ## The email transcript
 
         {transcript}
 
-        ## Descriptions for each of the form fields
+        ## Required JSON format
 
-        {form_field_descriptions}
-
-        ## Example required JSON format
-
-        {{
-            "an.example.field.item": "<field result goes here>",
-            "another.example.field.item": "<field result goes here>",
+        [
+            "<first-question>",
+            "<second-question>",
             ...
-            "last.field.result.that.you.found": "<field result goes here>"
-        }}
+            "nth-question"
+        ]
+
+        ## An example response
+
+        [
+            "At what point during studies does one get to run a franchise?",
+            "Age limits for the course",
+            "Am I required to pay back the loan during my studies or after, if I do go the loan route?",
+            "What is the education component of the program and how is it delivered?"
+        ]
 
         ## Your JSON response (ONLY respond with JSON, nothing else)
     """
 ).strip()
 
 
-async def collect_form_items(
-    email: Email, remaining_form_fields_text: str
-) -> dict[str, str]:
+async def get_queries(email: Email) -> list[str]:
     scope = email["user_email"]
 
     email_thread = get_email_thread(email)
 
-    prompt = TASK.format(
-        transcript="{transcript}", form_field_descriptions=remaining_form_fields_text
-    )
-
     response = await run_with_summary_fallback(
         scope=scope,
-        prompt=prompt,
+        prompt=PROMPT,
         email_thread=email_thread,
         api_key=OPEN_AI_API_KEY,
         **MODEL_KWARGS,
@@ -96,6 +89,6 @@ async def collect_form_items(
 
     log_info(scope, response)
 
-    new_form_items = json.loads(response)
+    questions = json.loads(response)
 
-    return new_form_items
+    return questions

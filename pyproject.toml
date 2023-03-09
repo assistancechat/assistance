@@ -41,6 +41,9 @@ passporteye = "*"
 mail-parser-reply = "*"
 wasmer = "^1.1.0"
 wasmer-compiler-cranelift = "^1.1.0"
+torch = "^1.13.1"
+async-lru = "^2.0.2"
+asyncache = "^0.3.1"
 
 [tool.poetry.group.dev.dependencies]
 autoflake = "*"

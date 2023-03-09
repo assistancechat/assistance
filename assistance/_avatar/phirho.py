@@ -20,7 +20,7 @@ from datetime import datetime
 from zoneinfo import ZoneInfo
 
 from assistance import _ctx
-from assistance._completions import get_completion_only
+from assistance._openai import get_completion_only
 from assistance._config import DEFAULT_OPENAI_MODEL, ROOT_DOMAIN
 from assistance._email.reply import create_reply, get_all_user_emails
 from assistance._keys import get_openai_api_key, get_serp_api_key

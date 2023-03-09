@@ -16,6 +16,7 @@ import textwrap
 
 from assistance._config import ROOT_DOMAIN
 from assistance._forms.handler import handle_enrolment_email
+from assistance._faq.response import write_and_send_email_response
 from assistance._news.pipeline import add_to_google_alerts_pipeline
 from assistance._types import Email
 
@@ -24,7 +25,12 @@ async def jims_ac_enrolment(email: Email):
     await handle_enrolment_email("jims-ac", email)
 
 
+async def jims_ac_faq(email: Email):
+    await write_and_send_email_response("jims-ac", email)
+
+
 DEFAULT_TASKS = {
+    "jims-ac-faq": ("", jims_ac_faq),
     "jims-ac-enrolment": ("", jims_ac_enrolment),
     "googlealerts": (
         "Stores a Google Alert for future use by the targeted-news agent.",

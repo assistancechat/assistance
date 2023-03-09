@@ -23,7 +23,7 @@ from typing import Any, TypedDict
 from zoneinfo import ZoneInfo
 
 from assistance import _ctx
-from assistance._completions import get_completion_only
+from assistance._openai import get_completion_only
 from assistance._config import DEFAULT_OPENAI_MODEL, ROOT_DOMAIN
 from assistance._email.reply import create_reply, get_all_user_emails
 from assistance._keys import get_openai_api_key, get_serp_api_key
@@ -302,6 +302,8 @@ async def _evaluate_tools(scope, response):
                 continue
 
             tool["result"] = await TOOLS[tool_name](*args)
+        except KeyError:
+            pass
         except Exception as e:
             raise ValueError(
                 scope, f"Error running tool `{tool_name}` with args {tool_args}: {e}"

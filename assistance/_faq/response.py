@@ -12,6 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from assistance._config import load_faq_data
+from assistance._embeddings import get_top_questions_and_answers_text
+from assistance._keys import get_openai_api_key
+
 
 import json
 import re
@@ -32,6 +36,10 @@ from assistance._mailgun import send_email
 from assistance._summarisation.thread import run_with_summary_fallback
 from assistance._tooling.executive_function_system import get_tools_and_responses
 from assistance._types import Email
+from assistance._config import load_faq_data
+from .queries import get_queries
+from assistance._utilities import items_to_list_string
+
 
 OPEN_AI_API_KEY = get_openai_api_key()
 SERP_API_KEY = get_serp_api_key()
@@ -63,52 +71,44 @@ TASK = textwrap.dedent(
     """
         ## Overview
 
-        You are an AI Assistant named Meshach helping a student enrol
-        with the Diploma of Entrepreneurship / Bachelor of Business
-        degree at Alphacrucis University. You are about to write a reply
-        to the following email addresses:
+        You have been forwarded an email from Alex Carpenter. A
+        prospective student is asking him questions about Jim's
+        International Pathway Program. You are happy to help answer any
+        questions that the prospective student may have about the Jim's
+        International Pathway Program.
 
-        {email_addresses}
+        You are to draft Alex's response for him. Below are a range of
+        previous FAQ responses that Alex has provided to other students.
+        Use these FAQ responses as a guide to help you draft your own
+        response.
 
-        You are stepping through each step of the enrolment process. You
-        are currently up to the following step:
+        You have also been provided with a range of tool results. Use
+        these tool results to help you draft your own response.
 
-        {current_step}
+        ## Questions asked by THIS applicant
+
+        {queries}
+
+        ## Previous responses to OTHER prospective students
+
+        These questions are not necessarily the same as the questions
+        asked by this prospective student. However, you may use the
+        responses to these questions as a guide to help you draft your
+        own response.
+
+        {faq_responses}
 
         ## Instructions
 
-        - You must be very careful not to overwhelm the user by asking
-          them to fill out too much of the form at once. Only ask them
-          for a few related fields in any one email response.
         - Ask open-ended questions to understand what their needs are
         - Show genuine empathy and interest in their situation
-        - You have been provided with a range of tool results. Only get
-          your information from the tool results provided. Do not
-          utilise any of your outside knowledge to fill in any gaps.
-        - If the information within your tools isn't enough to provide
-          a response, simply mention that you don't have enough
-          information to provide a response and to please reach out to
-          simon@assistance.chat for further support around that query.
-        - Do not ask the user to email anyone else except those at the
-          assistance.chat domain.
-        - If you have some results that need to be confirmed, make sure
-          to ask the user to confirm a few of them in your response.
+        - DO NOT utilise any of your outside knowledge to fill in any
+          gaps. Instead only utilise the tool results and FAQ responses
+          to help you draft your response.
 
         ## Details about the email record
 
         - The subject of the email thread is "{subject}".
-
-        ## Extra details
-
-        - The time right now is {now}.
-
-        ## Form fields that still need to be collected (only ask a few at once)
-
-        {remaining_form_fields}
-
-        ## Form items that have been collected from the user and need user confirmation
-
-        {confirmation_still_needed}
 
         ## Email transcript
 
@@ -118,26 +118,22 @@ TASK = textwrap.dedent(
 
 
 async def write_and_send_email_response(
+    faq_name: str,
     email: Email,
-    form_name: str,
-    current_step: str,
-    remaining_form_fields: str,
-    confirmation_still_needed: str,
 ):
     scope = email["user_email"]
+    faq_data = await load_faq_data("jims-ac")
+    queries = await get_queries(email=email)
 
-    to_addresses, cc_addresses = get_all_user_emails(email)
-    email_addresses = to_addresses + cc_addresses
-    email_addresses_string = textwrap.indent("\n".join(email_addresses), "- ")
+    faq_responses = await get_top_questions_and_answers_text(
+        openai_api_key=OPEN_AI_API_KEY, faq_data=faq_data, queries=queries
+    )
 
     task = TASK.format(
         subject=email["subject"],
         transcript="{transcript}",
-        email_addresses=email_addresses_string,
-        current_step=current_step,
-        remaining_form_fields=remaining_form_fields,
-        confirmation_still_needed=confirmation_still_needed,
-        now=str(datetime.now(tz=ZoneInfo("Australia/Sydney"))),
+        queries=items_to_list_string(queries),
+        faq_responses=faq_responses,
     )
 
     email_thread, prompt = await _get_prompt(email, task)
@@ -155,9 +151,9 @@ async def write_and_send_email_response(
     reply = create_reply(original_email=email, response=response)
 
     mailgun_data = {
-        "from": f"{form_name}-enrolment@{ROOT_DOMAIN}",
-        "to": reply["to_addresses"],
-        "cc": reply["cc_addresses"],
+        "from": f"{faq_name}-faq@{ROOT_DOMAIN}",
+        "to": ["alexcarpenter2000@gmail.com"],
+        "cc": ["me@simonbiggs.net"],
         "subject": reply["subject"],
         "html_body": reply["html_reply"],
     }
