@@ -38,6 +38,8 @@ from assistance._tooling.executive_function_system import get_tools_and_response
 from assistance._types import Email
 from assistance._config import load_faq_data
 from .queries import get_queries
+from assistance._utilities import items_to_list_string
+
 
 OPEN_AI_API_KEY = get_openai_api_key()
 SERP_API_KEY = get_serp_api_key()
@@ -83,7 +85,16 @@ TASK = textwrap.dedent(
         You have also been provided with a range of tool results. Use
         these tool results to help you draft your own response.
 
-        ## Previous Responses to Other Students
+        ## Questions asked by THIS applicant
+
+        {queries}
+
+        ## Previous responses to OTHER prospective students
+
+        These questions are not necessarily the same as the questions
+        asked by this prospective student. However, you may use the
+        responses to these questions as a guide to help you draft your
+        own response.
 
         {faq_responses}
 
@@ -121,6 +132,7 @@ async def write_and_send_email_response(
     task = TASK.format(
         subject=email["subject"],
         transcript="{transcript}",
+        queries=items_to_list_string(queries),
         faq_responses=faq_responses,
     )
 

@@ -302,6 +302,8 @@ async def _evaluate_tools(scope, response):
                 continue
 
             tool["result"] = await TOOLS[tool_name](*args)
+        except KeyError:
+            pass
         except Exception as e:
             raise ValueError(
                 scope, f"Error running tool `{tool_name}` with args {tool_args}: {e}"
