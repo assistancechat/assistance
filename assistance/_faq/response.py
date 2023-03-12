@@ -153,17 +153,22 @@ async def write_and_send_email_response(
 
     reply = create_reply(original_email=email, response=response)
 
-    if email["subject"].startswith("Fwd: "):
+    if email["subject"].startswith("Fwd: ") or email["subject"].startswith("FW: "):
         reply["subject"] = email["subject"][5:]
 
         last_message_lower = email_thread[-1].lower()
 
-        try:
-            reply_to = get_cleaned_email(
-                last_message_lower.split("forwarded message")[-1]
-            )
-        except ValueError:
-            reply_to = email["from"]
+        first_reply_line = email["plain_replies_only"].splitlines()[0]
+        if first_reply_line.startswith("From: "):
+            reply_to = get_cleaned_email(first_reply_line)
+
+        else:
+            try:
+                reply_to = get_cleaned_email(
+                    last_message_lower.split("forwarded message")[-1]
+                )
+            except ValueError:
+                reply_to = email["from"]
     else:
         reply_to = email["from"]
 

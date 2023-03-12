@@ -29,7 +29,12 @@ async def jims_ac_faq(email: Email):
     await write_and_send_email_response("jims-ac", email)
 
 
+async def noop(email: Email):
+    pass
+
+
 DEFAULT_TASKS = {
+    "testing-ac": ("", noop),
     "jims-ac-faq": ("", jims_ac_faq),
     "jims-ac-enrolment": ("", jims_ac_enrolment),
     "googlealerts": (

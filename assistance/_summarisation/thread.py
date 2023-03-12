@@ -19,6 +19,16 @@
 import textwrap
 
 from assistance._openai import get_completion_only
+from assistance._config import DEFAULT_OPENAI_MODEL
+
+SUMMARY_KWARGS = {
+    "engine": DEFAULT_OPENAI_MODEL,
+    "max_tokens": 512,
+    "temperature": 0.7,
+    "top_p": 1,
+    "frequency_penalty": 0,
+    "presence_penalty": 0,
+}
 
 
 PROMPT = textwrap.dedent(
@@ -65,7 +75,7 @@ async def run_with_summary_fallback(
                 scope=scope,
                 prompt=PROMPT.format(transcript=transcript_to_summarise),
                 api_key=api_key,
-                **kwargs,
+                **SUMMARY_KWARGS,
             )
 
             summary_item = f"Summary of omitted emails:\n{summary}\n\n"
