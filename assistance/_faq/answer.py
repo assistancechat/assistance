@@ -142,7 +142,8 @@ RANK = textwrap.dedent(
 
         {{
             "does any response meet the required standard?": <true or false>,
-            "id of the best answer": <id>
+            "id of the best answer": <id>,
+            "does the selected answer completely answer the user's question?": <true or false>
         }}
 
         ## Your JSON response (ONLY respond with JSON, nothing else)
@@ -203,7 +204,12 @@ async def write_answer(
     )
 
     response_data = json.loads(response)
-    if not response_data["does any response meet the required standard?"]:
+    if (
+        not response_data["does any response meet the required standard?"]
+        or not response_data[
+            "does the selected answer completely answer the user's question?"
+        ]
+    ):
         return ""
 
     best_answer_id = response_data["id of the best answer"]

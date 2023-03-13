@@ -121,6 +121,8 @@ async def write_and_send_email_response(
     for question, answer in zip(questions, answers):
         question_and_answers_string += f"Q: {question}\nA: {answer}\n\n"
 
+    question_and_answers_string = question_and_answers_string.strip()
+
     prompt = PROMPT.format(
         transcript="{transcript}", question_and_answers=question_and_answers_string
     )
