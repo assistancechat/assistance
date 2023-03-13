@@ -24,7 +24,7 @@ from assistance._logging import log_info
 from assistance._openai import get_completion_only
 
 from .extract_questions import QuestionAndContext
-from .sub_questions import get_questions
+from .sub_questions import get_sub_questions
 
 # from .batched_questions import get_questions_by_batch
 
@@ -149,7 +149,7 @@ async def write_answer(
     question = question_and_context["question"]
     context = question_and_context["context"]
 
-    questions = await get_questions(scope=scope, question=question)
+    questions = await get_sub_questions(scope=scope, question=question, context=context)
 
     # Don't need to batch the questions for this use case
     # questions_by_batch = await get_questions_by_batch(scope=scope, questions=questions)

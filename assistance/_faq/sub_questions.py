@@ -20,7 +20,6 @@ from assistance._config import DEFAULT_OPENAI_MODEL
 from assistance._keys import get_openai_api_key
 from assistance._logging import log_info
 from assistance._openai import get_completion_only
-from assistance._utilities import items_to_list_string
 
 OPEN_AI_API_KEY = get_openai_api_key()
 
@@ -101,14 +100,19 @@ PROMPT = textwrap.dedent(
 
         {question}
 
+        ## Context around the question
+
+        {context}
+
         ## Your JSON response (ONLY respond with JSON, nothing else)
     """
 ).strip()
 
 
-async def get_questions(
+async def get_sub_questions(
     scope: str,
     question: str,
+    context: str,
     collected_questions: set | None = None,
     original_question: str | None = None,
     max_depth=3,
@@ -127,7 +131,9 @@ async def get_questions(
 
     response = await get_completion_only(
         scope=scope,
-        prompt=PROMPT.format(question=question, original_question=original_question),
+        prompt=PROMPT.format(
+            question=question, original_question=original_question, context=context
+        ),
         api_key=OPEN_AI_API_KEY,
         **MODEL_KWARGS,
     )
@@ -147,9 +153,10 @@ async def get_questions(
             collected_questions.add(sub_question)
 
             coroutines.append(
-                get_questions(
+                get_sub_questions(
                     scope,
                     question=sub_question,
+                    context=context,
                     collected_questions=collected_questions,
                     original_question=original_question,
                     max_depth=max_depth,

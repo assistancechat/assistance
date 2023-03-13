@@ -72,6 +72,8 @@ PROMPT = textwrap.dedent(
         DO NOT include the question and answers within your introduction
         or your conclusion.
 
+        The name to sign the email with is "Alex Carpenter".
+
         ## The questions and their answers that you have been provided.
 
         You do not need to repeat these. They will already be included
@@ -117,7 +119,9 @@ async def write_and_send_email_response(
 
     question_and_answers_string = ""
     for question_and_context, answer in zip(questions_and_contexts, answers):
-        question_and_answers_string += f"Q: {question_and_context}\nA: {answer}\n\n"
+        question_and_answers_string += (
+            f"Q: {question_and_context['question']}\nA: {answer}\n\n"
+        )
 
     question_and_answers_string = question_and_answers_string.strip()
 
@@ -143,7 +147,7 @@ async def write_and_send_email_response(
     reply = create_reply(original_email=email, response=response_email)
 
     if email["subject"].startswith("Fwd: ") or email["subject"].startswith("FW: "):
-        reply["subject"] = email["subject"][5:]
+        reply["subject"] = email["subject"].removeprefix("Fwd: ").removeprefix("FW: ")
 
         last_message_lower = email_thread[-1].lower()
 

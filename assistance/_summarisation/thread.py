@@ -44,7 +44,7 @@ PROMPT = textwrap.dedent(
 
 MAX_MODEL_TOKENS = 4096
 
-SUMMARY_BATCH_SIZE = 3
+SUMMARY_BATCH_SIZE = 2
 
 
 async def run_with_summary_fallback(
