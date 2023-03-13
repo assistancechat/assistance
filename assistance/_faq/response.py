@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from assistance._config import load_faq_data
-from assistance._embeddings import get_top_questions_and_answers_text
+from assistance._embeddings import get_top_questions_and_answers
 from assistance._keys import get_openai_api_key
 
 
@@ -123,10 +123,10 @@ async def write_and_send_email_response(
     email: Email,
 ):
     scope = email["user_email"]
-    faq_data = await load_faq_data("jims-ac")
+    faq_data = await load_faq_data(faq_name)
     queries = await get_queries(email=email)
 
-    faq_responses = await get_top_questions_and_answers_text(
+    faq_responses = await get_top_questions_and_answers(
         openai_api_key=OPEN_AI_API_KEY, faq_data=faq_data, queries=queries
     )
 

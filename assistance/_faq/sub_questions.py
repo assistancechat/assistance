@@ -108,7 +108,7 @@ PROMPT = textwrap.dedent(
 ).strip()
 
 
-async def get_sub_questions(
+async def get_questions(
     scope: str,
     question: str,
     collected_questions: set | None = None,
@@ -144,7 +144,7 @@ async def get_sub_questions(
             collected_questions.add(sub_question)
 
             coroutines.append(
-                get_sub_questions(
+                get_questions(
                     scope,
                     question=sub_question,
                     collected_questions=collected_questions,

@@ -22,7 +22,7 @@ from cachetools import LRUCache
 from assistance._openai import get_embedding
 
 
-async def get_top_questions_and_answers_text(openai_api_key, faq_data, queries, k=3):
+async def get_top_questions_and_answers(openai_api_key, faq_data, queries, k=3):
     all_most_relevant_results = await _get_top_questions_and_answers(
         openai_api_key, faq_data, queries, k=k
     )
@@ -45,7 +45,7 @@ async def get_top_questions_and_answers_text(openai_api_key, faq_data, queries, 
     strings_and_scores.sort(key=lambda x: x[1], reverse=True)
     collected_q_and_a_strings = [x[0] for x in strings_and_scores]
 
-    return "\n\n".join(collected_q_and_a_strings)
+    return collected_q_and_a_strings
 
 
 async def _get_top_questions_and_answers(openai_api_key, faq_data, queries, k=3):
