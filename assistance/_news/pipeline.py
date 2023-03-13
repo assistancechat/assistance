@@ -20,10 +20,7 @@ import aiofiles
 
 from assistance import _ctx
 from assistance._parsing.googlealerts import parse_alerts
-from assistance._paths import (
-    NEW_GOOGLE_ALERTS,
-    get_article_metadata_path,
-)
+from assistance._paths import NEW_GOOGLE_ALERTS, get_article_metadata_path
 from assistance._types import Article, Email
 from assistance._utilities import get_cleaned_url, get_hash_digest
 from assistance._vendor.stackoverflow.web_scraping import scrape

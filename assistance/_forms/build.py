@@ -17,7 +17,6 @@ from typing import Literal
 
 from assistance._config import FormItem
 
-
 text_format = Literal["record-description", "results", "description-only"]
 
 

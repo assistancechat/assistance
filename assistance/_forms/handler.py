@@ -14,22 +14,21 @@
 
 import json
 
-from assistance._types import Email
 from assistance._config import (
-    load_form_config,
-    get_form_entries,
-    get_complete_form_progression_keys,
     FormItem,
-    set_progression_key,
+    get_complete_form_progression_keys,
+    get_form_entries,
+    load_form_config,
     save_form_entries,
+    set_progression_key,
 )
 from assistance._email.thread import get_email_thread
+from assistance._types import Email
 
 from .build import walk_and_build_form_fields
-from .progression import get_current_stage_and_task
-from .confirmation import confirming_form_items
-
 from .collect import collect_form_items
+from .confirmation import confirming_form_items
+from .progression import get_current_stage_and_task
 from .ready import check_if_user_is_ready_to_continue
 from .response import write_and_send_email_response
 

@@ -16,11 +16,9 @@ import json
 import textwrap
 
 from assistance._config import DEFAULT_OPENAI_MODEL
-
 from assistance._email.thread import get_email_thread
 from assistance._keys import get_openai_api_key
 from assistance._logging import log_info
-
 from assistance._summarisation.thread import run_with_summary_fallback
 from assistance._types import Email
 

@@ -22,13 +22,13 @@ from zoneinfo import ZoneInfo
 from mailparser_reply import EmailReplyParser
 
 from assistance import _ctx
-from assistance._openai import get_completion_only
 from assistance._config import DEFAULT_OPENAI_MODEL, ROOT_DOMAIN
 from assistance._email.reply import create_reply, get_all_user_emails
 from assistance._email.thread import get_email_thread
 from assistance._keys import get_openai_api_key, get_serp_api_key
 from assistance._logging import log_info
 from assistance._mailgun import send_email
+from assistance._openai import get_completion_only
 from assistance._summarisation.thread import run_with_summary_fallback
 from assistance._tooling.executive_function_system import get_tools_and_responses
 from assistance._types import Email
