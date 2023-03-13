@@ -38,7 +38,7 @@ from assistance._summarisation.thread import run_with_summary_fallback
 from assistance._tooling.executive_function_system import get_tools_and_responses
 from assistance._types import Email
 from assistance._config import load_faq_data
-from .queries import get_queries
+from .extract_questions import get_questions
 from assistance._utilities import items_to_list_string
 from assistance._utilities import get_cleaned_email
 

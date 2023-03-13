@@ -78,7 +78,7 @@ PROMPT = textwrap.dedent(
 ).strip()
 
 
-async def get_queries(email: Email) -> list[str]:
+async def get_questions(email: Email) -> list[str]:
     scope = email["user_email"]
 
     email_thread = get_email_thread(email)

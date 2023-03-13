@@ -16,6 +16,7 @@ from assistance._config import load_faq_data
 from assistance._embeddings import get_top_questions_and_answers
 from assistance._keys import get_openai_api_key
 
+import asyncio
 
 import json
 import re
@@ -37,7 +38,8 @@ from assistance._summarisation.thread import run_with_summary_fallback
 from assistance._tooling.executive_function_system import get_tools_and_responses
 from assistance._types import Email
 from assistance._config import load_faq_data
-from .queries import get_queries
+from .extract_questions import get_questions
+from .answer import write_answer
 from assistance._utilities import items_to_list_string
 from assistance._utilities import get_cleaned_email
 
@@ -55,22 +57,9 @@ MODEL_KWARGS = {
 }
 
 
-EMAIL_PROMPT = textwrap.dedent(
+PROMPT = textwrap.dedent(
     """
-        {task}
-
-        ## Tool results
-
-        {tool_results}
-
-        ## Your email response (email content ONLY)
-    """
-).strip()
-
-
-TASK = textwrap.dedent(
-    """
-        ## Overview
+        # Write an email introduction and conclusion
 
         You have been forwarded an email from Alex Carpenter. A
         prospective student is asking him questions about Jim's
@@ -78,42 +67,36 @@ TASK = textwrap.dedent(
         questions that the prospective student may have about the Jim's
         International Pathway Program.
 
-        You are to draft Alex's response for him. Below are a range of
-        previous FAQ responses that Alex has provided to other students.
-        Use these FAQ responses as a guide to help you draft your own
-        response.
+        You have been provided with a list of the answers to a range of
+        questions that the prospective student asked. You are to write
+        the introduction to the email response and the conclusion to the
+        email response.
 
-        You have also been provided with a range of tool results. Use
-        these tool results to help you draft your own response.
+        This introduction and conclusion will be prepended and appended
+        around the question answers that you have already been provided.
 
-        ## Questions asked by THIS applicant
+        DO NOT include the question and answers within your introduction
+        or your conclusion.
 
-        {queries}
+        ## The questions and their answers that you have been provided.
 
-        ## Previous responses to OTHER prospective students
+        You do not need to repeat these. They will already be included
+        within your email response.
 
-        These questions are not necessarily the same as the questions
-        asked by this prospective student. However, you may use the
-        responses to these questions as a guide to help you draft your
-        own response.
-
-        {faq_responses}
-
-        ## Instructions
-
-        - Ask open-ended questions to understand what their needs are
-        - Show genuine empathy and interest in their situation
-        - DO NOT utilise any of your outside knowledge to fill in any
-          gaps. Instead only utilise the tool results and FAQ responses
-          to help you draft your response.
-
-        ## Details about the email record
-
-        - The subject of the email thread is "{subject}".
+        {question_and_answers}
 
         ## Email transcript
 
         {transcript}
+
+        ## Required JSON format
+
+        {{
+            "introduction": "<Your email introduction>",
+            "conclusion": "<Your email conclusion>"
+        }}
+
+        ## Your JSON response (ONLY respond with JSON, nothing else)
     """
 ).strip()
 
@@ -124,22 +107,25 @@ async def write_and_send_email_response(
 ):
     scope = email["user_email"]
     faq_data = await load_faq_data(faq_name)
-    queries = await get_queries(email=email)
+    questions = await get_questions(email=email)
 
-    faq_responses = await get_top_questions_and_answers(
-        openai_api_key=OPEN_AI_API_KEY, faq_data=faq_data, queries=queries
+    coroutines = []
+    for question in questions:
+        coroutines.append(
+            write_answer(scope=scope, faq_data=faq_data, question=question)
+        )
+
+    answers = await asyncio.gather(*coroutines)
+
+    question_and_answers_string = ""
+    for question, answer in zip(questions, answers):
+        question_and_answers_string += f"Q: {question}\nA: {answer}\n\n"
+
+    prompt = PROMPT.format(
+        transcript="{transcript}", question_and_answers=question_and_answers_string
     )
 
-    task = TASK.format(
-        subject=email["subject"],
-        transcript="{transcript}",
-        queries=items_to_list_string(queries),
-        faq_responses=faq_responses,
-    )
-
-    email_thread, prompt = await _get_prompt(email, task)
-
-    log_info(scope, _ctx.pp.pformat(email_thread))
+    email_thread = get_email_thread(email=email)
 
     response = await run_with_summary_fallback(
         scope=scope,
@@ -151,7 +137,10 @@ async def write_and_send_email_response(
 
     log_info(scope, response)
 
-    reply = create_reply(original_email=email, response=response)
+    result = json.loads(response)
+    response_email = f"{result['introduction']}\n\n{question_and_answers_string}\n\n{result['conclusion']}"
+
+    reply = create_reply(original_email=email, response=response_email)
 
     if email["subject"].startswith("Fwd: ") or email["subject"].startswith("FW: "):
         reply["subject"] = email["subject"][5:]
@@ -182,60 +171,3 @@ async def write_and_send_email_response(
     }
 
     await send_email(scope, mailgun_data)
-
-
-EXAMPLE_TOOL_USE = textwrap.dedent(
-    """
-        [
-            {{
-                "id": 0,
-                "step_by_step_thought_process": "I will start by using the 'now' tool to get the current date and time.",
-                "tool": "now",
-                "args": [],
-                "score": 9,
-                "confidence": 8
-            }},
-            {{
-                "id": 1,
-                "step_by_step_thought_process": "I am going to search for more details about the courses at Alphacrucis.",
-                "tool": "internet_search",
-                "args": ["Courses at Alphacrucis University"],
-                "score": 9,
-                "confidence": 8
-            }}
-        ]
-    """
-).strip()
-
-
-EXTRA_TOOLS = ""
-
-
-async def _get_prompt(email: Email, task: str):
-    scope = email["user_email"]
-
-    email_thread = get_email_thread(email)
-
-    log_info(scope, json.dumps(email_thread, indent=2))
-
-    tools = await get_tools_and_responses(
-        scope=scope,
-        task=task,
-        email_thread=email_thread,
-        example_tool_use=EXAMPLE_TOOL_USE,
-        extra_tools=EXTRA_TOOLS,
-    )
-    keys_to_keep = ["step_by_step_thought_process", "tool", "args", "result"]
-
-    filtered_tools = []
-    for tool in tools:
-        filtered_tool = {key: tool[key] for key in keys_to_keep}
-        filtered_tools.append(filtered_tool)
-
-    tools_string = json.dumps(filtered_tools, indent=2)
-
-    prompt = EMAIL_PROMPT.format(
-        task=task, tool_results=tools_string, transcript="{transcript}"
-    )
-
-    return email_thread, prompt
