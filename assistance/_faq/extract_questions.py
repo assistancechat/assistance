@@ -42,14 +42,19 @@ PROMPT = textwrap.dedent(
 
         You have been provided with an email transcript.
 
-        It is your job to extract a list of all of the questions,
-        queries, as well as any requests for information that are within
-        the email transcript. You are required to respond in JSON
-        format.
+        It is your job to extract a full and complete list of all of the
+        questions, queries, as well as any requests for information that
+        are within the email transcript. You are required to respond in
+        JSON format.
 
-        Make sure that each query includes any information relevant to
-        the query from the email. You may have to slightly reword the
-        query to achieve this.
+        When each question is being answered, only the question itself
+        will be available to the AI agent that has the job of answering
+        the question. So make sure all relevant information is included
+        within each extracted question.
+
+        You may reword questions as needed to help achieve an accurate
+        standalone representation of the question with all of its
+        accompanying information.
 
         ## The email transcript
 

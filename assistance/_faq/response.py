@@ -138,7 +138,7 @@ async def write_and_send_email_response(
     log_info(scope, response)
 
     result = json.loads(response)
-    response_email = f"{result['introduction']}\n\n{question_and_answers_string}\n\n{result['conclusion']}"
+    response_email = f"{result['introduction'].strip()}\n\n{question_and_answers_string}\n\n{result['conclusion'].strip()}"
 
     reply = create_reply(original_email=email, response=response_email)
 

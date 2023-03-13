@@ -92,6 +92,9 @@ PROMPT = textwrap.dedent(
         {faq_responses}
 
         ## Your answer
+
+        Q: {question}
+        A:
     """
 ).strip()
 
@@ -117,6 +120,9 @@ RANK = textwrap.dedent(
         Your response is required to be the id of the answer itself
         ONLY.
 
+        If no response meets the required answers standard then set the
+        "does any response meet the required standard?" field to false.
+
         ## Previous responses to OTHER prospective students
 
         These questions are not necessarily the same as the question
@@ -132,7 +138,14 @@ RANK = textwrap.dedent(
 
         {answers}
 
-        ## Your answer (provide the question id only as an integer)
+        ## Required JSON format
+
+        {{
+            "does any response meet the required standard?": <true or false>,
+            "id of the best answer": <id>
+        }}
+
+        ## Your JSON response (ONLY respond with JSON, nothing else)
     """
 ).strip()
 
@@ -178,7 +191,7 @@ async def write_answer(
     for i, response in enumerate(question_responses):
         question_responses_with_id.append({"id": i, "answer": response})
 
-    best_answer_id = await get_completion_only(
+    response = await get_completion_only(
         scope=scope,
         prompt=RANK.format(
             question=question,
@@ -188,5 +201,11 @@ async def write_answer(
         api_key=OPEN_AI_API_KEY,
         **MODEL_KWARGS,
     )
+
+    response_data = json.loads(response)
+    if not response_data["does any response meet the required standard?"]:
+        return ""
+
+    best_answer_id = response_data["id of the best answer"]
 
     return question_responses[int(best_answer_id)]
