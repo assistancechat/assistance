@@ -90,10 +90,12 @@ async def extract_questions(email: Email) -> list[QuestionAndContext]:
 
     email_thread = get_email_thread(email)
 
+    last_two_emails_thread = email_thread[-2:]
+
     response = await run_with_summary_fallback(
         scope=scope,
         prompt=PROMPT,
-        email_thread=email_thread,
+        email_thread=last_two_emails_thread,
         api_key=OPEN_AI_API_KEY,
         **MODEL_KWARGS,
     )

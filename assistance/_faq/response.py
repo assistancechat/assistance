@@ -36,6 +36,7 @@ from assistance._types import Email
 from assistance._utilities import get_cleaned_email, items_to_list_string
 
 from .answer import write_answer
+from .correspondent import get_first_name
 from .extract_questions import extract_questions
 
 OPEN_AI_API_KEY = get_openai_api_key()
@@ -55,11 +56,11 @@ PROMPT = textwrap.dedent(
     """
         # Write an email introduction and conclusion
 
-        You have been forwarded an email from Alex Carpenter. A
-        prospective student is asking him questions about Jim's
-        International Pathway Program. You are happy to help answer any
-        questions that the prospective student may have about the Jim's
-        International Pathway Program.
+        You have been forwarded an email from Alex Carpenter.
+        {students_name}, a prospective student is asking him questions
+        about Jim's International Pathway Program. You are happy to help
+        answer any questions that the prospective student may have about
+        the Jim's International Pathway Program.
 
         You have been provided with a list of the answers to a range of
         questions that the prospective student asked. You are to write
@@ -103,6 +104,33 @@ async def write_and_send_email_response(
 ):
     scope = email["user_email"]
     faq_data = await load_faq_data(faq_name)
+
+    email_thread = get_email_thread(email=email)
+
+    if email["subject"].startswith("Fwd: ") or email["subject"].startswith("FW: "):
+        subject = email["subject"].removeprefix("Fwd: ").removeprefix("FW: ")
+
+        last_message_lower = email_thread[-1].lower()
+
+        first_reply_line = email["plain_replies_only"].splitlines()[0]
+        if first_reply_line.startswith("From: "):
+            reply_to = get_cleaned_email(first_reply_line)
+
+        else:
+            try:
+                reply_to = get_cleaned_email(
+                    last_message_lower.split("forwarded message")[-1]
+                )
+            except ValueError:
+                reply_to = email["from"]
+    else:
+        reply_to = email["from"]
+        subject = None
+
+    students_name = await get_first_name(
+        scope=scope, email_thread=email_thread, their_email_address=reply_to
+    )
+
     questions_and_contexts = await extract_questions(email=email)
 
     coroutines = []
@@ -126,10 +154,10 @@ async def write_and_send_email_response(
     question_and_answers_string = question_and_answers_string.strip()
 
     prompt = PROMPT.format(
-        transcript="{transcript}", question_and_answers=question_and_answers_string
+        transcript="{transcript}",
+        question_and_answers=question_and_answers_string,
+        students_name=students_name,
     )
-
-    email_thread = get_email_thread(email=email)
 
     response = await run_with_summary_fallback(
         scope=scope,
@@ -145,32 +173,15 @@ async def write_and_send_email_response(
     response_email = f"{result['introduction'].strip()}\n\n{question_and_answers_string}\n\n{result['conclusion'].strip()}"
 
     reply = create_reply(original_email=email, response=response_email)
-
-    if email["subject"].startswith("Fwd: ") or email["subject"].startswith("FW: "):
-        reply["subject"] = email["subject"].removeprefix("Fwd: ").removeprefix("FW: ")
-
-        last_message_lower = email_thread[-1].lower()
-
-        first_reply_line = email["plain_replies_only"].splitlines()[0]
-        if first_reply_line.startswith("From: "):
-            reply_to = get_cleaned_email(first_reply_line)
-
-        else:
-            try:
-                reply_to = get_cleaned_email(
-                    last_message_lower.split("forwarded message")[-1]
-                )
-            except ValueError:
-                reply_to = email["from"]
-    else:
-        reply_to = email["from"]
+    if subject is None:
+        subject = reply["subject"]
 
     mailgun_data = {
         "from": f"{faq_name}-faq@{ROOT_DOMAIN}",
         "to": ["alexcarpenter2000@gmail.com"],
         "cc": ["me@simonbiggs.net"],
         "reply_to": reply_to,
-        "subject": reply["subject"],
+        "subject": subject,
         "html_body": reply["html_reply"],
     }
 
