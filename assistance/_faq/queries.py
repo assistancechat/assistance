@@ -28,7 +28,7 @@ OPEN_AI_API_KEY = get_openai_api_key()
 
 MODEL_KWARGS = {
     "engine": DEFAULT_OPENAI_MODEL,
-    "max_tokens": 2048,
+    "max_tokens": 512,
     "temperature": 0.7,
     "top_p": 1,
     "frequency_penalty": 0,
@@ -61,7 +61,7 @@ PROMPT = textwrap.dedent(
             "<first-question>",
             "<second-question>",
             ...
-            "nth-question"
+            "<nth-question>"
         ]
 
         ## An example response
