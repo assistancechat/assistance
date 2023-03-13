@@ -20,7 +20,7 @@ from assistance._config import DEFAULT_OPENAI_MODEL
 
 from assistance._keys import get_openai_api_key
 from assistance._logging import log_info
-
+from assistance._utilities import items_to_list_string
 from assistance._openai import get_completion_only
 
 
@@ -113,7 +113,12 @@ async def get_questions(
     question: str,
     collected_questions: set | None = None,
     original_question: str | None = None,
+    max_depth=3,
+    current_depth=0,
 ) -> list[str]:
+    if current_depth >= max_depth:
+        return []
+
     if collected_questions is None:
         collected_questions = set()
 
@@ -149,6 +154,8 @@ async def get_questions(
                     question=sub_question,
                     collected_questions=collected_questions,
                     original_question=original_question,
+                    max_depth=max_depth,
+                    current_depth=current_depth + 1,
                 )
             )
 
