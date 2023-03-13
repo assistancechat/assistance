@@ -13,7 +13,6 @@
 # limitations under the License.
 
 import json
-import asyncio
 import textwrap
 
 from assistance._config import DEFAULT_OPENAI_MODEL
@@ -22,7 +21,6 @@ from assistance._keys import get_openai_api_key
 from assistance._logging import log_info
 
 from assistance._openai import get_completion_only
-from assistance._types import Email
 
 OPEN_AI_API_KEY = get_openai_api_key()
 

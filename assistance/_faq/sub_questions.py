@@ -22,9 +22,7 @@ from assistance._keys import get_openai_api_key
 from assistance._logging import log_info
 
 from assistance._openai import get_completion_only
-from assistance._types import Email
 
-from .question_relevance import get_relevant_sub_questions
 
 OPEN_AI_API_KEY = get_openai_api_key()
 
@@ -73,6 +71,8 @@ PROMPT = textwrap.dedent(
 
         Make sure that any sub-questions that you provide are relevant
         to the original question.
+
+        Make sure each question only asks one thing at a time.
 
         ## Required JSON format
 
