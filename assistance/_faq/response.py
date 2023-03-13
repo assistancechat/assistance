@@ -101,19 +101,23 @@ async def write_and_send_email_response(
 ):
     scope = email["user_email"]
     faq_data = await load_faq_data(faq_name)
-    questions = await extract_questions(email=email)
+    questions_and_contexts = await extract_questions(email=email)
 
     coroutines = []
-    for question in questions:
+    for question_and_context in questions_and_contexts:
         coroutines.append(
-            write_answer(scope=scope, faq_data=faq_data, question=question)
+            write_answer(
+                scope=scope,
+                faq_data=faq_data,
+                question_and_context=question_and_context,
+            )
         )
 
     answers = await asyncio.gather(*coroutines)
 
     question_and_answers_string = ""
-    for question, answer in zip(questions, answers):
-        question_and_answers_string += f"Q: {question}\nA: {answer}\n\n"
+    for question_and_context, answer in zip(questions_and_contexts, answers):
+        question_and_answers_string += f"Q: {question_and_context}\nA: {answer}\n\n"
 
     question_and_answers_string = question_and_answers_string.strip()
 

@@ -16,7 +16,6 @@ import asyncio
 import json
 import random
 import textwrap
-from typing import TypedDict
 
 from assistance._config import DEFAULT_OPENAI_MODEL
 from assistance._embeddings import get_top_questions_and_answers
@@ -24,6 +23,7 @@ from assistance._keys import get_openai_api_key, get_serp_api_key
 from assistance._logging import log_info
 from assistance._openai import get_completion_only
 
+from .extract_questions import QuestionAndContext
 from .sub_questions import get_questions
 
 # from .batched_questions import get_questions_by_batch
@@ -65,6 +65,10 @@ PROMPT = textwrap.dedent(
         ## Question asked by THIS applicant
 
         {question}
+
+        ## Context from the email transcript for THIS question
+
+        {context}
 
         ## Previous responses to OTHER prospective students
 
@@ -116,6 +120,10 @@ RANK = textwrap.dedent(
 
         {question}
 
+        ## Context from the email transcript for THIS question
+
+        {context}
+
         ## Answers to THIS applicant's question to choose from
 
         {answers}
@@ -133,16 +141,14 @@ RANK = textwrap.dedent(
 ).strip()
 
 
-class QuestionAndContext(TypedDict):
-    question: str
-    context: str
-
-
 async def write_answer(
     scope: str,
     faq_data,
-    question: str,
+    question_and_context: QuestionAndContext,
 ):
+    question = question_and_context["question"]
+    context = question_and_context["context"]
+
     questions = await get_questions(scope=scope, question=question)
 
     # Don't need to batch the questions for this use case
@@ -161,7 +167,9 @@ async def write_answer(
             get_completion_only(
                 scope=scope,
                 prompt=PROMPT.format(
-                    question=question, faq_responses="\n\n".join(faq_responses)
+                    question=question,
+                    context=context,
+                    faq_responses="\n\n".join(faq_responses),
                 ),
                 api_key=OPEN_AI_API_KEY,
                 **MODEL_KWARGS,
@@ -183,6 +191,7 @@ async def write_answer(
         scope=scope,
         prompt=RANK.format(
             question=question,
+            context=context,
             faq_responses="\n\n".join(sorted_faq_responses),
             answers=json.dumps(question_responses_with_id, indent=2),
         ),

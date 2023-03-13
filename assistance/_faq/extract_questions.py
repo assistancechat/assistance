@@ -14,6 +14,7 @@
 
 import json
 import textwrap
+from typing import TypedDict
 
 from assistance._config import DEFAULT_OPENAI_MODEL
 from assistance._email.thread import get_email_thread
@@ -79,7 +80,12 @@ PROMPT = textwrap.dedent(
 ).strip()
 
 
-async def extract_questions(email: Email) -> list[str]:
+class QuestionAndContext(TypedDict):
+    question: str
+    context: str
+
+
+async def extract_questions(email: Email) -> list[QuestionAndContext]:
     scope = email["user_email"]
 
     email_thread = get_email_thread(email)
