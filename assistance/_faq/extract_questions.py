@@ -16,11 +16,9 @@ import json
 import textwrap
 
 from assistance._config import DEFAULT_OPENAI_MODEL
-
 from assistance._email.thread import get_email_thread
 from assistance._keys import get_openai_api_key
 from assistance._logging import log_info
-
 from assistance._summarisation.thread import run_with_summary_fallback
 from assistance._types import Email
 
@@ -38,7 +36,7 @@ MODEL_KWARGS = {
 
 PROMPT = textwrap.dedent(
     """
-        # Overview
+        # Question and context extraction
 
         You have been provided with an email transcript.
 
@@ -47,14 +45,12 @@ PROMPT = textwrap.dedent(
         are within the email transcript. You are required to respond in
         JSON format.
 
-        When each question is being answered, only the question itself
-        will be available to the AI agent that has the job of answering
-        the question. So make sure all relevant information is included
-        within each extracted question.
+        Make sure to include any relevant contextual information from
+        the email transcript that will be helpful in answering the given
+        question with each extracted question.
 
         You may reword questions as needed to help achieve an accurate
-        standalone representation of the question with all of its
-        accompanying information.
+        standalone representation of the question.
 
         ## The email transcript
 
@@ -63,19 +59,19 @@ PROMPT = textwrap.dedent(
         ## Required JSON format
 
         [
-            "<first-question>",
-            "<second-question>",
+            {{
+                "question": "<first question>",
+                "context": "<Any relevant context from the email transcript>"
+            }},
+            {{
+                "question": "<second question>",
+                "context": "<Any relevant context from the email transcript>"
+            }},
             ...
-            "<nth-question>"
-        ]
-
-        ## An example response
-
-        [
-            "At what point during studies does one get to run a franchise?",
-            "Age limits for the course",
-            "Am I required to pay back the loan during my studies or after, if I do go the loan route?",
-            "What is the education component of the program and how is it delivered?"
+            {{
+                "question": "<nth question>",
+                "context": "<Any relevant context from the email transcript>"
+            }}
         ]
 
         ## Your JSON response (ONLY respond with JSON, nothing else)
@@ -83,7 +79,7 @@ PROMPT = textwrap.dedent(
 ).strip()
 
 
-async def get_questions(email: Email) -> list[str]:
+async def extract_questions(email: Email) -> list[str]:
     scope = email["user_email"]
 
     email_thread = get_email_thread(email)

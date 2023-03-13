@@ -14,12 +14,12 @@
 
 import textwrap
 
-from assistance._openai import get_completion_only
 from assistance._config import DEFAULT_OPENAI_MODEL, ROOT_DOMAIN
 from assistance._email.reply import create_reply
 from assistance._keys import get_openai_api_key
 from assistance._logging import log_info
 from assistance._mailgun import send_email
+from assistance._openai import get_completion_only
 from assistance._types import Email
 
 OPEN_AI_API_KEY = get_openai_api_key()

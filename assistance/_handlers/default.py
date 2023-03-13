@@ -15,8 +15,8 @@
 import textwrap
 
 from assistance._config import ROOT_DOMAIN
-from assistance._forms.handler import handle_enrolment_email
 from assistance._faq.response import write_and_send_email_response
+from assistance._forms.handler import handle_enrolment_email
 from assistance._news.pipeline import add_to_google_alerts_pipeline
 from assistance._types import Email
 

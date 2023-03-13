@@ -14,19 +14,19 @@
 
 import json
 import pathlib
-from typing import Literal, TypedDict, cast, Any
+import tomllib
+from typing import Any, Literal, TypedDict, cast
 
 import aiofiles
-import tomllib
 
 from assistance._paths import (
     AGENT_MAPPING,
     CONFIG,
     EMAIL_MAPPING,
+    FAQ_DATA,
+    FORM_DATA,
     FORM_TEMPLATES,
     USER_DETAILS,
-    FORM_DATA,
-    FAQ_DATA,
 )
 
 DEFAULT_OPENAI_MODEL = "gpt-3.5-turbo"

@@ -12,12 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import collections
-import torch
 import asyncio
+import collections
+
+import torch
 from asyncache import cached
-from cachetools.keys import hashkey
 from cachetools import LRUCache
+from cachetools.keys import hashkey
 
 from assistance._openai import get_embedding
 

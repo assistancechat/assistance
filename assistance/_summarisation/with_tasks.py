@@ -17,9 +17,9 @@ import logging
 import textwrap
 
 from assistance import _ctx
-from assistance._openai import get_completion_only
 from assistance._config import DEFAULT_OPENAI_MODEL
 from assistance._logging import log_info
+from assistance._openai import get_completion_only
 from assistance._utilities import (
     get_approximate_allowed_remaining_words,
     items_to_list_string,

@@ -12,17 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import json
 import asyncio
+import json
 import textwrap
 
 from assistance._config import DEFAULT_OPENAI_MODEL
-
 from assistance._keys import get_openai_api_key
 from assistance._logging import log_info
-from assistance._utilities import items_to_list_string
 from assistance._openai import get_completion_only
-
+from assistance._utilities import items_to_list_string
 
 OPEN_AI_API_KEY = get_openai_api_key()
 
