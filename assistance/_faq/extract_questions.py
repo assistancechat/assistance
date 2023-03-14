@@ -28,7 +28,7 @@ OPEN_AI_API_KEY = get_openai_api_key()
 MODEL_KWARGS = {
     "engine": DEFAULT_OPENAI_MODEL,
     "max_tokens": 2048,
-    "temperature": 0.7,
+    "temperature": 0,
     "top_p": 1,
     "frequency_penalty": 0,
     "presence_penalty": 0,
@@ -76,28 +76,28 @@ PROMPT = textwrap.dedent(
         [
             {{
                 "question": "<first question>",
-                "context": "<Any relevant context from the email transcript>",
+                "context": "<any relevant context from the email transcript>",
                 "extracted answer": "<The answer given in the transcript>",
-                "step by step reasoning for whether or not the extracted answer completely answers the user's question": "<Your reasoning>",
-                "does this extracted answer completely answer the user's question?": <true or false>,
-                "was this question asked after the given answer": <true or false>
+                "think step by step": "<step by step reasoning>",
+                "has the user's question been answered?": <true or false>,
+                "was this question asked after the given answer?": <true or false>
             }},
             {{
-                "question": "<second question>",
-                "context": "<Any relevant context from the email transcript>",
+                "question": "<first question>",
+                "context": "<any relevant context from the email transcript>",
                 "extracted answer": "<The answer given in the transcript>",
-                "step by step reasoning for whether or not the extracted answer completely answers the user's question": "<Your reasoning>",
-                "does this extracted answer completely answer the user's question?": <true or false>,
-                "was this question asked after the given answer": <true or false>
+                "think step by step": "<step by step reasoning>",
+                "has the user's question been answered?": <true or false>,
+                "was this question asked after the given answer?": <true or false>
             }},
             ...
             {{
-                "question": "<nth question>",
-                "context": "<Any relevant context from the email transcript>",
+                "question": "<first question>",
+                "context": "<any relevant context from the email transcript>",
                 "extracted answer": "<The answer given in the transcript>",
-                "step by step reasoning for whether or not the extracted answer completely answers the user's question": "<Your reasoning>",
-                "does this extracted answer completely answer the user's question?": <true or false>,
-                "was this question asked after the given answer": <true or false>
+                "think step by step": "<step by step reasoning>",
+                "has the user's question been answered?": <true or false>,
+                "was this question asked after the given answer?": <true or false>
             }}
         ]
 
@@ -148,14 +148,10 @@ async def extract_questions(email: Email) -> list[QuestionAndContext]:
         del question["extracted answer"]
 
         question["answer_again"] = (
-            not question[
-                "does this extracted answer completely answer the user's question?"
-            ]
-            or question["was this question asked after the given answer"]
+            not question["has the user's question been answered?"]
+            or question["was this question asked after the given answer?"]
         )
-        del question[
-            "does this extracted answer completely answer the user's question?"
-        ]
-        del question["was this question asked after the given answer"]
+        del question["has the user's question been answered?"]
+        del question["was this question asked after the given answer?"]
 
     return questions
