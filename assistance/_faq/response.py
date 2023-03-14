@@ -25,7 +25,6 @@ from assistance import _ctx
 from assistance._config import DEFAULT_OPENAI_MODEL, ROOT_DOMAIN, load_faq_data
 from assistance._email.reply import create_reply, get_all_user_emails
 from assistance._email.thread import get_email_thread
-from assistance._embeddings import get_top_questions_and_answers
 from assistance._keys import get_openai_api_key, get_serp_api_key
 from assistance._logging import log_info
 from assistance._mailgun import send_email

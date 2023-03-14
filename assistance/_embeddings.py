@@ -32,9 +32,7 @@ async def get_top_questions_and_answers(openai_api_key, faq_data, queries, k=3):
 
     for most_relevant_results in all_most_relevant_results:
         for item in most_relevant_results:
-            q_and_a_string = (
-                f"Q: {item['question'].strip()}\nA: {item['answer'].strip()}"
-            )
+            q_and_a_string = f"Question: {item['question'].strip()}\nAnswer: {item['answer'].strip()}"
 
             collected_q_and_a_strings_with_score[q_and_a_string].append(item["score"])
 
@@ -44,9 +42,12 @@ async def get_top_questions_and_answers(openai_api_key, faq_data, queries, k=3):
         strings_and_scores.append((q_and_a_string, sqrt_sum_of_square_scores))
 
     strings_and_scores.sort(key=lambda x: x[1], reverse=True)
-    collected_q_and_a_strings = [x[0] for x in strings_and_scores]
 
-    return collected_q_and_a_strings
+    responses_with_score = []
+    for string, score in strings_and_scores:
+        responses_with_score.append(f"Importance Score: {score:.2f}\n{string}")
+
+    return responses_with_score
 
 
 async def _get_top_questions_and_answers(openai_api_key, faq_data, queries, k=3):

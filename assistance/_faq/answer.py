@@ -62,6 +62,16 @@ PROMPT = textwrap.dedent(
         previous FAQ responses. If no FAQ responses is relevant to the
         question, then ONLY respond with an empty string.
 
+        Make sure to focus on the FAQ responses that have the highest
+        "Importance Score".
+
+        ## Your traits
+
+        - Show genuine empathy and interest in their situation
+        - You are trying to find ways to help them be successful in
+          their application
+        - You are helpful and friendly
+
         ## Question asked by THIS applicant
 
         {question}
@@ -79,8 +89,8 @@ PROMPT = textwrap.dedent(
 
         ## Your answer
 
-        Q: {question}
-        A:
+        Question: {question}
+        Answer:
     """
 ).strip()
 
@@ -131,8 +141,9 @@ RANK = textwrap.dedent(
         ## Required JSON format
 
         {{
+            "think step by step for id": "<step by step reasoning>",
             "id of the best answer": <id>,
-            "think step by step": "<step by step reasoning>",
+            "think step by step for the four validation checks": "<step by step reasoning>",
             "does the selected answer completely answer the user's question?": <true or false>,
             "does the selected answer get its information from the FAQ responses?": <true or false>,
             "does the selected answer answer the question in a way that is consistent with the FAQ responses?": <true or false>,
