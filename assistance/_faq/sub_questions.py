@@ -37,27 +37,35 @@ PROMPT = textwrap.dedent(
     """
         # Overview
 
-        You have been provided with a question from a user within an
-        email.
+        You have been provided with a question from a prospective
+        student who is enquiring about Jim's International Pathway
+        Program within an email.
 
-        You have access to a question and answer tool that records
-        the questions that previous users have asked. You are aiming
-        to search through these questions to find the most relevant
-        questions that can be used to answer the provided question.
+        You have access to a question and answer tool that records the
+        questions that other prospective students have asked. You are
+        aiming to search through these questions to find the most
+        relevant questions that can be used to answer the provided
+        question.
 
         However, to have the best chance at extracting the relevant
         information it is helpful to split a question into a series of
         sub-questions that can then also be provided to the tool.
 
         These questions are required to be written from the perspective
-        of the user who has sent you this email.
+        of the prospective student who has sent you this email.
 
         It is your job to take the provided question and create a series
         of sub-questions that can be to the tool to then aid you in the
         answering of the question.
 
-        Use the "known-facts" key to describe any facts that you
-        currently know about the question.
+        Include each of the following types of questions within your
+        sub-questions:
+
+        - Creative rewording questions of the original question
+        - Precursor questions that help provide further information and
+          context
+        - Sub-set questions that try to take different parts of the
+          original question and answer them separately
 
         Use the "think-step-by-step" key to describe the thought process
         that you went through to determine each of the required
@@ -75,19 +83,16 @@ PROMPT = textwrap.dedent(
 
         [
             {{
-                "known-facts": "<semicolon separated list of relevant known facts>",
-                "think-step-by-step": "<step by step thought process for the first required sub-question>",
+                "think step by step": "<step by step reasoning>",
                 "question": "<first sub-question>"
             }},
             {{
-                "known-facts": "<semicolon separated list of relevant known facts>",
-                "think-step-by-step": "<step by step thought process for the second required sub-question>",
+                "think step by step": "<step by step reasoning>",
                 "question": "<second sub-question>"
             }},
             ...
             {{
-                "known-facts": "<semicolon separated list of relevant known facts>",
-                "think-step-by-step": "<step by step thought process for the nth required sub-question>",
+                "think step by step": "<step by step reasoning>",
                 "question": "<nth sub-question>"
             }}
         ]

@@ -132,6 +132,7 @@ RANK = textwrap.dedent(
 
         {{
             "id of the best answer": <id>,
+            "think step by step": "<step by step reasoning>",
             "does the selected answer completely answer the user's question?": <true or false>,
             "does the selected answer get its information from the FAQ responses?": <true or false>,
             "does the selected answer answer the question in a way that is consistent with the FAQ responses?": <true or false>,
