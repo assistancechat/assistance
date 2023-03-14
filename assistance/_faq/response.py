@@ -132,7 +132,9 @@ async def write_and_send_email_response(
     questions_and_contexts = await extract_questions(email=email)
 
     questions_without_answers = [
-        item for item in questions_and_contexts if not item["answer"]
+        item
+        for item in questions_and_contexts
+        if not item["complete"] or not item["answer"]
     ]
 
     coroutines = []

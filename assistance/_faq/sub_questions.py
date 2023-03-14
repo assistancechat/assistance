@@ -25,7 +25,7 @@ OPEN_AI_API_KEY = get_openai_api_key()
 
 MODEL_KWARGS = {
     "engine": DEFAULT_OPENAI_MODEL,
-    "max_tokens": 512,
+    "max_tokens": 1024,
     "temperature": 0.7,
     "top_p": 1,
     "frequency_penalty": 0,

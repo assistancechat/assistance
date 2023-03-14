@@ -50,10 +50,14 @@ PROMPT = textwrap.dedent(
 
         Make sure to include any relevant contextual information from
         the email transcript that will be helpful in answering the given
-        question with each extracted question.
+        question with each extracted question. The AI that is answering
+        the question itself does not have access to the email thread.
+        Make sure to include any parts of the email thread that could
+        be helpful in knowing what was being asked by the prospective
+        student.
 
-        You may reword questions as needed to help achieve an accurate
-        standalone representation of the question.
+        Do not reword the question, provide the question as is it was
+        originally written.
 
         If somewhere within the transcript the question has already been
         answered then provide the answer within the "extracted answer"
@@ -72,18 +76,21 @@ PROMPT = textwrap.dedent(
             {{
                 "question": "<first question>",
                 "context": "<Any relevant context from the email transcript>",
-                "extracted answer": "<The answer given in the transcript>"
+                "extracted answer": "<The answer given in the transcript>",
+                "does this extracted answer completely answer the user's question?": <true or false>
             }},
             {{
                 "question": "<second question>",
                 "context": "<Any relevant context from the email transcript>",
-                "extracted answer": "<The answer given in the transcript>"
+                "extracted answer": "<The answer given in the transcript>",
+                "does this extracted answer completely answer the user's question?": <true or false>
             }},
             ...
             {{
                 "question": "<nth question>",
                 "context": "<Any relevant context from the email transcript>",
-                "extracted answer": "<The answer given in the transcript>"
+                "extracted answer": "<The answer given in the transcript>",
+                "does this extracted answer completely answer the user's question?": <true or false>
             }}
         ]
 
@@ -106,6 +113,7 @@ class QuestionAndContext(TypedDict):
     question: str
     context: str
     answer: str
+    complete: bool
 
 
 async def extract_questions(email: Email) -> list[QuestionAndContext]:
@@ -131,5 +139,12 @@ async def extract_questions(email: Email) -> list[QuestionAndContext]:
     for question in questions:
         question["answer"] = question["extracted answer"]
         del question["extracted answer"]
+
+        question["complete"] = question[
+            "does this extracted answer completely answer the user's question?"
+        ]
+        del question[
+            "does this extracted answer completely answer the user's question?"
+        ]
 
     return questions
