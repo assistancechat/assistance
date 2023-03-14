@@ -49,12 +49,13 @@ PROMPT = textwrap.dedent(
         or its application.
 
         Make sure to include any relevant contextual information from
-        the email transcript that will be helpful in answering the given
-        question with each extracted question. The AI that is answering
-        the question itself does not have access to the email thread.
-        Make sure to include any parts of the email thread that could
-        be helpful in knowing what was being asked by the prospective
-        student.
+        the email transcript around why the user is asking the question.
+        In particular, make sure to include information around the focus
+        of the question being asked.
+
+        Include at the end of the context a re-wording of the question
+        in your own words. Making sure to highlight any key components
+        of the question that you think are important.
 
         Do not reword the question, provide the question as is it was
         originally written.
@@ -77,20 +78,26 @@ PROMPT = textwrap.dedent(
                 "question": "<first question>",
                 "context": "<Any relevant context from the email transcript>",
                 "extracted answer": "<The answer given in the transcript>",
-                "does this extracted answer completely answer the user's question?": <true or false>
+                "step by step reasoning for whether or not the extracted answer completely answers the user's question": "<Your reasoning>",
+                "does this extracted answer completely answer the user's question?": <true or false>,
+                "was this question asked after the given answer": <true or false>
             }},
             {{
                 "question": "<second question>",
                 "context": "<Any relevant context from the email transcript>",
                 "extracted answer": "<The answer given in the transcript>",
-                "does this extracted answer completely answer the user's question?": <true or false>
+                "step by step reasoning for whether or not the extracted answer completely answers the user's question": "<Your reasoning>",
+                "does this extracted answer completely answer the user's question?": <true or false>,
+                "was this question asked after the given answer": <true or false>
             }},
             ...
             {{
                 "question": "<nth question>",
                 "context": "<Any relevant context from the email transcript>",
                 "extracted answer": "<The answer given in the transcript>",
-                "does this extracted answer completely answer the user's question?": <true or false>
+                "step by step reasoning for whether or not the extracted answer completely answers the user's question": "<Your reasoning>",
+                "does this extracted answer completely answer the user's question?": <true or false>,
+                "was this question asked after the given answer": <true or false>
             }}
         ]
 
@@ -113,7 +120,7 @@ class QuestionAndContext(TypedDict):
     question: str
     context: str
     answer: str
-    complete: bool
+    answer_again: bool
 
 
 async def extract_questions(email: Email) -> list[QuestionAndContext]:
@@ -140,11 +147,15 @@ async def extract_questions(email: Email) -> list[QuestionAndContext]:
         question["answer"] = question["extracted answer"]
         del question["extracted answer"]
 
-        question["complete"] = question[
-            "does this extracted answer completely answer the user's question?"
-        ]
+        question["answer_again"] = (
+            not question[
+                "does this extracted answer completely answer the user's question?"
+            ]
+            or question["was this question asked after the given answer"]
+        )
         del question[
             "does this extracted answer completely answer the user's question?"
         ]
+        del question["was this question asked after the given answer"]
 
     return questions

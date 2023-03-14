@@ -56,18 +56,20 @@ PROMPT = textwrap.dedent(
     """
         # Write an email introduction and conclusion
 
-        You have been forwarded an email from Alex Carpenter. A
-        prospective student is asking him questions about Jim's
-        International Pathway Program. You are happy to help answer any
-        questions that the prospective student may have about the Jim's
-        International Pathway Program.
+        You have been forwarded an email from Alex Carpenter.
+        {first_name} is asking Alex questions about Jim's International
+        Pathway Program. You are happy to help answer any questions that
+        {first_name} may have about the Jim's International
+        Pathway Program.
 
         You have been provided with a list of the answers to a range of
-        questions that the prospective student asked. You are to write
+        questions that {first_name}. You are to write
         the introduction to the email response and the conclusion to the
         email response.
 
-        Address the prospective student by their first name.
+        Address {first_name} by their first name, unless it is not
+        known. If it is not known simply start the email without
+        addressing them.
 
         This introduction and conclusion will be prepended and appended
         around the question answers that you have already been provided.
@@ -129,12 +131,16 @@ async def write_and_send_email_response(
         reply_to = email["from"]
         subject = None
 
+    first_name = await get_first_name(
+        scope=scope, email_thread=email_thread, their_email_address=reply_to
+    )
+
     questions_and_contexts = await extract_questions(email=email)
 
     questions_without_answers = [
         item
         for item in questions_and_contexts
-        if not item["complete"] or not item["answer"]
+        if item["answer_again"] or not item["answer"]
     ]
 
     coroutines = []
@@ -158,7 +164,9 @@ async def write_and_send_email_response(
     question_and_answers_string = question_and_answers_string.strip()
 
     prompt = PROMPT.format(
-        transcript="{transcript}", question_and_answers=question_and_answers_string
+        transcript="{transcript}",
+        question_and_answers=question_and_answers_string,
+        first_name=first_name,
     )
 
     response = await run_with_summary_fallback(
