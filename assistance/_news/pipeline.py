@@ -50,6 +50,10 @@ async def add_to_google_alerts_pipeline(email: Email):
 
 
 async def _pre_cache_articles(article_details: list[Article]):
+    coroutines = []
+
     for article in article_details:
         url = get_cleaned_url(article["url"])
-        await scrape(_ctx.session, url)
+        coroutines.append(scrape(_ctx.session, url))
+
+    await asyncio.gather(*coroutines)

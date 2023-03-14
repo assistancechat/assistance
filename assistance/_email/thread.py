@@ -21,7 +21,7 @@ from assistance._types import Email
 def get_email_thread(email: Email):
     parser = EmailReplyParser()
     email_message = parser.read(email["plain_all_content"])
-    email_thread = [str(item) for item in email_message.replies[-1::-1]]
+    email_thread = [str(item.content) for item in email_message.replies[-1::-1]]
 
     email_thread[-1] = f"On {email['date']}, {email['from']} wrote:\n{email_thread[-1]}"
 

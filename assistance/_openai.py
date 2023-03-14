@@ -29,6 +29,7 @@ from tenacity import (
     wait_random_exponential,
 )
 
+from assistance import _ctx
 from assistance._logging import log_info
 
 from ._paths import COMPLETIONS, get_completion_cache_path
@@ -66,7 +67,7 @@ async def _completion_with_back_off(**kwargs):
     except (FileNotFoundError, json.JSONDecodeError):
         pass
 
-    log_info(scope, f"New completion request: {completion_request}")
+    log_info(scope, _ctx.pp.pformat(kwargs_for_cache_hash))
 
     query_timestamp = time.time_ns()
 
@@ -107,7 +108,7 @@ async def _chat_completion_wrapper(**kwargs):
     try:
         response = await openai.ChatCompletion.acreate(**kwargs)
     except Exception as e:
-        if "This model's maximum context length is 4096 tokens" in str(e):
+        if "This model's maximum context length is" in str(e):
             raise ValueError("Model maximum reached")
 
         raise

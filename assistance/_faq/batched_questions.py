@@ -56,21 +56,18 @@ PROMPT = textwrap.dedent(
         [
             {{
                 "id": 0,
-                "known facts": "<semicolon separated list of relevant known facts>",
-                "think step by step": "<step by step thought process",
+                "think step by step": "<step by step reasoning>",
                 "questions that should be asked before this one": [<first question id>, <second question id>, ..., <ith question id>]
             }},
             {{
                 "id": 1,
-                "known facts": "<semicolon separated list of relevant known facts>",
-                "think step by step": "<step by step thought process>",
+                "think step by step": "<step by step reasoning>",
                 "questions that should be asked before this one": [<first question id>, <second question id>, ..., <ith question id>]
             }},
             ...
             {{
                 "id": <n - 1>,
-                "known facts": "<semicolon separated list of relevant known facts>",
-                "think step by step": "<step by step thought process>",
+                "think step by step": "<step by step reasoning>",
                 "questions that should be asked before this one": [<first question id>, <second question id>, ..., <ith question id>>]
             }}
         ]

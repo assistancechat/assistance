@@ -31,7 +31,26 @@ SUMMARY_KWARGS = {
 }
 
 
-PROMPT = textwrap.dedent(
+SUMMARY_PROMPT_WITH_INSTRUCTIONS = textwrap.dedent(
+    """
+        # Summarise with instructions
+
+        Write a summary of the following email thread while following
+        the given instructions.
+
+        ## Instructions
+
+        {instructions}
+
+        ## Email transcript
+
+        {transcript}
+
+        ## Your Summary
+    """
+).strip()
+
+SUMMARY_PROMPT_WITHOUT_INSTRUCTIONS = textwrap.dedent(
     """
         Write a summary of the following email thread:
 
@@ -52,6 +71,7 @@ async def run_with_summary_fallback(
     prompt: str,
     email_thread: list[str],
     api_key: str,
+    instructions: str | None = None,
     **kwargs,
 ):
     while True:
@@ -71,9 +91,18 @@ async def run_with_summary_fallback(
 
             transcript_to_summarise = "\n\n".join(email_thread[0:SUMMARY_BATCH_SIZE])
 
+            if instructions:
+                summary_prompt = SUMMARY_PROMPT_WITH_INSTRUCTIONS.format(
+                    transcript=transcript_to_summarise, instructions=instructions
+                )
+            else:
+                summary_prompt = SUMMARY_PROMPT_WITHOUT_INSTRUCTIONS.format(
+                    transcript=transcript_to_summarise
+                )
+
             summary = await get_completion_only(
                 scope=scope,
-                prompt=PROMPT.format(transcript=transcript_to_summarise),
+                prompt=summary_prompt,
                 api_key=api_key,
                 **SUMMARY_KWARGS,
             )
