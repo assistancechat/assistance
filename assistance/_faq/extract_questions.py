@@ -37,14 +37,16 @@ MODEL_KWARGS = {
 
 PROMPT = textwrap.dedent(
     """
-        # Question and context extraction
+        # Extraction of Questions about Jim's International Pathway Program
 
-        You have been provided with an email transcript.
+        You have been provided with an email transcript where a range
+        of questions about the Jim's International Pathway Program and
+        its application process have been asked.
 
         It is your job to extract a full and complete list of all of the
         questions, queries, as well as any requests for information that
-        are within the email transcript. You are required to respond in
-        JSON format.
+        are within the email transcript that are related to the program
+        or its application.
 
         Make sure to include any relevant contextual information from
         the email transcript that will be helpful in answering the given
@@ -52,6 +54,13 @@ PROMPT = textwrap.dedent(
 
         You may reword questions as needed to help achieve an accurate
         standalone representation of the question.
+
+        If somewhere within the transcript the question has already been
+        answered then provide the answer within the "extracted answer"
+        field.
+
+        If the question has not been answered yet, leave the "extracted answer"
+        field blank with an empty string ("").
 
         ## The email transcript
 
@@ -62,16 +71,19 @@ PROMPT = textwrap.dedent(
         [
             {{
                 "question": "<first question>",
-                "context": "<Any relevant context from the email transcript>"
+                "context": "<Any relevant context from the email transcript>",
+                "extracted answer": "<The answer given in the transcript>"
             }},
             {{
                 "question": "<second question>",
-                "context": "<Any relevant context from the email transcript>"
+                "context": "<Any relevant context from the email transcript>",
+                "extracted answer": "<The answer given in the transcript>"
             }},
             ...
             {{
                 "question": "<nth question>",
-                "context": "<Any relevant context from the email transcript>"
+                "context": "<Any relevant context from the email transcript>",
+                "extracted answer": "<The answer given in the transcript>"
             }}
         ]
 
@@ -80,9 +92,20 @@ PROMPT = textwrap.dedent(
 ).strip()
 
 
+SUMMARY_INSTRUCTIONS = textwrap.dedent(
+    """
+        When summarising the email thread, please make sure to include
+        any questions that was asked within the email thread as well as
+        any answers that were given, as well as any contextual
+        information around the question and answer itself.
+    """
+).strip()
+
+
 class QuestionAndContext(TypedDict):
     question: str
     context: str
+    answer: str
 
 
 async def extract_questions(email: Email) -> list[QuestionAndContext]:
@@ -90,12 +113,13 @@ async def extract_questions(email: Email) -> list[QuestionAndContext]:
 
     email_thread = get_email_thread(email)
 
-    last_two_emails_thread = email_thread[-2:]
+    # last_two_emails_thread = email_thread[-2:]
 
     response = await run_with_summary_fallback(
         scope=scope,
         prompt=PROMPT,
-        email_thread=last_two_emails_thread,
+        instructions="",
+        email_thread=email_thread,
         api_key=OPEN_AI_API_KEY,
         **MODEL_KWARGS,
     )
@@ -103,5 +127,9 @@ async def extract_questions(email: Email) -> list[QuestionAndContext]:
     log_info(scope, response)
 
     questions = json.loads(response)
+
+    for question in questions:
+        question["answer"] = question["extracted answer"]
+        del question["extracted answer"]
 
     return questions

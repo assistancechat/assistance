@@ -107,7 +107,7 @@ async def _chat_completion_wrapper(**kwargs):
     try:
         response = await openai.ChatCompletion.acreate(**kwargs)
     except Exception as e:
-        if "This model's maximum context length is 4096 tokens" in str(e):
+        if "This model's maximum context length is" in str(e):
             raise ValueError("Model maximum reached")
 
         raise
