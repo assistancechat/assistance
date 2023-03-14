@@ -24,7 +24,6 @@ MODEL_KWARGS = {
     "engine": DEFAULT_OPENAI_MODEL,
     "max_tokens": 256,
     "temperature": 0.7,
-    "stop": ["\n"],
     "top_p": 1,
     "frequency_penalty": 0,
     "presence_penalty": 0,
@@ -36,12 +35,20 @@ PROMPT = textwrap.dedent(
         # Get Correspondent
 
         Alex Carpenter is having an email conversation with a
-        prospective student who's email address is {email_address}. What
-        is the first name of this student?
+        prospective student. The transcript of the email conversation
+        is below. Please extract the first name of the student from the
+        email transcript.
+
+        If you are unable to extract the first name, please instead
+        just write [Name not found in email transcript].
 
         ## Email transcript
 
         {transcript}
+
+        ## Email address of the student
+
+        {email_address}
 
         ## Response
 
