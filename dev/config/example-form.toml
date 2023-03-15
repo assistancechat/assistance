@@ -392,3 +392,23 @@ validator = "year"
 [field.education.highest-education-level]
 text = "What is your highest level of education attained to date?"
 options = "education-level"
+
+[field.education.year-highest-education-level-attained]
+text = "The year highest education attained (e.g. 2003)"
+validator = "year"
+
+[field.education.completed-studies-in-australia]
+text = "Have you completed any studies in Australia?"
+type = "bool"
+
+[field.education.qualification]
+text = "Qualification"
+
+
+[field.education.qualification-status]
+text = "What is your highest level of education attained to date?"
+options = "education-level"
+
+[field.education.current-studies]
+text = "Are you currently studying elsewhere?"
+type = "bool"
