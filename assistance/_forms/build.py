@@ -30,9 +30,17 @@ def walk_and_build_form_fields(
     form_text="",
     text_format="record-description",
     form_entries: None | dict[str, FormItem] = None,
+    current_headers: None | list[str] = None,
+    split_form_text: list[str] = None,  # type: ignore
 ):
     if parents is None:
         parents = []
+
+    if split_form_text is None:
+        split_form_text = [""]
+
+    if current_headers is None:
+        current_headers = ["", ""]
 
     if allow is not None:
         allow = set(allow)
@@ -53,7 +61,12 @@ def walk_and_build_form_fields(
             if form_text != "":
                 form_text += "\n"
 
-            form_text += "#" * header_level + f" {item}\n\n"
+            if split_form_text[-1] != "":
+                split_form_text.append("")
+
+            header_text = "#" * header_level + f" {item}\n\n"
+            form_text += header_text
+            current_headers[header_level - 3] = header_text
 
             continue
 
@@ -73,7 +86,7 @@ def walk_and_build_form_fields(
             if allow is not None and record not in allow:
                 continue
 
-            form_text = walk_and_build_form_fields(
+            form_text, split_form_text = walk_and_build_form_fields(
                 item,
                 parents=record_path,
                 form_text=form_text,
@@ -81,6 +94,8 @@ def walk_and_build_form_fields(
                 allow=allow,
                 text_format=text_format,
                 form_entries=form_entries,
+                current_headers=current_headers,
+                split_form_text=split_form_text,
             )
 
             continue
@@ -99,6 +114,10 @@ def walk_and_build_form_fields(
 
                 new_text = f"{item}:\n{form_entry_item['value']}\n\n"
 
-            form_text += new_text
+            if split_form_text[-1] == "":
+                split_form_text[-1] = current_headers[0] + current_headers[1]
 
-    return form_text
+            form_text += new_text
+            split_form_text[-1] += new_text
+
+    return form_text, split_form_text
