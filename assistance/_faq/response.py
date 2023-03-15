@@ -168,7 +168,7 @@ async def write_and_send_email_response(
         first_name=first_name,
     )
 
-    response = await run_with_summary_fallback(
+    response, _ = await run_with_summary_fallback(
         scope=scope,
         prompt=prompt,
         email_thread=email_thread,

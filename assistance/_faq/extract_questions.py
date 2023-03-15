@@ -136,7 +136,7 @@ async def extract_questions(email: Email) -> list[QuestionAndContext]:
 
     # last_two_emails_thread = email_thread[-2:]
 
-    response = await run_with_summary_fallback(
+    response, _ = await run_with_summary_fallback(
         scope=scope,
         prompt=PROMPT,
         instructions="",

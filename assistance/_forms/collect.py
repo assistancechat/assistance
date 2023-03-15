@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import asyncio
 import json
 import textwrap
 
@@ -43,45 +44,39 @@ TASK = textwrap.dedent(
         record.
 
         Determine which fields are able to be accurately extracted and
-        present them in JSON format. Only provide the fields that you
-        are able to extract with confidence.
-
-        ## The email transcript
-
-        {transcript}
+        present them in JSON format.
 
         ## Descriptions for each of the form fields
 
         {form_field_descriptions}
 
-        ## Example required JSON format (only include the fields that you can extract with confidence)
+        ## Example required JSON format
 
         {{
-            "field items that can be extracted with confidence from the transcript": {{
-                "think step by step": "<step by step reasoning>",
-                "value": [
-                    "an.example.field.item",
-                    "another.example.field.item",
-                    ...
-                    "last.field.result.that.you.found"
-                ]
+            "an.example.field.item": {{
+                "the description of this form item": "<the relevant field description provided above>",
+                "section of email transcript": "<section of email transcript that contains this result, leave blank if the not in transcript>",
+                "value": "<field result goes here>",
+                "does this value match what was within the current email transcript?": <true or false>
             }},
-            "field item values": {{
-                "an.example.field.item": {{
-                    "think step by step for value": "<step by step reasoning>",
-                    "value": "<field result goes here>"
-                }},
-                "another.example.field.item": {{
-                    "think step by step for value": "<step by step reasoning>",
-                    "value": "<field result goes here>"
-                }},
-                ...
-                "last.field.result.that.you.found": {{
-                    "think step by step for value": "<step by step reasoning>",
-                    "value": "<field result goes here>"
-                }}
+            "another.example.field.item": {{
+                "the description of this form item": "<the relevant field description provided above>",
+                "section of email transcript": "<section of email transcript that contains this result, leave blank if value not in transcript>",
+                "value": "<field result goes here>",
+                "does this value match what was within the current email transcript?": <true or false>
+            }},
+            ...
+            "last.field.result.that.you.found": {{
+                "the description of this form item": "<the relevant field description provided above>",
+                "section of email transcript": "<section of email transcript that contains this result, leave blank if value not in transcript>",
+                "value": "<field result goes here>",
+                "does this value match what was within the current email transcript?": <true or false>
             }}
         }}
+
+        ## The email transcript
+
+        {transcript}
 
         ## Your JSON response (ONLY respond with JSON, nothing else)
     """
@@ -89,17 +84,36 @@ TASK = textwrap.dedent(
 
 
 async def collect_form_items(
-    email: Email, remaining_form_fields_text: str
+    email: Email, split_remaining_form_fields: list[str]
 ) -> dict[str, str]:
     scope = email["user_email"]
 
     email_thread = get_email_thread(email)
 
+    coroutines = []
+
+    for form_fields in split_remaining_form_fields:
+        coroutines.append(
+            _collect_subset_of_form_fields(scope, email_thread, form_fields)
+        )
+
+    collected_fields = await asyncio.gather(*coroutines)
+
+    all_collected_fields = {}
+    for collected_field in collected_fields:
+        all_collected_fields.update(collected_field)
+
+    return all_collected_fields
+
+
+async def _collect_subset_of_form_fields(
+    scope, email_thread, remaining_form_fields_text: str
+):
     prompt = TASK.format(
         transcript="{transcript}", form_field_descriptions=remaining_form_fields_text
     )
 
-    response = await run_with_summary_fallback(
+    response, transcript = await run_with_summary_fallback(
         scope=scope,
         prompt=prompt,
         email_thread=email_thread,
@@ -112,8 +126,21 @@ async def collect_form_items(
     new_form_items = json.loads(response)
 
     valid_form_items = {}
-    for key, item in new_form_items["field item values"].items():
-        if item["can this value be extracted from the transcript with confidence?"]:
-            valid_form_items[key] = item["value"]
+    for key, item in new_form_items.items():
+        value = item["value"]
+
+        if not value:
+            continue
+
+        validation = (
+            item["section of email transcript"] in transcript
+            and value in item["section of email transcript"]
+            and item[
+                "does this value match what was within the current email transcript?"
+            ]
+        )
+
+        if validation:
+            valid_form_items[key] = value
 
     return valid_form_items

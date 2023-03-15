@@ -202,7 +202,7 @@ async def react_to_avatar_request(
         email_thread, prompt = await _prompt_as_discourse_thread(email)
         is_discourse = True
 
-        response = await run_with_summary_fallback(
+        response, _ = await run_with_summary_fallback(
             scope=scope,
             prompt=prompt,
             email_thread=email_thread,

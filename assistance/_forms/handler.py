@@ -47,7 +47,7 @@ async def handle_enrolment_email(form_name: str, email: Email):
         fields_that_need_confirmation.add(key)
 
     if fields_that_need_confirmation:
-        confirmation_form_fields_text = walk_and_build_form_fields(
+        confirmation_form_fields_text, _ = walk_and_build_form_fields(
             cfg["field"], allow=fields_that_need_confirmation
         )
 
@@ -81,12 +81,12 @@ async def handle_enrolment_email(form_name: str, email: Email):
 
             break
 
-    remaining_form_fields_text = walk_and_build_form_fields(
+    _, split_remaining_form_fields = walk_and_build_form_fields(
         cfg["field"], ignore=set(form_entries.keys())
     )
 
     new_collected_items = await collect_form_items(
-        email=email, remaining_form_fields_text=remaining_form_fields_text
+        email=email, split_remaining_form_fields=split_remaining_form_fields
     )
     new_form_entries = {
         key: FormItem(value=value, confirmed=False)
@@ -107,7 +107,7 @@ async def handle_enrolment_email(form_name: str, email: Email):
 
         fields_that_still_need_confirmation.add(key)
 
-    confirmation_still_needed_text = walk_and_build_form_fields(
+    confirmation_still_needed_text, _ = walk_and_build_form_fields(
         cfg["field"],
         allow=fields_that_still_need_confirmation,
         form_entries=form_entries,
@@ -143,7 +143,7 @@ async def handle_enrolment_email(form_name: str, email: Email):
     # if not ready_to_continue:
     #     task = "- Be helpful and responsive to the user's queries.\n- Ask the user whether or not they are ready to continue with the questions for the form."
 
-    updated_remaining_form_fields_text = walk_and_build_form_fields(
+    updated_remaining_form_fields_text, _ = walk_and_build_form_fields(
         cfg["field"], ignore=set(form_entries.keys()), text_format="description-only"
     )
 

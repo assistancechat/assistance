@@ -243,7 +243,7 @@ async def get_tools_and_responses(
             extra_tools=extra_tools,
         )
 
-        response = await run_with_summary_fallback(
+        response, _ = await run_with_summary_fallback(
             scope=scope,
             prompt=prompt,
             email_thread=email_thread,

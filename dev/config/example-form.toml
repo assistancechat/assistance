@@ -64,6 +64,11 @@ task = """\
 - Detail the process
 - Ask the user if they have any questions about the process
 
+In this introductory email, do not ask for any information that would be able
+to be extracted automatically from a passport. In a follow up email you plan
+to ask them to attach their passport to the email, and you can get that
+information then.
+
 ## The process
 
 - The user is enrolling for the Diploma of Entrepreneurship / Bachelor of
