@@ -22,6 +22,7 @@ from assistance._keys import get_openai_api_key
 from assistance._logging import log_info
 from assistance._summarisation.thread import run_with_summary_fallback
 from assistance._types import Email
+from assistance._utilities import items_to_list_string
 
 OPEN_AI_API_KEY = get_openai_api_key()
 
@@ -54,7 +55,6 @@ TASK = textwrap.dedent(
 
         {{
             "an.example.field.item": {{
-                "the headings that contain this form item": "<the headings which this form item is under>",
                 "the description of this form item": "<the relevant field description provided above>",
                 "section of email transcript": "<section of email transcript that contains this result, leave blank if the not in transcript>",
                 "value": "<field result goes here>",
@@ -62,7 +62,6 @@ TASK = textwrap.dedent(
                 "could have this response be referred to something else that is not relevant to this field item?": <true or false>
             }},
             "another.example.field.item": {{
-                "the headings that contain this form item": "<the headings which this form item is under>",
                 "the description of this form item": "<the relevant field description provided above>",
                 "section of email transcript": "<section of email transcript that contains this result, leave blank if the not in transcript>",
                 "value": "<field result goes here>",
@@ -71,7 +70,6 @@ TASK = textwrap.dedent(
             }},
             ...
             "last.field.result.that.you.found": {{
-                "the headings that contain this form item": "<the headings which this form item is under>",
                 "the description of this form item": "<the relevant field description provided above>",
                 "section of email transcript": "<section of email transcript that contains this result, leave blank if the not in transcript>",
                 "value": "<field result goes here>",
@@ -115,8 +113,21 @@ async def collect_form_items(
 async def _collect_subset_of_form_fields(
     scope, email_thread, remaining_form_fields_text: str
 ):
+    lines = remaining_form_fields_text.splitlines()
+
+    header_items = items_to_list_string(
+        [line.replace("#", "").strip() for line in lines if line.startswith("#")]
+    )
+
+    header_text = f"The form items below are only referring to information that is under the following headings:\n{header_items}\n\n"
+
+    updated_lines = [line for line in lines if not line.startswith("#")]
+
+    updated_remaining_form_fields_text = header_text + "\n".join(updated_lines)
+
     prompt = TASK.format(
-        transcript="{transcript}", form_field_descriptions=remaining_form_fields_text
+        transcript="{transcript}",
+        form_field_descriptions=updated_remaining_form_fields_text,
     )
 
     response, transcript = await run_with_summary_fallback(

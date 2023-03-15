@@ -42,10 +42,10 @@ PROMPT = textwrap.dedent(
     """
         # Form support for Jim's International Pathway Program
 
-        You are the Meshach AI helping a student enrol with the Diploma
-        of Entrepreneurship / Bachelor of Business degree at Alphacrucis
-        University. This is as a part of Jim's International Pathway
-        Program.
+        You are AssistanceChat, an AI that is helping a student enrol
+        with the Diploma of Entrepreneurship / Bachelor of Business
+        degree at Alphacrucis University. This is as a part of Jim's
+        International Pathway Program.
 
         It is your job to write the introduction, body and conclusion
         of an email. Between the body and the conclusion a section of
