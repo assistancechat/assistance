@@ -1,0 +1,394 @@
+[defaults]
+optional = false
+type = "str"
+
+[options]
+employment-status = [
+  "Casual",
+  "Part Time",
+  "Full Time",
+  "Employer",
+  "Employed",
+  "Employed - unpaid worker in a family business",
+  "Unemployed - seeking full-time employment",
+  "Unemployed - seeking part-time employment",
+  "Unemployed - not seeking employment",
+]
+visa-type = ["Student", "Working", "Visitor", "Spouse", "Other"]
+disability-type = [
+  "Hearing",
+  "Vision",
+  "Learning",
+  "Medical",
+  "Mobility",
+  "Other",
+]
+relationship = [
+  "Employer",
+  "Manager",
+  "Staff Contact",
+  "Legal Guardian",
+  "Spouse",
+  "Father",
+  "Mother",
+  "Daughter",
+  "Son",
+  "Brother",
+  "Sister",
+  "Other",
+]
+education-level = [
+  "A complete final year of secondary education course at school",
+  "A complete Higher education bachelor level course",
+  "A complete Higher education postgraduate level course",
+  "A complete Higher education sub-degree level course",
+  "A complete VET award course",
+  "A completed other qualification or certificate of attainment or competence",
+  "An incomplete Higher education course",
+  "No prior educational attainment",
+  "Overseas student",
+]
+secondary-level = [
+  "Year 12",
+  "Year 11",
+  "Year 10",
+  "Year 9",
+  "Lower than Year 9",
+]
+
+[[progression]]
+key = "introduction"
+task = """\
+- Greet the new user by the first name inferred from their email
+- Introduce yourself
+- Detail the process
+- Ask the user if they have any questions about the process
+
+## The process
+
+- The user is enrolling for the Diploma of Entrepreneurship / Bachelor of
+  Business course at the Sydney (Paramatta) NSW Alphacrucis campus
+- Through the following series of email questions, we will collect the
+  information required to enrol the user in the course.\
+"""
+
+[[progression]]
+key = "passport"
+task = """\
+- Requesting the user for a scan or picture of their passport.
+- This passport needs to be attached in reply to this email.\
+"""
+fields_for_completion = [
+  "documents.passport",
+  "personal.first-name",
+  "personal.middle-names",
+  "personal.family-name",
+  "personal.date-of-birth",
+  "personal.nationality",
+  "personal.passport-number",
+  "personal.passport-expiry-date",
+]
+handler = "extract_passport_details"
+
+[[progression]]
+key = "remaining"
+task = """\
+- Select a reasonable subset of relevant fields from the remaining fields
+  section and ask the user to provide you the relevant information within
+  the content of their email.\
+"""
+fields_for_completion = "ALL"
+
+[[progression]]
+key = "complete"
+task = """\
+- Inform the user that they have completed the enrolment process!
+- Thank them for their time.
+- Ask them if they have any particular feedback on the process.
+"""
+
+
+# Jim's group enrolment form fields
+[field.documents]
+h3 = "Documents for submission"
+
+[field.documents.passport]
+text = "Passport"
+type = "file"
+
+
+## Personal Details
+[field.personal]
+h3 = "Personal Details"
+
+[field.personal.first-award-in-australia]
+text = "Is this the first award, such as a diploma or higher education degree, that you will be studying in Australia?"
+type = "bool"
+
+[field.personal.title]
+text = "Title"
+
+[field.personal.first-name]
+text = "First Name"
+optional = true
+extract-from = "passport"
+
+[field.personal.middle-names]
+text = "Middle Names/s"
+optional = true
+extract-from = "passport"
+
+[field.personal.family-name]
+text = "Family Name"
+extract-from = "passport"
+
+[field.personal.date-of-birth]
+text = "Applicant's Date of Birth"
+validator = "date"
+extract-from = "passport"
+
+[field.personal.country-of-birth]
+text = "Country of Birth"
+validator = "country"
+
+[field.personal.nationality]
+text = "Nationality"
+validator = "nationality"
+extract-from = "passport"
+
+[field.personal.year-of-arrival-in-australia]
+text = "If born overseas, either the year of your arrival in Australia, or the year when you intend to arrive"
+validator = "year"
+conditional = { not-equal = { country-of-birth = "Australia" } }
+
+[field.personal.passport-number]
+text = "Passport Number"
+validator = "passport-number"
+extract-from = "passport"
+
+[field.personal.passport-expiry-date]
+text = "Passport Expiry Date"
+validator = "date"
+extract-from = "passport"
+
+[field.personal.first-language]
+text = "First Language"
+validator = "language"
+
+[field.personal.any-other-languages-spoken]
+text = "Any other language(s) that are spoken at home"
+type = "list[str]"
+validator = "language"
+
+[field.personal.current-employment-status]
+text = "Current Employment Status"
+options = "employment-status"
+
+### Visa Status
+[field.personal.visa-status]
+h4 = "Visa Status"
+
+[field.personal.visa-status.currently-living-in-australia]
+text = "Are you currently living in Australia?"
+type = "bool"
+
+[field.personal.visa-status.has-australian-visa]
+text = "Do you have an Australian visa?"
+type = "bool"
+
+[field.personal.visa-status.current-visa-type]
+text = "What is your current visa type?"
+options = "visa-type"
+conditional = { equal = { has-australian-visa = true } }
+
+[field.personal.visa-status.expected-course-completion-date]
+text = "What is the expected date of completion of your course?"
+validator = "date"
+conditional = { equal = { current-visa-type = "Student" } }
+
+[field.personal.visa-status.why-applying-to-change-providers]
+text = "Why are you applying to change providers and/or courses?"
+conditional = { equal = { current-visa-type = "Student" } }
+
+[field.personal.visa-status.current-course-months]
+text = "How many months have you been studying your current course?"
+type = "number"
+conditional = { equal = { current-visa-type = "Student" } }
+
+[field.personal.visa-status.release-letter]
+text = "If you have not completed at least 6 months of your current course, please attach a Release Letter from your current Education Provider"
+type = "file"
+conditional = { less-than = { current-course-months = 6 } }
+
+[field.personal.visa-status.visa-type-to-be-applied-for]
+text = "What visa type are you applying for?"
+options = "visa-type"
+conditional = { equal = { has-australian-visa = false } }
+
+[field.personal.visa-status.visa-type-other]
+text = "If your visa type is other, please provide more details"
+conditional = { or = [
+  { equal = { current-visa-type = "Other" } },
+  { equal = { visa-type-to-be-applied-for = "Other" } },
+] }
+
+### Disability
+[field.personal.disability]
+h4 = "Disability"
+
+[field.personal.disability.has-disability]
+text = "Do you have a disability, impairment or long term medical condition which may affect your studies? NOTE: The disability information requested is required to submit data sourced from this form to the Australian government as a regulatory reporting requirement. The information may be used for regulatory or research purposes. The answers provided in this section will **not** impact your admission eligibility."
+type = "bool"
+
+[field.personal.disability.disability-type]
+text = "What type of disability, impairment or long term medical condition do you have?"
+options = "disability-type"
+conditional = { equal = { has-disability = true } }
+
+[field.personal.disability.disability-other]
+text = "If your disability type is 'Other', please provide more details"
+conditional = { equal = { disability-type = "Other" } }
+
+[field.personal.disability.disability-support]
+text = "Would you like to receive advice on support services, equipment and facilities which may assist you?"
+type = "bool"
+conditional = { equal = { has-disability = true } }
+
+
+## Contact Details
+[field.contact]
+h3 = "Contact Details"
+
+[field.contact.email]
+text = "Email Address"
+validator = "email"
+
+[field.contact.australian-contact-number]
+text = "Australian Contact Number"
+validator = "phone"
+
+[field.contact.other-contact-number]
+text = "Other Contact Number"
+validator = "phone"
+optional = true
+
+### Australian Address
+[field.contact.has-australian-address]
+text = "Do you have an Australian address?"
+type = "bool"
+
+[field.contact.australian-address]
+h4 = "Australian Address"
+validator = "address"
+conditional = { equal = { has-australian-address = true } }
+
+[field.contact.australian-address.unit-number]
+text = "Unit Number"
+optional = true
+
+[field.contact.australian-address.street-number]
+text = "Street Number"
+
+[field.contact.australian-address.street-name]
+text = "Street Name"
+
+[field.contact.australian-address.city-or-suburb]
+text = "City / Suburb"
+
+[field.contact.australian-address.state]
+text = "State"
+validator = "state"
+
+[field.contact.australian-address.postcode]
+text = "Postcode"
+validator = "postcode"
+
+### Permanent Home Address (Outside Australia)
+[field.contact.has-address-outside-australia]
+text = "Do you have a premanent home address outside of Australia?"
+type = "bool"
+
+[field.contact.address-outside-australia]
+h4 = "Permanent Home Address (Outside Australia)"
+validator = "address"
+conditional = { equal = { has-address-outside-australia = true } }
+
+[field.contact.address-outside-australia.line-1]
+text = "Line 1"
+
+[field.contact.address-outside-australia.line-2]
+text = "Line 2"
+optional = true
+
+[field.contact.address-outside-australia.line-3]
+text = "Line 3"
+optional = true
+
+[field.contact.address-outside-australia.city-or-suburb]
+text = "City / Suburb"
+
+[field.contact.address-outside-australia.postcode]
+text = "Postcode"
+validator = "postcode"
+optional = true
+
+[field.contact.address-outside-australia.country]
+text = "Country"
+validator = "country"
+
+### Emergency Contact
+[field.contact.emergency-contact]
+h4 = "Emergency Contact (please give us contact details of a friend or relative)"
+
+[field.contact.emergency-contact.title]
+text = "Title"
+
+[field.contact.emergency-contact.first-name]
+text = "First Name"
+
+[field.contact.emergency-contact.family-name]
+text = "Family Name"
+
+[field.contact.emergency-contact.date-of-birth]
+text = "Date of Birth"
+
+[field.contact.emergency-contact.email]
+text = "Email Address"
+validator = "email"
+
+[field.contact.emergency-contact.contact-number]
+text = "Phone Number"
+validator = "phone"
+
+[field.contact.emergency-contact.relationship]
+text = "Emergency Contact's Relationship to you"
+options = "relationship"
+
+[field.contact.emergency-contact.relationship-other]
+text = "If your relationship is 'Other', please provide more details"
+conditional = { equal = { relationship = "Other" } }
+
+## Course Details
+[field.course]
+h3 = "Course Details"
+
+[field.course.has-unique-student-identifier]
+text = "Do you have a Unique Student Identifier (USI)?"
+type = "bool"
+
+[field.course.unique-student-identifier]
+text = "Unique Student Identifier (USI)"
+conditional = { equal = { has-unique-student-identifier = true } }
+
+## Education Details
+[field.education]
+h3 = "Education Details"
+
+[field.education.year-left-secondary-school]
+text = "What year did you leave secondary school?"
+validator = "year"
+
+
+[field.education.highest-education-level]
+text = "What is your highest level of education attained to date?"
+options = "education-level"
