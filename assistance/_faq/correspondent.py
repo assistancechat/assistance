@@ -59,7 +59,7 @@ PROMPT = textwrap.dedent(
 
 async def get_first_name(scope: str, email_thread, their_email_address: str) -> str:
     prompt = PROMPT.replace("{email_address}", their_email_address)
-    response = await run_with_summary_fallback(
+    response, _ = await run_with_summary_fallback(
         scope=scope,
         prompt=prompt,
         email_thread=email_thread,

@@ -12,24 +12,30 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import base64
 import json
+import pathlib
+import tempfile
+from typing import TypedDict
+
+import aiofiles
 
 from assistance._config import (
     FormItem,
+    ProgressionItem,
     get_complete_form_progression_keys,
     get_form_entries,
     load_form_config,
     save_form_entries,
     set_progression_key,
 )
-from assistance._email.thread import get_email_thread
 from assistance._types import Email
 
 from .build import walk_and_build_form_fields
 from .collect import collect_form_items
 from .confirmation import confirming_form_items
+from .passport import get_fields_from_passport
 from .progression import get_current_stage_and_task
-from .ready import check_if_user_is_ready_to_continue
 from .response import write_and_send_email_response
 
 
@@ -47,7 +53,7 @@ async def handle_enrolment_email(form_name: str, email: Email):
         fields_that_need_confirmation.add(key)
 
     if fields_that_need_confirmation:
-        confirmation_form_fields_text = walk_and_build_form_fields(
+        confirmation_form_fields_text, _ = walk_and_build_form_fields(
             cfg["field"], allow=fields_that_need_confirmation
         )
 
@@ -81,12 +87,12 @@ async def handle_enrolment_email(form_name: str, email: Email):
 
             break
 
-    remaining_form_fields_text = walk_and_build_form_fields(
+    _, split_remaining_form_fields = walk_and_build_form_fields(
         cfg["field"], ignore=set(form_entries.keys())
     )
 
     new_collected_items = await collect_form_items(
-        email=email, remaining_form_fields_text=remaining_form_fields_text
+        email=email, split_remaining_form_fields=split_remaining_form_fields
     )
     new_form_entries = {
         key: FormItem(value=value, confirmed=False)
@@ -100,6 +106,19 @@ async def handle_enrolment_email(form_name: str, email: Email):
 
         form_entries[key] = item
 
+    progression = await _get_current_progression_item(
+        cfg, form_name, user_email, form_entries
+    )
+
+    if progression["attachment_handler"]:
+        handler = _ATTACHMENT_HANDLERS[progression["attachment_handler"]]
+        extracted_form_entries = await handler(email["attachments"])
+        form_entries.update(extracted_form_entries)
+
+    progression = await _get_current_progression_item(
+        cfg, form_name, user_email, form_entries
+    )
+
     fields_that_still_need_confirmation = set()
     for key, item in form_entries.items():
         if item["confirmed"]:
@@ -107,44 +126,23 @@ async def handle_enrolment_email(form_name: str, email: Email):
 
         fields_that_still_need_confirmation.add(key)
 
-    confirmation_still_needed_text = walk_and_build_form_fields(
+    confirmation_still_needed_text, _ = walk_and_build_form_fields(
         cfg["field"],
         allow=fields_that_still_need_confirmation,
         form_entries=form_entries,
         text_format="results",
     )
 
-    while True:
-        form_progression = await get_complete_form_progression_keys(
-            form_name, user_email
-        )
-        stage, task, fields_for_stage_completion = get_current_stage_and_task(
-            cfg["progression"], form_progression
-        )
+    if "ALL" in progression["fields_for_completion"]:
+        allow = None
+    else:
+        allow = set(progression["fields_for_completion"])
 
-        if fields_for_stage_completion is None or stage is None:
-            break
-
-        if len(set(fields_for_stage_completion).difference(form_entries)) == 0:
-            await set_progression_key(form_name, user_email, stage)
-            continue
-
-        break
-
-    if stage is None or task is None:
-        stage = cfg["progression"][-1]["key"]
-        task = cfg["progression"][-1]["task"]
-
-    # if stage == cfg["progression"][0]["key"]:
-    #     ready_to_continue = True
-    # else:
-    #     ready_to_continue = await check_if_user_is_ready_to_continue(email)
-
-    # if not ready_to_continue:
-    #     task = "- Be helpful and responsive to the user's queries.\n- Ask the user whether or not they are ready to continue with the questions for the form."
-
-    updated_remaining_form_fields_text = walk_and_build_form_fields(
-        cfg["field"], ignore=set(form_entries.keys()), text_format="description-only"
+    updated_remaining_form_fields_text, _ = walk_and_build_form_fields(
+        cfg["field"],
+        ignore=set(form_entries.keys()),
+        allow=allow,
+        text_format="description-only",
     )
 
     await save_form_entries(form_name, user_email, form_entries)
@@ -152,10 +150,103 @@ async def handle_enrolment_email(form_name: str, email: Email):
     await write_and_send_email_response(
         email=email,
         form_name=form_name,
-        current_step=task,
+        current_step=progression["task"],
         remaining_form_fields=updated_remaining_form_fields_text,
         confirmation_still_needed=confirmation_still_needed_text,
     )
 
-    if fields_for_stage_completion is None:
-        await set_progression_key(form_name, user_email, stage)
+    if progression["always_run_at_least_once"]:
+        await set_progression_key(form_name, user_email, progression["key"])
+
+
+async def _get_current_progression_item(
+    cfg, form_name, user_email, form_entries
+) -> ProgressionItem:
+    while True:
+        completed_form_progression_items = await get_complete_form_progression_keys(
+            form_name, user_email
+        )
+        progression = get_current_stage_and_task(
+            cfg["progression"], completed_form_progression_items
+        )
+
+        if progression is None or progression["always_run_at_least_once"]:
+            break
+
+        if len(set(progression["fields_for_completion"]).difference(form_entries)) == 0:
+            await set_progression_key(form_name, user_email, progression["key"])
+            continue
+
+        break
+
+    if progression is None:
+        progression = cfg["progression"][-1]
+
+    return progression
+
+
+class Attachment(TypedDict):
+    content_type: str
+    data: str
+    filename: str
+    size: int
+
+
+async def _extract_passport_details_as_field_items(attachments: list[Attachment]):
+    passport_results = await _extract_passport_details(attachments)
+
+    if passport_results is None:
+        return {}
+
+    passport_details, passport_data = passport_results
+
+    return {
+        "documents.passport": FormItem(value=passport_data, confirmed=True),
+        "personal.first-name": FormItem(
+            value=passport_details["first_name"], confirmed=False
+        ),
+        "personal.middle-names": FormItem(
+            value=passport_details["middle_names"], confirmed=False
+        ),
+        "personal.family-name": FormItem(
+            value=passport_details["family_name"], confirmed=False
+        ),
+        "personal.date-of-birth": FormItem(
+            value=passport_details["date_of_birth"], confirmed=False
+        ),
+        "personal.nationality": FormItem(
+            value=passport_details["nationality"], confirmed=False
+        ),
+        "personal.passport-number": FormItem(
+            value=passport_details["passport_number"], confirmed=False
+        ),
+        "personal.passport-expiry-date": FormItem(
+            value=passport_details["passport_expiry_date"], confirmed=False
+        ),
+    }
+
+
+async def _extract_passport_details(attachments: list[Attachment]):
+    for attachment in attachments:
+        img_data = base64.b64decode(attachment["data"].encode())
+
+        with tempfile.TemporaryDirectory() as tmp_dir_name:
+            dir = pathlib.Path(tmp_dir_name)
+            path = dir / attachment["filename"]
+            async with aiofiles.open(path, "wb") as f:
+                await f.write(img_data)
+
+            try:
+                passport_details = get_fields_from_passport(str(path))
+
+            # TODO: Improve this
+            except Exception as e:
+                print(e)
+                continue
+            else:
+                return passport_details, attachment["data"]
+
+
+_ATTACHMENT_HANDLERS = {
+    "extract_passport_details": _extract_passport_details_as_field_items,
+}

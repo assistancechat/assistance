@@ -114,4 +114,4 @@ async def run_with_summary_fallback(
 
         break
 
-    return response
+    return response, transcript

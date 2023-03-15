@@ -111,8 +111,9 @@ async def get_agent_mappings(user: str):
 class ProgressionItem(TypedDict):
     key: str
     task: str
-    fields_for_completion: list[str] | None
-    handler: str | None
+    fields_for_completion: list[str]
+    attachment_handler: str | None
+    always_run_at_least_once: bool
 
 
 class FormConfig(TypedDict):
@@ -125,6 +126,16 @@ class FormConfig(TypedDict):
 async def load_form_config(name: str) -> FormConfig:
     async with aiofiles.open(FORM_TEMPLATES / f"{name}.toml", encoding="utf8") as f:
         form_template = cast(FormConfig, tomllib.loads(await f.read()))
+
+    for item in form_template["progression"]:
+        if "fields_for_completion" not in item:
+            item["fields_for_completion"] = []
+
+        if "attachment_handler" not in item:
+            item["attachment_handler"] = None
+
+        if "always_run_at_least_once" not in item:
+            item["always_run_at_least_once"] = False
 
     return form_template
 

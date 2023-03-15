@@ -71,7 +71,7 @@ async def check_if_user_is_ready_to_continue(email: Email) -> bool:
 
     email_thread = get_email_thread(email)
 
-    response = await run_with_summary_fallback(
+    response, _ = await run_with_summary_fallback(
         scope=scope,
         prompt=PROMPT,
         email_thread=email_thread,

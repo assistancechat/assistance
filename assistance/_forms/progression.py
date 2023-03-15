@@ -18,15 +18,11 @@ from assistance._config import ProgressionItem
 
 def get_current_stage_and_task(
     progression_cfg: list[ProgressionItem], complete_progression_keys: set[str]
-) -> tuple[str | None, str | None, list[str] | None]:
+) -> ProgressionItem | None:
     for item in progression_cfg:
         if item["key"] in complete_progression_keys:
             continue
 
-        fields_for_completion = None
-        if "fields_for_completion" in item:
-            fields_for_completion = item["fields_for_completion"]
+        return item
 
-        return item["key"], item["task"], fields_for_completion
-
-    return None, None, None
+    return None
