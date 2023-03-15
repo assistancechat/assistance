@@ -62,10 +62,25 @@ TASK = textwrap.dedent(
         ## Example required JSON format
 
         {{
-            "an.example.field.item": "<field result goes here>",
-            "another.example.field.item": "<field result goes here>",
+            "an.example.field.item": {{
+                "think step by step for value": "<step by step reasoning>",
+                "value": "<field result goes here>",
+                "think step by step for validation": "<step by step reasoning>",
+                "can this value be extracted from the transcript with confidence?": <true or false>
+            }},
+            "another.example.field.item": {{
+                "think step by step for value": "<step by step reasoning>",
+                "value": "<field result goes here>",
+                "think step by step for validation": "<step by step reasoning>",
+                "can this value be extracted from the transcript with confidence?": <true or false>
+            }},
             ...
-            "last.field.result.that.you.found": "<field result goes here>"
+            "last.field.result.that.you.found": {{
+                "think step by step for value": "<step by step reasoning>",
+                "value": "<field result goes here>",
+                "think step by step for validation": "<step by step reasoning>",
+                "can this value be extracted from the transcript with confidence?": <true or false>
+            }}
         }}
 
         ## Your JSON response (ONLY respond with JSON, nothing else)
@@ -96,4 +111,9 @@ async def collect_form_items(
 
     new_form_items = json.loads(response)
 
-    return new_form_items
+    valid_form_items = {}
+    for key, item in new_form_items.items():
+        if item["can this value be extracted from the transcript with confidence?"]:
+            valid_form_items[key] = item["value"]
+
+    return valid_form_items
