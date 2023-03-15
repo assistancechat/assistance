@@ -112,11 +112,7 @@ async def handle_enrolment_email(form_name: str, email: Email):
 
     if progression["attachment_handler"]:
         handler = _ATTACHMENT_HANDLERS[progression["attachment_handler"]]
-        extracted_form_values = await handler(email["attachments"])
-        extracted_form_entries = {
-            key: FormItem(value=value, confirmed=False)
-            for key, value in extracted_form_values.items()
-        }
+        extracted_form_entries = await handler(email["attachments"])
         form_entries.update(extracted_form_entries)
 
     progression = await _get_current_progression_item(
@@ -189,18 +185,36 @@ class Attachment(TypedDict):
 
 
 async def _extract_passport_details_as_field_items(attachments: list[Attachment]):
-    passport_details = await _extract_passport_details(attachments)
+    passport_results = await _extract_passport_details(attachments)
 
-    assert passport_details is not None
+    if passport_results is None:
+        return {}
+
+    passport_details, passport_data = passport_results
 
     return {
-        "personal.first-name": passport_details["first_name"],
-        "personal.middle-names": passport_details["middle_names"],
-        "personal.family-name": passport_details["family_name"],
-        "personal.date-of-birth": passport_details["date_of_birth"],
-        "personal.nationality": passport_details["nationality"],
-        "personal.passport-number": passport_details["passport_number"],
-        "personal.passport-expiry-date": passport_details["passport_expiry_date"],
+        "documents.passport": FormItem(value=passport_data, confirmed=True),
+        "personal.first-name": FormItem(
+            value=passport_details["first_name"], confirmed=False
+        ),
+        "personal.middle-names": FormItem(
+            value=passport_details["middle_names"], confirmed=False
+        ),
+        "personal.family-name": FormItem(
+            value=passport_details["family_name"], confirmed=False
+        ),
+        "personal.date-of-birth": FormItem(
+            value=passport_details["date_of_birth"], confirmed=False
+        ),
+        "personal.nationality": FormItem(
+            value=passport_details["nationality"], confirmed=False
+        ),
+        "personal.passport-number": FormItem(
+            value=passport_details["passport_number"], confirmed=False
+        ),
+        "personal.passport-expiry-date": FormItem(
+            value=passport_details["passport_expiry_date"], confirmed=False
+        ),
     }
 
 
@@ -222,7 +236,7 @@ async def _extract_passport_details(attachments: list[Attachment]):
                 print(e)
                 continue
             else:
-                return passport_details
+                return passport_details, attachment["data"]
 
 
 _ATTACHMENT_HANDLERS = {

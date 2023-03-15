@@ -96,7 +96,10 @@ async def _handle_new_email(hash_digest: str, raw_email: RawEmail):
 
     email = await _initial_parsing(raw_email)
 
-    log_info(email["user_email"], _ctx.pp.pformat(email))
+    email_without_attachments = email.copy()
+    email_without_attachments["attachments"] = []
+
+    log_info(email["user_email"], _ctx.pp.pformat(email_without_attachments))
 
     await _react_to_email(email)
 
