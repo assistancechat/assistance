@@ -75,27 +75,33 @@ PROMPT = textwrap.dedent(
 
         [
             {{
+                "think step by step for question and its context": "<step by step reasoning>",
                 "question": "<first question>",
-                "context": "<any relevant context from the email transcript>",
+                "context": "<any relevant question context from the email transcript>",
+                "think step by step for extracted answer": "<step by step reasoning>",
                 "extracted answer": "<The answer given in the transcript>",
-                "think step by step": "<step by step reasoning>",
+                "think step by step for verification questions": "<step by step reasoning>",
                 "has the user's question been answered?": <true or false>,
                 "was this question asked after the given answer?": <true or false>
             }},
             {{
+                "think step by step for question and its context": "<step by step reasoning>",
                 "question": "<first question>",
-                "context": "<any relevant context from the email transcript>",
+                "context": "<any relevant question context from the email transcript>",
+                "think step by step for extracted answer": "<step by step reasoning>",
                 "extracted answer": "<The answer given in the transcript>",
-                "think step by step": "<step by step reasoning>",
+                "think step by step for verification questions": "<step by step reasoning>",
                 "has the user's question been answered?": <true or false>,
                 "was this question asked after the given answer?": <true or false>
             }},
             ...
             {{
+                "think step by step for question and its context": "<step by step reasoning>",
                 "question": "<first question>",
-                "context": "<any relevant context from the email transcript>",
+                "context": "<any relevant question context from the email transcript>",
+                "think step by step for extracted answer": "<step by step reasoning>",
                 "extracted answer": "<The answer given in the transcript>",
-                "think step by step": "<step by step reasoning>",
+                "think step by step for verification questions": "<step by step reasoning>",
                 "has the user's question been answered?": <true or false>,
                 "was this question asked after the given answer?": <true or false>
             }}
