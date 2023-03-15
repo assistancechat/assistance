@@ -31,7 +31,7 @@ SERP_API_KEY = get_serp_api_key()
 
 MODEL_KWARGS = {
     "engine": DEFAULT_OPENAI_MODEL,
-    "max_tokens": 512,
+    "max_tokens": 1024,
     "temperature": 0.7,
     "top_p": 1,
     "frequency_penalty": 0,
@@ -92,7 +92,7 @@ PROMPT = textwrap.dedent(
 
         - The time right now is {now}.
 
-        ## Form fields that still need to be collected (only ask the user for at most 3 at a time)
+        ## Form fields that you'd like them to provide answers for in their response
 
         {remaining_form_fields}
 

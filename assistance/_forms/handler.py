@@ -133,8 +133,16 @@ async def handle_enrolment_email(form_name: str, email: Email):
         text_format="results",
     )
 
+    if "ALL" in progression["fields_for_completion"]:
+        allow = None
+    else:
+        allow = set(progression["fields_for_completion"])
+
     updated_remaining_form_fields_text, _ = walk_and_build_form_fields(
-        cfg["field"], ignore=set(form_entries.keys()), text_format="description-only"
+        cfg["field"],
+        ignore=set(form_entries.keys()),
+        allow=allow,
+        text_format="description-only",
     )
 
     await save_form_entries(form_name, user_email, form_entries)

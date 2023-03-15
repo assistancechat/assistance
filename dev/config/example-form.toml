@@ -64,11 +64,6 @@ task = """\
 - Detail the process
 - Ask the user if they have any questions about the process
 
-In this introductory email, do not ask for any information that would be able
-to be extracted automatically from a passport. In a follow up email you plan
-to ask them to attach their passport to the email, and you can get that
-information then.
-
 ## The process
 
 - The user is enrolling for the Diploma of Entrepreneurship / Bachelor of
@@ -76,6 +71,7 @@ information then.
 - Through the following series of email questions, we will collect the
   information required to enrol the user in the course.\
 """
+fields_for_completion = ["personal.first-name", "contact.email"]
 always_run_at_least_once = true
 
 [[progression]]
@@ -90,13 +86,13 @@ extract the information automatically.\
 """
 fields_for_completion = [
   "documents.passport",
-  "personal.first-name",
-  "personal.middle-names",
-  "personal.family-name",
-  "personal.date-of-birth",
-  "personal.nationality",
-  "personal.passport-number",
-  "personal.passport-expiry-date",
+  # "personal.first-name",
+  # "personal.middle-names",
+  # "personal.family-name",
+  # "personal.date-of-birth",
+  # "personal.nationality",
+  # "personal.passport-number",
+  # "personal.passport-expiry-date",
 ]
 attachment_handler = "extract_passport_details"
 
@@ -105,9 +101,10 @@ key = "remaining"
 task = """\
 - Select a reasonable subset of relevant fields from the remaining fields
   section and ask the user to provide you the relevant information within
-  the content of their email.\
+  the content of their email.
+- It would be a good idea to ONLY select three form fields at a time.\
 """
-fields_for_completion = "ALL"
+fields_for_completion = ["ALL"]
 
 [[progression]]
 key = "complete"
