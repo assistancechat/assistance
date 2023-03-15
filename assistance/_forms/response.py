@@ -83,6 +83,8 @@ PROMPT = textwrap.dedent(
           that query.
         - Do not ask the user to email anyone else except Alex or
           yourself.
+        - If you have some results that need to be confirmed, make sure
+          to ask the user to confirm a few of them in your response.
 
         ## Details about the email record
 
@@ -96,7 +98,7 @@ PROMPT = textwrap.dedent(
 
         {remaining_form_fields}
 
-        ## Confirmation text that will be included between your body and conclusion sections
+        ## Form items that have been collected from the user and need user confirmation
 
         {confirmation_still_needed}
 
@@ -104,17 +106,7 @@ PROMPT = textwrap.dedent(
 
         {transcript}
 
-        ## Required JSON format
-
-        {{
-            "introduction": "<Your email introduction>",
-            "body": "<Your email body>",
-            "conclusion": "<Your email conclusion>"
-        }}
-
-        ## Your JSON response (ONLY respond with JSON, nothing else)
-
-        {{
+        ## Your email response (email content ONLY)
     """
 ).strip()
 
@@ -154,14 +146,9 @@ async def write_and_send_email_response(
         **MODEL_KWARGS,
     )
 
-    response_with_open_bracket = "{\n" + response
+    log_info(scope, response)
 
-    log_info(scope, response_with_open_bracket)
-
-    response_data = json.loads(response_with_open_bracket)
-    email_text = f"{response_data['introduction']}\n\n{response_data['body']}\n\n{confirmation_still_needed}\n\n{response_data['conclusion']}"
-
-    reply = create_reply(original_email=email, response=email_text)
+    reply = create_reply(original_email=email, response=response)
 
     mailgun_data = {
         "from": agent_email_address,
