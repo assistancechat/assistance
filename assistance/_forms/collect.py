@@ -54,23 +54,29 @@ TASK = textwrap.dedent(
 
         {{
             "an.example.field.item": {{
+                "the headings that contain this form item": "<the headings which this form item is under>",
                 "the description of this form item": "<the relevant field description provided above>",
                 "section of email transcript": "<section of email transcript that contains this result, leave blank if the not in transcript>",
                 "value": "<field result goes here>",
-                "does this value match what was within the current email transcript?": <true or false>
+                "does this value match what was within the current email transcript?": <true or false>,
+                "could have this response be referred to something else that is not relevant to this field item?": <true or false>
             }},
             "another.example.field.item": {{
+                "the headings that contain this form item": "<the headings which this form item is under>",
                 "the description of this form item": "<the relevant field description provided above>",
-                "section of email transcript": "<section of email transcript that contains this result, leave blank if value not in transcript>",
+                "section of email transcript": "<section of email transcript that contains this result, leave blank if the not in transcript>",
                 "value": "<field result goes here>",
-                "does this value match what was within the current email transcript?": <true or false>
+                "does this value match what was within the current email transcript?": <true or false>,
+                "could have this response be referred to something else that is not relevant to this field item?": <true or false>
             }},
             ...
             "last.field.result.that.you.found": {{
+                "the headings that contain this form item": "<the headings which this form item is under>",
                 "the description of this form item": "<the relevant field description provided above>",
-                "section of email transcript": "<section of email transcript that contains this result, leave blank if value not in transcript>",
+                "section of email transcript": "<section of email transcript that contains this result, leave blank if the not in transcript>",
                 "value": "<field result goes here>",
-                "does this value match what was within the current email transcript?": <true or false>
+                "does this value match what was within the current email transcript?": <true or false>,
+                "could have this response be referred to something else that is not relevant to this field item?": <true or false>
             }}
         }}
 
@@ -137,6 +143,9 @@ async def _collect_subset_of_form_fields(
             and value in item["section of email transcript"]
             and item[
                 "does this value match what was within the current email transcript?"
+            ]
+            and not item[
+                "could have this response be referred to something else that is not relevant to this field item?"
             ]
         )
 

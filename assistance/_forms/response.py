@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
+import json
 import textwrap
 from datetime import datetime
 from zoneinfo import ZoneInfo
@@ -42,11 +42,18 @@ PROMPT = textwrap.dedent(
     """
         # Form support for Jim's International Pathway Program
 
-        You are the Pathway Enrolment AI Assistant helping a student
-        enrol with the Diploma of Entrepreneurship / Bachelor of
-        Business degree at Alphacrucis University. This is as a part of
-        Jim's International Pathway Program. You are about to write a
-        reply to the following email addresses:
+        You are the Meshach AI helping a student enrol with the Diploma
+        of Entrepreneurship / Bachelor of Business degree at Alphacrucis
+        University. This is as a part of Jim's International Pathway
+        Program.
+
+        It is your job to write the introduction, body and conclusion
+        of an email. Between the body and the conclusion a section of
+        text that asks the user to confirm the information they have
+        provided will be inserted for you. You do not need to ask them
+        to further confirm this information.
+
+        You are writing an email reply to the following email addresses:
 
         {email_addresses}
 
@@ -76,8 +83,6 @@ PROMPT = textwrap.dedent(
           that query.
         - Do not ask the user to email anyone else except Alex or
           yourself.
-        - If you have some results that need to be confirmed, make sure
-          to ask the user to confirm a few of them in your response.
 
         ## Details about the email record
 
@@ -91,7 +96,7 @@ PROMPT = textwrap.dedent(
 
         {remaining_form_fields}
 
-        ## Form items that have been collected from the user and need user confirmation
+        ## Confirmation text that will be included between your body and conclusion sections
 
         {confirmation_still_needed}
 
@@ -99,7 +104,17 @@ PROMPT = textwrap.dedent(
 
         {transcript}
 
-        ## Your email response (email content ONLY)
+        ## Required JSON format
+
+        {{
+            "introduction": "<Your email introduction>",
+            "body": "<Your email body>",
+            "conclusion": "<Your email conclusion>"
+        }}
+
+        ## Your JSON response (ONLY respond with JSON, nothing else)
+
+        {{
     """
 ).strip()
 
@@ -139,9 +154,14 @@ async def write_and_send_email_response(
         **MODEL_KWARGS,
     )
 
-    log_info(scope, response)
+    response_with_open_bracket = "{\n" + response
 
-    reply = create_reply(original_email=email, response=response)
+    log_info(scope, response_with_open_bracket)
+
+    response_data = json.loads(response_with_open_bracket)
+    email_text = f"{response_data['introduction']}\n\n{response_data['body']}\n\n{confirmation_still_needed}\n\n{response_data['conclusion']}"
+
+    reply = create_reply(original_email=email, response=email_text)
 
     mailgun_data = {
         "from": agent_email_address,

@@ -81,7 +81,11 @@ information then.
 key = "passport"
 task = """\
 - Requesting the user for a scan or picture of their passport.
-- This passport needs to be attached in reply to this email.\
+- This passport needs to be attached in reply to this email.
+
+Do not ask them for any information that would be able to be extracted
+automatically from a passport as once we have their attachement, we will
+extract the information automatically.\
 """
 fields_for_completion = [
   "documents.passport",
