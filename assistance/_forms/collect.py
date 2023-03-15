@@ -46,11 +46,6 @@ TASK = textwrap.dedent(
         present them in JSON format. Only provide the fields that you
         are able to extract with confidence.
 
-        DO NOT include a field in your response at all if it has not
-        been able to be determined. DO NOT use null, N/A or an empty
-        string as a value, instead, just do not include that field in
-        your response.
-
         ## The email transcript
 
         {transcript}
@@ -59,27 +54,32 @@ TASK = textwrap.dedent(
 
         {form_field_descriptions}
 
-        ## Example required JSON format
+        ## Example required JSON format (only include the fields that you can extract with confidence)
 
         {{
-            "an.example.field.item": {{
-                "think step by step for value": "<step by step reasoning>",
-                "value": "<field result goes here>",
-                "think step by step for validation": "<step by step reasoning>",
-                "can this value be extracted from the transcript with confidence?": <true or false>
+            "field items that can be extracted with confidence from the transcript": {{
+                "think step by step": "<step by step reasoning>",
+                "value": [
+                    "an.example.field.item",
+                    "another.example.field.item",
+                    ...
+                    "last.field.result.that.you.found"
+                ]
             }},
-            "another.example.field.item": {{
-                "think step by step for value": "<step by step reasoning>",
-                "value": "<field result goes here>",
-                "think step by step for validation": "<step by step reasoning>",
-                "can this value be extracted from the transcript with confidence?": <true or false>
-            }},
-            ...
-            "last.field.result.that.you.found": {{
-                "think step by step for value": "<step by step reasoning>",
-                "value": "<field result goes here>",
-                "think step by step for validation": "<step by step reasoning>",
-                "can this value be extracted from the transcript with confidence?": <true or false>
+            "field item values": {{
+                "an.example.field.item": {{
+                    "think step by step for value": "<step by step reasoning>",
+                    "value": "<field result goes here>"
+                }},
+                "another.example.field.item": {{
+                    "think step by step for value": "<step by step reasoning>",
+                    "value": "<field result goes here>"
+                }},
+                ...
+                "last.field.result.that.you.found": {{
+                    "think step by step for value": "<step by step reasoning>",
+                    "value": "<field result goes here>"
+                }}
             }}
         }}
 
@@ -112,7 +112,7 @@ async def collect_form_items(
     new_form_items = json.loads(response)
 
     valid_form_items = {}
-    for key, item in new_form_items.items():
+    for key, item in new_form_items["field item values"].items():
         if item["can this value be extracted from the transcript with confidence?"]:
             valid_form_items[key] = item["value"]
 
