@@ -76,6 +76,7 @@ information then.
 - Through the following series of email questions, we will collect the
   information required to enrol the user in the course.\
 """
+always_run_at_least_once = true
 
 [[progression]]
 key = "passport"
@@ -97,7 +98,7 @@ fields_for_completion = [
   "personal.passport-number",
   "personal.passport-expiry-date",
 ]
-handler = "extract_passport_details"
+attachment_handler = "extract_passport_details"
 
 [[progression]]
 key = "remaining"

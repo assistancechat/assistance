@@ -47,7 +47,10 @@ router = APIRouter(prefix="/email")
 async def receive_email(request: Request):
     raw_email: RawEmail = await request.json()
 
-    logging.info(_ctx.pp.pformat(raw_email))
+    email_without_attachments = raw_email.copy()
+    email_without_attachments["attachments"] = []
+
+    logging.info(_ctx.pp.pformat(email_without_attachments))
 
     hash_digest = await _store_email(raw_email)
 

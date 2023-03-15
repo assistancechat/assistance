@@ -22,14 +22,12 @@ from assistance._config import (
     save_form_entries,
     set_progression_key,
 )
-from assistance._email.thread import get_email_thread
 from assistance._types import Email
 
 from .build import walk_and_build_form_fields
 from .collect import collect_form_items
 from .confirmation import confirming_form_items
 from .progression import get_current_stage_and_task
-from .ready import check_if_user_is_ready_to_continue
 from .response import write_and_send_email_response
 
 
@@ -115,25 +113,24 @@ async def handle_enrolment_email(form_name: str, email: Email):
     )
 
     while True:
-        form_progression = await get_complete_form_progression_keys(
+        completed_form_progression_items = await get_complete_form_progression_keys(
             form_name, user_email
         )
-        stage, task, fields_for_stage_completion = get_current_stage_and_task(
-            cfg["progression"], form_progression
+        progression = get_current_stage_and_task(
+            cfg["progression"], completed_form_progression_items
         )
 
-        if fields_for_stage_completion is None or stage is None:
+        if progression is None or progression["always_run_at_least_once"]:
             break
 
-        if len(set(fields_for_stage_completion).difference(form_entries)) == 0:
-            await set_progression_key(form_name, user_email, stage)
+        if len(set(progression["fields_for_completion"]).difference(form_entries)) == 0:
+            await set_progression_key(form_name, user_email, progression["key"])
             continue
 
         break
 
-    if stage is None or task is None:
-        stage = cfg["progression"][-1]["key"]
-        task = cfg["progression"][-1]["task"]
+    if progression is None:
+        progression = cfg["progression"][-1]
 
     # if stage == cfg["progression"][0]["key"]:
     #     ready_to_continue = True
@@ -152,10 +149,10 @@ async def handle_enrolment_email(form_name: str, email: Email):
     await write_and_send_email_response(
         email=email,
         form_name=form_name,
-        current_step=task,
+        current_step=progression["task"],
         remaining_form_fields=updated_remaining_form_fields_text,
         confirmation_still_needed=confirmation_still_needed_text,
     )
 
-    if fields_for_stage_completion is None:
-        await set_progression_key(form_name, user_email, stage)
+    if progression["always_run_at_least_once"]:
+        await set_progression_key(form_name, user_email, progression["key"])
