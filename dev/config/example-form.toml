@@ -133,7 +133,7 @@ text = "Is this the first award, such as a diploma or higher education degree, t
 type = "bool"
 
 [field.personal.title]
-text = "Title"
+text = "Title (eg. Mr, Mrs, Ms, Dr, etc.)"
 
 [field.personal.first-name]
 text = "First Name"

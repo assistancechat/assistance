@@ -106,7 +106,11 @@ PROMPT = textwrap.dedent(
 
         {transcript}
 
-        ## Your email response (email content ONLY)
+        ## Your email response
+
+        Subject: {subject}
+
+        Content:
     """
 ).strip()
 
