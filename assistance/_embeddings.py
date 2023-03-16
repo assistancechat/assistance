@@ -69,7 +69,7 @@ async def _get_all_docstrings():
 @cached(cache={})
 async def _get_file_contents(path):
     async with aiofiles.open(path, "r") as f:
-        return await f.read()
+        return (await f.read()).strip()
 
 
 async def get_top_questions_and_answers(openai_api_key, faq_data, queries, k=3):

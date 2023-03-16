@@ -201,7 +201,13 @@ async def _dependency_walk(docstring_hash: str):
         dependencies: list[str] = json.loads(await f.read())
 
     coroutines = [_dependency_walk(dependency) for dependency in dependencies]
-    sub_trees = await asyncio.gather(*coroutines)
+
+    try:
+        sub_trees = await asyncio.gather(*coroutines)
+    except FileNotFoundError as e:
+        raise ValueError(
+            f"While processing {docstring_hash} a dependency was not found"
+        ) from e
 
     tree = {docstring_hash: sub_trees}
 
@@ -265,7 +271,8 @@ async def _generate_docstrings(
             return equivalent_hash
 
     async with aiofiles.open(docstring_registry_path, "w") as f:
-        await f.write(docstring)
+        file_contents = docstring + "\n"
+        await f.write(file_contents)
 
     log_info(scope, f"Generating child docstrings for {docstring_hash[0:8]}")
     child_docstrings = await _run_with_error_loop(
@@ -290,7 +297,8 @@ async def _generate_docstrings(
     child_docstring_hashes = await asyncio.gather(*coroutines)
 
     async with aiofiles.open(dependencies_registry_path, "w") as f:
-        await f.write(json.dumps(child_docstring_hashes, indent=2))
+        file_contents = json.dumps(child_docstring_hashes, indent=2) + "\n"
+        await f.write(file_contents)
 
     return docstring_hash
 
