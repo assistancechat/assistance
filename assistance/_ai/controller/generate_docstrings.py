@@ -172,7 +172,7 @@ SIMILAR_PROMPT = textwrap.dedent(
 
         {{
             "most_similar": <index of most similar docstring>,
-            "same_function": <boolean>
+            "same_function": <true or false>
         }}
 
         ## Your JSON response (ONLY respond with JSON, nothing else)
@@ -180,13 +180,44 @@ SIMILAR_PROMPT = textwrap.dedent(
 ).strip()
 
 
-async def generate_docstrings(
+async def generate_docstrings_tree(scope: str, task: str):
+    root_docstring_hash = await _generate_docstrings(scope, task)
+
+    previous_tree = None
+    tree = await _dependency_walk(root_docstring_hash)
+
+    while previous_tree != tree:
+        previous_tree = tree
+        root_docstring_hash = await _generate_docstrings(scope, task)
+        tree = await _dependency_walk(root_docstring_hash)
+
+    return tree
+
+
+async def _dependency_walk(docstring_hash: str):
+    dependencies_registry_path = _get_dependencies_registry_path(docstring_hash)
+
+    async with aiofiles.open(dependencies_registry_path, "r") as f:
+        dependencies: list[str] = json.loads(await f.read())
+
+    coroutines = [_dependency_walk(dependency) for dependency in dependencies]
+    sub_trees = await asyncio.gather(*coroutines)
+
+    tree = {docstring_hash: sub_trees}
+
+    return tree
+
+
+def _get_dependencies_registry_path(docstring_hash):
+    return AI_REGISTRY_DIR.joinpath("dependencies", f"{docstring_hash}.json")
+
+
+async def _generate_docstrings(
     scope: str,
     task: str,
     docstring: str | None = None,
-    max_depth=3,
+    max_depth=10,
     current_depth=0,
-    force_dependency_check=False,
 ) -> str:
     if docstring is None:
         log_info(scope, "Generating initial docstring")
@@ -207,20 +238,7 @@ async def generate_docstrings(
     docstring_registry_path = AI_REGISTRY_DIR.joinpath(
         "docstrings", f"{docstring_hash}.txt"
     )
-    dependencies_registry_path = AI_REGISTRY_DIR.joinpath(
-        "dependencies", f"{docstring_hash}.json"
-    )
-
-    if docstring_registry_path.exists():
-        if not force_dependency_check:
-            log_info(
-                scope,
-                f"Skipping docstring generation for {docstring_hash[0:8]} as it has already been generated",
-            )
-            return docstring_hash
-
-        if dependencies_registry_path.exists():
-            return docstring_hash
+    dependencies_registry_path = _get_dependencies_registry_path(docstring_hash)
 
     similar_docstring_hashes, similar_docstrings = await get_closest_functions(
         openai_api_key=OPEN_AI_API_KEY, docstring=docstring
@@ -260,7 +278,7 @@ async def generate_docstrings(
     coroutines = []
     for child_docstring in child_docstrings:
         coroutines.append(
-            generate_docstrings(
+            _generate_docstrings(
                 scope,
                 task=task,
                 docstring=child_docstring,

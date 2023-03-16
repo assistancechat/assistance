@@ -1,0 +1,11 @@
+Calculates the sum of all integers in a given list.
+
+Parameters
+----------
+int_list : list[int]
+    The list of integers to be summed.
+
+Returns
+-------
+int
+    The sum of all integers in the input list.

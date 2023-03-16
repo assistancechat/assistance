@@ -39,20 +39,21 @@ async def get_closest_functions(openai_api_key, docstring, k=3):
         all_docstrings, openai_api_key=openai_api_key
     )
 
-    indices, _scores = top_k_embeddings(docstring_embedding, registry_embeddings, k)
+    all_indices, _all_scores = top_k_embeddings(
+        docstring_embedding, registry_embeddings, k
+    )
 
     top_docstring_hashes: list[str] = []
     top_docstrings: list[str] = []
 
-    for index in indices:
-        top_docstring_hashes.append(docstring_hashes[index])
-        top_docstrings.append(all_docstrings[index])
+    for indices in all_indices:
+        for index in indices:
+            top_docstring_hashes.append(docstring_hashes[index])
+            top_docstrings.append(all_docstrings[index])
 
     return top_docstring_hashes, top_docstrings
 
 
-# TODO: Have a fancy way to cache this, and then have a file lister that
-# clobbers the cache when a file is added.
 async def _get_all_docstrings():
     docstring_hashes: list[str] = []
     coroutines = []
@@ -65,6 +66,7 @@ async def _get_all_docstrings():
     return docstring_hashes, all_docstrings
 
 
+@cached(cache={})
 async def _get_file_contents(path):
     async with aiofiles.open(path, "r") as f:
         return await f.read()
@@ -150,7 +152,7 @@ def _top_k_embeddings(queries, embeddings, k):
 
 @cached(
     cache=LRUCache(maxsize=32),
-    key=lambda questions, openai_api_key: hashkey(questions),
+    key=lambda blocks, openai_api_key: hashkey(blocks),
 )
 async def _get_cuda_embeddings(
     blocks: tuple[str, ...], openai_api_key: str

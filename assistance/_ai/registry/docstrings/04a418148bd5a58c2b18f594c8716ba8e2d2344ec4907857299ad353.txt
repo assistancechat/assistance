@@ -1,0 +1,11 @@
+Displays the given board using IPython display calls.
+
+Parameters
+----------
+board : list[list[int]]
+    The board to be displayed as a list of lists of integers.
+
+Returns
+-------
+None
+    Displays the board using IPython display calls.

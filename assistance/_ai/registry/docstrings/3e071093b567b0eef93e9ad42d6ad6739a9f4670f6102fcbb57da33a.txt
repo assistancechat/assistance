@@ -1,0 +1,6 @@
+Displays the current state of the board using IPython display calls.
+
+Parameters
+----------
+board : list[list[int]]
+    The current state of the board as a list of lists of integers.
