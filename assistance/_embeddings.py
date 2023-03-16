@@ -15,12 +15,59 @@
 import asyncio
 import collections
 
+import aiofiles
 import torch
 from asyncache import cached
 from cachetools import LRUCache
 from cachetools.keys import hashkey
 
 from assistance._openai import get_embedding
+from assistance._paths import AI_REGISTRY_DIR
+
+
+async def get_closest_functions(openai_api_key, docstring, k=3):
+    docstring_embedding = await _get_cuda_embeddings(
+        blocks=(docstring,), openai_api_key=openai_api_key
+    )
+
+    docstring_hashes, all_docstrings = await _get_all_docstrings()
+
+    if len(all_docstrings) <= k:
+        return docstring_hashes, all_docstrings
+
+    registry_embeddings = await _get_cuda_embeddings(
+        all_docstrings, openai_api_key=openai_api_key
+    )
+
+    indices, _scores = top_k_embeddings(docstring_embedding, registry_embeddings, k)
+
+    top_docstring_hashes: list[str] = []
+    top_docstrings: list[str] = []
+
+    for index in indices:
+        top_docstring_hashes.append(docstring_hashes[index])
+        top_docstrings.append(all_docstrings[index])
+
+    return top_docstring_hashes, top_docstrings
+
+
+# TODO: Have a fancy way to cache this, and then have a file lister that
+# clobbers the cache when a file is added.
+async def _get_all_docstrings():
+    docstring_hashes: list[str] = []
+    coroutines = []
+    for path in list(AI_REGISTRY_DIR.joinpath("docstrings").glob("*")):
+        coroutines.append(_get_file_contents(path))
+        docstring_hashes.append(path.stem)
+
+    all_docstrings: tuple[str, ...] = tuple(await asyncio.gather(*coroutines))
+
+    return docstring_hashes, all_docstrings
+
+
+async def _get_file_contents(path):
+    async with aiofiles.open(path, "r") as f:
+        return await f.read()
 
 
 async def get_top_questions_and_answers(openai_api_key, faq_data, queries, k=3):
@@ -106,21 +153,9 @@ def _top_k_embeddings(queries, embeddings, k):
     key=lambda questions, openai_api_key: hashkey(questions),
 )
 async def _get_cuda_embeddings(
-    questions: tuple[str, ...], openai_api_key: str
+    blocks: tuple[str, ...], openai_api_key: str
 ) -> torch.Tensor:
     embeddings = await asyncio.gather(
-        *[
-            get_embedding(block=question, api_key=openai_api_key)
-            for question in questions
-        ]
+        *[get_embedding(block=block, api_key=openai_api_key) for block in blocks]
     )
     return torch.tensor(embeddings, device="cuda")
-
-
-@cached(
-    cache=LRUCache(maxsize=32),
-    key=lambda questions, openai_api_key: hashkey(questions),
-)
-async def _get_cuda_embedding(question: str, openai_api_key: str) -> torch.Tensor:
-    embedding = await get_embedding(block=question, api_key=openai_api_key)
-    return torch.tensor([embedding], device="cuda")

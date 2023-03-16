@@ -1,6 +1,0 @@
-{
-  "name": "initialize_empty_2d_list",
-  "docstring": "Initializes an empty 2D list with the given dimensions.\n\nParameters\n----------\nrows : int\n    The number of rows in the 2D list.\ncols : int\n    The number of columns in the 2D list.\n\nReturns\n-------\nlist[list[None]]\n    The 2D list initialized with None values.",
-  "examples": "To use this function, you would call it with the desired number of rows and columns:\n\n>>> empty_2d_list = initialize_empty_2d_list(3, 4)\n>>> empty_2d_list\n[[None, None, None, None], [None, None, None, None], [None, None, None, None]]\n\nAnother example with different dimensions:\n\n>>> empty_2d_list = initialize_empty_2d_list(2, 2)\n>>> empty_2d_list\n[[None, None], [None, None]]",
-  "dependencies": []
-}

@@ -12,15 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
 import asyncio
 import json
 import textwrap
 
+import aiofiles
+
 from assistance._config import DEFAULT_OPENAI_MODEL
+from assistance._embeddings import get_closest_functions
 from assistance._keys import get_openai_api_key
 from assistance._logging import log_info
 from assistance._openai import get_completion_only
+from assistance._paths import AI_REGISTRY_DIR
 
 from .indexer import hash_for_docstring
 
@@ -29,20 +32,17 @@ OPEN_AI_API_KEY = get_openai_api_key()
 MODEL_KWARGS = {
     "engine": DEFAULT_OPENAI_MODEL,
     "max_tokens": 2048,
-    "temperature": 0.7,
-    "top_p": 1,
-    "frequency_penalty": 0,
-    "presence_penalty": 0,
+    "temperature": 0,
 }
 
 
 DOCSTRING_INSTRUCTIONS = textwrap.dedent(
     """
-        It is your job to write the docstring in numpydoc of python
-        function docstring that fulfils this task.
+        When you write a docstring it is to be in the numpydoc format.
 
-        When writing the docstring do not include examples or notes.
-        Keep the function as simple as possible, but no simpler.
+        When writing a docstring do not include examples or notes.
+        Keep the function referred to by the docstring as simple as
+        possible, but no simpler.
     """
 ).strip()
 
@@ -50,7 +50,7 @@ DOCSTRING_INSTRUCTIONS = textwrap.dedent(
 INITIAL_PROMPT = (
     textwrap.dedent(
         """\
-        # Writing a docstring for a function that fulfil a task
+        # Writing a docstring for a function to fulfil a task
 
         ## Instructions
 
@@ -86,33 +86,26 @@ INITIAL_PROMPT = (
 PROMPT = (
     textwrap.dedent(
         r"""\
-        # Writing a list of docstrings for functions that fulfil a task
+        # Writing a list of child docstrings for a parent docstring
 
         ## Instructions
 
-        You have been provided with a current task and an original task.
-        The current task has been derived from the original task. You
-        are aiming to complete the current task while keeping in mind
-        that it your approach stays relevant to the original task.
+        You are a single component of an AI cluster.
+
+        You are aiming to create a list of child docstrings in order to
+        help the cluster of AI agents write a library of functions that
+        achieves the original task.
+
+        DO NOT create docstrings for the original task itself, other
+        AI agents will be doing that. Instead, only create docstrings
+        for functions that will be explicitly helpful in the creation
+        of your given parent docstring.
 
         {DOCSTRING_INSTRUCTIONS}
 
-        ## Your current task
+        ## Your parent docstring
 
-        You are aiming to create a function that meets the requirement
-        of the following docstring:
-
-        ```
         {docstring}
-        ```
-
-        It is your task to create a range of functions that you would
-        like to use within the function that you create for the above
-        docstring.
-
-        Only include functions that are relevant to the original task
-        and are not overly simple where the implementation would be
-        one line of code.
 
         ## The original task
 
@@ -153,17 +146,48 @@ PROMPT = (
     .replace("{DOCSTRING_INSTRUCTIONS}", DOCSTRING_INSTRUCTIONS)
 )
 
+SIMILAR_PROMPT = textwrap.dedent(
+    """\
+        # Docstring comparison
 
-async def generate(
+        ## Instructions
+
+        You are comparing a base docstring to a series of similar
+        docstrings. It is your goal to determine which of the docstrings
+        is most similar to the base docstring.
+
+        You are then to determine if the function produced by the most
+        similar docstring is the same as the function produced by the
+        base docstring.
+
+        ## Base docstring
+
+        {base_docstring}
+
+        ## Similar docstrings
+
+        {similar_docstrings}
+
+        ## Required JSON format
+
+        {{
+            "most_similar": <index of most similar docstring>,
+            "same_function": <boolean>
+        }}
+
+        ## Your JSON response (ONLY respond with JSON, nothing else)
+"""
+).strip()
+
+
+async def generate_docstrings(
     scope: str,
     task: str,
     docstring: str | None = None,
     max_depth=3,
     current_depth=0,
-) -> set[str]:
-    if current_depth >= max_depth:
-        return set()
-
+    force_dependency_check=False,
+) -> str:
     if docstring is None:
         log_info(scope, "Generating initial docstring")
         docstring = await get_completion_only(
@@ -177,7 +201,53 @@ async def generate(
 
     docstring_hash = hash_for_docstring(docstring)
 
-    # Test if this docstring exists, if it does return hash of existing docstring
+    if current_depth >= max_depth:
+        return docstring_hash
+
+    docstring_registry_path = AI_REGISTRY_DIR.joinpath(
+        "docstrings", f"{docstring_hash}.txt"
+    )
+    dependencies_registry_path = AI_REGISTRY_DIR.joinpath(
+        "dependencies", f"{docstring_hash}.json"
+    )
+
+    if docstring_registry_path.exists():
+        if not force_dependency_check:
+            log_info(
+                scope,
+                f"Skipping docstring generation for {docstring_hash[0:8]} as it has already been generated",
+            )
+            return docstring_hash
+
+        if dependencies_registry_path.exists():
+            return docstring_hash
+
+    similar_docstring_hashes, similar_docstrings = await get_closest_functions(
+        openai_api_key=OPEN_AI_API_KEY, docstring=docstring
+    )
+
+    if len(similar_docstrings) != 0:
+        similar_docstrings_with_indices = [
+            f"[{i}]\n{item}" for i, item in enumerate(similar_docstrings)
+        ]
+        similar_docstrings_text = "\n\n".join(similar_docstrings_with_indices)
+        is_it_the_same_data = await _run_with_error_loop(
+            scope=scope,
+            prompt=SIMILAR_PROMPT.format(
+                base_docstring=docstring, similar_docstrings=similar_docstrings_text
+            ),
+            api_key=OPEN_AI_API_KEY,
+            model_kwargs=MODEL_KWARGS,
+        )
+
+        if is_it_the_same_data["same_function"]:
+            index_of_most_similar = is_it_the_same_data["most_similar"]
+            equivalent_hash = similar_docstring_hashes[index_of_most_similar]
+
+            return equivalent_hash
+
+    async with aiofiles.open(docstring_registry_path, "w") as f:
+        await f.write(docstring)
 
     log_info(scope, f"Generating child docstrings for {docstring_hash[0:8]}")
     child_docstrings = await _run_with_error_loop(
@@ -189,18 +259,8 @@ async def generate(
 
     coroutines = []
     for child_docstring in child_docstrings:
-        # TODO: Only create sub-docstrings if this current docstring doesn't
-        # already have a function that fulfils it.
-
-        # TODO:
-        # - Search here for created functions
-        # - Return the found functions
-        # - Ask a separate agent, do any of these found functions sufficiently match the desired docstring?
-        # - If so, return the found functions
-        # - If not, create a new function starting with the following approach
-
         coroutines.append(
-            generate(
+            generate_docstrings(
                 scope,
                 task=task,
                 docstring=child_docstring,
@@ -209,9 +269,12 @@ async def generate(
             )
         )
 
-    sub_docstrings = await asyncio.gather(*coroutines)
+    child_docstring_hashes = await asyncio.gather(*coroutines)
 
-    return {docstring}.union(child_docstrings).union(*sub_docstrings)
+    async with aiofiles.open(dependencies_registry_path, "w") as f:
+        await f.write(json.dumps(child_docstring_hashes, indent=2))
+
+    return docstring_hash
 
 
 ERROR_MESSAGE_TEMPLATE = textwrap.dedent(
