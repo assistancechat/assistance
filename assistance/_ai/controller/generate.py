@@ -43,12 +43,6 @@ DOCSTRING_INSTRUCTIONS = textwrap.dedent(
 
         When writing the docstring do not include examples or notes.
         Keep the function as simple as possible, but no simpler.
-
-        Make sure that your docstring describes what the function does
-        but not *how* it does it. A function definition shouldn't be
-        restricted by implementation details.
-
-        Make sure to include both a Parameters and a Returns section.
     """
 ).strip()
 
@@ -116,9 +110,9 @@ PROMPT = (
         like to use within the function that you create for the above
         docstring.
 
-        If the provided docstring within this current task is already
-        a simple enough function that does not require any further
-        functions to be created, then simply return an empty list.
+        Only include functions that are relevant to the original task
+        and are not overly simple where the implementation would be
+        one line of code.
 
         ## The original task
 
