@@ -26,7 +26,7 @@ OPEN_AI_API_KEY = get_openai_api_key()
 
 MODEL_KWARGS = {
     "engine": DEFAULT_OPENAI_MODEL,
-    "max_tokens": 1024,
+    "max_tokens": 2048,
     "temperature": 0.7,
     "top_p": 1,
     "frequency_penalty": 0,
@@ -110,16 +110,12 @@ async def generate_docstrings(
     if original_task is None:
         original_task = task
 
-    response = await get_completion_only(
+    docstrings = await _run_with_error_loop(
         scope=scope,
         prompt=PROMPT.format(task=task, original_task=original_task),
         api_key=OPEN_AI_API_KEY,
-        **MODEL_KWARGS,
+        model_kwargs=MODEL_KWARGS,
     )
-
-    log_info(scope, response)
-
-    docstrings = json.loads(response)
 
     coroutines = []
     for docstring in docstrings:
@@ -146,3 +142,38 @@ async def generate_docstrings(
     sub_docstrings = await asyncio.gather(*coroutines)
 
     return set(docstrings).union(*sub_docstrings)
+
+
+ERROR_MESSAGE_TEMPLATE = textwrap.dedent(
+    """
+        # Error Message
+
+        You previously attempted the following prompt, however, when
+        attempting to run `json.loads(response)` on the response you
+        provided the following error was raise:
+
+        {error}
+    """
+).strip()
+
+
+async def _run_with_error_loop(scope, prompt, api_key, model_kwargs):
+    error_message = ""
+
+    while True:
+        response = await get_completion_only(
+            scope=scope,
+            prompt=error_message + prompt,
+            api_key=api_key,
+            **model_kwargs,
+        )
+
+        log_info(scope, response)
+
+        try:
+            data = json.loads(response)
+        except json.JSONDecodeError as e:
+            error_message = ERROR_MESSAGE_TEMPLATE.format(error=repr(e)) + "\n\n"
+            continue
+
+        return data
