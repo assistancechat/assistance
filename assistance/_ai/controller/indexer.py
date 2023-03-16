@@ -19,17 +19,29 @@ from assistance._utilities import get_hash_digest
 
 EXAMPLE_DOCSTRING = textwrap.dedent(
     """
-        Searches the internet for information related to the given query.
+        Calls a large language model (LLM) with the given prompt and
+        returns the generated response.
 
         Parameters
         ----------
-        query : str
-            The search query.
+        prompt : str
+            The input prompt to be used when calling the LLM.
 
         Returns
         -------
         str
-            A summary of the findings related to the query.
+            The generated response from the LLM based on the input prompt.
+    """
+).strip()
+
+ANOTHER_DOCSTRING = textwrap.dedent(
+    """
+        Returns the current date and time in ISO format.
+
+        Returns
+        -------
+        str
+            The current date and time in ISO 8601 format (YYYY-MM-DDTHH:MM:SS).
     """
 ).strip()
 

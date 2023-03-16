@@ -106,6 +106,7 @@
       "deepmind",
       "DICOM",
       "dlqms",
+      "docstrings",
       "doctest",
       "dtype",
       "Eidel",
