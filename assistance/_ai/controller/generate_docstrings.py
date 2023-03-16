@@ -14,6 +14,7 @@
 
 import asyncio
 import json
+import shutil
 import textwrap
 
 import aiofiles
@@ -171,8 +172,10 @@ SIMILAR_PROMPT = textwrap.dedent(
         ## Required JSON format
 
         {{
-            "most_similar": <index of most similar docstring>,
-            "same_function": <true or false>
+            "think step by step": "<step by step reasoning>",
+            "most similar": <index of most similar docstring>,
+            "same function": <true or false>,
+            "explanation": "<explanation>"
         }}
 
         ## Your JSON response (ONLY respond with JSON, nothing else)
@@ -180,27 +183,55 @@ SIMILAR_PROMPT = textwrap.dedent(
 ).strip()
 
 
-async def generate_docstrings_tree(scope: str, task: str):
-    root_docstring_hash = await _generate_docstrings(scope, task)
+Tree = dict[str, list["Tree"]]
 
-    previous_tree = None
-    tree = await _dependency_walk(root_docstring_hash)
 
-    while previous_tree != tree:
-        previous_tree = tree
-        root_docstring_hash = await _generate_docstrings(scope, task)
-        tree = await _dependency_walk(root_docstring_hash)
+async def generate_docstrings_tree(scope: str, task: str, max_depth: int):
+    root_docstring = await get_completion_only(
+        scope=scope,
+        prompt=INITIAL_PROMPT.format(task=task),
+        api_key=OPEN_AI_API_KEY,
+        **MODEL_KWARGS,
+    )
+
+    root_docstring_hash = None
+
+    tree = None
+    for i in range(max_depth):
+        root_docstring_hash = await _generate_docstrings(
+            scope,
+            task,
+            docstring=root_docstring,
+            already_traversing=set(),
+            max_depth=i,
+            parent=None,
+        )
+        # previous_tree = tree
+        # tree = await _dependency_walk(root_docstring_hash, max_depth=max_depth - 1)
+
+        # if tree == previous_tree:
+        #     break
+
+    assert root_docstring_hash is not None
+    # assert tree is not None
 
     return tree
 
 
-async def _dependency_walk(docstring_hash: str):
-    dependencies_registry_path = _get_dependencies_registry_path(docstring_hash)
+async def _dependency_walk(
+    docstring_hash: str,
+    max_depth: int,
+    current_depth=0,
+) -> Tree:
+    dependencies_registry_path = _get_dependencies_registry_dir(docstring_hash)
 
     async with aiofiles.open(dependencies_registry_path, "r") as f:
         dependencies: list[str] = json.loads(await f.read())
 
-    coroutines = [_dependency_walk(dependency) for dependency in dependencies]
+    coroutines = [
+        _dependency_walk(dependency, max_depth, current_depth + 1)
+        for dependency in dependencies
+    ]
 
     try:
         sub_trees = await asyncio.gather(*coroutines)
@@ -214,47 +245,66 @@ async def _dependency_walk(docstring_hash: str):
     return tree
 
 
-def _get_dependencies_registry_path(docstring_hash):
-    return AI_REGISTRY_DIR.joinpath("dependencies", f"{docstring_hash}.json")
+def _get_docstring_registry_path(docstring_hash: str):
+    docstring_registry_path = AI_REGISTRY_DIR.joinpath(
+        "docstrings", f"{docstring_hash}.txt"
+    )
+
+    return docstring_registry_path
+
+
+def _get_dependencies_registry_dir(docstring_hash: str):
+    dir = AI_REGISTRY_DIR.joinpath("dependencies", docstring_hash)
+    dir.mkdir(exist_ok=True)
+
+    return dir
+
+
+def _get_dependents_registry_dir(docstring_hash: str):
+    dir = AI_REGISTRY_DIR.joinpath("dependents", docstring_hash)
+    dir.mkdir(exist_ok=True)
+
+    return dir
 
 
 async def _generate_docstrings(
     scope: str,
     task: str,
-    docstring: str | None = None,
-    max_depth=10,
+    already_traversing: set[str],
+    docstring: str,
+    max_depth: int,
+    parent: str | None,
     current_depth=0,
-) -> str:
-    if docstring is None:
-        log_info(scope, "Generating initial docstring")
-        docstring = await get_completion_only(
-            scope=scope,
-            prompt=INITIAL_PROMPT.format(task=task),
-            api_key=OPEN_AI_API_KEY,
-            **MODEL_KWARGS,
-        )
-
-        assert docstring is not None
-
+) -> str | None:
     docstring_hash = hash_for_docstring(docstring)
+    if docstring_hash in already_traversing:
+        return docstring_hash
+
+    already_traversing.add(docstring_hash)
+    # log_info(scope, already_traversing)
 
     if current_depth >= max_depth:
         return docstring_hash
 
-    docstring_registry_path = AI_REGISTRY_DIR.joinpath(
-        "docstrings", f"{docstring_hash}.txt"
-    )
-    dependencies_registry_path = _get_dependencies_registry_path(docstring_hash)
+    docstring_registry_path = _get_docstring_registry_path(docstring_hash)
+    dependents_registry_dir = _get_dependents_registry_dir(docstring_hash)
+    dependencies_registry_dir = _get_dependencies_registry_dir(docstring_hash)
 
-    similar_docstring_hashes, similar_docstrings = await get_closest_functions(
+    similar_docstrings_to_check_against = await get_closest_functions(
         openai_api_key=OPEN_AI_API_KEY, docstring=docstring
     )
 
-    if len(similar_docstrings) != 0:
+    try:
+        similar_docstrings_to_check_against.remove(docstring)
+    except ValueError:
+        pass
+
+    if len(similar_docstrings_to_check_against) != 0:
         similar_docstrings_with_indices = [
-            f"[{i}]\n{item}" for i, item in enumerate(similar_docstrings)
+            f"[{i}]\n{item}"
+            for i, item in enumerate(similar_docstrings_to_check_against)
         ]
-        similar_docstrings_text = "\n\n".join(similar_docstrings_with_indices)
+        similar_docstrings_text = "\n\n---\n\n".join(similar_docstrings_with_indices)
         is_it_the_same_data = await _run_with_error_loop(
             scope=scope,
             prompt=SIMILAR_PROMPT.format(
@@ -264,15 +314,62 @@ async def _generate_docstrings(
             model_kwargs=MODEL_KWARGS,
         )
 
-        if is_it_the_same_data["same_function"]:
-            index_of_most_similar = is_it_the_same_data["most_similar"]
-            equivalent_hash = similar_docstring_hashes[index_of_most_similar]
+        # Sometimes the LLM puts in a non-empty string like "unknown"
+        if is_it_the_same_data["same function"] is True:
+            index_of_most_similar = is_it_the_same_data["most similar"]
+            similar_docstring = similar_docstrings_to_check_against[
+                index_of_most_similar
+            ]
 
-            return equivalent_hash
+            similar_docstring_hash = hash_for_docstring(similar_docstring)
+
+            if similar_docstring_hash == parent:
+                docstring_registry_path.unlink()
+                shutil.rmtree(dependencies_registry_dir)
+                shutil.rmtree(dependencies_registry_dir)
+                for path in dependents_registry_dir.glob("*"):
+                    dependent = path.stem
+                    dependent_dependency_dir = _get_dependencies_registry_dir(dependent)
+
+                    old_dependency_path = dependent_dependency_dir / docstring_hash
+                    old_dependency_path.unlink()
+
+                    return None
+
+            similar_function_docstring_path = _get_docstring_registry_path(
+                similar_docstring_hash
+            )
+
+            # Don't use aio, want this to run sequentially
+            if similar_function_docstring_path.exists():
+                docstring_registry_path.unlink()
+                shutil.rmtree(dependencies_registry_dir)
+                for path in dependents_registry_dir.glob("*"):
+                    dependent = path.stem
+                    dependent_dependency_dir = _get_dependencies_registry_dir(dependent)
+
+                    old_dependency_path = dependent_dependency_dir / docstring_hash
+                    new_dependency_path = (
+                        dependent_dependency_dir / similar_docstring_hash
+                    )
+                    old_dependency_path.rename(new_dependency_path)
+
+                return await _generate_docstrings(
+                    scope,
+                    task=task,
+                    docstring=similar_docstring,
+                    max_depth=max_depth,
+                    current_depth=current_depth,
+                    already_traversing=already_traversing,
+                    parent=parent,
+                )
 
     async with aiofiles.open(docstring_registry_path, "w") as f:
         file_contents = docstring + "\n"
         await f.write(file_contents)
+
+    if parent is not None:
+        (dependents_registry_dir / parent).touch()
 
     log_info(scope, f"Generating child docstrings for {docstring_hash[0:8]}")
     child_docstrings = await _run_with_error_loop(
@@ -291,14 +388,15 @@ async def _generate_docstrings(
                 docstring=child_docstring,
                 max_depth=max_depth,
                 current_depth=current_depth + 1,
+                already_traversing=already_traversing,
+                parent=docstring_hash,
             )
         )
 
     child_docstring_hashes = await asyncio.gather(*coroutines)
 
-    async with aiofiles.open(dependencies_registry_path, "w") as f:
-        file_contents = json.dumps(child_docstring_hashes, indent=2) + "\n"
-        await f.write(file_contents)
+    for child_hash in child_docstring_hashes:
+        (dependencies_registry_dir / child_hash).touch()
 
     return docstring_hash
 

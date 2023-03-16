@@ -25,45 +25,41 @@ from assistance._openai import get_embedding
 from assistance._paths import AI_REGISTRY_DIR
 
 
-async def get_closest_functions(openai_api_key, docstring, k=3):
+async def get_closest_functions(openai_api_key, docstring, k=3) -> list[str]:
     docstring_embedding = await _get_cuda_embeddings(
         blocks=(docstring,), openai_api_key=openai_api_key
     )
 
-    docstring_hashes, all_docstrings = await _get_all_docstrings()
+    all_docstrings = await _get_all_docstrings()
 
     if len(all_docstrings) <= k:
-        return docstring_hashes, all_docstrings
+        return all_docstrings
 
     registry_embeddings = await _get_cuda_embeddings(
-        all_docstrings, openai_api_key=openai_api_key
+        tuple(all_docstrings), openai_api_key=openai_api_key
     )
 
     all_indices, _all_scores = top_k_embeddings(
         docstring_embedding, registry_embeddings, k
     )
 
-    top_docstring_hashes: list[str] = []
     top_docstrings: list[str] = []
 
     for indices in all_indices:
         for index in indices:
-            top_docstring_hashes.append(docstring_hashes[index])
             top_docstrings.append(all_docstrings[index])
 
-    return top_docstring_hashes, top_docstrings
+    return top_docstrings
 
 
 async def _get_all_docstrings():
-    docstring_hashes: list[str] = []
     coroutines = []
     for path in list(AI_REGISTRY_DIR.joinpath("docstrings").glob("*")):
         coroutines.append(_get_file_contents(path))
-        docstring_hashes.append(path.stem)
 
-    all_docstrings: tuple[str, ...] = tuple(await asyncio.gather(*coroutines))
+    all_docstrings: list[str] = await asyncio.gather(*coroutines)
 
-    return docstring_hashes, all_docstrings
+    return all_docstrings
 
 
 @cached(cache={})

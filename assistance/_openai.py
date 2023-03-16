@@ -149,6 +149,8 @@ async def _get_embedding_with_cache(block: str, api_key):
     except (FileNotFoundError, json.JSONDecodeError):
         pass
 
+    logging.info("A new embedding: %s", block)
+
     result = await _get_embedding(block, api_key)
 
     asyncio.create_task(_store_cache(cache_path, result))
