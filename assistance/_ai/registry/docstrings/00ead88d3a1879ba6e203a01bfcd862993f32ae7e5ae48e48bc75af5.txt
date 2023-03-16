@@ -1,0 +1,11 @@
+Updates the board based on the rules of the game of life.
+
+Parameters
+----------
+board : list[list[int]]
+    The current state of the board as a list of lists of integers.
+
+Returns
+-------
+list[list[int]]
+    The updated state of the board as a list of lists of integers.

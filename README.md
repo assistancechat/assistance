@@ -24,7 +24,8 @@ Test that it works:
 wasmtime \
   --env PYTHONPATH=/assistance:/assistance/.venv/lib/python3.11/site-packages \
   --mapdir /assistance::$HOME/git/assistance \
-  ~/.assistance/wasm/python.wasm
+  ~/.assistance/wasm/python.wasm \
+  -- -c "print('hello world!')"
 ```
 
 Acknowledgment to https://wasmlabs.dev/articles/python-wasm32-wasi/ where much

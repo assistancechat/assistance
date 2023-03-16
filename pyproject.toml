@@ -42,7 +42,6 @@ mail-parser-reply = "*"
 wasmer = "^1.1.0"
 wasmer-compiler-cranelift = "^1.1.0"
 torch = "^1.13.1"
-async-lru = "^2.0.2"
 asyncache = "^0.3.1"
 
 [tool.poetry.group.dev.dependencies]
@@ -67,10 +66,7 @@ color_output = true
 known_first_party = ["assistance"]
 
 [tool.pyright]
-ignore = [
-    "**/node_modules",
-    "**/__pycache__"
-]
+ignore = ["**/node_modules", "**/__pycache__"]
 typeCheckingMode = "basic"
 
 [tool.pylint.master]
@@ -78,16 +74,16 @@ ignore-patterns = "./src/python/assistance/_client/**/*.py"
 
 [tool.pylint.messages-control]
 disable = [
-    "fixme",
-    "line-too-long",
-    "missing-function-docstring",
-    "no-name-in-module",
-    "missing-class-docstring",
-    "too-few-public-methods",
-    "invalid-name",
-    "missing-module-docstring",
-    "no-member",
-    "logging-fstring-interpolation",
+  "fixme",
+  "line-too-long",
+  "missing-function-docstring",
+  "no-name-in-module",
+  "missing-class-docstring",
+  "too-few-public-methods",
+  "invalid-name",
+  "missing-module-docstring",
+  "no-member",
+  "logging-fstring-interpolation",
 ]
 
 [tool.pylint.design]

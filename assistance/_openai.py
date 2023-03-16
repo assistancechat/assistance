@@ -20,6 +20,8 @@ import time
 
 import aiofiles
 import openai
+from asyncache import cached
+from cachetools import LRUCache
 from tenacity import (
     retry,
     retry_all,
@@ -46,6 +48,7 @@ async def get_completion_only(**kwargs) -> str:
     return stripped_response
 
 
+# Cache this with an LRU cache as well
 async def _completion_with_back_off(**kwargs):
     scope: str = kwargs["scope"]
     del kwargs["scope"]
@@ -145,6 +148,8 @@ async def _get_embedding_with_cache(block: str, api_key):
             return json.loads(await f.read())
     except (FileNotFoundError, json.JSONDecodeError):
         pass
+
+    logging.info("A new embedding: %s", block)
 
     result = await _get_embedding(block, api_key)
 

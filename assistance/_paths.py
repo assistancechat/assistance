@@ -53,6 +53,9 @@ TESTS_DATA = TEST_DIR.joinpath("data")
 FORM_TEMPLATES = CONFIG.joinpath("form-templates")
 FAQ_DATA = CONFIG.joinpath("faq")
 
+AI_DIR = LIB.joinpath("_ai")
+AI_REGISTRY_DIR = AI_DIR.joinpath("registry")
+
 
 def get_article_metadata_path(hash_digest: str, create_parent: bool = False):
     path = _get_record_path(ARTICLE_METADATA, hash_digest, create_parent)

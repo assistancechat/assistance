@@ -14,7 +14,9 @@
 
 import logging
 from logging.handlers import RotatingFileHandler
+from typing import Any
 
+from assistance import _ctx
 from assistance._paths import PHIRHO_LOGS
 
 
@@ -42,7 +44,12 @@ def main():
     logger.addHandler(handler)
 
 
-def log_info(scope: str, message: str):
+def log_info(scope: str, message: Any):
+    if not isinstance(message, str):
+        message = _ctx.pp.pformat(message)
+
+    assert isinstance(message, str)
+
     logging.info(f"[{scope}] {message}")
 
 
