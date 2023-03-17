@@ -419,3 +419,134 @@ options = "education-level"
 [field.education.current-studies]
 text = "Are you currently studying elsewhere?"
 type = "bool"
+
+[field.education.gender-of-parent-1]
+text = "Gender of Parent / Guardian 1"
+options = ["Male", "Female"]
+
+[field.education.highest-level-education-completed-parent-1]
+text = "What is the highest level of education completed?"
+options = [
+    "Postgraduate qualification (eg. Grad Dip, Masters, Doctorate)",
+    "Bachelor Degree",
+    "Other post-school qualification (eg. TAFE/VET Certificate, Diploma, Adv. Diploma, etc.)",
+    "Completed Year 12 schooling (or equivalent)",
+    "Completed Year 10 schooling, continued but not Year 12",
+    "Completed Year 10 schooling (or equivalent)",
+    "Didn't complete Year 10 schooling",
+    "Don't know"
+]
+
+[field.education.gender-of-parent-2]
+text = "Gender of Parent / Guardian 2"
+options = ["Male", "Female"]
+
+
+[field.education.highest-level-education-completed-parent-2]
+text = "What is the highest level of education completed?"
+options = [
+    "Postgraduate qualification (eg. Grad Dip, Masters, Doctorate)",
+    "Bachelor Degree",
+    "Other post-school qualification (eg. TAFE/VET Certificate, Diploma, Adv. Diploma, etc.)",
+    "Completed Year 12 schooling (or equivalent)",
+    "Completed Year 10 schooling, continued but not Year 12",
+    "Completed Year 10 schooling (or equivalent)",
+    "Didn't complete Year 10 schooling",
+    "Don't know"
+]
+
+## Genuine Temporary Entrant (GTE) Requirement
+
+[field.GTE.study-gap]
+text = "What have you done since high school (include work and further study)? If you have completed any study in Australia, please provide the details of this (e.g. institution name and course studied)"
+
+[field.GTE.why-australia]
+text = "Why do you want to travel to Australia for study? Please explain in 100 - 150 of your own words."
+
+[field.GTE.why-AC]
+text = "Why have you chosen to apply to this college? Please explain in 100 - 150 of your own words."
+
+[field.GTE.why-not-SA]
+text = "Why have you not chosen to study in your home country? Please explain in 100 - 150 of your own words."
+
+[field.GTE.why-new-specialisation]
+text = "If you have changed your field of specialisation (e.g you have bachelor’s degree in mechanical engineering and intend to study a ministry course), then please clarify why"
+
+[field.GTE.what-career-future]
+text = "What career or job title would you like in the future?"
+
+[field.GTE.what-interests-you-about-this-job]
+text = "What interests you most about this job?"
+
+[field.GTE.family-in-australia]
+text = "Do you have any family currently living in Australia?"
+type = "bool"
+
+[field.GTE.living-with-in-australia]
+text = "Do you plan to live with friends/family already residing in Australia?"
+type = "bool"
+
+[field.GTE.relationship-to-you]
+text = "Relationship to you"
+conditional = { equal = { living-with-in-australia = "Yes" } }
+
+[field.GTE.their-profession]
+text = "What is their profession?"
+conditional = { equal = { living-with-in-australia = "Yes" } }
+
+[field.GTE.how-to-secure-housing]
+text = "How do you intend to secure housing?"
+conditional = { equal = { living-with-in-australia = "No" } }
+
+[field.GTE.expected-to-pay]
+text = "Who is expected to pay for your tuition costs & living expenses?"
+options = [
+    "I am paying for myself",
+    "My sponsor",
+    "Financing through Jim's Group Program",
+    "Other"
+]
+
+[field.GTE.australia-visa-past]
+text = "Have you applied for any type of Australian visa in the past?"
+type = "bool"
+
+[field.GTE.refused-a-visa]
+text = "Have you ever been refused a visa?"
+type = "bool"
+
+[field.GTE.explain-refused-visa]
+text = "Please explain which visa(s) was/were not granted and why"
+conditional = { equal = { refused-a-visa = "Yes" } }
+
+[field.GTE.marriage]
+text = "Are you married?"
+type = "bool"
+
+[field.GTE.spouse-employment]
+text = "Is your spouse currently employed?"
+type = "bool"
+conditional = { equal = { marriage = "Yes" } }
+
+[field.GTE.join-as-dependents]
+text = "Will your spouse and/or children join you as dependants in Australia?"
+type = "bool"
+conditional = { equal = { marriage = "Yes" } }
+
+[field.GTE.children]
+text = "Do you have any children?"
+type = "bool"
+
+[field.GTE.dependents-refused]
+text = "Have any of your dependants been refused a visa in the past"
+type = "bool"
+conditional = { equal = { join-as-dependents = "Yes" } }
+
+[field.GTE.dependants-passports]
+text = "Certified copies of all dependants' passports (incl. children and spouse)"
+type = "file_upload"
+conditional = { equal = { join-as-dependents = "Yes" } }
+
+[field.GTE.explanation-dependents-refused]
+text = "Please explain which visa was refused and why"
+conditional = { equal = { dependents-refused = "Yes" } }
