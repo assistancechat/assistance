@@ -1,91 +1,18 @@
 [build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+requires = ["flit_core >=3.2,<4"]
+build-backend = "flit_core.buildapi"
 
-[tool.poetry]
+[project]
 name = "assistance"
-version = "0.1.1"
-description = ""
 authors = [
-  "Simon Biggs <simon@assistance.chat>",
-  "Ken Cheung <ken@assistance.chat>",
-  "Alex Carpenter <alex@assistance.chat>",
+  { name = "Alex Carpenter", email = "alex@refuge.au" },
+  { name = "Simon Biggs", email = "simon@refuge.au" },
 ]
-license = "Apache-2.0"
 readme = "README.md"
+license = { file = "LICENSE" }
+classifiers = ["License :: OSI Approved :: Apache Software License"]
+dynamic = ["version", "description"]
+dependencies = []
 
-[tool.poetry.scripts]
-assistance = "assistance.__main__:main"
-
-[tool.poetry.dependencies]
-python = "~3.11"
-
-openai = "*"
-beautifulsoup4 = "*"
-
-aiofiles = "*"
-aiohttp = "*"
-fastapi = "*"
-uvicorn = { extras = ["standard"], version = "*" }
-
-typer = "*"
-
-gunicorn = "*"
-stripe = "*"
-tenacity = "*"
-ipykernel = "*"
-google-search-results = "*"
-
-aiocron = "*"
-passporteye = "*"
-mail-parser-reply = "*"
-wasmer = "^1.1.0"
-wasmer-compiler-cranelift = "^1.1.0"
-torch = "^1.13.1"
-asyncache = "^0.3.1"
-
-[tool.poetry.group.dev.dependencies]
-autoflake = "*"
-bandit = "*"
-black = "*"
-docformatter = "*"
-flake8 = "*"
-ipython = "*"
-isort = "*"
-mypy = "*"
-pre-commit = "*"
-pylint = "*"
-pyright = "*"
-pytest = "*"
-pytest-bandit = "*"
-pyupgrade = "*"
-
-[tool.isort]
-profile = "black"
-color_output = true
-known_first_party = ["assistance"]
-
-[tool.pyright]
-ignore = ["**/node_modules", "**/__pycache__"]
-typeCheckingMode = "basic"
-
-[tool.pylint.master]
-ignore-patterns = "./src/python/assistance/_client/**/*.py"
-
-[tool.pylint.messages-control]
-disable = [
-  "fixme",
-  "line-too-long",
-  "missing-function-docstring",
-  "no-name-in-module",
-  "missing-class-docstring",
-  "too-few-public-methods",
-  "invalid-name",
-  "missing-module-docstring",
-  "no-member",
-  "logging-fstring-interpolation",
-]
-
-[tool.pylint.design]
-max-locals = 25
-max-args = 8
+[project.urls]
+Home = "https://refuge.au"

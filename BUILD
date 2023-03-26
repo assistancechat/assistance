@@ -1,9 +1,6 @@
 python_sources(name="lib", sources=["**/*.py"])
 
-poetry_requirements(
-    name="poetry",
-)
-
-python_requirements(
-    name="reqs",
+resource(
+    name="py_typed",
+    source="assistance/py.typed",
 )

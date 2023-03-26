@@ -1,0 +1,61 @@
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry]
+name = "assistance"
+version = "0.1.1"
+description = ""
+authors = [
+  "Simon Biggs <simon@assistance.chat>",
+  "Ken Cheung <ken@assistance.chat>",
+  "Alex Carpenter <alex@assistance.chat>",
+]
+license = "Apache-2.0"
+readme = "README.md"
+
+[tool.poetry.scripts]
+assistance = "assistance.__main__:main"
+
+[tool.poetry.dependencies]
+python = "~3.11"
+
+openai = "*"
+beautifulsoup4 = "*"
+
+aiofiles = "*"
+aiohttp = "*"
+fastapi = "*"
+uvicorn = { extras = ["standard"], version = "*" }
+
+typer = "*"
+
+gunicorn = "*"
+stripe = "*"
+tenacity = "*"
+ipykernel = "*"
+google-search-results = "*"
+
+aiocron = "*"
+passporteye = "*"
+mail-parser-reply = "*"
+wasmer = "^1.1.0"
+wasmer-compiler-cranelift = "^1.1.0"
+torch = "^1.13.1"
+asyncache = "^0.3.1"
+
+[tool.poetry.group.dev.dependencies]
+autoflake = "*"
+bandit = "*"
+black = "*"
+docformatter = "*"
+flake8 = "*"
+ipython = "*"
+isort = "*"
+mypy = "*"
+pre-commit = "*"
+pylint = "*"
+pyright = "*"
+pytest = "*"
+pytest-bandit = "*"
+pyupgrade = "*"
