@@ -18,7 +18,14 @@ import pathlib
 LIB = pathlib.Path(__file__).parent
 
 STORE = pathlib.Path.home().joinpath(".assistance")
-CONFIG = STORE.joinpath("config")
+
+MONOREPO = LIB.parent.parent.parent
+if MONOREPO.name == "monorepo":
+    CONFIG = MONOREPO.joinpath("config")
+else:
+    CONFIG = STORE.joinpath("config")
+
+
 SECRETS = CONFIG.joinpath("secrets")
 
 USERS = STORE.joinpath("users")
