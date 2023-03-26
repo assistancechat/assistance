@@ -5,7 +5,10 @@
     },
     {
       "path": ".."
-    }
+    },
+    {
+      "path": "../../jims"
+    },
   ],
   "settings": {
     "editor.tabSize": 2,
