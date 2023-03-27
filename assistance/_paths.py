@@ -19,7 +19,7 @@ LIB = pathlib.Path(__file__).parent
 
 STORE = pathlib.Path.home().joinpath(".assistance")
 
-MONOREPO = LIB.parent.parent.parent
+MONOREPO = LIB.parent.parent.parent.parent
 if MONOREPO.name == "monorepo":
     CONFIG = MONOREPO.joinpath("config")
 else:
