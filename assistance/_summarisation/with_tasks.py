@@ -17,7 +17,7 @@ import logging
 import textwrap
 
 from assistance import _ctx
-from assistance._config import DEFAULT_OPENAI_MODEL
+from assistance._config import SIMPLER_OPENAI_MODEL
 from assistance._logging import log_info
 from assistance._openai import get_completion_only
 from assistance._utilities import (
@@ -29,7 +29,7 @@ from assistance._vendor.stackoverflow.web_scraping import scrape
 MAX_NUMBER_OF_TEXT_SECTIONS = 20
 
 MODEL_KWARGS = {
-    "engine": DEFAULT_OPENAI_MODEL,
+    "engine": SIMPLER_OPENAI_MODEL,
     "max_tokens": 512,
     "temperature": 0.7,
     "top_p": 1,

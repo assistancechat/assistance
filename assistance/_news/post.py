@@ -15,14 +15,14 @@
 import asyncio
 import textwrap
 
-from assistance._config import DEFAULT_OPENAI_MODEL
+from assistance._config import SIMPLER_OPENAI_MODEL
 from assistance._keys import get_openai_api_key
 from assistance._openai import get_completion_only
 from assistance._summarisation.with_tasks import summarise_news_article_url_with_tasks
 from assistance._utilities import items_to_list_string
 
 MODEL_KWARGS = {
-    "engine": DEFAULT_OPENAI_MODEL,
+    "engine": SIMPLER_OPENAI_MODEL,
     "max_tokens": 2048,
     "temperature": 0.7,
     "top_p": 1,

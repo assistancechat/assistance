@@ -15,7 +15,7 @@
 import json
 import textwrap
 
-from assistance._config import DEFAULT_OPENAI_MODEL
+from assistance._config import SIMPLER_OPENAI_MODEL
 from assistance._email.thread import get_email_thread
 from assistance._keys import get_openai_api_key
 from assistance._logging import log_info
@@ -25,7 +25,7 @@ from assistance._types import Email
 OPEN_AI_API_KEY = get_openai_api_key()
 
 MODEL_KWARGS = {
-    "engine": DEFAULT_OPENAI_MODEL,
+    "engine": SIMPLER_OPENAI_MODEL,
     "max_tokens": 512,
     "temperature": 0.7,
     "top_p": 1,

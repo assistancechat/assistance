@@ -17,7 +17,7 @@ import textwrap
 from datetime import datetime
 from zoneinfo import ZoneInfo
 
-from assistance._config import DEFAULT_OPENAI_MODEL, ROOT_DOMAIN
+from assistance._config import ROOT_DOMAIN, SIMPLER_OPENAI_MODEL
 from assistance._email.reply import create_reply, get_all_user_emails
 from assistance._email.thread import get_email_thread
 from assistance._keys import get_openai_api_key, get_serp_api_key
@@ -30,7 +30,7 @@ OPEN_AI_API_KEY = get_openai_api_key()
 SERP_API_KEY = get_serp_api_key()
 
 MODEL_KWARGS = {
-    "engine": DEFAULT_OPENAI_MODEL,
+    "engine": SIMPLER_OPENAI_MODEL,
     "max_tokens": 1024,
     "temperature": 0.7,
     "top_p": 1,

@@ -29,7 +29,9 @@ from assistance._paths import (
     USER_DETAILS,
 )
 
-DEFAULT_OPENAI_MODEL = "gpt-3.5-turbo"
+SIMPLER_OPENAI_MODEL = "gpt-3.5-turbo"
+SOTA_OPENAI_MODEL = "gpt-4"
+
 ROOT_DOMAIN = "assistance.chat"
 PAYMENT_LINK = "https://buy.stripe.com/bIYeXF2s1d0E4wg9AB"
 EMAIL_PRODUCT_ID = "prod_NLuYISl8KZ6fUX"

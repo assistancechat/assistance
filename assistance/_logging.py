@@ -44,11 +44,15 @@ def main():
     logger.addHandler(handler)
 
 
-def log_info(scope: str, message: Any):
+def log_info(scope: None | str, message: Any):
     if not isinstance(message, str):
         message = _ctx.pp.pformat(message)
 
     assert isinstance(message, str)
+
+    if scope is None:
+        logging.info(message)
+        return
 
     logging.info(f"[{scope}] {message}")
 

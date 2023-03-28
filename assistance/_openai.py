@@ -79,7 +79,6 @@ async def _completion_with_back_off(**kwargs):
     log_info(scope, f"Completion result: {response}")
 
     asyncio.create_task(_store_cache(completion_cache_path, response))
-    asyncio.create_task(_store_result(scope, kwargs, response, query_timestamp))
 
     return response
 
@@ -122,16 +121,6 @@ async def _chat_completion_wrapper(**kwargs):
 async def _store_cache(completion_cache_path: pathlib.Path, response):
     async with aiofiles.open(completion_cache_path, "w") as f:
         await f.write(json.dumps(response, indent=2))
-
-
-async def _store_result(user_email: str, kwargs, response, query_timestamp: int):
-    usage_record_path = COMPLETIONS / user_email / f"{query_timestamp}.json"
-    usage_record_path.parent.mkdir(parents=True, exist_ok=True)
-
-    record = {"input": kwargs, "output": dict(response)}
-
-    async with aiofiles.open(usage_record_path, "w") as f:
-        await f.write(json.dumps(record, indent=2, sort_keys=True))
 
 
 async def get_embedding(block: str, api_key) -> list[float]:
