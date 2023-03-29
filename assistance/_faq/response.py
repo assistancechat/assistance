@@ -42,7 +42,7 @@ OPEN_AI_API_KEY = get_openai_api_key()
 SERP_API_KEY = get_serp_api_key()
 
 MODEL_KWARGS = {
-    "engine": DEFAULT_OPENAI_MODEL,
+    "engine": "gpt-4",
     "max_tokens": 512,
     "temperature": 0.7,
     "top_p": 1,
