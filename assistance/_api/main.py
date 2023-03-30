@@ -19,7 +19,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from assistance import _ctx, _logging
 from assistance._config import ROOT_DOMAIN
 
-from .routers import email, stripe
+from .routers import email, postal, stripe
 
 _logging.main()
 
@@ -44,6 +44,7 @@ app.add_middleware(
 
 app.include_router(stripe.router)
 app.include_router(email.router)
+app.include_router(postal.router)
 
 
 @app.on_event("startup")
