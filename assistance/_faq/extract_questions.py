@@ -16,7 +16,7 @@ import json
 import textwrap
 from typing import TypedDict
 
-from assistance._config import SIMPLER_OPENAI_MODEL
+from assistance._config import SOTA_OPENAI_MODEL
 from assistance._email.thread import get_email_thread
 from assistance._keys import get_openai_api_key
 from assistance._logging import log_info
@@ -26,7 +26,7 @@ from assistance._types import Email
 OPEN_AI_API_KEY = get_openai_api_key()
 
 MODEL_KWARGS = {
-    "engine": SIMPLER_OPENAI_MODEL,
+    "engine": SOTA_OPENAI_MODEL,
     "max_tokens": 2048,
     "temperature": 0,
     "top_p": 1,

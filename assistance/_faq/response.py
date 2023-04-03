@@ -22,7 +22,7 @@ from zoneinfo import ZoneInfo
 from mailparser_reply import EmailReplyParser
 
 from assistance import _ctx
-from assistance._config import ROOT_DOMAIN, SIMPLER_OPENAI_MODEL, load_faq_data
+from assistance._config import ROOT_DOMAIN, SOTA_OPENAI_MODEL, load_faq_data
 from assistance._email.reply import create_reply, get_all_user_emails
 from assistance._email.thread import get_email_thread
 from assistance._keys import get_openai_api_key, get_serp_api_key
@@ -42,8 +42,8 @@ OPEN_AI_API_KEY = get_openai_api_key()
 SERP_API_KEY = get_serp_api_key()
 
 MODEL_KWARGS = {
-    "engine": SIMPLER_OPENAI_MODEL,
-    "max_tokens": 512,
+    "engine": SOTA_OPENAI_MODEL,
+    "max_tokens": 1500,
     "temperature": 0.7,
     "top_p": 1,
     "frequency_penalty": 0,
@@ -62,26 +62,23 @@ PROMPT = textwrap.dedent(
         Pathway Program.
 
         You have been provided with a list of the answers to a range of
-        questions that {first_name}. You are to write
-        the introduction to the email response and the conclusion to the
-        email response.
+        questions that {first_name}. You are to write an introduction
+        and conclusion to the email response to include around these
+        questions and answers. Make sure to include the questions and
+        answers in the same format you have been provided.
+
+        You may remove components of answers if they are not appropriate
+        within the context of the email. Do no add any extra information
+        into any of the answers. If in your opinion the answer is not
+        helpful please write "A:" without anything after it.
 
         Address {first_name} by their first name, unless it is not
         known. If it is not known simply start the email without
         addressing them.
 
-        This introduction and conclusion will be prepended and appended
-        around the question answers that you have already been provided.
-
-        DO NOT include the question and answers within your introduction
-        or your conclusion.
-
         The name to sign the email with is "Alex Carpenter".
 
         ## The questions and their answers that you have been provided.
-
-        You do not need to repeat these. They will already be included
-        within your email response.
 
         {question_and_answers}
 
@@ -89,14 +86,21 @@ PROMPT = textwrap.dedent(
 
         {transcript}
 
-        ## Required JSON format
+        ## Required email format
 
-        {{
-            "introduction": "<Your email introduction>",
-            "conclusion": "<Your email conclusion>"
-        }}
+        [YOUR INTRODUCTION]
 
-        ## Your JSON response (ONLY respond with JSON, nothing else)
+        [THE QUESTIONS AND ANSWERS YOU HAVE BEEN PROVIDED]
+
+        [YOUR CONCLUSION]
+
+        ## Your email response
+
+        Email subject:
+
+        {subject}
+
+        Email body:
     """
 ).strip()
 
@@ -162,10 +166,16 @@ async def write_and_send_email_response(
 
     question_and_answers_string = question_and_answers_string.strip()
 
+    prompt_subject = email["subject"]
+
+    if not prompt_subject.startswith("Re:"):
+        prompt_subject = f"Re: {prompt_subject}"
+
     prompt = PROMPT.format(
         transcript="{transcript}",
         question_and_answers=question_and_answers_string,
         first_name=first_name,
+        subject=prompt_subject,
     )
 
     response, _ = await run_with_summary_fallback(
@@ -178,10 +188,7 @@ async def write_and_send_email_response(
 
     log_info(scope, response)
 
-    result = json.loads(response)
-    response_email = f"{result['introduction'].strip()}\n\n{question_and_answers_string}\n\n{result['conclusion'].strip()}"
-
-    reply = create_reply(original_email=email, response=response_email)
+    reply = create_reply(original_email=email, response=response)
     if subject is None:
         subject = reply["subject"]
 

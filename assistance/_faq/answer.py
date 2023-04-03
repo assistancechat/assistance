@@ -36,10 +36,12 @@ MODEL_KWARGS = {
     "engine": SIMPLER_OPENAI_MODEL,
     "max_tokens": 512,
     "temperature": 0.7,
-    "top_p": 1,
-    "frequency_penalty": 0,
-    "presence_penalty": 0,
 }
+
+# MODEL_KWARGS_WITH_GPT_4 = {
+#     **MODEL_KWARGS,
+#     "engine": "gpt-4",
+# }
 
 PROMPT = textwrap.dedent(
     """
@@ -190,6 +192,19 @@ async def write_answer(
             )
         )
 
+    # coroutines.append(
+    #     get_completion_only(
+    #         scope=scope,
+    #         prompt=PROMPT.format(
+    #             question=question,
+    #             context=context,
+    #             faq_responses="\n\n".join(sorted_faq_responses),
+    #         ),
+    #         api_key=OPEN_AI_API_KEY,
+    #         **MODEL_KWARGS_WITH_GPT_4,
+    #     )
+    # )
+
     question_responses = await asyncio.gather(*coroutines)
 
     log_info(scope, json.dumps(question_responses, indent=2))
@@ -210,6 +225,7 @@ async def write_answer(
             answers=json.dumps(question_responses_with_id, indent=2),
         ),
         api_key=OPEN_AI_API_KEY,
+        # **MODEL_KWARGS_WITH_GPT_4,
         **MODEL_KWARGS,
     )
 
