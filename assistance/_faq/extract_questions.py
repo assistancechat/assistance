@@ -26,7 +26,7 @@ from assistance._types import Email
 OPEN_AI_API_KEY = get_openai_api_key()
 
 MODEL_KWARGS = {
-    "engine": DEFAULT_OPENAI_MODEL,
+    "engine": "gpt-4",
     "max_tokens": 2048,
     "temperature": 0,
     "top_p": 1,
