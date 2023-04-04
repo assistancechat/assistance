@@ -99,13 +99,13 @@ async def get_user_from_email(email_address: str):
 
 
 async def get_user_details(user: str):
-    details = await _get_file_based_mapping(USER_DETAILS, user)
+    details = await get_file_based_mapping(USER_DETAILS, user)
 
     return details
 
 
 async def get_agent_mappings(user: str):
-    details = await _get_file_based_mapping(AGENT_MAPPING, user)
+    details = await get_file_based_mapping(AGENT_MAPPING, user)
 
     return details
 
@@ -116,6 +116,9 @@ class ProgressionItem(TypedDict):
     fields_for_completion: list[str]
     attachment_handler: str | None
     always_run_at_least_once: bool
+    # TODO: Better handling of these fields
+    subject: str
+    body: str
 
 
 class FormConfig(TypedDict):
@@ -177,34 +180,15 @@ async def save_form_entries(
             await f.write(json.dumps(item))
 
 
-async def get_complete_form_progression_keys(
-    form_name: str, user_email: str
-) -> set[str]:
-    file_contents = await _get_form_data(
-        form_name=form_name, data_type="progression", user_email=user_email
-    )
-
-    return file_contents["empty_files"]
-
-
-async def set_progression_key(form_name: str, user_email: str, key: str):
-    path = FORM_DATA / form_name / "progression" / user_email / key
-
-    path.parent.mkdir(parents=True, exist_ok=True)
-
-    async with aiofiles.open(path, "w"):
-        pass
-
-
 async def _get_form_data(form_name: str, data_type: str, user_email: str):
-    results = await _get_file_based_mapping(
+    results = await get_file_based_mapping(
         FORM_DATA / form_name / data_type, user_email, include_user=False
     )
 
     return results
 
 
-async def _get_file_based_mapping(root: pathlib.Path, user: str, include_user=True):
+async def get_file_based_mapping(root: pathlib.Path, user: str, include_user=True):
     user_details_files = (root / user).glob("*")
 
     details = {}

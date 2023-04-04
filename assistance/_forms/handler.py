@@ -23,19 +23,18 @@ import aiofiles
 from assistance._config import (
     FormItem,
     ProgressionItem,
-    get_complete_form_progression_keys,
     get_form_entries,
     load_form_config,
     save_form_entries,
-    set_progression_key,
 )
+from assistance._progression import get_complete_progression_keys, set_progression_key
 from assistance._types import Email
 
+from .._progression import get_current_stage_and_task
 from .build import walk_and_build_form_fields
 from .collect import collect_form_items
 from .confirmation import confirming_form_items
 from .passport import get_fields_from_passport
-from .progression import get_current_stage_and_task
 from .response import write_and_send_email_response
 
 
@@ -156,15 +155,15 @@ async def handle_enrolment_email(form_name: str, email: Email):
     )
 
     if progression["always_run_at_least_once"]:
-        await set_progression_key(form_name, user_email, progression["key"])
+        await set_progression_key("form", form_name, user_email, progression["key"])
 
 
 async def _get_current_progression_item(
     cfg, form_name, user_email, form_entries
 ) -> ProgressionItem:
     while True:
-        completed_form_progression_items = await get_complete_form_progression_keys(
-            form_name, user_email
+        completed_form_progression_items = await get_complete_progression_keys(
+            "form", form_name, user_email
         )
         progression = get_current_stage_and_task(
             cfg["progression"], completed_form_progression_items
@@ -174,7 +173,7 @@ async def _get_current_progression_item(
             break
 
         if len(set(progression["fields_for_completion"]).difference(form_entries)) == 0:
-            await set_progression_key(form_name, user_email, progression["key"])
+            await set_progression_key("form", form_name, user_email, progression["key"])
             continue
 
         break

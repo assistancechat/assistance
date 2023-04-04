@@ -33,6 +33,7 @@ EMAIL_MAPPING = USERS.joinpath("email-mapping")
 USER_DETAILS = USERS.joinpath("details")
 AGENT_MAPPING = USERS.joinpath("agent-mapping")
 FORM_DATA = USERS.joinpath("forms")
+CAMPAIGN_DATA = USERS.joinpath("campaigns")
 
 RECORDS = STORE.joinpath("records")
 
