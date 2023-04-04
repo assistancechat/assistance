@@ -6,23 +6,24 @@
 
 #     http://www.apache.org/licenses/LICENSE-2.0
 
-import asyncio
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+
 import pathlib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from typing import Literal
 
 import aiofiles
-
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
 import aiosmtplib
 import marko
 
 from assistance._config import ProgressionItem, get_file_based_mapping
+from assistance._mailgun import send_email
 from assistance._paths import CAMPAIGN_DATA, FORM_DATA
 
 
@@ -69,8 +70,12 @@ async def set_progression_key(
         pass
 
 
+# @retry(
+#     wait=wait_random_exponential(min=20, max=240),
+#     stop=stop_after_attempt(12),
+# )
 async def send_campaign_email_with_progression(
-    smtp_config, campaign_cfg, name_lookup, user_email_address
+    scope, campaign_cfg, name_lookup, user_email_address
 ):
     name = name_lookup[user_email_address]
     campaign_email_address = campaign_cfg["defaults"]["campaign_email_address"].strip()
@@ -92,11 +97,6 @@ async def send_campaign_email_with_progression(
         + campaign_cfg["defaults"]["signature"].strip()
     )
 
-    message = MIMEMultipart("alternative")
-    message["From"] = "Alex Carpenter <pathways@jims.international>"
-    message["To"] = user_email_address
-    message["Subject"] = subject
-
     plain_body = body_template.format(
         name=name,
         user_email_address=user_email_address,
@@ -104,12 +104,15 @@ async def send_campaign_email_with_progression(
     )
     html_body = marko.convert(plain_body)
 
-    plain_text_message = MIMEText(plain_body, "plain", "utf-8")
-    html_message = MIMEText(html_body, "html", "utf-8")
-    message.attach(plain_text_message)
-    message.attach(html_message)
+    postal_data = {
+        "from": "Alex Carpenter <pathways@jims.international>",
+        "to": [user_email_address],
+        "subject": subject,
+        "plain_body": plain_body,
+        "html_body": html_body,
+    }
 
-    await aiosmtplib.send(message, **smtp_config)
+    await send_email(scope, postal_data)
 
     await set_progression_key(
         "campaign", "jims-ac", user_email_address, email_template["key"]
