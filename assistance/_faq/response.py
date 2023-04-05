@@ -55,7 +55,7 @@ PROMPT = textwrap.dedent(
     """
         # Write an email introduction and conclusion
 
-        You have been forwarded an email from Alex Carpenter.
+        You are writing an email on behalf of Alex Carpenter.
         {first_name} is asking Alex questions about Jim's International
         Pathway Program. You are happy to help answer any questions that
         {first_name} may have about the Jim's International
