@@ -96,6 +96,10 @@ async def _handle_new_email(hash_digest: str, raw_email: RawEmail):
 
     email = await _initial_parsing(raw_email)
 
+    if email["agent_domain"] != ROOT_DOMAIN:
+        logging.info("Email is not from the root domain. Breaking loop. Doing nothing.")
+        return
+
     email_without_attachments = email.copy()
     email_without_attachments["attachments"] = []
 
@@ -253,7 +257,10 @@ async def _initial_parsing(raw_email: RawEmail):
     to = str(intermediate_email_dict["to"])
     rcpt_to = str(intermediate_email_dict["rcpt_to"])
 
-    intermediate_email_dict["agent_name"] = rcpt_to.split("@")[0].lower()
+    agent_name, agent_domain = rcpt_to.split("@")
+
+    intermediate_email_dict["agent_name"] = agent_name.lower()
+    intermediate_email_dict["agent_domain"] = agent_domain.lower()
 
     cleaned_to = get_cleaned_email(to.lower())
     cleaned_rcpt_to = get_cleaned_email(rcpt_to.lower())

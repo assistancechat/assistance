@@ -85,6 +85,7 @@ Email = TypedDict(
         "to": str,
         "token": str,
         "agent_name": str,
+        "agent_domain": str,
         "user_email": str,
     },
 )
