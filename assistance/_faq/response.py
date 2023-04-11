@@ -134,6 +134,13 @@ async def write_and_send_email_response(
         )
         return
 
+    if "unsubscribe" in email["subject"].lower():
+        log_info(
+            scope,
+            "Ignoring email that has unsubscribe within the subject.",
+        )
+        return
+
     faq_data = await load_faq_data(faq_name)
 
     first_name = await get_first_name(
