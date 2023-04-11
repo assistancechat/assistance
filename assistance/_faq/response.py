@@ -101,7 +101,6 @@ async def write_and_send_email_response(
     email: Email,
 ):
     scope = email["user_email"]
-    faq_data = await load_faq_data(faq_name)
 
     email_thread = get_email_thread(email=email)
 
@@ -112,18 +111,30 @@ async def write_and_send_email_response(
 
         first_reply_line = email["plain_replies_only"].splitlines()[0]
         if first_reply_line.startswith("From: "):
-            reply_to = get_cleaned_email(first_reply_line)
+            text_to_extract_reply_to_from = first_reply_line
 
         else:
             try:
-                reply_to = get_cleaned_email(
-                    last_message_lower.split("forwarded message")[-1]
-                )
+                text_to_extract_reply_to_from = last_message_lower.split(
+                    "forwarded message"
+                )[-1]
+
             except ValueError:
-                reply_to = email["from"]
+                text_to_extract_reply_to_from = email["from"]
     else:
-        reply_to = email["from"]
+        text_to_extract_reply_to_from = email["from"]
         subject = None
+
+    reply_to = get_cleaned_email(text_to_extract_reply_to_from)
+
+    if reply_to == "pathways@jims.international":
+        log_info(
+            scope,
+            "FAQ would be sent through to pathways itself. Breaking the loop. Doing nothing.",
+        )
+        return
+
+    faq_data = await load_faq_data(faq_name)
 
     first_name = await get_first_name(
         scope=scope, email_thread=email_thread, their_email_address=reply_to
