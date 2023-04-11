@@ -13,26 +13,17 @@
 # limitations under the License.
 
 import asyncio
-import json
-import re
 import textwrap
-from datetime import datetime
-from zoneinfo import ZoneInfo
 
-from mailparser_reply import EmailReplyParser
-
-from assistance import _ctx
 from assistance._config import ROOT_DOMAIN, SOTA_OPENAI_MODEL, load_faq_data
-from assistance._email.reply import create_reply, get_all_user_emails
+from assistance._email.reply import create_reply
 from assistance._email.thread import get_email_thread
 from assistance._keys import get_openai_api_key, get_serp_api_key
 from assistance._logging import log_info
 from assistance._mailgun import send_email
-from assistance._openai import get_completion_only
 from assistance._summarisation.thread import run_with_summary_fallback
-from assistance._tooling.executive_function_system import get_tools_and_responses
 from assistance._types import Email
-from assistance._utilities import get_cleaned_email, items_to_list_string
+from assistance._utilities import get_cleaned_email
 
 from .answer import write_answer
 from .correspondent import get_first_name
@@ -196,13 +187,13 @@ async def write_and_send_email_response(
         f'reply-formatter==={reply_to.replace("@", "==")}@assistance.chat'
     )
 
-    mailgun_data = {
+    postal_data = {
         "from": f"{faq_name}-faq@{ROOT_DOMAIN}",
         "to": ["pathways@jims.international"],
-        "bcc": ["me@simonbiggs.net", "Cameron.Richardson@ac.edu.au"],
+        "bcc": ["me@simonbiggs.net"],
         "reply_to": formatting_reply_to,
         "subject": subject,
         "html_body": reply["html_reply"],
     }
 
-    await send_email(scope, mailgun_data)
+    await send_email(scope, postal_data)

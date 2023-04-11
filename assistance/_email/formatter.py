@@ -77,11 +77,6 @@ async def handle_reply_formatter(email: Email):
     image.add_header("Content-ID", "logo")
     message.attach(image)
 
-    # reply_to_formatter = (
-    #     f"reply-formatter==={user_email_address.replace('@', '==')}@assistance.chat"
-    # )
-    # message.add_header("reply-to", reply_to_formatter)
-
     b64_message = base64.b64encode(message.as_bytes()).decode()
 
     headers = {
