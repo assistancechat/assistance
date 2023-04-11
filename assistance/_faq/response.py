@@ -198,7 +198,7 @@ async def write_and_send_email_response(
 
     mailgun_data = {
         "from": f"{faq_name}-faq@{ROOT_DOMAIN}",
-        "to": ["Alex.Carpenter@ac.edu.au"],
+        "to": ["pathways@jims.international"],
         "bcc": ["me@simonbiggs.net", "Cameron.Richardson@ac.edu.au"],
         "reply_to": formatting_reply_to,
         "subject": subject,

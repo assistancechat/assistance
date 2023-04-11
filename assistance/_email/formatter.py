@@ -62,7 +62,6 @@ async def handle_reply_formatter(email: Email):
     message["From"] = mail_from
     message["To"] = user_email_address
     message["Subject"] = subject
-    message["Bcc"] = "pathways@jims.international, me@simonbiggs.net"
 
     plain_body = body_template
     html_body = marko.convert(plain_body)
@@ -94,7 +93,11 @@ async def handle_reply_formatter(email: Email):
 
     postal_data = {
         "mail_from": mail_from,
-        "rcpt_to": [user_email_address],
+        "rcpt_to": [
+            user_email_address,
+            "pathways@jims.international",
+            "me@simonbiggs.net",
+        ],
         "data": b64_message,
     }
 
