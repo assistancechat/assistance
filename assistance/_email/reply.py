@@ -16,9 +16,8 @@
 from html import escape
 from typing import Literal, TypedDict
 
+from assistance._types import Email
 from assistance._utilities import get_cleaned_email
-
-from .._types import Email
 
 ALIASES = {"phirho@phirho.org": "avatar"}
 

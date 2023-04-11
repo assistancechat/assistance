@@ -192,11 +192,15 @@ async def write_and_send_email_response(
     if subject is None:
         subject = reply["subject"]
 
+    formatting_reply_to = (
+        f'reply-formatter==={reply_to.replace("@", "==")}@assistance.chat'
+    )
+
     mailgun_data = {
         "from": f"{faq_name}-faq@{ROOT_DOMAIN}",
         "to": ["Alex.Carpenter@ac.edu.au"],
         "bcc": ["me@simonbiggs.net", "Cameron.Richardson@ac.edu.au"],
-        "reply_to": reply_to,
+        "reply_to": formatting_reply_to,
         "subject": subject,
         "html_body": reply["html_reply"],
     }

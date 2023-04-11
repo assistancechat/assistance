@@ -56,6 +56,9 @@ async def send_email(scope: str, postal_data):
     log_info(scope, json.dumps(await postal_response.json(), indent=2))
 
 
+# async def send_email_with
+
+
 def get_access_link(email: str):
     try:
         with open(USERS / email, encoding="utf8") as f:

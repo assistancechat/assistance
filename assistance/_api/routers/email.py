@@ -27,6 +27,7 @@ from assistance._config import (
     get_user_details,
     get_user_from_email,
 )
+from assistance._email.formatter import handle_reply_formatter
 from assistance._email.reply import ALIASES, create_reply
 from assistance._handlers.custom import react_to_custom_agent_request
 from assistance._handlers.default import DEFAULT_TASKS
@@ -172,7 +173,14 @@ async def _react_to_email(email: Email):
 
         return
 
-    await _fallback_email_handler(user_details=user_details, email=email)
+    if email["agent_name"].startswith("reply-formatter"):
+        await handle_reply_formatter(email=email)
+
+        return
+
+    logging.info("No handler found. Doing nothing.")
+
+    # await _fallback_email_handler(user_details=user_details, email=email)
     return
 
 
