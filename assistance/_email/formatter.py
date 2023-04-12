@@ -57,7 +57,7 @@ async def handle_reply_formatter(email: Email):
     )
 
     subject = email["subject"]
-    subject = subject.replace(SUPERVISION_SUBJECT_FLAG, "").strip()
+    subject = subject.split(SUPERVISION_SUBJECT_FLAG)[-1].strip()
 
     body_template = formatting_adjusted_reply + "\n\n" + SIGNATURE.strip()
 
