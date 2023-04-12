@@ -15,7 +15,12 @@
 import asyncio
 import textwrap
 
-from assistance._config import ROOT_DOMAIN, SOTA_OPENAI_MODEL, load_faq_data
+from assistance._config import (
+    ROOT_DOMAIN,
+    SOTA_OPENAI_MODEL,
+    SUPERVISION_SUBJECT_FLAG,
+    load_faq_data,
+)
 from assistance._email.reply import create_reply
 from assistance._email.thread import get_email_thread
 from assistance._keys import get_openai_api_key, get_serp_api_key
@@ -201,6 +206,8 @@ async def write_and_send_email_response(
     if subject is None:
         subject = reply["subject"]
 
+    subject_with_action_flag = f"{SUPERVISION_SUBJECT_FLAG} {subject}"
+
     formatting_reply_to = (
         f'reply-formatter==={reply_to.replace("@", "==")}@assistance.chat'
     )
@@ -210,7 +217,7 @@ async def write_and_send_email_response(
         "to": ["pathways@jims.international"],
         "bcc": ["me@simonbiggs.net"],
         "reply_to": formatting_reply_to,
-        "subject": subject,
+        "subject": subject_with_action_flag,
         "html_body": reply["html_reply"],
     }
 

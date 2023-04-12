@@ -32,6 +32,8 @@ from assistance._paths import (
 SIMPLER_OPENAI_MODEL = "gpt-3.5-turbo"
 SOTA_OPENAI_MODEL = "gpt-4"
 
+SUPERVISION_SUBJECT_FLAG = "[SUPERVISION TASK]"
+
 ROOT_DOMAIN = "assistance.chat"
 PAYMENT_LINK = "https://buy.stripe.com/bIYeXF2s1d0E4wg9AB"
 EMAIL_PRODUCT_ID = "prod_NLuYISl8KZ6fUX"

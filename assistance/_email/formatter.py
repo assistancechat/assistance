@@ -23,6 +23,7 @@ import marko
 from mailparser_reply import EmailReplyParser
 
 from assistance import _ctx
+from assistance._config import SUPERVISION_SUBJECT_FLAG
 from assistance._keys import get_postal_api_key
 from assistance._paths import MONOREPO
 from assistance._types import Email
@@ -30,6 +31,8 @@ from assistance._types import Email
 POSTAL_API_KEY = get_postal_api_key()
 
 SIGNATURE = """
+Kind regards,
+
 **Alex Carpenter**\\
 Head of Development, Solving Australia's Skills Shortage\\
 Head of Entrepreneurship
@@ -54,6 +57,8 @@ async def handle_reply_formatter(email: Email):
     )
 
     subject = email["subject"]
+    subject = subject.replace(SUPERVISION_SUBJECT_FLAG, "").strip()
+
     body_template = formatting_adjusted_reply + "\n\n" + SIGNATURE.strip()
 
     mail_from = "Alex Carpenter <pathways@jims.international>"
