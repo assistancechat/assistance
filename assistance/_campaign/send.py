@@ -43,28 +43,7 @@ from assistance._utilities import EMAIL_PATTERN
 POSTAL_API_KEY = get_postal_api_key()
 
 
-async def campaign_workflow(email_list=None):
-    base_config = MONOREPO / "shared" / "jims" / "config.toml"
-    campaign_config = MONOREPO / "shared" / "jims" / "campaign.toml"
-
-    with open(base_config, "rb") as f:
-        cfg = tomllib.load(f)
-
-    with open(campaign_config, "rb") as f:
-        cfg = {
-            **cfg,
-            **tomllib.load(f),
-        }
-
-    (
-        loaded_email_list,
-        started_application_emails,
-        name_lookup,
-    ) = _get_email_segments_and_name_lookup()
-
-    if email_list is None:
-        email_list = set(loaded_email_list) - set(started_application_emails)
-
+async def campaign_workflow(cfg, name_lookup, email_list):
     coroutines = []
     for user_email_address in email_list:
         coroutines.append(
@@ -128,6 +107,9 @@ async def _create_and_send_email_with_signature(
         user_email_address=user_email_address,
     )
 
+    # Handles case where {name} is empty string
+    body = body.replace(" ,", ",")
+
     message = MIMEMultipart("alternative")
     message["From"] = mail_from
     message["To"] = user_email_address
@@ -167,7 +149,17 @@ async def _create_and_send_email_with_signature(
 def _get_email_segments_and_name_lookup():
     formsite_export_path = RECORDS / "formsite" / "FormSiteExport20230404.csv"
     applications = pd.read_csv(formsite_export_path)
-    started_application_emails = (
+
+    incomplete_applications = _extract_emails(
+        {
+            email
+            for email, status in zip(
+                applications["Email Address"], applications["Status"]
+            )
+            if status != "Complete"
+        }
+    )
+    started_application_emails = _extract_emails(
         set(applications["Username"])
         .union(applications["Email Address"], applications["Email"])
         .difference({np.NaN})
@@ -208,8 +200,6 @@ def _get_email_segments_and_name_lookup():
 
     emails_to_remove = unsubscribe_emails.union(bounced_emails)
 
-    email_list = all_eoi_emails.difference(emails_to_remove)
-
     name_lookup = {}
 
     for email, name in zip(eoi_third[0], eoi_third[1]):
@@ -230,11 +220,31 @@ def _get_email_segments_and_name_lookup():
         except AttributeError:
             pass
 
+    for email, first_name, last_name in zip(
+        applications["Email Address"],
+        applications["First Name"],
+        applications["Family Name"],
+    ):
+        if not isinstance(last_name, str):
+            last_name = ""
+
+        if not isinstance(first_name, str):
+            first_name = ""
+
+        name = (first_name + " " + last_name).strip()
+        name_lookup[email.lower()] = name
+
     name_lookup["me@simonbiggs.net"] = "Simon Biggs"
     name_lookup["alex.carpenter@ac.edu.au"] = "Alex Carpenter"
     name_lookup["cameron.richardson@ac.edu.au"] = "Cameron Richardson"
 
-    return email_list, started_application_emails, name_lookup
+    return (
+        all_eoi_emails,
+        emails_to_remove,
+        started_application_emails,
+        incomplete_applications,
+        name_lookup,
+    )
 
 
 def _extract_emails(email_series: Iterable[str]):
