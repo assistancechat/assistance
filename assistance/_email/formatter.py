@@ -46,20 +46,9 @@ LOGO_PATH = MONOREPO / "images" / "logo.png"
 
 
 async def handle_reply_formatter(email: Email):
+    subject, body_template = _get_reply_template(email)
+
     user_email_address = email["agent_name"].split("===")[-1].replace("==", "@")
-
-    parser = EmailReplyParser()
-    email_message = parser.read(email["plain_all_content"])
-
-    most_recent_reply = str(email_message.replies[0].body)
-    formatting_adjusted_reply = "\n".join(
-        [line.lstrip("> ") + "  " for line in most_recent_reply.splitlines()]
-    )
-
-    subject = email["subject"]
-    subject = subject.split(SUPERVISION_SUBJECT_FLAG)[-1].strip()
-
-    body_template = formatting_adjusted_reply + "\n\n" + SIGNATURE.strip()
 
     mail_from = "Alex Carpenter <pathways@jims.international>"
 
@@ -106,3 +95,22 @@ async def handle_reply_formatter(email: Email):
         headers=headers,
         data=json.dumps(postal_data),
     )
+
+
+def _get_reply_template(email: Email):
+    parser = EmailReplyParser()
+    email_message = parser.read(email["plain_all_content"])
+
+    most_recent_reply = str(email_message.replies[0].body)
+    formatting_adjusted_reply = "\n".join(
+        [line.lstrip("> ").strip() for line in most_recent_reply.splitlines()]
+    )
+
+    formatting_adjusted_reply = formatting_adjusted_reply.replace("\nA:", "  \nA:")
+
+    subject = email["subject"]
+    subject = subject.split(SUPERVISION_SUBJECT_FLAG)[-1].strip()
+
+    body_template = formatting_adjusted_reply + "\n\n" + SIGNATURE.strip()
+
+    return subject, body_template
