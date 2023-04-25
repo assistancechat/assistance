@@ -43,7 +43,9 @@ from assistance._utilities import EMAIL_PATTERN
 POSTAL_API_KEY = get_postal_api_key()
 
 
-async def campaign_workflow(cfg, name_lookup, email_list):
+async def campaign_workflow(
+    cfg, name_lookup, email_list, dry_run=False, allowed_keys: None | set[str] = None
+):
     coroutines = []
     for user_email_address in email_list:
         coroutines.append(
@@ -51,19 +53,30 @@ async def campaign_workflow(cfg, name_lookup, email_list):
                 cfg=cfg,
                 user_email_address=user_email_address,
                 name_lookup=name_lookup,
+                dry_run=dry_run,
+                allowed_keys=allowed_keys,
             )
         )
 
     return await asyncio.gather(*coroutines)
 
 
-async def _send_campaign_email(cfg, user_email_address, name_lookup):
+async def _send_campaign_email(
+    cfg, user_email_address, name_lookup, dry_run, allowed_keys: None | set[str]
+):
     key, subject, body_template = await _get_email_template_for_user(
         cfg, user_email_address
     )
 
+    if allowed_keys is not None:
+        if key not in allowed_keys:
+            return None, None
+
     if key is None or subject is None or body_template is None:
         return None, None
+
+    if dry_run:
+        return user_email_address, key
 
     mail_from = f"Alex Carpenter <{cfg['campaign_email_address']}>"
 
@@ -165,17 +178,24 @@ def _get_email_segments_and_name_lookup():
         .difference({np.NaN})
     )
 
-    eoi_first_path = (
-        MONOREPO
-        / "records"
-        / "jims"
-        / "emails"
-        / "eoi"
-        / "New Leads Ad_Leads_2023-01-17_2023-03-13.csv"
+    eoi_ads_leads_paths = (MONOREPO / "records" / "jims" / "emails" / "eoi").glob(
+        "New Leads Ad_Leads_*.csv"
     )
-    eoi_first = pd.read_csv(
-        eoi_first_path, encoding="utf-16", delimiter="\t", encoding_errors="replace"
-    )
+
+    name_lookup = {}
+    ads_leads_emails = set()
+
+    for path in eoi_ads_leads_paths:
+        eoi_ads_leads = pd.read_csv(
+            path, encoding="utf-16", delimiter="\t", encoding_errors="replace"
+        )
+        for email, name in zip(eoi_ads_leads["email"], eoi_ads_leads["full_name"]):
+            try:
+                name_lookup[email.lower()] = name
+            except AttributeError:
+                pass
+
+        ads_leads_emails.update(_extract_emails(eoi_ads_leads["email"]))
 
     eoi_second_path = (
         MONOREPO / "records" / "jims" / "emails" / "eoi" / "Contacts_2.csv"
@@ -189,7 +209,7 @@ def _get_email_segments_and_name_lookup():
     )
     eoi_third = pd.read_excel(eoi_third_path, header=None)
 
-    all_eoi_emails = _extract_emails(eoi_first["email"]).union(
+    all_eoi_emails = ads_leads_emails.union(
         _extract_emails(eoi_second["email address"]), _extract_emails(eoi_third[0])
     )
 
@@ -199,8 +219,6 @@ def _get_email_segments_and_name_lookup():
     bounced_emails = _extract_emails(pd.read_csv(bounced)["email"])
 
     emails_to_remove = unsubscribe_emails.union(bounced_emails)
-
-    name_lookup = {}
 
     for email, name in zip(eoi_third[0], eoi_third[1]):
         name_lookup[email.lower()] = name
@@ -213,12 +231,6 @@ def _get_email_segments_and_name_lookup():
         else:
             name = (first_name + " " + last_name).strip()
         name_lookup[email.lower()] = name
-
-    for email, name in zip(eoi_first["email"], eoi_first["full_name"]):
-        try:
-            name_lookup[email.lower()] = name
-        except AttributeError:
-            pass
 
     for email, first_name, last_name in zip(
         applications["Email Address"],

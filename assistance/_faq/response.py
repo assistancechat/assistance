@@ -146,12 +146,6 @@ async def write_and_send_email_response(
         )
         return
 
-    faq_data = await load_faq_data(faq_name)
-
-    first_name = await get_first_name(
-        scope=scope, email_thread=email_thread, their_email_address=reply_to
-    )
-
     questions_and_contexts = await extract_questions(email=email)
 
     questions_without_answers = [
@@ -160,8 +154,48 @@ async def write_and_send_email_response(
         if item["answer_again"] or not item["answer"]
     ]
 
+    first_name = await get_first_name(
+        scope=scope, email_thread=email_thread, their_email_address=reply_to
+    )
+
+    response = await _handle_questions(
+        scope, email, email_thread, first_name, faq_name, questions_without_answers
+    )
+
+    log_info(scope, response)
+
+    reply = create_reply(original_email=email, response=response)
+    if subject is None:
+        subject = reply["subject"]
+
+    subject_with_action_flag = f"{SUPERVISION_SUBJECT_FLAG} {subject}"
+
+    formatting_reply_to = (
+        f'reply-formatter==={reply_to.replace("@", "==")}@assistance.chat'
+    )
+
+    postal_data = {
+        "from": f"{faq_name}-faq@{ROOT_DOMAIN}",
+        "to": ["pathways@jims.international"],
+        "bcc": ["me@simonbiggs.net"],
+        "reply_to": formatting_reply_to,
+        "subject": subject_with_action_flag,
+        "html_body": reply["html_reply"],
+    }
+
+    await send_email(scope, postal_data)
+
+
+async def _handle_questions(
+    scope, email: Email, email_thread: list[str], first_name, faq_name, questions
+):
+    if len(questions) == 0:
+        return "No questions were found that require answering"
+
+    faq_data = await load_faq_data(faq_name)
+
     coroutines = []
-    for question_and_context in questions_without_answers:
+    for question_and_context in questions:
         coroutines.append(
             write_answer(
                 scope=scope,
@@ -173,7 +207,7 @@ async def write_and_send_email_response(
     answers = await asyncio.gather(*coroutines)
 
     question_and_answers_string = ""
-    for question_and_context, answer in zip(questions_without_answers, answers):
+    for question_and_context, answer in zip(questions, answers):
         question_and_answers_string += (
             f"Q: {question_and_context['question']}\nA: {answer}\n\n"
         )
@@ -200,25 +234,4 @@ async def write_and_send_email_response(
         **MODEL_KWARGS,
     )
 
-    log_info(scope, response)
-
-    reply = create_reply(original_email=email, response=response)
-    if subject is None:
-        subject = reply["subject"]
-
-    subject_with_action_flag = f"{SUPERVISION_SUBJECT_FLAG} {subject}"
-
-    formatting_reply_to = (
-        f'reply-formatter==={reply_to.replace("@", "==")}@assistance.chat'
-    )
-
-    postal_data = {
-        "from": f"{faq_name}-faq@{ROOT_DOMAIN}",
-        "to": ["pathways@jims.international"],
-        "bcc": ["me@simonbiggs.net"],
-        "reply_to": formatting_reply_to,
-        "subject": subject_with_action_flag,
-        "html_body": reply["html_reply"],
-    }
-
-    await send_email(scope, postal_data)
+    return response

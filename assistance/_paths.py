@@ -43,6 +43,7 @@ ARTICLE_METADATA = RECORDS.joinpath("article-metadata")
 DOWNLOADED_ARTICLES = RECORDS.joinpath("downloaded-articles")
 EMAILS = RECORDS.joinpath("emails")
 POSTAL = RECORDS.joinpath("postal")
+CONTACT_FORM = RECORDS.joinpath("contact-form")
 COMPLETION_CACHE = RECORDS.joinpath("completion-cache")
 
 PIPELINES = STORE.joinpath("pipelines")
@@ -86,6 +87,12 @@ def get_emails_path(hash_digest: str, create_parent: bool = False):
 
 def get_postal_path(hash_digest: str, create_parent: bool = False):
     path = _get_record_path(POSTAL, hash_digest, create_parent)
+
+    return path
+
+
+def get_contact_form_path(hash_digest: str, create_parent: bool = False):
+    path = _get_record_path(CONTACT_FORM, hash_digest, create_parent)
 
     return path
 
