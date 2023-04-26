@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from collections import defaultdict
 import asyncio
 import base64
 import json
@@ -32,7 +33,14 @@ import pandas as pd
 from assistance import _ctx
 from assistance._keys import get_postal_api_key
 from assistance._mailgun import send_email
-from assistance._paths import EMAILS, MONOREPO, RECORDS, get_emails_path
+from assistance._paths import (
+    EMAILS,
+    MONOREPO,
+    RECORDS,
+    get_emails_path,
+    CONTACT_FORM,
+    CAMPAIGN_DATA,
+)
 from assistance._progression import (
     get_complete_progression_keys,
     get_current_stage_and_task,
@@ -58,7 +66,10 @@ async def campaign_workflow(
             )
         )
 
-    return await asyncio.gather(*coroutines)
+    results = await asyncio.gather(*coroutines)
+
+    filtered_results = [item for item in results if item[0] is not None]
+    return filtered_results
 
 
 async def _send_campaign_email(
@@ -159,7 +170,7 @@ async def _create_and_send_email_with_signature(
     )
 
 
-def _get_email_segments_and_name_lookup():
+async def _get_email_segments_and_name_lookup():
     formsite_export_path = RECORDS / "formsite" / "FormSiteExport20230404.csv"
     applications = pd.read_csv(formsite_export_path)
 
@@ -209,8 +220,15 @@ def _get_email_segments_and_name_lookup():
     )
     eoi_third = pd.read_excel(eoi_third_path, header=None)
 
+    contact_form_entries = _get_contact_form_eois()
+    contact_form_emails = _extract_emails(
+        {entry["email"] for entry in contact_form_entries}
+    )
+
     all_eoi_emails = ads_leads_emails.union(
-        _extract_emails(eoi_second["email address"]), _extract_emails(eoi_third[0])
+        _extract_emails(eoi_second["email address"]),
+        _extract_emails(eoi_third[0]),
+        contact_form_emails,
     )
 
     unsubscribe_emails = _update_and_get_unsubscribes()
@@ -218,10 +236,15 @@ def _get_email_segments_and_name_lookup():
     bounced = MONOREPO / "records" / "jims" / "emails" / "bounced" / "first-run.csv"
     bounced_emails = _extract_emails(pd.read_csv(bounced)["email"])
 
-    emails_to_remove = unsubscribe_emails.union(bounced_emails)
+    recently_emailed = await _emails_recently_sent()
+
+    emails_to_remove = unsubscribe_emails.union(bounced_emails, recently_emailed)
 
     for email, name in zip(eoi_third[0], eoi_third[1]):
-        name_lookup[email.lower()] = name
+        try:
+            name_lookup[email.lower()] = name
+        except AttributeError:
+            pass
 
     for email, first_name, last_name in zip(
         eoi_second["email address"], eoi_second["First Name"], eoi_second["Last Name"]
@@ -246,6 +269,11 @@ def _get_email_segments_and_name_lookup():
         name = (first_name + " " + last_name).strip()
         name_lookup[email.lower()] = name
 
+    for entry in contact_form_entries:
+        name_lookup[
+            entry["email"].lower()
+        ] = f'{entry["first-name"]} {entry["last-name"]}'
+
     name_lookup["me@simonbiggs.net"] = "Simon Biggs"
     name_lookup["alex.carpenter@ac.edu.au"] = "Alex Carpenter"
     name_lookup["cameron.richardson@ac.edu.au"] = "Cameron Richardson"
@@ -257,6 +285,16 @@ def _get_email_segments_and_name_lookup():
         incomplete_applications,
         name_lookup,
     )
+
+
+def _get_contact_form_eois():
+    form_entries = []
+
+    for path in CONTACT_FORM.glob("*/*/*.json"):
+        with open(path) as f:
+            form_entries.append(json.load(f))
+
+    return form_entries
 
 
 def _extract_emails(email_series: Iterable[str]):
@@ -334,3 +372,20 @@ async def _get_email_template_for_user(cfg, user_email_address):
 
 async def _update_progression_for_user(user_email_address: str, key: str):
     await set_progression_key("campaign", "jims-ac", user_email_address, key)
+
+
+async def _emails_recently_sent(tolerance=4000):
+    last_touched = defaultdict(lambda: 0.0)
+    progression_record = (CAMPAIGN_DATA / "jims-ac" / "progression").glob("*/*")
+
+    for record in progression_record:
+        last_touched[record.parent.name] = max(
+            last_touched[record.parent.name], record.stat().st_mtime
+        )
+
+    most_recent = max(last_touched.values())
+    diff = {key: most_recent - item for key, item in last_touched.items()}
+
+    recently_emailed = {key for key, item in diff.items() if item < tolerance}
+
+    return recently_emailed
