@@ -151,7 +151,7 @@ async def write_and_send_email_response(
     questions_without_answers = [
         item
         for item in questions_and_contexts
-        if item["answer_again"] or not item["answer"]
+        if (item["answer_again"] or not item["answer"]) and item["question"]
     ]
 
     first_name = await get_first_name(

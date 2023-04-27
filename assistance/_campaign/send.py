@@ -12,27 +12,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import time
 from collections import defaultdict
 import asyncio
 import base64
 import json
-import pathlib
 import re
-import tomllib
 from email.mime.image import MIMEImage
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-from typing import Iterable, Literal
+from typing import Iterable
 
-import aiofiles
-import aiosmtplib
+
 import marko
 import numpy as np
 import pandas as pd
 
 from assistance import _ctx
 from assistance._keys import get_postal_api_key
-from assistance._mailgun import send_email
 from assistance._paths import (
     EMAILS,
     MONOREPO,
@@ -47,6 +44,7 @@ from assistance._progression import (
     set_progression_key,
 )
 from assistance._utilities import EMAIL_PATTERN
+
 
 POSTAL_API_KEY = get_postal_api_key()
 
@@ -375,6 +373,17 @@ async def _update_progression_for_user(user_email_address: str, key: str):
 
 
 async def _emails_recently_sent(tolerance=4000):
+    last_touched = await _get_last_touched()
+
+    now = time.time()
+    diff = {key: now - item for key, item in last_touched.items()}
+
+    recently_emailed = {key for key, item in diff.items() if item < tolerance}
+
+    return recently_emailed
+
+
+async def _get_last_touched():
     last_touched = defaultdict(lambda: 0.0)
     progression_record = (CAMPAIGN_DATA / "jims-ac" / "progression").glob("*/*")
 
@@ -383,9 +392,4 @@ async def _emails_recently_sent(tolerance=4000):
             last_touched[record.parent.name], record.stat().st_mtime
         )
 
-    most_recent = max(last_touched.values())
-    diff = {key: most_recent - item for key, item in last_touched.items()}
-
-    recently_emailed = {key for key, item in diff.items() if item < tolerance}
-
-    return recently_emailed
+    return last_touched

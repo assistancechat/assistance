@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
+import time
 import pathlib
 from typing import Literal
 
@@ -59,7 +59,13 @@ async def set_progression_key(
     root = PROGRESSION_TYPE_TO_ROOT[progression_type]
 
     path = root / progression_name / "progression" / user_email / key
+
+    if path.exists():
+        return
+
     path.parent.mkdir(parents=True, exist_ok=True)
 
-    async with aiofiles.open(path, "w"):
-        pass
+    progression_file_contents = str(time.time())
+
+    async with aiofiles.open(path, "w") as f:
+        await f.write(progression_file_contents)
