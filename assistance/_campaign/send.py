@@ -47,11 +47,22 @@ from assistance._utilities import EMAIL_PATTERN
 
 
 POSTAL_API_KEY = get_postal_api_key()
+THIRTY_SIX_HOURS = 36 * 60 * 60
+TWENTY_FOUR_HOURS = 24 * 60 * 60
 
 
 async def campaign_workflow(
-    cfg, name_lookup, email_list, dry_run=False, allowed_keys: None | set[str] = None
+    cfg,
+    name_lookup,
+    email_list: set[str],
+    dry_run=False,
+    allowed_keys: None | set[str] = None,
+    skip_recently_emailed=True,
 ):
+    if skip_recently_emailed:
+        recently_emailed = await _emails_recently_sent(tolerance=TWENTY_FOUR_HOURS)
+        email_list -= recently_emailed
+
     coroutines = []
     for user_email_address in email_list:
         coroutines.append(
@@ -234,9 +245,7 @@ async def _get_email_segments_and_name_lookup():
     bounced = MONOREPO / "records" / "jims" / "emails" / "bounced" / "first-run.csv"
     bounced_emails = _extract_emails(pd.read_csv(bounced)["email"])
 
-    recently_emailed = await _emails_recently_sent()
-
-    emails_to_remove = unsubscribe_emails.union(bounced_emails, recently_emailed)
+    emails_to_remove = unsubscribe_emails.union(bounced_emails)
 
     for email, name in zip(eoi_third[0], eoi_third[1]):
         try:
@@ -384,7 +393,7 @@ async def _emails_recently_sent(tolerance=4000):
 
 
 async def _get_last_touched():
-    last_touched = defaultdict(lambda: 0.0)
+    last_touched: dict[str, float] = defaultdict(lambda: 0.0)
     progression_record = (CAMPAIGN_DATA / "jims-ac" / "progression").glob("*/*")
 
     for record in progression_record:

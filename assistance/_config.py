@@ -192,9 +192,7 @@ async def _get_form_data(form_name: str, data_type: str, user_email: str):
 
 async def get_file_based_mapping(root: pathlib.Path, user: str, include_user=True):
     user_details_files = (root / user).glob("*")
-
     details = {}
-    empty_files = set()
 
     if include_user:
         details["user"] = user
@@ -209,12 +207,6 @@ async def get_file_based_mapping(root: pathlib.Path, user: str, include_user=Tru
             details[file.name[:-5]] = json.loads(file_contents)
             continue
 
-        if file_contents == "":
-            empty_files.add(file.name)
-            continue
-
         details[file.name] = file_contents
-
-    details["empty_files"] = empty_files
 
     return details

@@ -22,8 +22,14 @@ def get_progression_stats():
     progression_timing_data = defaultdict(dict)
 
     for record in progression_record:
-        progression_timing_data[record.parent.name.lower()][
-            record.name
-        ] = record.stat().st_mtime
+        with open(record) as f:
+            time = f.read()
+
+        if time == "":
+            time = record.stat().st_mtime
+        else:
+            time = float(time)
+
+        progression_timing_data[record.parent.name.lower()][record.name] = time
 
     return progression_timing_data

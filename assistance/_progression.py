@@ -50,7 +50,7 @@ async def get_complete_progression_keys(
         root / progression_name / "progression", user_email, include_user=False
     )
 
-    return results["empty_files"]
+    return set(results.keys())
 
 
 async def set_progression_key(
@@ -61,7 +61,7 @@ async def set_progression_key(
     path = root / progression_name / "progression" / user_email / key
 
     if path.exists():
-        return
+        raise ValueError("Tried to set a progression key that already exists")
 
     path.parent.mkdir(parents=True, exist_ok=True)
 
