@@ -157,6 +157,9 @@ RANK = textwrap.dedent(
 ).strip()
 
 
+MAX_NUM_FAQ_RESPONSES = 15
+
+
 async def write_answer(
     scope: str,
     faq_data,
@@ -174,7 +177,7 @@ async def write_answer(
         openai_api_key=OPEN_AI_API_KEY, faq_data=faq_data, queries=questions
     )
 
-    sorted_faq_responses = faq_responses.copy()
+    sorted_faq_responses = faq_responses.copy()[0:MAX_NUM_FAQ_RESPONSES]
 
     coroutines = []
     for _ in range(10):
