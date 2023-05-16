@@ -27,6 +27,8 @@ def pull():
 
 
 def push(message: str):
+    logging.info(f"Creating commits with message: {message}")
+
     repo = Repo(MONOREPO)
     _recursive_push(repo, message)
 
@@ -44,7 +46,8 @@ def _recursive_push(repo: Repo, message: str):
     for submodule in repo.submodules:
         _recursive_push(submodule.module(), message)
 
-    logging.info(f"Adding and committing changes in: {repo.remotes.origin.url}")
+    if not repo.is_dirty(untracked_files=True):
+        return
 
     repo.git.add(A=True)
 
