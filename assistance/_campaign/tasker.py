@@ -58,7 +58,7 @@ async def _campaign():
         started_application_emails,
         _incomplete_applications,
         name_lookup,
-    ) = await send._get_email_segments_and_name_lookup()
+    ) = await send.get_email_segments_and_name_lookup()
 
     campaign_email_list = (
         set(all_eoi_emails)

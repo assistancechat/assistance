@@ -188,7 +188,7 @@ async def _create_and_send_email_with_signature(
     )
 
 
-async def _get_email_segments_and_name_lookup():
+async def get_email_segments_and_name_lookup():
     formsite_export_path = RECORDS / "formsite" / "FormSiteExport20230404.csv"
     applications = pd.read_csv(formsite_export_path)
 
