@@ -12,8 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import asyncio
-import random
 import json
 import pathlib
 import tomllib
@@ -193,30 +191,22 @@ async def _get_form_data(form_name: str, data_type: str, user_email: str):
 
 
 async def get_file_based_mapping(root: pathlib.Path, user: str, include_user=True):
-    while True:
-        try:
-            user_details_files = (root / user).glob("*")
-            details = {}
+    user_details_files = (root / user).glob("*")
+    details = {}
 
-            if include_user:
-                details["user"] = user
+    if include_user:
+        details["user"] = user
 
-            for file in user_details_files:
-                assert file.name != "user"
+    for file in user_details_files:
+        assert file.name != "user"
 
-                async with aiofiles.open(file) as f:
-                    file_contents = (await f.read()).strip()
+        async with aiofiles.open(file) as f:
+            file_contents = (await f.read()).strip()
 
-                if file.name.endswith(".json"):
-                    details[file.name[:-5]] = json.loads(file_contents)
-                    continue
+        if file.name.endswith(".json"):
+            details[file.name[:-5]] = json.loads(file_contents)
+            continue
 
-                details[file.name] = file_contents
+        details[file.name] = file_contents
 
-            return details
-
-        except OSError as e:
-            if e.errno == 24:
-                await asyncio.sleep(1 + random.random())
-            else:
-                raise
+    return details
