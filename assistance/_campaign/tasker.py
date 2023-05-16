@@ -16,33 +16,21 @@ import logging
 import tomllib
 import json
 
-from git.repo import Repo
-from git.util import Actor
-from git.exc import HookExecutionError
 
 from assistance._paths import MONOREPO
 from assistance._campaign import send
+from assistance._git import push, pull
 
 from . import stats
 
 
 async def run_campaign():
-    _pull()
+    pull()
     await _campaign()
 
     stats.run_stats()
 
-    _push("Push of data after campaign run")
-
-
-def _pull():
-    repo = Repo(MONOREPO)
-    _recursive_pull(repo)
-
-
-def _push(message: str):
-    repo = Repo(MONOREPO)
-    _recursive_push(repo, message)
+    push("Push of data after campaign run")
 
 
 async def _campaign():
@@ -80,32 +68,3 @@ async def _campaign():
     )
 
     logging.info(f"Results: {json.dumps(results, indent=2)}")
-
-
-def _recursive_pull(repo: Repo):
-    logging.info(f"Pulling: {repo.remotes.origin.url}")
-
-    repo.remotes.origin.pull()
-
-    for submodule in repo.submodules:
-        _recursive_pull(submodule.module())
-
-
-def _recursive_push(repo: Repo, message: str):
-    for submodule in repo.submodules:
-        _recursive_push(submodule.module(), message)
-
-    logging.info(f"Adding and committing changes in: {repo.remotes.origin.url}")
-
-    repo.git.add(A=True)
-
-    committer = Actor("Refuge Bot", "bot@refuge.au")
-
-    try:
-        repo.index.commit(message, author=committer, committer=committer)
-    except HookExecutionError:
-        repo.git.add(A=True)
-        repo.index.commit(message, author=committer, committer=committer)
-
-    logging.info(f"Pushing: {repo.remotes.origin.url}")
-    repo.remotes.origin.push()
