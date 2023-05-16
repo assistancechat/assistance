@@ -27,8 +27,7 @@ from assistance._git import push, pull
 from . import stats
 
 
-# @aiocron.crontab("0 16 * * tue,thu")
-@aiocron.crontab("9 15 * * tue,thu")
+@aiocron.crontab("0 16 * * tue,thu")
 async def run_campaign():
     logging.info("Running campaign")
 
