@@ -13,8 +13,59 @@
 # limitations under the License.
 
 
+from datetime import datetime
 from collections import defaultdict
-from assistance._paths import CAMPAIGN_DATA
+import pytz
+import pandas as pd
+from assistance._paths import CAMPAIGN_DATA, MONOREPO
+
+
+def run_stats():
+    stats_path = MONOREPO / "shared" / "jims" / "campaign-overview.csv"
+
+    progression_timing_data = get_progression_stats()
+    counts = defaultdict(lambda: defaultdict(lambda: 0))
+    tz = pytz.timezone("Africa/Johannesburg")
+
+    for _email, user_data in progression_timing_data.items():
+        for key, timestamp in user_data.items():
+            dt = datetime.fromtimestamp(timestamp, tz=tz)
+
+            counts[(dt.year, dt.month, dt.day)][key] += 1
+
+    keys = sorted(counts)
+
+    rows = [(key, dict(counts[key])) for key in keys]
+
+    data = {
+        "year": [row[0][0] for row in rows],
+        "month": [row[0][1] for row in rows],
+        "day": [row[0][2] for row in rows],
+    }
+
+    for key in [
+        "introduction",
+        "next-steps",
+        "last-reminder",
+        "first-follow-up-after-application-start",
+    ]:
+        column_data = []
+
+        for row in rows:
+            try:
+                column_data.append(row[1][key])
+            except KeyError:
+                column_data.append(0)
+
+        data[key] = column_data
+
+    previous_data = pd.read_csv(stats_path)
+
+    df = pd.DataFrame(data)
+    ignore_rows = 2
+    df = pd.concat((previous_data[0:6], df[ignore_rows:]))
+
+    df.to_csv(stats_path, index=None)  # type: ignore
 
 
 def get_progression_stats():

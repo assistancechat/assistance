@@ -60,7 +60,7 @@ async def campaign_workflow(
     skip_recently_emailed=True,
 ):
     if skip_recently_emailed:
-        recently_emailed = await _emails_recently_sent(tolerance=TWENTY_FOUR_HOURS)
+        recently_emailed = await _emails_recently_sent(tolerance=THIRTY_SIX_HOURS)
         email_list -= recently_emailed
 
     coroutines = []
