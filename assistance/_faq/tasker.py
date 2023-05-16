@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import logging
+
 import aiocron
 import tomlkit
 import json
@@ -27,9 +29,10 @@ from assistance._git import push, pull
 IGNORE_EMAIL_STRINGS = ["Ready to Launch"]
 
 
-# @aiocron.crontab("0 15 * * *")
-@aiocron.crontab("26 14 * * *")
+@aiocron.crontab("0 15 * * *")
 async def run_faq_update():
+    logging.info("Running FAQ update")
+
     pull()
     await _update_faq()
 

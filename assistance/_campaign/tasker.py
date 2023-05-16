@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import logging
+
 import aiocron
 import logging
 import tomllib
@@ -25,9 +27,10 @@ from assistance._git import push, pull
 from . import stats
 
 
-# @aiocron.crontab("0 16 * * tue,thu")
-@aiocron.crontab("27 14 * * *")
+@aiocron.crontab("0 16 * * tue,thu")
 async def run_campaign():
+    logging.info("Running campaign")
+
     pull()
     await _campaign()
 
@@ -64,10 +67,7 @@ async def _campaign():
     )
 
     results = await send.campaign_workflow(
-        campaign_cfg,
-        name_lookup=name_lookup,
-        email_list=campaign_email_list,
-        dry_run=True,
+        campaign_cfg, name_lookup=name_lookup, email_list=campaign_email_list
     )
 
     logging.info(f"Results: {json.dumps(results, indent=2)}")
