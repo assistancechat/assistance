@@ -47,23 +47,7 @@ def schema(path: str):
 
 
 @app.command()
-def admin():
-    from streamlit import config
-    from streamlit.web import bootstrap
+def tasker():
+    from assistance._tasker import main as _main
 
-    from assistance._paths import LIB
-
-    # This config option is important. The exposure onto the interwebs
-    # is undergone behind an NGINX reverse proxy. It is that reverse
-    # proxy that protects the interface via user authentication.
-    config.set_option("server.address", "localhost")
-
-    config.set_option("browser.gatherUsageStats", False)
-    config.set_option("server.port", 8501)
-
-    bootstrap.run(
-        str(LIB / "_streamlit.py"),
-        command_line=None,
-        args=[],
-        flag_options={},
-    )
+    _main()

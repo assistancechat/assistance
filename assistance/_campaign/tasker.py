@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import aiocron
 import logging
 import tomllib
 import json
@@ -24,6 +25,8 @@ from assistance._git import push, pull
 from . import stats
 
 
+# @aiocron.crontab("0 16 * * tue,thu")
+@aiocron.crontab("27 14 * * *")
 async def run_campaign():
     pull()
     await _campaign()
