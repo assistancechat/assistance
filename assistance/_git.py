@@ -57,6 +57,10 @@ def _recursive_push(repo: Repo, message: str):
         repo.index.commit(message, author=committer, committer=committer)
     except HookExecutionError:
         repo.git.add(A=True)
+
+        if not repo.is_dirty(untracked_files=True):
+            return
+
         repo.index.commit(message, author=committer, committer=committer)
 
     logging.info(f"Pushing: {repo.remotes.origin.url}")
