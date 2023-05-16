@@ -63,6 +63,8 @@ async def campaign_workflow(
         recently_emailed = await _emails_recently_sent(tolerance=THIRTY_SIX_HOURS)
         email_list -= recently_emailed
 
+    semaphore = asyncio.Semaphore(50)
+
     coroutines = []
     for user_email_address in email_list:
         coroutines.append(
@@ -72,6 +74,7 @@ async def campaign_workflow(
                 name_lookup=name_lookup,
                 dry_run=dry_run,
                 allowed_keys=allowed_keys,
+                semaphore=semaphore,
             )
         )
 
@@ -82,37 +85,43 @@ async def campaign_workflow(
 
 
 async def _send_campaign_email(
-    cfg, user_email_address, name_lookup, dry_run, allowed_keys: None | set[str]
+    cfg,
+    user_email_address,
+    name_lookup,
+    dry_run,
+    allowed_keys: None | set[str],
+    semaphore: asyncio.Semaphore,
 ):
-    key, subject, body_template = await _get_email_template_for_user(
-        cfg, user_email_address
-    )
+    async with semaphore:
+        key, subject, body_template = await _get_email_template_for_user(
+            cfg, user_email_address
+        )
 
-    if allowed_keys is not None:
-        if key not in allowed_keys:
+        if allowed_keys is not None:
+            if key not in allowed_keys:
+                return None, None
+
+        if key is None or subject is None or body_template is None:
             return None, None
 
-    if key is None or subject is None or body_template is None:
-        return None, None
+        if dry_run:
+            return user_email_address, key
 
-    if dry_run:
+        mail_from = f"Alex Carpenter <{cfg['campaign_email_address']}>"
+
+        await _create_and_send_email_with_signature(
+            name_lookup=name_lookup,
+            user_email_address=user_email_address,
+            subject=subject,
+            body_template=body_template,
+            campaign_email_address=cfg["campaign_email_address"],
+            signature_template=cfg["signature"],
+            mail_from=mail_from,
+        )
+
+        await _update_progression_for_user(user_email_address, key)
+
         return user_email_address, key
-
-    mail_from = f"Alex Carpenter <{cfg['campaign_email_address']}>"
-
-    await _create_and_send_email_with_signature(
-        name_lookup=name_lookup,
-        user_email_address=user_email_address,
-        subject=subject,
-        body_template=body_template,
-        campaign_email_address=cfg["campaign_email_address"],
-        signature_template=cfg["signature"],
-        mail_from=mail_from,
-    )
-
-    await _update_progression_for_user(user_email_address, key)
-
-    return user_email_address, key
 
 
 async def _create_and_send_email_with_signature(
