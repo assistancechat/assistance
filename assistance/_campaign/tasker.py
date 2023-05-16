@@ -32,6 +32,8 @@ async def run_campaign():
 
     stats.run_stats()
 
+    _push("Push of data after campaign run")
+
 
 def _pull():
     repo = Repo(MONOREPO)
@@ -90,10 +92,10 @@ def _recursive_pull(repo: Repo):
 
 
 def _recursive_push(repo: Repo, message: str):
-    logging.info(f"Adding and committing changes in: {repo.remotes.origin.url}")
-
     for submodule in repo.submodules:
         _recursive_push(submodule.module(), message)
+
+    logging.info(f"Adding and committing changes in: {repo.remotes.origin.url}")
 
     repo.git.add(A=True)
 
