@@ -92,6 +92,9 @@ def _recursive_pull(repo: Repo):
 def _recursive_push(repo: Repo, message: str):
     logging.info(f"Adding and committing changes in: {repo.remotes.origin.url}")
 
+    for submodule in repo.submodules:
+        _recursive_push(submodule.module(), message)
+
     repo.git.add(A=True)
 
     committer = Actor("Refuge Bot", "bot@refuge.au")
@@ -103,8 +106,4 @@ def _recursive_push(repo: Repo, message: str):
         repo.index.commit(message, author=committer, committer=committer)
 
     logging.info(f"Pushing: {repo.remotes.origin.url}")
-
     repo.remotes.origin.push()
-
-    for submodule in repo.submodules:
-        _recursive_push(submodule.module(), message)
