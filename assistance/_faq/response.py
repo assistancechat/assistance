@@ -132,7 +132,10 @@ async def write_and_send_email_response(
 
     reply_to = get_cleaned_email(text_to_extract_reply_to_from)
 
-    if reply_to == "pathways@jims.international":
+    if reply_to.lower() in {
+        "pathways@jims.international",
+        "cameron.richardson@ac.edu.au",
+    }:
         log_info(
             scope,
             "FAQ would be sent through to pathways itself. Breaking the loop. Doing nothing.",
