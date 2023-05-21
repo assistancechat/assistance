@@ -30,6 +30,7 @@ from assistance._types import Email
 
 POSTAL_API_KEY = get_postal_api_key()
 
+# TODO: Pull this from the config file instead
 SIGNATURE = """
 Kind regards,
 
