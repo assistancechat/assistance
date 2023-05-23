@@ -180,7 +180,7 @@ async def write_answer(
     sorted_faq_responses = faq_responses.copy()[0:MAX_NUM_FAQ_RESPONSES]
 
     coroutines = []
-    for _ in range(10):
+    for _ in range(5):
         random.shuffle(faq_responses)
         coroutines.append(
             get_completion_only(
