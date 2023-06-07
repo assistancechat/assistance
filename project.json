@@ -1,0 +1,88 @@
+{
+  "name": "assistance",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "library",
+  "sourceRoot": "libs/assistance/assistance",
+  "targets": {
+    "docs": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "pydoc-markdown -p assistance --render-toc > docs/source/api.md",
+        "cwd": "libs/assistance"
+      }
+    },
+    "lock": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "poetry lock --no-update",
+        "cwd": "libs/assistance"
+      }
+    },
+    "add": {
+      "executor": "@nxlv/python:add",
+      "options": {}
+    },
+    "update": {
+      "executor": "@nxlv/python:update",
+      "options": {}
+    },
+    "remove": {
+      "executor": "@nxlv/python:remove",
+      "options": {}
+    },
+    "build": {
+      "executor": "@nxlv/python:build",
+      "outputs": [
+        "{projectRoot}/dist"
+      ],
+      "options": {
+        "outputPath": "libs/assistance/dist",
+        "publish": true,
+        "lockedVersions": true,
+        "bundleLocalDependencies": true
+      }
+    },
+    "install": {
+      "executor": "@nxlv/python:install",
+      "options": {
+        "silent": false,
+        "args": "",
+        "cacheDir": ".cache/pypoetry",
+        "verbose": false,
+        "debug": false
+      }
+    },
+    "lint": {
+      "executor": "@nxlv/python:flake8",
+      "outputs": [
+        "{workspaceRoot}/reports/libs/assistance/pylint.txt"
+      ],
+      "options": {
+        "outputFile": "reports/libs/assistance/pylint.txt"
+      }
+    },
+    "test": {
+      "executor": "nx:run-commands",
+      "outputs": [
+        "{workspaceRoot}/reports/libs/assistance/unittests",
+        "{workspaceRoot}/coverage/libs/assistance"
+      ],
+      "options": {
+        "command": "poetry run pytest tests/",
+        "cwd": "libs/assistance"
+      }
+    },
+    "tox": {
+      "executor": "@nxlv/python:tox",
+      "outputs": [
+        "{workspaceRoot}/reports/libs/assistance/unittests",
+        "{workspaceRoot}/coverage/libs/assistance"
+      ],
+      "options": {
+        "silent": false,
+        "args": ""
+      }
+    }
+  },
+  "tags": []
+}
