@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import logging
 import time
 from collections import defaultdict
 import asyncio
@@ -218,11 +219,16 @@ async def get_email_segments_and_name_lookup():
         eoi_ads_leads = pd.read_csv(
             path, encoding="utf-16", delimiter="\t", encoding_errors="replace"
         )
-        for email, name in zip(eoi_ads_leads["email"], eoi_ads_leads["full_name"]):
-            try:
-                name_lookup[email.lower()] = name
-            except AttributeError:
-                pass
+
+        try:
+            for email, name in zip(eoi_ads_leads["email"], eoi_ads_leads["full_name"]):
+                try:
+                    name_lookup[email.lower()] = name
+                except AttributeError:
+                    pass
+        except KeyError:
+            logging.warning(f"Had key error, columns are {eoi_ads_leads.columns}")
+            raise
 
         ads_leads_emails.update(_extract_emails(eoi_ads_leads["email"]))
 
